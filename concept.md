@@ -1,6 +1,6 @@
 # λ
 
-Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell and Raku.
+Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell, Raku, Smalltalk, Io, Red and Forth.
 
 ## Goals
 - Everything is a function.
@@ -22,8 +22,16 @@ Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell and Raku.
 - There's a minimalist 'core' library, and a maximilist 'standard' library.
 - The language is very close to how computers actually work, and has very little abstraction.
 - Spaced function names are allowed.
-- In general, the language is read from left-to-right as a convention. Code should be refactored to follow this rule.
-- Ideally, the language is made using only the NAND instruction.
+- In general, the language is read from left-to-right as a conventtion. Code should be refactored to follow this rule.
+- Ideally, the language is made using only the NAND instruction. That or something like flipjump.
+- If you can imagine it, you can metaprogram it; you should be able to play doom with macros and stuff
+
+- Okay, new ideas. Not stack oriented.
+- It uses infix notation for everything.
+- It has letters, words and sentences.
+- Letters are basically just UTF-8 characters; I called them letters because 'characters' is too long.
+- Words are a series of characters with a definition.
+- And sentences are basically a string of characters within a string of characters, denoted by []. They can be treated as code, or just some text. Doesn't matter.
 
 ## Examples
 
@@ -32,35 +40,5 @@ Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell and Raku.
 echo "This runs at compile time."
 cache echo "This runs at compile time, but faster the second time."
 compile echo "This compile to an executable."
-```
-
-### 'Stacked-oriented' language
-```
-# Returns true
-(+ 1 1) == (1 + 1) == (1 1 +)
-```
-
-### Structures
-```
-node {
-    value → 1
-    next → ()
-}
-
-# The two are equivalent.
-
-node value → 1
-node next → ()
-
-# Although the language is also some dynamic since next doesn't
-# have to be declare when null.
-```
-
-### Isolate function
-```
-# All true.
-+ 1 2 × 3 == 9
-+ 1 ⬩ 2 × 3 == 7
-+ 1 ( 2 × 3 ) == 7
 ```
 
