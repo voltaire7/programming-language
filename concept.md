@@ -32,13 +32,24 @@ Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell, Raku, Smalltalk, Io, Red and F
 - Letters are basically just UTF-8 characters; I called them letters because 'characters' is too long.
 - Words are a series of characters with a definition.
 - And sentences are basically a string of characters within a string of characters, denoted by []. They can be treated as code, or just some text. Doesn't matter.
+- The language is homoiconic.
 
 ## Examples
 
 ### 'Interpreted-Compiled' language
-```
-echo "This runs at compile time."
-cache echo "This runs at compile time, but faster the second time."
-compile echo "This compile to an executable."
-```
+
+[This a comment, but also an unused string.]
+
+[The language is procedural, and therefore, read left-to-right, always.]
+
+[This is how to load a file]
+load ./filename
+
+[This is how you execute code. Code is executed when inside []s.]
+do [print hello world]
+
+[This is how you define a word]
+set word0 expression
+set word1 [list of expressions]
+
 
