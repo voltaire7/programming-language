@@ -2,6 +2,10 @@
 
 Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell, Raku, Smalltalk, Io, Red and Forth.
 
+This language is my attempt at scratching an itch, an itch I've had everytime I've used another language, and where I've thought: "This syntax isn't consistent."; "Do we really need this feature?"; "I could do this better."; and so on... Point is: I want to create a perfect language – for me atleast.
+
+This language doesn't have a name. I you must refer to it, call it the nameless programming language. “But isn't nameless it's name, then?” No, it's not: it wouldn't be nameless, otherwise.
+
 ## Goals
 - Everything is a function.
 - Statements written at the top level are executed at compile time; those passed to the compile function are, well, compiled.
@@ -33,6 +37,22 @@ Based on: LISP (Scheme), Jai, Uiua, BQN, Haskell, Raku, Smalltalk, Io, Red and F
 - Words are a series of characters with a definition.
 - And sentences are basically a string of characters within a string of characters, denoted by []. They can be treated as code, or just some text. Doesn't matter.
 - The language is homoiconic.
+- Maybe I should only have the input and output words for any type of IO?
+
+- Nah, [ is just another function. Actually, the code only has strings and functions that parse said strings.
+Maybe I could just have the let or define function, and the utf-8 characters for 0 and 1 will compile to their binary equivalent. And will can build the rest from that?
+
+- Okay, I know I'm going back and forth, but maybe I could do it where a function can switch from prefix, to infix, to postfix, and maybe circumfix (althought I'm having a headache because of the last one)? I should try atleast.
+- I may not, then again. If I do it like that, then symbols could be evaluated afterwards – but then again, some functions should be able to do that... Fuck, this is hard.
+- How about every function is postfix by default, but if the arguments aren't enough, it curries a prefix function?
+
+- Okay, so this language is basically a LISP that tries to remove the parenthesis, the right-to-left reading and to make the language very close to hardware while still remaining high-level.
+
+- Aren't classes just dictionnaries? Aren't dictionnaries just arrays where even values are keys, and uneven values are... values? And aren't arrays just strings? Food for thought.
+
+- Maybe a analysis/synthesis duality, instead of the LISP eval/apply?
+
+- Maybe I could have a main function that takes a selection coordinates and a value for what to change the selection to? I could call the function alter?
 
 ## Examples
 
@@ -48,8 +68,9 @@ load ./filename
 [This is how you execute code. Code is executed when inside []s.]
 do [print hello world]
 
-[This is how you define a word]
-set word0 expression
-set word1 [list of expressions]
+[This is how you define a word.]
+let word0 expression
+let word1 [list of expressions]
 
-
+[This lets you halt the program.]
+halt

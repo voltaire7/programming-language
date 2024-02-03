@@ -1,0 +1,81 @@
+[Model 1 - S Expressions]
+atom [a] 2
+atom [a] [This is a string.]
+atom [b] do [print a]
+list [b] [print a]
+list [c] [
+   print a
+   print ++ a a
+]
+atom [add x y] + x y
+add 1 2
+
+[Model 2 - Omnifix Expressions];
+atom [a] [This is also a string.]
+[b] atom [And this as well.]
+[c] [And this.] atom
+list [d] [print a]
+[This gets printed.] print
+a print
+print b
+
+[Fib à la Haskell]
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
+fib = 1 : 1 : zipWith (+) fib (tail fib)
+print (fib 1000)
+
+[Fib à la Model 1]
+atom [fib n] cond [
+   = n 0 0
+   = n 1 1
+   true + fib - n 1 fib - n 2
+]
+atom [fib n] ? | = n 0 = n 1 n + fib - n 1 fib - n 2
+atom [fib] : : 1 1 zipWith [+] fib tail fib
+print fib 1000
+
+[Fib à la Model 2];
+[fib] list [
+   dup = 0 ? [] [dup = 1 ? [] [dub dup - 1 swap - 2 fib swap fib +]]
+]
+[fib] list [d d = 0 s = 1 | ? [] [d - 1 s - 2 fib s fib +]]
+[list [fib] [1 : 1 : fib fib tail zipWith [+]] ;[Probably doesn't work...]];
+1000 fib print
+1000 dup = 0 ? [] [dup = 1 ? [] [dub - 1 swap - 2 fib swap fib +]] print
+1000 d d = 0 s = 1 | ? [] [d - 1 s - 2 fib s fib +] print
+
+[Interesting fact about Model 1]
+atom [list x y] atom x do y
+
+[So yeah, I'm sticking with Model 1.
+Kinda sucks for Model 2.
+Had high hopes for it.]
+
+[Oh shit, comment function:]
+atom [comment x y] y
++ comment [This is ignored.] 1 2
+[Shit, it's just the K combinator... Or yay?]
+
+[Maybe in path ./src/]
+::modules:fib 1000
+[[::] could be [..]?]
+
+[Maybe also a function called alter?]
+atom [alter old new] todo
+
+[Also todo from Rust.]
+atom [todo] panic [Not implemented yet.]
+list [panic msg] [
+   eprint msg
+   exit 1
+]
+
+[Rules instead of types?]
+rule [a] [i32]
+atom [a] [35]
+
+[Model 3 - Procedures]
+list [x] [push 1 push 2 add]
+
