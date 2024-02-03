@@ -49,14 +49,13 @@ print fib 1000
 [Interesting fact about Model 1]
 atom [list x y] atom x do y
 
-[So yeah, I'm sticking with Model 1.
-Kinda sucks for Model 2.
-Had high hopes for it.]
+[So yeah, I'm sticking with Model 1. Kinda sucks for Model 2. Had high hopes
+for it.]
 
 [Oh shit, comment function:]
 atom [comment x y] y
 + comment [This is ignored.] 1 2
-[Shit, it's just the K combinator... Or yay?]
+[Shit, it's just the KI combinators... Or yay?]
 
 [Maybe in path ./src/]
 ::modules:fib 1000
@@ -78,4 +77,8 @@ atom [a] [35]
 
 [Model 3 - Procedures]
 list [x] [push 1 push 2 add]
+
+[On second thought... I don't really need a Model 3. I can make Model 1 both
+functionnal and procedural. I think that's the best, yeah. The question is how
+do I keep the abstraction to a minimum.]
 
