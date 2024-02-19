@@ -37,9 +37,7 @@ atom [fib] : : 1 1 zipWith [+] fib tail fib
 print fib 1000
 
 [Fib à la Model 2];
-[fib] list [
-   dup = 0 ? [] [dup = 1 ? [] [dub dup - 1 swap - 2 fib swap fib +]]
-]
+[fib] list [dup = 0 ? [] [dup = 1 ? [] [dub dup - 1 swap - 2 fib swap fib +]]]
 [fib] list [d d = 0 s = 1 | ? [] [d - 1 s - 2 fib s fib +]]
 [list [fib] [1 : 1 : fib fib tail zipWith [+]] ;[Probably doesn't work...]];
 1000 fib print
@@ -49,8 +47,7 @@ print fib 1000
 [Interesting fact about Model 1]
 atom [list x y] atom x do y
 
-[So yeah, I'm sticking with Model 1. Kinda sucks for Model 2. Had high hopes
-for it.]
+[So yeah, I'm sticking with Model 1. Kinda sucks for Model 2. Had high hopes for it.]
 
 [Oh shit, comment function:]
 atom [comment x y] y
@@ -73,12 +70,23 @@ list [panic msg] [
 
 [Rules instead of types?]
 rule [a] [i32]
-atom [a] [35]
+atom [a] 35
 
 [Model 3 - Procedures]
 list [x] [push 1 push 2 add]
 
-[On second thought... I don't really need a Model 3. I can make Model 1 both
-functionnal and procedural. I think that's the best, yeah. The question is how
-do I keep the abstraction to a minimum.]
+[On second thought... I don't really need a Model 3. I can make Model 1 both functionnal and
+procedural. I think that's the best, yeah. The question is how do I keep the abstraction to a
+minimum.]
+
+[Model 1 vs Scheme]
+atom [fib n]
+   ? | = n 0 = n 1
+      n
+      + fib - n 1 fib - n 2
+
+(define (fib n)
+   (if (or (= n 0) (= n 1))
+      n
+      (+ (fib (- n 1)) (fib (- n 2)))))
 
