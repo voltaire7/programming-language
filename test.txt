@@ -90,3 +90,5 @@ atom [fib n]
       n
       (+ (fib (- n 1)) (fib (- n 2)))))
 
+[A procedural programming language with functionnal caracteristics.]
+
