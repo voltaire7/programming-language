@@ -92,3 +92,60 @@ atom [fib n]
 
 [A procedural programming language with functionnal caracteristics.]
 
+[Converted jai code]
+atom [render] do [
+   fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+   fill-rect bar-rect unpack-color BAR-COLOR
+   for targets-poolif !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+]
+
+[Other shit]
+atom [test] do [
+   print [Hello, World!]
+
+   if true
+      print [yes]
+      print [no]
+
+   loop print [loops forever]
+   for 0 10 print format [prints 10 time. this is [i]]
+   while condition [you know.]
+
+   [<3]
+]
+
+[Procedural vs functionnal]
+atom [main] do [
+   add [x] 1 2
+   eq [y] x 3
+   if y print [truth] print [falsehood]
+]
+atom [main] do [
+   if eq 3 add 1 2
+      print [truth]
+      print [falsehood]
+]
+
+[Declarative wins character count. But you don't have to declare variables in imperative.
+Food for thought. Nevermind. You still have to name them. Wait, you can reuse the name? Fuck, I
+don't know!]
+
+[More complex procedure]
+atom [complex x y z] do [
+   format z [Hello [x], my name is [y]]
+   print z
+]
+atom [complex x y z] do [
+   atom z format [Hello [x], my name is [y]]
+   print z
+]
+
+[Holy fuck! Procedural actually beats functionnal... I know this is an edge case, but if there's a
+lot of mutable state in your app, it could benefit from it.]
+
+[I certainly like the limited indentation of procedural programming. As well as how it's read
+left-to-right. Damn, I'm stuck.]
+
+complex [John] [Jane] [a]
+
+

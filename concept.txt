@@ -54,6 +54,13 @@ Maybe I could just have the let or define function, and the utf-8 characters for
 
 - Maybe I could have a main function that takes a selection coordinates and a value for what to change the selection to? I could call the function alter?
 
+- Lazy should be idiomatic if possible. Like metaprogramming, where it's lazy because the code is quoted, or eager because it isn't?
+- Should have duck typing.
+- Maybe I should have non [] strings? It will make the language more terse, more usefull for the shell and all that.
+- How about: a function takes an unlimited of operands, but the last one is also a function call, it executes and then the called function calls another function, so on, until the end of the program. Basically, a chain of functions.
+- Nevermind. Probably not a good idea. ^
+- Explore sound static analysis, model checking, concolic testing as possible alternatives to dependent typing.
+
 ## Examples
 
 ### 'Interpreted-Compiled' language
