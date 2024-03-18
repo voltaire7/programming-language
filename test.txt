@@ -132,8 +132,8 @@ don't know!]
 
 [More complex procedure]
 atom [complex x y z] do [
-   format z [Hello [x], my name is [y]]
-   print z
+   format x [Hello [y], my name is [z]]
+   print x
 ]
 atom [complex x y z] do [
    atom z format [Hello [x], my name is [y]]
@@ -146,6 +146,6 @@ lot of mutable state in your app, it could benefit from it.]
 [I certainly like the limited indentation of procedural programming. As well as how it's read
 left-to-right. Damn, I'm stuck.]
 
-complex [John] [Jane] [a]
+complex [a] [John] [Jane]
 
 
