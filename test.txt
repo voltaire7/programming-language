@@ -136,8 +136,8 @@ atom [complex x y z] do [
    print x
 ]
 atom [complex x y z] do [
-   atom z format [Hello [x], my name is [y]]
-   print z
+   atom x format [Hello [y], my name is [z]]
+   print x
 ]
 
 [Holy fuck! Procedural actually beats functionnal... I know this is an edge case, but if there's a
