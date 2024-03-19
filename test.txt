@@ -148,4 +148,34 @@ left-to-right. Damn, I'm stuck.]
 
 complex [a] [John] [Jane]
 
+[Fib procedural]
+fib = 1 : 1 : zipWith (+) fib (tail fib)
+atom [fib] do [
+   : [x] 1 1
+   tail [y] fib:x
+   zipWith [y] [+] fib:x fib:y
+   : [x] x y
+]
+atom [fib out init] do [
+   : out init out
+   tail [t] out
+   zipWith [z] [+] out t
+   : [out] out z
+   fib
+]
+atom [fib] : : 1 1 zipWith [+] fib tail fib
+
+[This might be the best I can do right now. No, this may be impossible without functions returning
+values.]
+
+[Adding something to PATH; importing.]
+atom [core] usr:name:local:lang:core
+
+[Recursion]
+atom [recur] do [
+    print [do stuff...]
+    > bool a b
+    if bool recur print [all good]
+]
+
 
