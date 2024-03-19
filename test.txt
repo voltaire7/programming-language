@@ -203,33 +203,42 @@ swap [x] [y]
 
 atom [binary-search result target items] do [
    atom [low] 0
-   get-len [high] items
+   len [high] items
    sub [high] high 1
    <= [cond] low high
+   atom [continue?] true
    while cond do [
       add [mid] low high
       div [mid] mid 2
 
       cmp [c] mid target
-      equal? c atom result mid
+      equal? c do [atom result mid atom [continue?] false]
       less? c do [atom [low] mid add [low] low 1]
       more? c do [atom [high] mid sub [high] high 1]
 
       <= [cond] low high
+      && [cond] cond continue?
    ]
 ]
 
 atom [binary-search target items] do [
    atom [low] 0
-   atom [high] sub get-len items 1
-   while <= low high do [
+   atom [high] sub len items 1
+   atom [continue?] true
+   while && <= low high continue? do [
       atom [mid] div add low high 2
 
       atom [c] cmp mid target
-      equal? c atom result mid
-      less? c do [atom [low] add mid 1]
-      more? c do [atom [high] sub mid 1]
+      equal? c do [mid atom [continue?] false]
+      less? c atom [low] add mid 1
+      more? c atom [high] sub mid 1
    ]
 ]
+
+[I think I should stick with the imperative + declarative styles, make them work together.]
+
+[Problem is that declarative does not function the same way as assembly. I don't like the
+inconsistency... But then again, why does [atom] sometimes define procedures, sometimes variables?
+Not that is not very consistent.]
 
 
