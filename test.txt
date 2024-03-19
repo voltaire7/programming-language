@@ -149,7 +149,6 @@ left-to-right. Damn, I'm stuck.]
 complex [a] [John] [Jane]
 
 [Fib procedural]
-fib = 1 : 1 : zipWith (+) fib (tail fib)
 atom [fib] do [
    : [x] 1 1
    tail [y] fib:x
@@ -173,9 +172,64 @@ atom [core] usr:name:local:lang:core
 
 [Recursion]
 atom [recur] do [
-    print [do stuff...]
-    > bool a b
-    if bool recur print [all good]
+   print [do stuff...]
+   > bool a b
+   if bool recur print [all good]
+]
+
+[Then again...]
+atom [number] 123
+atom [string] [Hello, World!]
+atom [say-hello] print string
+
+atom [add-num] add [n] number 321
+add-num
+print add-num:n
+[or]
+atom [add-num n] add n number 321
+add-num [n]
+print n
+
+[What differenciates a variable and a procedure?]
+
+atom [swap x y] do [
+   atom [temp] x
+   atom x y
+   atom y temp
+]
+atom [x] 1
+atom [y] 2
+swap [x] [y]
+
+atom [binary-search result target items] do [
+   atom [low] 0
+   get-len [high] items
+   sub [high] high 1
+   <= [cond] low high
+   while cond do [
+      add [mid] low high
+      div [mid] mid 2
+
+      cmp [c] mid target
+      equal? c atom result mid
+      less? c do [atom [low] mid add [low] low 1]
+      more? c do [atom [high] mid sub [high] high 1]
+
+      <= [cond] low high
+   ]
+]
+
+atom [binary-search target items] do [
+   atom [low] 0
+   atom [high] sub get-len items 1
+   while <= low high do [
+      atom [mid] div add low high 2
+
+      atom [c] cmp mid target
+      equal? c atom result mid
+      less? c do [atom [low] add mid 1]
+      more? c do [atom [high] sub mid 1]
+   ]
 ]
 
 
