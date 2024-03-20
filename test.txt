@@ -96,7 +96,7 @@ atom [fib n]
 atom [render] do [
    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
    fill-rect bar-rect unpack-color BAR-COLOR
-   for targets-poolif !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+   for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
 ]
 
 [Other shit]
@@ -240,5 +240,90 @@ atom [binary-search target items] do [
 [Problem is that declarative does not function the same way as assembly. I don't like the
 inconsistency... But then again, why does [atom] sometimes define procedures, sometimes variables?
 Not that is not very consistent.]
+
+atom [render] do [
+   proj-rect [pr] proj-x proj-y
+   unpack-color [pc] PROJ-COLOR
+   fill-rect pr pc
+
+   unpack-color [bc] BAR-COLOR
+   fill-rect bar-rect bc
+
+   for targets-pool do [
+      target-rect [tr] it
+      unpack-color [tc] TARGET-COLOR
+      if !it.dead fill-rect tr tc
+   ]
+]
+
+[Procedural is almost always more verbose. Thought I was onto something for a second there.]
+
+[Also, I'm not doing [list] anymore: unnecessary.]
+
+[Holy fucking shit]
+atom [add-print x y] do [
+   add [x] x y
+   print x
+]
+add-print 1 2
+[becomes]
+atom [x] 1
+atom [y] 2
+add [x] x y
+print x
+
+[It might be possible to make it as tacit as functionnal...]
+
+[Every procedure should have an opposite that reverse a change.]
+undo
+for 2 undo
+
+[Most elegant?]
+atom [func] do [todo x y]
+atom [x y] 1 2
+func [becomes] todo x y
+
+[Also, [atom [] do []] may not be possible... Because do is executed during asignment.]
+
+[Maybe...]
+atom [test-func] reduce [
+    print [Somthing]
+]
+[This might the best.]
+atom [say-hello] [print [Hello, World!]]
+[There's some polishing required here...]
+
+[Wait no! [print] does do [reduce], it just doesn't execute, because [atom] returns nothing!]
+[God, I'm so smart.]
+
+[LOL]
+
+[Wait... but that means that means that arithmetic operations don't get precalculated?]
+
+atom [calculate] do [
+   add [x] x y
+   print x
+]
+
+atom [x y] 1 2 calculate
+atom [x y] 1 2 do [
+   add [x] x y
+   print x
+]
+
+[Actually, [do] should be completely lazy, otherwise it fucks everything up. Like, how do you reduce
+two add operations into one? You can't. And you shouldn't. This is an assembly-like programming
+language. Most things are arithmetic.]
+
+[You can do eager evaluation as follows:]
+add [CONSTANT] 1 2
+add [CONSTANT] x 3
+
+atom [calculate] print CONSTANT
+calculate [prints 6]
+
+[Seems to work for now. It's like python for now, where it's not actually a constant, but I don't
+know... I could add a [rule] to make them throw and [error] when trying to call [atom] on a
+pre-assigned constant?]
 
 
