@@ -316,14 +316,83 @@ two add operations into one? You can't. And you shouldn't. This is an assembly-l
 language. Most things are arithmetic.]
 
 [You can do eager evaluation as follows:]
-add [CONSTANT] 1 2
-add [CONSTANT] x 3
+add [temp] 1 2
+add [CONSTANT] temp 3
 
 atom [calculate] print CONSTANT
-calculate [prints 6]
+calculate
+[will print [6]]
 
 [Seems to work for now. It's like python for now, where it's not actually a constant, but I don't
 know... I could add a [rule] to make them throw and [error] when trying to call [atom] on a
 pre-assigned constant?]
+
+[I shouldn't shy away from the [proc arg1 arg2] format. It's more tacit, and more consistent with
+the intrinsics.]
+
+atom [test x y] do [
+   add [z] x y
+   format [f] [[x] + [y] = [z]]
+   print f
+]
+test 1 2
+[reduces to]
+atom [x] 1 atom [y] 2 do [
+   add [z] x y
+   format [f] [[x] + [y] = [z]]
+   print f
+]
+
+[vs]
+
+atom [test] do [
+   add [z] x y
+   format [f] [[x] + [y] = [z]]
+   print f
+]
+atom [x y] 1 2
+test
+[reduces to]
+atom [x y] 1 2 do [
+   add [z] x y
+   format [f] [[x] + [y] = [z]]
+   print f
+]
+
+[Honestly, both are very elegant. But the most tacit one is... fucking neither! Damn. They are both
+the same exact character count...]
+
+[Still, I will stick with the second one. You only have to define a procedure once. And once you do,
+you can call it as many times as you want.]
+
+[Also, functionnal way for the bros:]
+atom [test x y]
+   print format [f] [[x] + [y] = [add x y]]
+test 1 2
+[reduces to]
+atom [x] 1 atom [y] 2
+   print format [[x] + [y] = [add x y]]
+
+[Fuck, it's still so much nicer...]
+
+[But how does functionnal translate on the lower level?]
+atom [x] 1 atom [y] 2
+   print format [[x] + [y] = [add x y]]
+[becomes]
+mov [x1] 1
+mov [x2] 2
+add [x1] x1 x2
+[string manipulation magic]
+[syscall to print]
+
+[The thing about functionnal, it that you don't need to name value. Everything is chained. But can't
+I do that with procedural as well? Pretty sure.]
+<= 1 0 true? print [yes] false? print [no]
+
+[I can even have ifs]
+<= 1 0 if print [yes] print [no]
+
+[I don't care if it's worse. It's closer to how computers work. I will make it work. Someway,
+somehow.]
 
 
