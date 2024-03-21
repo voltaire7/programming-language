@@ -415,4 +415,17 @@ atom [x] 1 add [x] x 2 add [x] x 3
 
 [This is so cool...]
 
+[Lemme try some tail optimized recursion.]
+atom [func n] do [
+   sub n 1
+   == n 0
+   true? func n
+]
+
+[When a procedure interacs with the left hand side of the code, it's a procedure, but when it
+interacs with the right hand side, it's a macro. But macros are also procedures, only, procedures
+that write code. That's why the programming language has this weird way of prcessing, where if the
+code wants to interact with code from the left, it has to do so through pointers, while with code on
+the right, it's just text that has yet to be converted into data or other code.]
+
 
