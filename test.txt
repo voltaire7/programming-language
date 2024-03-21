@@ -391,8 +391,28 @@ I do that with procedural as well? Pretty sure.]
 
 [I can even have ifs]
 <= 1 0 if print [yes] print [no]
+[Holy fuck, prefix procedures the look like infix!]
 
 [I don't care if it's worse. It's closer to how computers work. I will make it work. Someway,
 somehow.]
+
+[Also, [env] needs to get worked, to make it so calling a library procedure doesn't fuck up the
+[control flow] of a local procedure. Put another way, [cond] should be local.]
+
+[I keep getting ideas...]
+atom [break] atom [continue-loop?] false
+while do [
+   print [still true]
+   break
+]
+
+[Chaining operations]
+atom [chain x] atom [x] x
+atom [+ y] add x y
+
+chain 1 + 2 + 3
+atom [x] 1 add [x] x 2 add [x] x 3
+
+[This is so cool...]
 
 
