@@ -407,11 +407,11 @@ while do [
 ]
 
 [Chaining operations]
-atom [chain x] atom [x] x
+atom [chain x] []
 atom [+ y] add x y
 
 chain 1 + 2 + 3
-atom [x] 1 add [x] x 2 add [x] x 3
+atom [x] 1 [] add [x] x 2 add [x] x 3
 
 [This is so cool...]
 
