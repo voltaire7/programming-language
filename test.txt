@@ -428,4 +428,9 @@ that write code. That's why the programming language has this weird way of proce
 code wants to interact with code from the left, it has to do so through pointers, while with code on
 the right, it's just text that has yet to be converted into data or other code.]
 
-
+[Inline assign]
+atom [as symbol] atom symbol out
+chain 1 + 2 as [result]
+print result
+import [numpy] as [np]
+[^ a funny]
