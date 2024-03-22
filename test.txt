@@ -391,7 +391,7 @@ I do that with procedural as well? Pretty sure.]
 
 [I can even have ifs]
 <= 1 0 if print [yes] print [no]
-[Holy fuck, prefix procedures the look like infix!]
+[Holy fuck, prefix procedures look infix!]
 
 [I don't care if it's worse. It's closer to how computers work. I will make it work. Someway,
 somehow.]
