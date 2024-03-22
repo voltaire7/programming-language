@@ -449,6 +449,47 @@ if 1 == 0 then print [equal] else print [!equal]
 loop print [loops forever]
 repeat 10 print [loops 10 times]
 for 0 10 print [loops starting at 0, until 10 is reached]
+for-each [0 1 2] print it
 while print [loops until [while?] becomes false]
-[[repeat] and [for] need a variable to keeps track of the count, so there's no need to define a value for [it].]
+[[repeat] and [for] need a variable to keeps track of the count, so there's no need to define a
+value for [it].]
+
+[Here are some definitions for the loops]
+atom [loop proc] do [
+   proc
+   loop proc
+]
+atom [repeat to proc] for 0 n proc
+atom [for it to proc] do [
+   cmp [result] it to
+   = error [[it] and [to] cannot be the same values; please try another combination.]
+   > for-
+   < for+
+]
+atom [for-] do [
+   proc
+   sub [it] 1
+   cmp it to
+   != for it to proc
+]
+atom [for+] do [
+   proc
+   add [it] 1
+   cmp it to
+   != for it to proc
+]
+atom [for-each items proc] do [
+   get-len [len] items
+   for 0 len proc
+]
+atom [while proc] do [
+   atom [while?] true
+   atom [label] while?
+   while-arg
+]
+atom [while-arg] do [
+   proc
+   if label while-arg []
+]
+
 
