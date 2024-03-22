@@ -492,4 +492,17 @@ atom [while-arg] do [
    if label while-arg []
 ]
 
+[But functionnal may actually come out of it as well...]
+atom [+ x y] do [
+   add [x] x y
+   x
+]
++ + 1 2 3
+atom [x] + atom [y] 1 do [
+   add [x] x y
+   x
+] 2 3
+[Seriously, what does [atom [proc] do []]?]
+
+[I need a better understanding of assembly to figure this out.]
 
