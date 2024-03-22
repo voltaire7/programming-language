@@ -526,3 +526,19 @@ join add [x] x y
 atom [proc] add [x] x y atom [next] join proc 
 [What the fuck am I doing?]
 
+[I'll try again]
+atom [join proc next] do [
+   proc
+   next
+]
+atom [thing] join proc1 join proc2 join proc3 []
+[This is what I had in mind. I don't know how it's better than do [] though...]
+
+[I'm conflicted about this...]
+atom [+ x y] do [
+   y
+   add [x] x y
+]
++ 1 + 2 3
+[Should I consider functionnal again?]
+
