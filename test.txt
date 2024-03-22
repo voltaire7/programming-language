@@ -536,9 +536,34 @@ atom [thing] join proc1 join proc2 join proc3 []
 
 [I'm conflicted about this...]
 atom [+ x y] do [
-   y
+   x
    add [x] x y
 ]
-+ 1 + 2 3
++ + 1 2 3
 [Should I consider functionnal again?]
+
+[Wait, no. Shit gets fucked up.]
+atom [x] + 1 2 atom [y] 3 do [
+   x
+   add [x] x y
+]
+atom [x] + 1 2 atom [y] 3 do [
+   + 1 2
+   add [x] x y
+]
+atom [x] + 1 2 atom [y] 3 do [
+   atom [x] 1 atom [y] 2 do [
+      x
+      add [x] x y
+   ]
+   add [x] x y
+]
+atom [x] + 1 2 atom [y] 3 do [
+   atom [x] 1 atom [y] 2 do [
+      1
+      add [x] x y
+   ]
+   add [x] x y
+]
+[Maybe if I made [x] and [y] local to the procedure?]
 
