@@ -434,3 +434,14 @@ chain 1 + 2 as [result]
 print result
 import [numpy] as [np]
 [^ a funny]
+
+[I don't think I should abuse it like this but it's interesting to think about.]
+atom [if val1] []
+atom [== val2] cmp [bool] val1 val2
+atom [then proc] eq? proc
+atom [else proc] ne? proc
+if 1 == 0 then print [equal] else [!equal]
+[[then] and [else] could be intrinsics]
+
+[Sometimes my genius is... it's almost frightening.]
+
