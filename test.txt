@@ -506,3 +506,7 @@ atom [x] + atom [y] 1 do [
 
 [I need a better understanding of assembly to figure this out.]
 
+[Wait does this mean this is valid?]
+atom [apply proc] proc
+apply add [x] x y
+
