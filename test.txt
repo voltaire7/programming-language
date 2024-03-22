@@ -510,3 +510,19 @@ atom [x] + atom [y] 1 do [
 atom [apply proc] proc
 apply add [x] x y
 
+[So these should also be equivalent]
+atom [proc] do [] proc
+atom [proc] [] do proc
+[One way or another, something will be loaded from memory, and that sonething will be executed.]
+
+[Also]
+atom [join proc next] do [
+   proc
+   next
+]
+join add [x] x y join add [x] x y []
+atom [join proc next] join proc join proc join proc []
+join add [x] x y
+atom [proc] add [x] x y atom [next] join proc 
+[What the fuck am I doing?]
+
