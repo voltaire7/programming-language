@@ -567,3 +567,29 @@ atom [x] + 1 2 atom [y] 3 do [
 ]
 [Maybe if I made [x] and [y] local to the procedure?]
 
+atom [add-all x y] do [
+   == y []
+   false? do [
+      add [x] x y
+      add-all x
+   ]
+]
+add-all 1 2 3 []
+atom [x] 1 atom [y] 2 do [
+   == y []
+   false? do [
+      add [x] x y
+      add-all x
+   ]
+] 3 []
+atom [x] 1 atom [y] 2 add-all x 3 []
+[Hm. Does it really work like that?]
+
+[More functionnal]
+lambda [x y] 1 2
+atom [x] 1 atom [y] 2
+
+[Should be equivalent?]
+atom [func x y] []
+atom [func] do [lambda [x y]]
+
