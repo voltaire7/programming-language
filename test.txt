@@ -586,10 +586,10 @@ atom [x] 1 atom [y] 2 add-all x 3 []
 [Hm. Does it really work like that?]
 
 [More functionnal]
-lambda [x y] 1 2
+let [x y] 1 2
 atom [x] 1 atom [y] 2
 
 [Should be equivalent?]
 atom [func x y] []
-atom [func] do [lambda [x y]]
+atom [func] do [let [x y]]
 
