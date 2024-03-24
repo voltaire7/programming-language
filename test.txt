@@ -593,3 +593,77 @@ atom [x] 1 atom [y] 2
 atom [func x y] []
 atom [func] do [let [x y]]
 
+[Maybe it's that simple?]
+atom [atom name value] push-key name value atoms
+[But any more than, and we're implementing stuff.]
+
+[Functionnal again]
+atom [+ x y] do [
+   x y
+   proc? [x] atom [x] _
+   proc? [y] atom [y] _
+   add [_] x y
+]
++ + 1 2 + 3 4
+atom [x] + 1 2 atom [y] + 3 4 do [
+   x y
+   proc? [x] atom [x] _
+   proc? [y] atom [y] _
+   add [_] x y
+]
+atom [x] + 1 2 atom [y] + 3 4 do [
+   atom [x] 1 atom [y] 2 do [
+      x y
+      proc? [x] atom [x] _
+      proc? [y] atom [y] _
+      add [_] x y
+   ]
+   atom [x] 3 atom [y] 4 do [
+      x y
+      proc? [x] atom [x] _
+      proc? [y] atom [y] _
+      add [_] x y
+   ]
+   proc? [x] atom [x] _
+   proc? [y] atom [y] _
+   add [_] x y
+]
+atom [x] + 1 2 atom [y] + 3 4 do [
+   atom [x] 1 atom [y] 2 do [
+      1 2
+      proc? [x] atom [x] _
+      proc? [y] atom [y] _
+      add [_] x y
+   ]
+   atom [x] 3 atom [y] 4 do [
+      3 4
+      proc? [x] atom [x] _
+      proc? [y] atom [y] _
+      add [_] x y
+   ]
+   proc? [x] atom [x] _
+   proc? [y] atom [y] _
+   add [_] x y
+]
+[Is it impossible? Well whatever. I can tell already: the hoops you have to jump through to get this
+behavior is insane. I will probably still try to make this work, but the procedural way is far
+better. You know, left-to-right and infix is just more elegant.]
+
+chain 1 + 2 + 3 + 4 as [test]
+print _ [outputs 10]
+print test [outputs 10]
+[I mean look at this! It's fucking beautiful!]
+
+[Rust syntax]
+atom [let name] []
+atom [= value] atom [name] value
+atom [;] atom [name] []
+let [test_val] = 2 ;
+[Well, "Rust" syntax.]
+
+[Delete]
+atom [delete name] atom name []
+
+[I don't think this language should have something like function overloading.]
+
+
