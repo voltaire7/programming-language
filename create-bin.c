@@ -7,7 +7,12 @@
 int main(int argc, char **argv) {
     unsigned char buf[BUFSZ] = {0};
     size_t bytes = 0, i, readsz = sizeof buf;
-    FILE *fp_in = argc > 1 ? fopen(argv[1], "r") : stdin;
+    if (argc != 2) {
+        fprintf(stderr, "Usage: <source_file.c>\n\n");
+        return 1;
+    }
+
+    FILE *fp_in = fopen(argv[1], "r");
     FILE *fp_out = fopen("output_file", "w");
 
     if (!fp_in) {
@@ -18,13 +23,7 @@ int main(int argc, char **argv) {
     /* read/output BUFSZ bytes at a time */
     while ((bytes = fread(buf, sizeof *buf, readsz, fp_in)) == readsz) {
         fwrite(buf, sizeof *buf, readsz, fp_out); // Write buffer contents to file
-        for (i = 0; i < readsz; i++)
-            printf(" 0x%02x", buf[i]);
-        putchar('\n');
     }
-    for (i = 0; i < bytes; i++) /* output final partial buf */
-        printf(" 0x%02x", buf[i]);
-    putchar('\n');
 
     if (fp_in != stdin)
         fclose(fp_in);
