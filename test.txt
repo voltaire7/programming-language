@@ -666,4 +666,43 @@ atom [delete name] atom name []
 
 [I don't think this language should have something like function overloading.]
 
+[Maybe I could have a [type] [Single] that can only be called once, and once done, it will be
+removed from the list of variables?]
+
+[If each variable has the following values:]
+
+struct [atom] [
+   name value before after
+]
+
+[where [name] is of course the symbol of the [atom], then [value] is the what it returns, or the
+pointer to the value in memory. What if there was [before] and [after], where [before] is code that
+gets executed before the value is called, while [after] is code executed after it's called. So like,
+in [before] we could have a macro that sets up the arguments of the procedure, then adds the [value]
+after the declarations? And in [after], I could have some RAII clean up? I think I'm unto something,
+but the idea needs polishing.]
+
+[Btw, if I do [before] and [after], I could probably do this:]
+type [+] [
+    before atom [x] prev 1
+    after atom [y] next 1
+]
+atom [+] add [_] x y
+1 + 2 print _
+[I'm not sure where I'm going with this, frankly.]
+
+[Maybe the entire program is actually a list of tokens that can change itself.]
+1 2 3 print get 1 program
+[outputs 2?]
+
+[Or maybe...]
+atom [+] add #-1 #1
+1 + 2
+[where #n is a relative value? But how do [add] work then?]
+
+[I really need to start working on the implementation. There's only so much I can do with only
+theory, and so little technical knowledge.]
+
+[I know that, eventually, everything becomes [hex []], and then gets executed. But how does it do it? *Sigh*]
+
 
