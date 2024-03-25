@@ -703,6 +703,15 @@ atom [+] add #-1 #1
 [I really need to start working on the implementation. There's only so much I can do with only
 theory, and so little technical knowledge.]
 
-[I know that, eventually, everything becomes [hex []], and then gets executed. But how does it do it? *Sigh*]
+[I know that, eventually, everything becomes [hex []], and then gets executed. But how does it do
+it? *Sigh*]
 
+[I feel like python will be more useful for learning how to write this programming language than
+Rust or C...]
 
+[Is this programming language becoming too complicated, like LISP nowadays?]
+
+[I should stick with the S Expressions. Adding anything else is bloat.]
+
+[Btw, the model where we do [add #-1 #1] is interesting but stupid, because what is [add] defined
+as? There is still a lesson here though. Just need to find out which.]

@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
     unsigned char buf[BUFSZ] = {0};
     size_t bytes = 0, i, readsz = sizeof buf;
     if (argc != 2) {
-        fprintf(stderr, "Usage: <source_file.c>\n\n");
+        fprintf(stderr, "Usage: <source_file.c>\n");
         return 1;
     }
 
