@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#define BUFSZ 16
+#define BUFSZ 8
 
 int main(int argc, char **argv) {
     unsigned char buf[BUFSZ] = {0};
     size_t bytes = 0, i, readsz = sizeof buf;
-    FILE *fp_in = argc > 1 ? fopen(argv[1], "rb") : stdin;
-    FILE *fp_out = fopen("output_file", "wb"); // Open a new file for writing
+    FILE *fp_in = argc > 1 ? fopen(argv[1], "r") : stdin;
+    FILE *fp_out = fopen("output_file", "w");
 
     if (!fp_in) {
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
