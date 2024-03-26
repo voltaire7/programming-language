@@ -728,4 +728,7 @@ works.]
 some C code, and while it isn't as noticeable for small procedures, for larger ones, 3 spaces just
 feels wrong. Not to mention, 4 spaces is byte aligned.]
 
+[I think I might replace every instance of [atom] with [macro], because that's what they are. But I
+don't know. [atom] sounds real nice.]
+
 
