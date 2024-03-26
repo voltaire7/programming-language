@@ -4,8 +4,8 @@ atom [a] [This is a string.]
 atom [b] do [print a]
 list [b] [print a]
 list [c] [
-   print a
-   print ++ a a
+    print a
+    print ++ a a
 ]
 atom [add x y] + x y
 add 1 2
@@ -28,9 +28,9 @@ print (fib 1000)
 
 [Fib à la Model 1]
 atom [fib n] cond [
-   = n 0 0
-   = n 1 1
-   true + fib - n 1 fib - n 2
+    = n 0 0
+    = n 1 1
+    true + fib - n 1 fib - n 2
 ]
 atom [fib n] ? | = n 0 = n 1 n + fib - n 1 fib - n 2
 atom [fib] : : 1 1 zipWith [+] fib tail fib
@@ -64,8 +64,8 @@ atom [alter old new] todo
 [Also todo from Rust.]
 atom [todo] panic [Not implemented yet.]
 list [panic msg] [
-   eprint msg
-   exit 1
+    eprint msg
+    exit 1
 ]
 
 [Rules instead of types?]
@@ -81,49 +81,49 @@ minimum.]
 
 [Model 1 vs Scheme]
 atom [fib n]
-   ? | = n 0 = n 1
-      n
-      + fib - n 1 fib - n 2
+    ? | = n 0 = n 1
+        n
+        + fib - n 1 fib - n 2
 
 (define (fib n)
-   (if (or (= n 0) (= n 1))
-      n
-      (+ (fib (- n 1)) (fib (- n 2)))))
+    (if (or (= n 0) (= n 1))
+        n
+        (+ (fib (- n 1)) (fib (- n 2)))))
 
 [A procedural programming language with functionnal caracteristics.]
 
 [Converted jai code]
 atom [render] do [
-   fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
-   fill-rect bar-rect unpack-color BAR-COLOR
-   for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
 ]
 
 [Other shit]
 atom [test] do [
-   print [Hello, World!]
+    print [Hello, World!]
 
-   if true
-      print [yes]
-      print [no]
+    if true
+        print [yes]
+        print [no]
 
-   loop print [loops forever]
-   for 0 10 print format [prints 10 time. this is [i]]
-   while condition [you know.]
+    loop print [loops forever]
+    for 0 10 print format [prints 10 time. this is [i]]
+    while condition [you know.]
 
-   [<3]
+    [<3]
 ]
 
 [Procedural vs functionnal]
 atom [main] do [
-   add [x] 1 2
-   eq [y] x 3
-   if y print [truth] print [falsehood]
+    add [x] 1 2
+    eq [y] x 3
+    if y print [truth] print [falsehood]
 ]
 atom [main] do [
-   if eq 3 add 1 2
-      print [truth]
-      print [falsehood]
+    if eq 3 add 1 2
+        print [truth]
+        print [falsehood]
 ]
 
 [Declarative wins character count. But you don't have to declare variables in imperative.
@@ -132,12 +132,12 @@ don't know!]
 
 [More complex procedure]
 atom [complex x y z] do [
-   format x [Hello [y], my name is [z]]
-   print x
+    format x [Hello [y], my name is [z]]
+    print x
 ]
 atom [complex x y z] do [
-   atom x format [Hello [y], my name is [z]]
-   print x
+    atom x format [Hello [y], my name is [z]]
+    print x
 ]
 
 [Holy fuck! Procedural actually beats functionnal... I know this is an edge case, but if there's a
@@ -150,17 +150,17 @@ complex [a] [John] [Jane]
 
 [Fib procedural]
 atom [fib] do [
-   : [x] 1 1
-   tail [y] fib:x
-   zipWith [y] [+] fib:x fib:y
-   : [x] x y
+    : [x] 1 1
+    tail [y] fib:x
+    zipWith [y] [+] fib:x fib:y
+    : [x] x y
 ]
 atom [fib out init] do [
-   : out init out
-   tail [t] out
-   zipWith [z] [+] out t
-   : [out] out z
-   fib
+    : out init out
+    tail [t] out
+    zipWith [z] [+] out t
+    : [out] out z
+    fib
 ]
 atom [fib] : : 1 1 zipWith [+] fib tail fib
 
@@ -172,9 +172,9 @@ atom [core] usr:name:local:lang:core
 
 [Recursion]
 atom [recur] do [
-   print [do stuff...]
-   > bool a b
-   if bool recur print [all good]
+    print [do stuff...]
+    > bool a b
+    if bool recur print [all good]
 ]
 
 [Then again...]
@@ -193,46 +193,46 @@ print n
 [What differenciates a variable and a procedure?]
 
 atom [swap x y] do [
-   atom [temp] x
-   atom x y
-   atom y temp
+    atom [temp] x
+    atom x y
+    atom y temp
 ]
 atom [x] 1
 atom [y] 2
 swap [x] [y]
 
 atom [binary-search result target items] do [
-   atom [low] 0
-   len [high] items
-   sub [high] high 1
-   <= [cond] low high
-   atom [continue?] true
-   while cond do [
-      add [mid] low high
-      div [mid] mid 2
+    atom [low] 0
+    len [high] items
+    sub [high] high 1
+    <= [cond] low high
+    atom [continue?] true
+    while cond do [
+        add [mid] low high
+        div [mid] mid 2
 
-      cmp [c] mid target
-      equal? c do [atom result mid atom [continue?] false]
-      less? c do [atom [low] mid add [low] low 1]
-      more? c do [atom [high] mid sub [high] high 1]
+        cmp [c] mid target
+        equal? c do [atom result mid atom [continue?] false]
+        less? c do [atom [low] mid add [low] low 1]
+        more? c do [atom [high] mid sub [high] high 1]
 
-      <= [cond] low high
-      && [cond] cond continue?
-   ]
+        <= [cond] low high
+        && [cond] cond continue?
+    ]
 ]
 
 atom [binary-search target items] do [
-   atom [low] 0
-   atom [high] sub len items 1
-   atom [continue?] true
-   while && <= low high continue? do [
-      atom [mid] div add low high 2
+    atom [low] 0
+    atom [high] sub len items 1
+    atom [continue?] true
+    while && <= low high continue? do [
+        atom [mid] div add low high 2
 
-      atom [c] cmp mid target
-      equal? c do [mid atom [continue?] false]
-      less? c atom [low] add mid 1
-      more? c atom [high] sub mid 1
-   ]
+        atom [c] cmp mid target
+        equal? c do [mid atom [continue?] false]
+        less? c atom [low] add mid 1
+        more? c atom [high] sub mid 1
+    ]
 ]
 
 [I think I should stick with the imperative + declarative styles, make them work together.]
@@ -242,18 +242,18 @@ inconsistency... But then again, why does [atom] sometimes define procedures, so
 Not that is not very consistent.]
 
 atom [render] do [
-   proj-rect [pr] proj-x proj-y
-   unpack-color [pc] PROJ-COLOR
-   fill-rect pr pc
+    proj-rect [pr] proj-x proj-y
+    unpack-color [pc] PROJ-COLOR
+    fill-rect pr pc
 
-   unpack-color [bc] BAR-COLOR
-   fill-rect bar-rect bc
+    unpack-color [bc] BAR-COLOR
+    fill-rect bar-rect bc
 
-   for targets-pool do [
-      target-rect [tr] it
-      unpack-color [tc] TARGET-COLOR
-      if !it.dead fill-rect tr tc
-   ]
+    for targets-pool do [
+        target-rect [tr] it
+        unpack-color [tc] TARGET-COLOR
+        if !it.dead fill-rect tr tc
+    ]
 ]
 
 [Procedural is almost always more verbose. Thought I was onto something for a second there.]
@@ -262,8 +262,8 @@ atom [render] do [
 
 [Holy fucking shit]
 atom [add-print x y] do [
-   add [x] x y
-   print x
+    add [x] x y
+    print x
 ]
 add-print 1 2
 [becomes]
@@ -301,14 +301,14 @@ atom [say-hello] [print [Hello, World!]]
 [Wait... but that means that means that arithmetic operations don't get precalculated?]
 
 atom [calculate] do [
-   add [x] x y
-   print x
+    add [x] x y
+    print x
 ]
 
 atom [x y] 1 2 calculate
 atom [x y] 1 2 do [
-   add [x] x y
-   print x
+    add [x] x y
+    print x
 ]
 
 [Actually, [do] should be completely lazy, otherwise it fucks everything up. Like, how do you reduce
@@ -331,32 +331,32 @@ pre-assigned constant?]
 the intrinsics.]
 
 atom [test x y] do [
-   add [z] x y
-   format [f] [[x] + [y] = [z]]
-   print f
+    add [z] x y
+    format [f] [[x] + [y] = [z]]
+    print f
 ]
 test 1 2
 [reduces to]
 atom [x] 1 atom [y] 2 do [
-   add [z] x y
-   format [f] [[x] + [y] = [z]]
-   print f
+    add [z] x y
+    format [f] [[x] + [y] = [z]]
+    print f
 ]
 
 [vs]
 
 atom [test] do [
-   add [z] x y
-   format [f] [[x] + [y] = [z]]
-   print f
+    add [z] x y
+    format [f] [[x] + [y] = [z]]
+    print f
 ]
 atom [x y] 1 2
 test
 [reduces to]
 atom [x y] 1 2 do [
-   add [z] x y
-   format [f] [[x] + [y] = [z]]
-   print f
+    add [z] x y
+    format [f] [[x] + [y] = [z]]
+    print f
 ]
 
 [Honestly, both are very elegant. But the most tacit one is... fucking neither! Damn. They are both
@@ -367,17 +367,17 @@ you can call it as many times as you want.]
 
 [Also, functionnal way for the bros:]
 atom [test x y]
-   print format [f] [[x] + [y] = [add x y]]
+    print format [f] [[x] + [y] = [add x y]]
 test 1 2
 [reduces to]
 atom [x] 1 atom [y] 2
-   print format [[x] + [y] = [add x y]]
+    print format [[x] + [y] = [add x y]]
 
 [Fuck, it's still so much nicer...]
 
 [But how does functionnal translate on the lower level?]
 atom [x] 1 atom [y] 2
-   print format [[x] + [y] = [add x y]]
+    print format [[x] + [y] = [add x y]]
 [becomes]
 mov [x1] 1
 mov [x2] 2
@@ -402,8 +402,8 @@ somehow.]
 [I keep getting ideas...]
 atom [break] atom [continue-loop?] false
 while do [
-   print [still true]
-   break
+    print [still true]
+    break
 ]
 
 [Chaining operations]
@@ -417,9 +417,9 @@ atom [x] 1 [] add [x] x 2 add [x] x 3
 
 [Lemme try some tail optimized recursion.]
 atom [func n] do [
-   sub n 1
-   == n 0
-   false? func n
+    sub n 1
+    == n 0
+    false? func n
 ]
 
 [When a procedure interacs with the left hand side of the code, it's a procedure, but when it
@@ -456,51 +456,51 @@ value for [it].]
 
 [Here are some definitions for the loops]
 atom [loop proc] do [
-   proc
-   loop proc
+    proc
+    loop proc
 ]
 atom [repeat to proc] for 0 n proc
 atom [for it to proc] do [
-   cmp [result] it to
-   = error [[it] and [to] cannot be the same values; please try another combination.]
-   > for-
-   < for+
+    cmp [result] it to
+    = error [[it] and [to] cannot be the same values; please try another combination.]
+    > for-
+    < for+
 ]
 atom [for-] do [
-   proc
-   sub [it] 1
-   cmp it to
-   != for it to proc
+    proc
+    sub [it] 1
+    cmp it to
+    != for it to proc
 ]
 atom [for+] do [
-   proc
-   add [it] 1
-   cmp it to
-   != for it to proc
+    proc
+    add [it] 1
+    cmp it to
+    != for it to proc
 ]
 atom [for-each items proc] do [
-   get-len [len] items
-   for 0 len proc
+    get-len [len] items
+    for 0 len proc
 ]
 atom [while proc] do [
-   atom [while?] true
-   atom [label] while?
-   while-arg
+    atom [while?] true
+    atom [label] while?
+    while-arg
 ]
 atom [while-arg] do [
-   proc
-   if label while-arg []
+    proc
+    if label while-arg []
 ]
 
 [But functionnal may actually come out of it as well...]
 atom [+ x y] do [
-   add [x] x y
-   x
+    add [x] x y
+    x
 ]
 + + 1 2 3
 atom [x] + atom [y] 1 do [
-   add [x] x y
-   x
+    add [x] x y
+    x
 ] 2 3
 [Seriously, what does [atom [proc] do []]?]
 
@@ -517,8 +517,8 @@ atom [proc] [] do proc
 
 [Also]
 atom [join proc next] do [
-   proc
-   next
+    proc
+    next
 ]
 join add [x] x y join add [x] x y []
 atom [join proc next] join proc join proc join proc []
@@ -528,59 +528,59 @@ atom [proc] add [x] x y atom [next] join proc
 
 [I'll try again]
 atom [join proc next] do [
-   proc
-   next
+    proc
+    next
 ]
 atom [thing] join proc1 join proc2 join proc3 []
 [This is what I had in mind. I don't know how it's better than do [] though...]
 
 [I'm conflicted about this...]
 atom [+ x y] do [
-   x
-   add [x] x y
+    x
+    add [x] x y
 ]
 + + 1 2 3
 [Should I consider functionnal again?]
 
 [Wait, no. Shit gets fucked up.]
 atom [x] + 1 2 atom [y] 3 do [
-   x
-   add [x] x y
+    x
+    add [x] x y
 ]
 atom [x] + 1 2 atom [y] 3 do [
-   + 1 2
-   add [x] x y
+    + 1 2
+    add [x] x y
 ]
 atom [x] + 1 2 atom [y] 3 do [
-   atom [x] 1 atom [y] 2 do [
-      x
-      add [x] x y
-   ]
-   add [x] x y
+    atom [x] 1 atom [y] 2 do [
+        x
+        add [x] x y
+    ]
+    add [x] x y
 ]
 atom [x] + 1 2 atom [y] 3 do [
-   atom [x] 1 atom [y] 2 do [
-      1
-      add [x] x y
-   ]
-   add [x] x y
+    atom [x] 1 atom [y] 2 do [
+        1
+        add [x] x y
+    ]
+    add [x] x y
 ]
 [Maybe if I made [x] and [y] local to the procedure?]
 
 atom [add-all x y] do [
-   == y []
-   false? do [
-      add [x] x y
-      add-all x
-   ]
+    == y []
+    false? do [
+        add [x] x y
+        add-all x
+    ]
 ]
 add-all 1 2 3 []
 atom [x] 1 atom [y] 2 do [
-   == y []
-   false? do [
-      add [x] x y
-      add-all x
-   ]
+    == y []
+    false? do [
+        add [x] x y
+        add-all x
+    ]
 ] 3 []
 atom [x] 1 atom [y] 2 add-all x 3 []
 [Hm. Does it really work like that?]
@@ -599,51 +599,51 @@ atom [atom name value] push-key name value atoms
 
 [Functionnal again]
 atom [+ x y] do [
-   x y
-   proc? [x] atom [x] _
-   proc? [y] atom [y] _
-   add [_] x y
+    x y
+    proc? [x] atom [x] _
+    proc? [y] atom [y] _
+    add [_] x y
 ]
 + + 1 2 + 3 4
 atom [x] + 1 2 atom [y] + 3 4 do [
-   x y
-   proc? [x] atom [x] _
-   proc? [y] atom [y] _
-   add [_] x y
+    x y
+    proc? [x] atom [x] _
+    proc? [y] atom [y] _
+    add [_] x y
 ]
 atom [x] + 1 2 atom [y] + 3 4 do [
-   atom [x] 1 atom [y] 2 do [
-      x y
-      proc? [x] atom [x] _
-      proc? [y] atom [y] _
-      add [_] x y
-   ]
-   atom [x] 3 atom [y] 4 do [
-      x y
-      proc? [x] atom [x] _
-      proc? [y] atom [y] _
-      add [_] x y
-   ]
-   proc? [x] atom [x] _
-   proc? [y] atom [y] _
-   add [_] x y
+    atom [x] 1 atom [y] 2 do [
+        x y
+        proc? [x] atom [x] _
+        proc? [y] atom [y] _
+        add [_] x y
+    ]
+    atom [x] 3 atom [y] 4 do [
+        x y
+        proc? [x] atom [x] _
+        proc? [y] atom [y] _
+        add [_] x y
+    ]
+    proc? [x] atom [x] _
+    proc? [y] atom [y] _
+    add [_] x y
 ]
 atom [x] + 1 2 atom [y] + 3 4 do [
-   atom [x] 1 atom [y] 2 do [
-      1 2
-      proc? [x] atom [x] _
-      proc? [y] atom [y] _
-      add [_] x y
-   ]
-   atom [x] 3 atom [y] 4 do [
-      3 4
-      proc? [x] atom [x] _
-      proc? [y] atom [y] _
-      add [_] x y
-   ]
-   proc? [x] atom [x] _
-   proc? [y] atom [y] _
-   add [_] x y
+    atom [x] 1 atom [y] 2 do [
+        1 2
+        proc? [x] atom [x] _
+        proc? [y] atom [y] _
+        add [_] x y
+    ]
+    atom [x] 3 atom [y] 4 do [
+        3 4
+        proc? [x] atom [x] _
+        proc? [y] atom [y] _
+        add [_] x y
+    ]
+    proc? [x] atom [x] _
+    proc? [y] atom [y] _
+    add [_] x y
 ]
 [Is it impossible? Well whatever. I can tell already: the hoops you have to jump through to get this
 behavior is insane. I will probably still try to make this work, but the procedural way is far
@@ -672,7 +672,7 @@ removed from the list of variables?]
 [If each variable has the following values:]
 
 struct [atom] [
-   name value before after
+    name value before after
 ]
 
 [where [name] is of course the symbol of the [atom], then [value] is the what it returns, or the
@@ -715,3 +715,17 @@ Rust or C...]
 
 [Btw, the model where we do [add #-1 #1] is interesting but stupid, because what is [add] defined
 as? There is still a lesson here though. Just need to find out which.]
+
+[Maybe I shouldn't have a hex procedure? Maybe numbers simply get hexecuted (?) when 32 bits have be
+gathered? Maybe numbers are just functions that reduce to themselves in binary format?]
+
+[I think I should just use hexadecimal for all number types. Like what, is anyone going to use my
+programming language expect me? And little endian too. Of course that would mean I need to get used
+to hexadecimal, and convert it off the top of my head, but otherwise, I should try it and see how it
+works.]
+
+[Incidentally, in regards to trying out things, I think the 3 space indent is bad. I tried it for
+some C code, and while it isn't as noticeable for small procedures, for larger ones, 3 spaces just
+feels wrong. Not to mention, 4 spaces is byte aligned.]
+
+

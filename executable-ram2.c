@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 
 int main(int argc, char **argv) {
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
         printf("Error: Hexadecimal string length must be even.\n");
         return 1;
     }
-    
+
     // Convert hexadecimal string to byte array
     size_t codeSize = hexLength / 2;
     unsigned char *code = malloc(codeSize);
