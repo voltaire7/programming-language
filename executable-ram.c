@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
+// Run code with 200d80d2300080d2011000d4 as argument to test
 int main(int argc, char **argv) {
     if (argc != 2) {
         printf("Usage: %s <hex_string>\n", argv[0]);
@@ -12,20 +13,35 @@ int main(int argc, char **argv) {
     // Get the hexadecimal string from command-line argument
     const char *hexString = argv[1];
     size_t hexLength = strlen(hexString);
-    if (hexLength % 2 != 0) {
-        printf("Error: Hexadecimal string length must be even.\n");
+
+    // Determine the actual length of the hex string without whitespace
+    size_t actualHexLength = 0;
+    for (size_t i = 0; i < hexLength; ++i) {
+        if (hexString[i] != ' ') { // Ignore whitespace
+            ++actualHexLength;
+        }
+    }
+
+    if (actualHexLength % 2 != 0) {
+        printf("Error: Hexadecimal string length must be even after ignoring whitespace.\n");
         return 1;
     }
 
     // Convert hexadecimal string to byte array
-    size_t codeSize = hexLength / 2;
+    size_t codeSize = actualHexLength / 2;
     unsigned char *code = malloc(codeSize);
     if (code == NULL) {
         perror("malloc");
         return 1;
     }
+
+    size_t j = 0; // Index for the actual hex string without whitespace
     for (size_t i = 0; i < hexLength; i += 2) {
-        sscanf(&hexString[i], "%2hhx", &code[i / 2]);
+        while (hexString[j] == ' ') {
+            j += 1; // Skip whitespace
+        }
+        sscanf(&hexString[j], "%2hhx", &code[i / 2]);
+        j += 2;
     }
 
     int (*addr)() = NULL;
@@ -41,7 +57,7 @@ int main(int argc, char **argv) {
     memcpy(addr, code, codeSize);
 
     // Modify the protection to allow execution
-    if (mprotect(addr, sizeof(code), PROT_EXEC) == -1) {
+    if (mprotect(addr, codeSize, PROT_EXEC) == -1) {
         perror("mprotect");
         return 1;
     }

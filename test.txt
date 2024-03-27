@@ -731,4 +731,9 @@ feels wrong. Not to mention, 4 spaces is byte aligned.]
 [I think I might replace every instance of [atom] with [macro], because that's what they are. But I
 don't know. [atom] sounds real nice.]
 
+[If I write]
+mov x0 [str]
+[should x0 now have the utf-8 value of [str]? I feel like yes... But that would mean that mov isn't
+a parameterless macro... Though.]
+
 
