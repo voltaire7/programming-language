@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-// Run code with 200d80d2300080d2011000d4 as argument to test
+// Run code with '200d80d2 300080d2 011000d4' as argument to test
 int main(int argc, char **argv) {
     if (argc != 2) {
         printf("Usage: %s <hex_string>\n", argv[0]);
@@ -23,7 +23,8 @@ int main(int argc, char **argv) {
     }
 
     if (actualHexLength % 2 != 0) {
-        printf("Error: Hexadecimal string length must be even after ignoring whitespace.\n");
+        printf("Error: Hexadecimal string length must be even after ignoring "
+               "whitespace.\n");
         return 1;
     }
 

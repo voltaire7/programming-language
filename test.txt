@@ -736,4 +736,20 @@ mov x0 [str]
 [should x0 now have the utf-8 value of [str]? I feel like yes... But that would mean that mov isn't
 a parameterless macro... Though.]
 
+[This blows. I found out that the way an instruction is encoded is not necessarily byte aligned, an
+so I will find it difficult to write the most basic macro...]
+
+[And now chatGPT tells me that not every instruction is 32 bits. This is going to be so difficult.]
+
+[Oh hey there, I didn't see you. So after giving RISC-V's specification a look I saw that unlike
+arm64, the opcode is the smallest value, and the destination register is the thing that follows. So
+I think I'm going to try and run the programming language on a RISC-V platform. This is of course
+far harder than it sounds, but no harm in trying.]
+
+[The idea about abandonning [hex []] is no longer realistic. To begin with, opcodes are not byte
+aligned, whether on arm64 or RISC-V. So I'll instead have something call [bin []].]
+
+[Damn, I don't think I could even do something like [[mov] -> 000000] because, we do do know that
+[x1] will be a fixed size, but not the number that follows.]
+
 
