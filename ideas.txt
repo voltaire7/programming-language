@@ -761,4 +761,3 @@ example, [printf] a function pointer? Damn, this is tough.]
 typing [(func arg1 arg2)], call the function. But man, this sucks, because I build this whole idea
 over the premise that the LISP model is imperfect. I can cede just yet...]
 
-
