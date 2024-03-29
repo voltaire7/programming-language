@@ -752,4 +752,9 @@ aligned, whether on arm64 or RISC-V. So I'll instead have something call [bin []
 [Damn, I don't think I could even do something like [[mov] -> 000000] because, we do do know that
 [x1] will be a fixed size, but not the number that follows.]
 
+[I am a little conflicted now: in [foo] could just be a function pointer, and you call the pointer
+by putting parentheses after it. This is elegant, and I like it. Question is, how do I replicate the
+behavior? Do I just quote it? But then, how is it different from a normal string? How do I, for
+example, [printf] a function pointer? Damn, this is tough.]
+
 
