@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 
 #define BUFSZ 8
@@ -22,7 +21,8 @@ int main(int argc, char **argv) {
 
     /* read/output BUFSZ bytes at a time */
     while ((bytes = fread(buf, sizeof *buf, readsz, fp_in)) == readsz) {
-        fwrite(buf, sizeof *buf, readsz, fp_out); // Write buffer contents to file
+        fwrite(buf, sizeof *buf, readsz,
+               fp_out); // Write buffer contents to file
     }
 
     if (fp_in != stdin)

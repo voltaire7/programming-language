@@ -4,14 +4,14 @@
 #include <sys/mman.h>
 
 // Run code with '200d80d2 300080d2 011000d4' as argument to test
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     if (argc != 2) {
         printf("Usage: %s <hex_string>\n", argv[0]);
         return 1;
     }
 
     // Get the hexadecimal string from command-line argument
-    const char *hexString = argv[1];
+    const char* hexString = argv[1];
     size_t hexLength = strlen(hexString);
 
     // Determine the actual length of the hex string without whitespace
@@ -23,14 +23,16 @@ int main(int argc, char **argv) {
     }
 
     if (actualHexLength % 2 != 0) {
-        printf("Error: Hexadecimal string length must be even after ignoring "
-               "whitespace.\n");
+        printf(
+            "Error: Hexadecimal string length must be even after ignoring "
+            "whitespace.\n"
+        );
         return 1;
     }
 
     // Convert hexadecimal string to byte array
     size_t codeSize = actualHexLength / 2;
-    unsigned char *code = malloc(codeSize);
+    unsigned char* code = malloc(codeSize);
     if (code == NULL) {
         perror("malloc");
         return 1;

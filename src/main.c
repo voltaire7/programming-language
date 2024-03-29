@@ -1,8 +1,16 @@
 #include <stdio.h>
 
+#include "reading.c"
+
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        printf("Usage: %s <hex_string>\n", argv[0]);
-        return 1;
+    switch (argc) {
+        case 1:
+            repl();
+            break;
+        case 2:
+            printf("file");
+            break;
+        default:
+            return 1;
     }
 }
