@@ -757,4 +757,7 @@ by putting parentheses after it. This is elegant, and I like it. Question is, ho
 behavior? Do I just quote it? But then, how is it different from a normal string? How do I, for
 example, [printf] a function pointer? Damn, this is tough.]
 
+[Ok this is something that might give LISP edge: by typing [func], you get the function pointer, by
+typing [(func arg1 arg2)], call the function. But man, this sucks, because I build this whole idea
+over the premise that the LISP model is imperfect. I can cede just yet...]
 
