@@ -1,5 +1,5 @@
 AccessModifierOffset: -2
-AlignAfterOpenBracket: BlockIndent    # New in v14. For earlier clang-format versions, use AlwaysBreak instead.
+AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveMacros: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
@@ -61,9 +61,9 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: Inner
 PointerAlignment: Left
-ReferenceAlignment: Left              # New in v13. int &name  ==>  int& name
+ReferenceAlignment: Left
 ReflowComments: false
-SeparateDefinitionBlocks: Always      # New in v14.
+SeparateDefinitionBlocks: Always
 SortIncludes: true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
@@ -85,3 +85,4 @@ SpacesInSquareBrackets: false
 Standard: Cpp11
 TabWidth: 4
 UseTab: Never
+InsertBraces: true
