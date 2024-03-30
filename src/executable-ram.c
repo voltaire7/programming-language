@@ -3,7 +3,8 @@
 #include <string.h>
 #include <sys/mman.h>
 
-// Run code with '200d80d2 300080d2 011000d4' as argument to test
+// Run code with "400880d2 300080d2 011000d4" as argument to test
+// Found the problem: the procedure does not call return. Lot's of problems from that.
 int main(int argc, char** argv) {
     if (argc != 2) {
         printf("Usage: %s <hex_string>\n", argv[0]);

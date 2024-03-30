@@ -1,9 +1,9 @@
-#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/_types/_size_t.h>
 
-void remove_whitespace(char* str) {
+void remove_non_bin(char* str) {
     int i, j = 0;
     for (i = 0; str[i] != '\0'; i++) {
         if (str[i] == '0' || str[i] == '1') {
@@ -13,30 +13,64 @@ void remove_whitespace(char* str) {
     str[j] = '\0';
 }
 
-int reverse(int x) {
-    int ans = 0;
-    while (x != 0) {
-        int digit = x % 10;
-        if (ans > INT_MAX / 10 || ans < INT_MIN / 10) {
-            return 0;
+void remove_non_hex(char* str) {
+    int i, j = 0;
+    for (i = 0; str[i] != '\0'; i++) {
+        if ((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'a' && str[i] <= 'f')
+            || (str[i] >= 'A' && str[i] <= 'F')) {
+            str[j++] = str[i];
         }
-        ans = (ans * 10) + digit;
-        x /= 10;
     }
-    return ans;
+    str[j] = '\0';
 }
 
-int str_to_n(char* bin) {
-    remove_whitespace(bin);
-    int length = strlen(bin);
-    if (length % 32 != 0) {
-        printf(
-            "Error: Binary string length must be even after ignoring "
-            "whitespace.\n"
-        );
-        return -1;
+void reverse_string(char* str) {
+    int length = strlen(str);
+    int start = 0;
+    int end = length - 1;
+
+    while (start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+
+        start++;
+        end--;
     }
-    unsigned long num = strtoul(bin, NULL, 2);
-    return num;
-    // return reverse(num);
+}
+
+unsigned int* from_bin(char* bin) {
+    remove_non_bin(bin);
+    // reverse_string(bin);
+    int length = strlen(bin);
+    if (length % 32 != 0 || length == 0) {
+        printf("Error: This interpreter only accepts 32 bit instructions.\n");
+        return NULL;
+    }
+    unsigned int var = strtoul(bin, NULL, 2);
+    return NULL;
+}
+
+unsigned int* from_hex(char* hex, size_t* size) {
+    remove_non_hex(hex);
+    int length = strlen(hex);
+    // reverse_string(bin);
+    if (length % 8 != 0 || length == 0) {
+        printf("Error: This interpreter only accepts 32 bit instructions.\n");
+        return NULL;
+    }
+
+    *size = length / 2;
+    printf("length: %zu\n", *size);
+    unsigned int* code = malloc(*size);
+    int i = 0;
+    for (; i < length / 8; i += 1) {
+        char hexSubstring[9];
+        strncpy(hexSubstring, &hex[i * 8], 8);
+        hexSubstring[8] = '\0';
+
+        code[i] = (unsigned int) strtoul(hexSubstring, NULL, 16);
+    }
+    code[i + 1] = 0xd65f03c0;
+    return code;
 }

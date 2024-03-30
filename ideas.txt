@@ -761,3 +761,10 @@ example, [printf] a function pointer? Damn, this is tough.]
 typing [(func arg1 arg2)], call the function. But man, this sucks, because I build this whole idea
 over the premise that the LISP model is imperfect. I can cede just yet...]
 
+[I figured it out, if every value in LISP returns a pointer by default, then you would have to call
+variables as well (even more parentheses; heck no!). And in C, you constanly reference and
+dereference a variable, which is the equivalent of quoting and unquoting, but with a different
+syntax. Not to mention you don't really have symbols. In which case, I still need to figure out the
+tug of war between symbols, pointers and values.]
+
+
