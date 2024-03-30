@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,38 +40,48 @@ void reverse_string(char* str) {
     }
 }
 
-unsigned int* from_bin(char* bin) {
-    remove_non_bin(bin);
+unsigned int* from_str(char* str, size_t* size, int base, char endian) {
+    switch (base) {
+        case 2:
+            remove_non_bin(str);
+            break;
+        case 16:
+            remove_non_hex(str);
+            break;
+        default:
+            printf("Error: Unsupported 'base %d'\n", base);
+            exit(1);
+    }
+
+    if (endian == 'e') {
+        reverse_string(str);
+    } else if (endian != 'E') {
+        printf(
+            "Error: Please specify either little-endian 'e' or big-endian 'E'. "
+            "'%c' is not a valid option.\n",
+            endian
+        );
+        exit(1);
+    }
+
     // reverse_string(bin);
-    int length = strlen(bin);
-    if (length % 32 != 0 || length == 0) {
+    int length = strlen(str);
+    int digit_count = ceil(log(pow(2, 32) - 1) / log(base));
+    if (length % digit_count != 0 || length == 0) {
         printf("Error: This interpreter only accepts 32 bit instructions.\n");
         return NULL;
     }
-    unsigned int var = strtoul(bin, NULL, 2);
-    return NULL;
-}
 
-unsigned int* from_hex(char* hex, size_t* size) {
-    remove_non_hex(hex);
-    int length = strlen(hex);
-    // reverse_string(bin);
-    if (length % 8 != 0 || length == 0) {
-        printf("Error: This interpreter only accepts 32 bit instructions.\n");
-        return NULL;
-    }
-
-    *size = length / 2;
-    printf("length: %zu\n", *size);
+    *size = length / digit_count * 4 + 4;
     unsigned int* code = malloc(*size);
     int i = 0;
-    for (; i < length / 8; i += 1) {
-        char hexSubstring[9];
-        strncpy(hexSubstring, &hex[i * 8], 8);
-        hexSubstring[8] = '\0';
+    for (; i < length / digit_count; i += 1) {
+        char hexSubstring[digit_count + 1];
+        strncpy(hexSubstring, &str[i * digit_count], digit_count);
+        hexSubstring[digit_count] = '\0';
 
-        code[i] = (unsigned int) strtoul(hexSubstring, NULL, 16);
+        code[i] = (unsigned int) strtoul(hexSubstring, NULL, base);
     }
-    code[i + 1] = 0xd65f03c0;
+    code[i] = 0xd65f03c0;
     return code;
 }

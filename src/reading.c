@@ -5,12 +5,12 @@
 #include "execute.c"
 
 int repl() {
-    char buffer[100]; // Buffer to store input
+    char buffer[100];
 
     while (1) {
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
             size_t size;
-            unsigned int* code = from_hex(buffer, &size);
+            unsigned int* code = from_str(buffer, &size, 2, 'E');
             if (code != NULL) {
                 execute(code, size);
             }
