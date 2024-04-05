@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <sys/_types/_size_t.h>
 
-#include "convert-str.c"
-#include "execute.c"
+#include "execute.h"
+#include "from_str.h"
 
 int repl() {
     char buffer[100];

@@ -767,4 +767,45 @@ dereference a variable, which is the equivalent of quoting and unquoting, but wi
 syntax. Not to mention you don't really have symbols. In which case, I still need to figure out the
 tug of war between symbols, pointers and values.]
 
+[Iteration may actually be better than recursion... I mean, in assembly you have branch and branch
+with link; so while you usually do recursion, it's not really the same.]
+
+[More details about eager vs lazy.]
+chain 1 + 2 + 3 + 4 as [val]
+macro [val] do [chain 1 + 2 + 3 + 4]
+[The first one is eager because the program takes those additions and executes them left-to-right;
+the second one is lazy because [macro] gets executed, but not the arguments, since they are absorbed
+into the procedure call.]
+
+[I've been getting pretty decent at the CLI, but doing so, I question having to put [] around every
+thing that isn't a function or procedure call. Maybe I should follow LISP in this?]
+
+[Another reason why I shouldn't do [import] and instead just reference a file like a script is that
+I want the compiler to be single pass, but doing it otherwise would be complicated.]
+
+[Okay, so big problem for procedural:]
+atom [add x y z] todo
+[How do I define it?]
+atom [add x y z]
+    atom x + y z
+[Like this? Do you see the problem? Thing is, I'm trying to merge [add] and store instructions into
+the same thing, but they are not the same thing. The solution could be as follows:]
+atom [+ x] do [
+    add x0 _ x1
+    store x0 [_]
+]
+[where everything returns to [_]. Only the instructions themselves will keep use the old format, the
+rest will behave much like functionnal, but still left-to-right.]
+
+[But then again...]
+atom [+ x] atom [_] add _ x
+
+[It's important I get this right, because if I don't, the programming language may be dog shit.]
+
+[Maybe everything that hasn't been defined yet evaluates to itself, quoted. So that's how I could do
+numbers.]
+
+[I might want to create a proper proper LISP first using my low level model, just to get the hand of
+it.]
+
 
