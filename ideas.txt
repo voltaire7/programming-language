@@ -808,4 +808,66 @@ numbers.]
 [I might want to create a proper proper LISP first using my low level model, just to get the hand of
 it.]
 
+[Perhaps...]
+atom [recursive-proc x y] do [
+    todo x y
+    goto [recursive-proc]
+]
+[that way, there is no need to redefine [x] and [y] since they are already defined.]
+
+[[before] and [after] may be too much. An [env] should only have [symbol], [value] and [size].]
+
+[Do I really need dependent types? Is there no better way to check for correctness?]
+atom [val x] do [
+    < x 0 true? error [cannot be negative]
+    todo
+]
+val -1
+[The linter should be smart enough to tell that this will always throw, and warn you of it. No need
+for types; they are too complicated anyway.]
+
+[I am all the more motivated to create a LISP, because of this:]
+(define func (lambda (a) (display a)))
+[Because it's eager loaded, lambda executes, creates a procedure, and returns the pointer to it.]
+(func "Hello, World!")
+(func func) [outputs something like 0x20D1A5BC]
+[Holy fuck, is this elegant...]
+
+[Maybe]
+atom [func] lambda [a] print a
+func at [func]
+[outputs something like 0x20D1A5BC]
+func do [func] [Hello, World!]
+
+[In LISP, you have special notation for quoting, but everything else is call by value or call a
+procedure. In my language, lists are quoted by default, and if a procedure has args, they are called
+by default, when not quoted. But that was the funcionnal one. What about procedural?]
+
+atom [func] lambda [a] print a
+[Does not work because [lambda] is lazy. And procedures shouldn't be able to returns things.]
+lambda [a] print a as [func]
+[I think this works, but should I?]
+
+[Once again, functionnal is making a comeback.]
+[Also, I really need to figure out how to lazy [print]...]
+
+[Okay, lazy vs eager eval really fucks me up, because you have to mix them up, right?]
+atom [test] do [
+    other-func lambda [x] x
+    print _
+]
+[Does lambda create a new procedure everytime [test] is called?]
+
+atom [func] lambda [x y] todo
+[[lambda] is eager, but todo is not? What is the logic behind that?]
+lambda [x y] todo as [func]
+[More ugly but makes more sense. Maybe I already found the answer; and I'm just being stupid:]
+lambda [x] x
+atom [test] do [
+    other-func _
+    print _
+]
+[I guess it is still better than LISP, since I doesn't have some arbitrary procedures that lazy
+instead of the eager default.]
+
 

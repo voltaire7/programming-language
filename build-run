@@ -1,0 +1,3 @@
+#!/usr/bin/env fish
+
+cc src/main.c src/execute.c src/from_str.c && ./a.out $argv
