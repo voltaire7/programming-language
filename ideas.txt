@@ -870,4 +870,19 @@ atom [test] do [
 [I guess it is still better than LISP, since I doesn't have some arbitrary procedures that lazy
 instead of the eager default.]
 
+[I should drop the eager function as arguments, or whatever. Doesn't make sense with new model:]
+atom [func x y z] do [
+    print x
+    print y
+    print z
+]
+func [add] 1 2
+[becomes]
+do [add] 1 2
+[wait no... I have to rework [do []] if I do that...]
+
+[I should consider it seriously still... The biggest problem is [atom] and it's implementation.]
+[Maybe [list] will make a comeback? Nevermind again. There is simply no way of doing this without
+having non-quoted lists.]
+
 
