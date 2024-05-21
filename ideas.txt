@@ -885,4 +885,86 @@ do [add] 1 2
 [Maybe [list] will make a comeback? Nevermind again. There is simply no way of doing this without
 having non-quoted lists.]
 
+[Ok, let's think. Because I think I am unto something.]
+[Still a comment/string]
+(define [name] 5)
+(print name) [outputs [pointer] so bad]
+(print (name)) [outputs [value] so good]
+
+[Ok, now without parentheses, or less.]
+[Comment]
+define [name] 5
+print name [outputs [value] so good]
+print ptr-to name [outputs [pointer] so good]
+[problem is: should it be eager or lazy]
+
+[cannot be eager]
+define [func x y] do []
+
+[this can]
+define [func] lambda [x y] [print x print y]
+func 1 2
+[becomes]
+let [x y] 1 2 do [print x print y]
+[but should I?]
+
+[what about]
+define [func x y] ()
+[yeah, I've got nothing. I thought I was unto something last night; something to do with parentheses
+to be used for eager loading, but I don't remember what.]
+
+[wait no, the lisp example works because the [value] of [name] is a pointer to a pointer!]
+[damn, I went through this train of thought a while ago...]
+
+[In any case...]
+atom [atom symbol return] do [
+    ch symbol len > 1
+    then do [
+        car symbol as [name]
+        cdr symbol as [params]
+        atom name lambda params return
+    ]
+    else append env symbol return
+]
+[but it has to be lazy, otherwise [then do []] will get evaluated.]
+[god this shit is confusing]
+
+[maybe...]
+atom [then x] if _ x []
+atom [else x] if _ [] x
+
+[it should be lazy, but then I can't do [lambda]...]
+
+[optionnal []?]
+define name 3
+atom [define x y] do [
+    quoted? x atom x y
+    else atom quote x y
+]
+[something like that?]
+
+[it would be a bad practice though, but would make the all variables are quoted if undefined work.]
+
+[Hmm, if I do this...]
+atom [items] [ 1 2 3 ]
+[This would be a 5 [strings] or [u8] pointers, and the atom macro would see that the first pointer
+points to a value representing a array oppening, and then do the magic.]
+
+[Man... What the first macro takes the rest of the programming language as parameters? I think I had
+this idea before, but I would love to see this work!]
++ 1 2 - 3 4
+[[+] takes the first two values, then the rest; since it knows it only need two values, it simply
+executes [eval] or something like that, then [eval] executes the rest accordingly. If it's a
+[string], it calls eval on the next value; so on.]
+
+[Again, infix syntax, but not really.]
+atom [| x y] x _ y
+quote name | atom [John Doe]
+[Basically piping, but dummer. Equivalent:]
+quote name atom _ [John Doe]
+[This is not valid...]
+atom quote name [John Doe]
+[Since there are only side-effects.]
+[Also, I guess [x] is the first argument, while [y] is the rest of the application?]
+
 
