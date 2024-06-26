@@ -75,7 +75,7 @@ atom [a] 35
 [Model 3 - Procedures]
 list [x] [push 1 push 2 add]
 
-[On second thought... I don't really need a Model 3. I can make Model 1 both functionnal and
+[On second thought... I don't really need a Model 3. I can make Model 1 both functional and
 procedural. I think that's the best, yeah. The question is how do I keep the abstraction to a
 minimum.]
 
@@ -90,7 +90,7 @@ atom [fib n]
         n
         (+ (fib (- n 1)) (fib (- n 2)))))
 
-[A procedural programming language with functionnal caracteristics.]
+[A procedural programming language with functional caracteristics.]
 
 [Converted jai code]
 atom [render] do [
@@ -114,7 +114,7 @@ atom [test] do [
     [<3]
 ]
 
-[Procedural vs functionnal]
+[Procedural vs functional]
 atom [main] do [
     add [x] 1 2
     eq [y] x 3
@@ -140,7 +140,7 @@ atom [complex x y z] do [
     print x
 ]
 
-[Holy fuck! Procedural actually beats functionnal... I know this is an edge case, but if there's a
+[Holy fuck! Procedural actually beats functional... I know this is an edge case, but if there's a
 lot of mutable state in your app, it could benefit from it.]
 
 [I certainly like the limited indentation of procedural programming. As well as how it's read
@@ -272,7 +272,7 @@ atom [y] 2
 add [x] x y
 print x
 
-[It might be possible to make it as tacit as functionnal...]
+[It might be possible to make it as tacit as functional...]
 
 [Every procedure should have an opposite that reverse a change.]
 undo
@@ -365,7 +365,7 @@ the same exact character count...]
 [Still, I will stick with the second one. You only have to define a procedure once. And once you do,
 you can call it as many times as you want.]
 
-[Also, functionnal way for the bros:]
+[Also, functional way for the bros:]
 atom [test x y]
     print format [f] [[x] + [y] = [add x y]]
 test 1 2
@@ -375,7 +375,7 @@ atom [x] 1 atom [y] 2
 
 [Fuck, it's still so much nicer...]
 
-[But how does functionnal translate on the lower level?]
+[But how does functional translate on the lower level?]
 atom [x] 1 atom [y] 2
     print format [[x] + [y] = [add x y]]
 [becomes]
@@ -385,7 +385,7 @@ add [x1] x1 x2
 [string manipulation magic]
 [syscall to print]
 
-[The thing about functionnal, it that you don't need to name value. Everything is chained. But can't
+[The thing about functional, it that you don't need to name value. Everything is chained. But can't
 I do that with procedural as well? Pretty sure.]
 <= 1 0 true? print [yes] false? print [no]
 
@@ -492,7 +492,7 @@ atom [while-arg] do [
     if label while-arg []
 ]
 
-[But functionnal may actually come out of it as well...]
+[But functional may actually come out of it as well...]
 atom [+ x y] do [
     add [x] x y
     x
@@ -540,7 +540,7 @@ atom [+ x y] do [
     add [x] x y
 ]
 + + 1 2 3
-[Should I consider functionnal again?]
+[Should I consider functional again?]
 
 [Wait, no. Shit gets fucked up.]
 atom [x] + 1 2 atom [y] 3 do [
@@ -585,7 +585,7 @@ atom [x] 1 atom [y] 2 do [
 atom [x] 1 atom [y] 2 add-all x 3 []
 [Hm. Does it really work like that?]
 
-[More functionnal]
+[More functional]
 let [x y] 1 2
 atom [x] 1 atom [y] 2
 
@@ -597,7 +597,7 @@ atom [func] do [let [x y]]
 atom [atom name value] push-key name value atoms
 [But any more than, and we're implementing stuff.]
 
-[Functionnal again]
+[Functional again]
 atom [+ x y] do [
     x y
     proc? [x] atom [x] _
@@ -795,7 +795,7 @@ atom [+ x] do [
     store x0 [_]
 ]
 [where everything returns to [_]. Only the instructions themselves will keep use the old format, the
-rest will behave much like functionnal, but still left-to-right.]
+rest will behave much like functional, but still left-to-right.]
 
 [But then again...]
 atom [+ x] atom [_] add _ x
@@ -848,7 +848,7 @@ atom [func] lambda [a] print a
 lambda [a] print a as [func]
 [I think this works, but should I?]
 
-[Once again, functionnal is making a comeback.]
+[Once again, functional is making a comeback.]
 [Also, I really need to figure out how to lazy [print]...]
 
 [Okay, lazy vs eager eval really fucks me up, because you have to mix them up, right?]
@@ -966,5 +966,65 @@ quote name atom _ [John Doe]
 atom quote name [John Doe]
 [Since there are only side-effects.]
 [Also, I guess [x] is the first argument, while [y] is the rest of the application?]
+
+[Okay, listen.]
+atom [proc1] do [
+    get args 1 as arg1
+    print arg1
+]
+[because [args] is the rest of the application. So you can just index into it like some ordinary
+array. I love this!]
+[In fact, I can probably still do this:]
+atom [proc1 x y z] do []
+[equivalent]
+atom [proc1] do [
+    get args 0 as x
+    get args 1 as y
+    get args 2 as z
+]
+[Like bro, this is more elegant than anything I've come up with before!]
+
+[Holy fuck.]
+print [test]
+print [test again]
+[Usually, when you call a procedure, the things get put in the stack, but because the procedure
+you're calling is the one calling the next procedure, you fix most problems with recursion just like
+that!]
+
+calculate bottom top = sum $ filter (\x -> mod x 2 == 0) [bottom..top]
+[suppose...]
+atom [calculate bottom top] do [filter []]
+
+[I don't really like this]
+1 + 1 print _
+1 + 1 dbg
+[I probably won't keep debug, idk]
+
+[Functional won't die]
+atom [print x] do [
+    quote? x
+        then write x
+        else do [
+            x args
+            print _
+        ]
+]
+[so]
+print + 1 2 [outputs 3]
+
+[the beauty of this language is that anything is permissible]
+[the ugliness of this language is that anything is permissible]
+
+atom [+ x y] do [
+    num? x else do [x args as x]
+    num? y else do [x args as y]
+    + x y
+]
+print + * 1 2 - 3 4
+
+[I don't think I have to check for variables though?]
+atom [name] [Joe]
+print name
+[Damn, I don't know!]
 
 
