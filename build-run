@@ -1,3 +1,26 @@
 #!/usr/bin/env fish
 
-cc src/main.c src/execute.c src/from_str.c && ./a.out $argv
+# Check if at least one argument is provided
+if test (count $argv) -lt 1
+    echo "Usage: run_program.fish <command> [args...]"
+    exit 1
+end
+
+# Extract the first argument
+set command $argv[1]
+
+# Shift the arguments to pass the remaining ones to the programs
+set args (string join ' ' $argv[2..-1])
+
+# Execute the corresponding commands based on the first argument
+switch $command
+    case bin-exec
+        cc src/bin-exec/main.c src/bin-exec/execute.c src/bin-exec/from_str.c
+        ./a.out $args
+    case c-interp
+        cc src/c-interp/main.c
+        ./a.out $args
+    case '*'
+        echo "Unknown command: $command"
+        exit 1
+end

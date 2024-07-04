@@ -1156,4 +1156,28 @@ atom [+= val n] [
 let [a 1 b 2]
 [idk in what form though.]
 
+[Wait a second...]
+atom [func x y] fn [print [thing]]
+[this may be possible if [fn] moves [args] to the right.]
+[not very useful, though, since [fn] can't return anything...]
+
+[still can't do this though]
+0 then print x
+[[print] needs to be evaled to move [args]]
+
+[Sometimes, it's just ugly. I don't think I should go to such lengths just to avoid
+[proc [] [] as [f]]]
+[Death to syntaxic sugar!]
+[Also, quoting non-evaulated strings is just better. No suprise there.]
+
+[I could do this, though it's ugly.]
+0 then 1 print x
+[where]
+proc [skip f] [
+    [branching logic]
+        f args
+    += args skip
+] as [then]
+[could be worse]
+
 
