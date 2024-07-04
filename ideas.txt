@@ -1027,4 +1027,133 @@ atom [name] [Joe]
 print name
 [Damn, I don't know!]
 
+[btw, just remembered that I still don't know how to do [atom [] do []], at least not elegantly.]
+
+[in [bc] you can do [sqrt(2)] and the result is [1], but with [sqrt(2.0000000000)] and the result is
+[1.4142135623]; very interesting.]
+
+[The reason why [+ + 1 2 + 3 4] will never be possible is because in [+ a b], [a] and [b] will have
+to be argumentless functions that always return the same thing, which is obviously not procedural.]
+
+[Then again... Yeah, functionnal will never die. Anyway, can't way to finally put this project into
+motion.]
+
+[*Sigh*... Maybe I should add types... Otherwise, it becomes such a pain in the ass.]
+1.2 + 5 print _
+[How is [+] supposed to know if 1.2 is a float without specifying it...? [+float] maybe?
+[float-add]?]
+
+[Maybe I will have types, but they are not user declared?]
+
+atom [func x] fn [
+    print x
+]
+[[fn] is eager, compiles the quoted code and returns pointer to it?]
+atom [val1] [func]
+[[val1] = symbol to function.]
+do val1 1 [outputs [1]]
+atom [val2] func 2 [outputs [2]]
+[[val2] = [] because [func] got evaluated, and returned nothing?]
+
+fn [x] [print x] as [func]
+[more standard lambda?]
+
+[still, I could make it so [atom] always evaluates the value, it's just that if it's a variable,
+then the variables value will get assigned to [_]?]
+
+[maybe I could consider this:]
+atom var [this is a string]
+atom [var] [print [this is code]]
+[...but I already decided not to do this. If I do, the floodgates will open...]
+
+[btw, [let]]
+let [
+    a 2
+    b 5
+] []
+atom [let x y] fn [
+    count x as x-len
+    for 0 x-len [
+        get x it as [x0]
+        += [it] 1 get x it as [x1]
+        atom x0 x1
+    ]
+    do y
+    x-len / 2 pop _
+]
+[maybe a way to do scoping?]
+[nvm, can't define global variables this way.]
+[wait, not [pop 3] but reverse of [for]?]
+
+[right, almost forgot, if [fn] or whatever compile completely, we would need to compile the program
+supposing that we can stand long load times, since once the procedures have been assigned, and
+therefore compiled, they will run like it's a binary. food for thought.]
+
+[Perhaps this is the only overloading I need?]
+2 + 2 [integer addition]
+2.0 + 2.0 [floating point addition]
+[you would need to keep track of what value is what type yourself. The programming language doesn't
+do it for you.]
+2 + 2.0 [float added to int; fucks shit up]
+[also, I guess imaginary and complex numbers are kind of the same as integers, so you just need to
+keep track of that yourself as well.]
+[there's also this]
+2u64 + 2 [but maybe not? since temporary storage is like fixed size, but then again, it's also just
+a pointer... idk]
+[anyway, I should first try to avoid metadata like the plague, and see what happens.]
+
+func 1 2 as [val e]
+[multiple assignement?]
+
+1 > 0
+    then print [is bigger]
+    else print [is smaller]
+[^ this may be impossible, since [get args 1]]
+atom [then x] [
+    [insert branching logic]
+        x args
+]
+[since args is just a pointer, and the [x] in the assignement move the pointer right, you can just
+do this.]
+[still, it might be useful to have something like this:]
+1 > 0 ?
+    print [is bigger]
+    print [is smaller]
+[to prevent else from executing. idk.]
+[wait, shit. I remember now why I had to quote [x]: how do I know the args of [print] shouldn't be
+executed?]
+1 > 0
+    then [print [is bigger]]
+    else [print [is smaller]]
+
+[btw, this may be possible:]
+atom [func x] [
+    do-shit x
+    x args
+]
+1 func [+] 2 print _
+[nice.]
+
+[I'm still debating variable and procedure assignement.]
+proc [x y] [x + y print _] as [add-show]
+[^ this works, but it's ugly.]
+atom [func x y] + x y
+[doesn't work because of lazy vs eager.]
+
+[i think this is the best:]
+atom a 2                            [value of 2]
+atom str [this is a string]         [pointer to string]
+atom func' func                     [same pointer]
+atom [hello x y] [print [hello, world]] [compile procedure, [hello] now has the pointer to it.]
+
+[but that opens so many doors, and closes a few.]
+atom [+= val n] [
+    n + val as val
+]
+[or maybe it doesn't close doors?]
+
+[i should really consider this]
+let [a 1 b 2]
+[idk in what form though.]
+
 
