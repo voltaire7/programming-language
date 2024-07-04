@@ -1180,4 +1180,6 @@ proc [skip f] [
 ] as [then]
 [could be worse]
 
+[Remember to implement flipjump in the language.]
+
 
