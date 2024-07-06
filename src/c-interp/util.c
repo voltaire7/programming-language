@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern char*  fileContent;
-extern size_t contentSize;
-extern size_t position;
+char*  fileContent = NULL;
+size_t contentSize = 0;
+size_t position    = 0;
 
 void readFileContent(const char* filename) {
     FILE* filePointer = fopen(filename, "r");

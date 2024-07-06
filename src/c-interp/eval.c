@@ -1,13 +1,12 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "util.h"
 
-char*  fileContent = NULL;
-size_t contentSize = 0;
-size_t position    = 0;
+extern char*  fileContent;
+extern size_t contentSize;
+extern size_t position;
 
 int temp = 0;
 
