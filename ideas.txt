@@ -1035,7 +1035,7 @@ print name
 [The reason why [+ + 1 2 + 3 4] will never be possible is because in [+ a b], [a] and [b] will have
 to be argumentless functions that always return the same thing, which is obviously not procedural.]
 
-[Then again... Yeah, functionnal will never die. Anyway, can't way to finally put this project into
+[Then again... Yeah, functional will never die. Anyway, can't way to finally put this project into
 motion.]
 
 [*Sigh*... Maybe I should add types... Otherwise, it becomes such a pain in the ass.]
@@ -1183,5 +1183,40 @@ proc [skip f] [
 [Remember to implement flipjump in the language.]
 
 [I guess it's also a bit like vertical align: it's ugly but objectively better...]
+
+[maybe I could have [proc] and [item]?]
+
+[I doubt I could compile a procedure using the C interpreter, but I could probably do a scuffed
+variant, one that write C code to a file, compiles it and then executes the binary.]
+
+[I should have donut shaped code that prints donut as a demo.]
+
+[My [env] stack should have standard CRUD operations, plus upsert.]
+
+[I should make [bin-exec] as small as possible, i.e. ignore all the characters other than 0 and 1.]
+
+[I realized something.]
+2 print _ [outputs 2]
+item [a] 2
+a + 2 print _ [panic at a, because it is treating [a] as a procedure pointer.]
+ch a + 2 print _ [outputs 4]
+[guess [ch] makes a comeback.]
+[btw, would've been classy is it was called [return] instead of [ch], but it's too long, and it
+doesn't make sense in a lot of situations.]
+
+[I should consider making numbers not special. So the simplicity is taken to the extreme. Like
+functional, it needs testing.]
+
+[Also, experiment with tabs for vertical align.]
+
+[Should do tetris in C, then in this language.]
+
+[I should mention, this language is procedural, yet it is still takes inspiration from lambda
+calculus.]
+
+[Don't forget to experiment with spaced variable names. I doubt I will actually use it in
+production, but I want to see what it would look like.]
+
+[btw, the way procedure calls are done, allows infinite recursion.]
 
 

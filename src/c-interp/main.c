@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "env.c"
+
 char*  fileContent = NULL;
 size_t contentSize = 0;
 size_t position    = 0;
@@ -33,9 +35,8 @@ void readFileContent(const char* filename) {
     fclose(filePointer);
 }
 
-void printlen(char* str, const int offset, const int len) {
-    for (int i = offset; i != len; i++) putchar(str[i]);
-    putchar('\n');
+void printlen(char* str, const int len) {
+    for (char* max = str + len; str != max; str++) putchar(*str);
 }
 
 int atoi_len(const char* str, int length) {
@@ -87,15 +88,10 @@ void eval() {
                 temp = atoi_len(fileContent + start, position - start);
 
                 printf("Number: ");
-                printlen(fileContent, start, position);
-            } else {
-                while (!isspace(fileContent[position])
-                       && fileContent[position] != '\0') {
-                    position++;
-                }
-                printf("Symbol: ");
-                printlen(fileContent, start, position);
-            }
+                printlen(fileContent + start, position - start);
+            } else
+                goto symbol;
+
         } else if (fileContent[position] == '[') {
             position++;
             int layer = 0;
@@ -105,20 +101,23 @@ void eval() {
                 position++;
             } while (fileContent[position] != ']' || layer != 0);
             printf("Quote : ");
-            printlen(fileContent, start, ++position);
+            printlen(fileContent + start, ++position - start);
         } else {
             position++;
+        symbol:
             while (!isspace(fileContent[position])
                    && fileContent[position] != '0') {
                 position++;
             }
             printf("Symbol: ");
-            printlen(fileContent, start, position);
+            printlen(fileContent + start, position - start);
         }
+        putchar('\n');
     }
 }
 
 int main(int argc, char** argv) {
+    Dictionary* env = NULL;
     if (argc < 2) {
         printf("Usage: %s <filename>\n", argv[0]);
         return 1;
