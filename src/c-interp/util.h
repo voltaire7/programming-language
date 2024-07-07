@@ -8,5 +8,6 @@
 
 void readFileContent(const char* filename);
 void printlen(char* str, const int len);
+void eprintlen(char* str, const int len);
 
 #endif

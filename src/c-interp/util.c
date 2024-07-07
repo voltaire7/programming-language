@@ -33,3 +33,7 @@ void readFileContent(const char* filename) {
 void printlen(char* str, const int len) {
     for (char* max = str + len; str != max; str++) putchar(*str);
 }
+
+void eprintlen(char* str, const int len) {
+    for (char* max = str + len; str != max; str++) fputc(*str, stderr);
+}

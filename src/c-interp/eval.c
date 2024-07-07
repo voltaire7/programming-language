@@ -7,34 +7,34 @@
 
 extern char*  fileContent;
 extern size_t contentSize;
-extern size_t position;
+extern size_t token_end;
 
 extern Dictionary* env;
 
 void eval() {
     Value val;
-    for (;; position++) {
-        while (isspace(fileContent[position])) {
-            position++;
+    for (;; token_end++) {
+        while (isspace(fileContent[token_end])) {
+            token_end++;
         }
 
-        if (position >= contentSize) {
+        if (token_end >= contentSize) {
             exit(0);
         }
 
-        int offset = position;
-        if (isdigit(fileContent[position])) {
-            position++;
+        int offset = token_end;
+        if (isdigit(fileContent[token_end])) {
+            token_end++;
             ValueType type = INT_TYPE;
-            while (isdigit((fileContent[position]))) position++;
-            if (fileContent[position] == '.') {
-                while (isdigit(fileContent[++position]))
+            while (isdigit((fileContent[token_end]))) token_end++;
+            if (fileContent[token_end] == '.') {
+                while (isdigit(fileContent[++token_end]))
                     ;
                 type = FLOAT_TYPE;
             }
 
-            if (isspace(fileContent[position])
-                || fileContent[position] == '\0') {
+            if (isspace(fileContent[token_end])
+                || fileContent[token_end] == '\0') {
                 switch (type) {
                     case INT_TYPE:
                         val.intValue = atoi(fileContent + offset);
@@ -49,24 +49,24 @@ void eval() {
             } else
                 goto symbol;
 
-        } else if (fileContent[position] == '[') {
-            position++;
+        } else if (fileContent[token_end] == '[') {
+            token_end++;
             int layer = 0;
             do {
-                if (fileContent[position] == '[') layer++;
-                if (fileContent[position] == ']') layer--;
-                position++;
-            } while (fileContent[position] != ']' || layer != 0);
+                if (fileContent[token_end] == '[') layer++;
+                if (fileContent[token_end] == ']') layer--;
+                token_end++;
+            } while (fileContent[token_end] != ']' || layer != 0);
         } else {
-            position++;
+            token_end++;
         symbol:
-            while (!isspace(fileContent[position])
-                   && fileContent[position] != '0') {
-                position++;
+            while (!isspace(fileContent[token_end])
+                   && fileContent[token_end] != '0') {
+                token_end++;
             }
-            char* dest = malloc(position - offset);
-            strncpy(dest, fileContent + offset, position - offset);
-            dest[position - offset] = '\0';
+            char* dest = malloc(token_end - offset);
+            strncpy(dest, fileContent + offset, token_end - offset);
+            dest[token_end - offset] = '\0';
 
             Entry* result = lookup(env, dest);
             if (result != NULL)

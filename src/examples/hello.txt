@@ -1,2 +1,4 @@
-2 print _
+item [hello] [test]
+item hello [test]
+printf test
 

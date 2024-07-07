@@ -1229,4 +1229,29 @@ production, but I want to see what it would look like.]
 
 [1.0 will only release at the end of my life, after I will have thoroughly tested the language.]
 
+[Recursion doesn't really work.]
+proc [] [
+    func
+] as [func]
+[How is it supposed to know that it's called [func]?]
+
+[Probably will have to use [goto]]
+proc [] [
+    label [start]
+    do-stuff
+    goto start
+] as [func]
+
+proc [label] [
+    item [start] position
+]
+proc [start] [
+    item [position] start
+] as goto
+[I heard that [goto] is, like, literally Hitler, but this is the cleanest way to do recursion,
+without doing recursion.]
+[We're getting further and further away from functional programming...]
+
+[I'm curious, just how different will the implementation turn out to be?]
+
 
