@@ -7,7 +7,7 @@
 
 #define TABLE_SIZE 100
 
-typedef void (*proc)(void*);
+typedef void (*proc)(void);
 
 typedef enum {
     INT_TYPE,
@@ -16,8 +16,6 @@ typedef enum {
     STRING_TYPE,
     PROCEDURE_TYPE,
 } ValueType;
-
-typedef enum { PRINT } Procedure;
 
 typedef union {
     int   intValue;

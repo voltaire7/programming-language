@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "env.h"
-#include "procedures.h"
 
 extern char*  fileContent;
 extern size_t contentSize;
@@ -26,15 +25,27 @@ void eval() {
         int offset = position;
         if (isdigit(fileContent[position])) {
             position++;
+            ValueType type = INT_TYPE;
             while (isdigit((fileContent[position]))) position++;
-            if (fileContent[position] == '.')
+            if (fileContent[position] == '.') {
                 while (isdigit(fileContent[++position]))
                     ;
+                type = FLOAT_TYPE;
+            }
 
             if (isspace(fileContent[position])
                 || fileContent[position] == '\0') {
-                val.floatValue = atof(fileContent + offset);
-                upsert(env, "_", FLOAT_TYPE, val);
+                switch (type) {
+                    case INT_TYPE:
+                        val.intValue = atoi(fileContent + offset);
+                        break;
+                    case FLOAT_TYPE:
+                        val.floatValue = atof(fileContent + offset);
+                        break;
+                    default:
+                        exit(1);
+                }
+                upsert(env, "_", type, val);
             } else
                 goto symbol;
 
@@ -59,7 +70,7 @@ void eval() {
 
             Entry* result = lookup(env, dest);
             if (result != NULL)
-                result->value.procedureValue(0);
+                result->value.procedureValue();
             else {
                 fprintf(
                     stderr,
@@ -69,6 +80,5 @@ void eval() {
                 exit(1);
             }
         }
-        putchar('\n');
     }
 }

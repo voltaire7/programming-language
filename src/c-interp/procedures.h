@@ -1,8 +1,8 @@
-#ifndef PRINT_H
-#define PRINT_H
+#ifndef PROCEDURES_H
+#define PROCEDURES_H
 
 #include <stdio.h>
 
-void print();
+void PRINT();
 
-#endif /* PRINT_H */
+#endif

@@ -9,4 +9,4 @@
 void readFileContent(const char* filename);
 void printlen(char* str, const int len);
 
-#endif // FILE_OPERATIONS_H
+#endif

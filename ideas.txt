@@ -1223,4 +1223,10 @@ production, but I want to see what it would look like.]
 
 [Maybe [return] could assign the [_] of the outside scope!]
 
+[Damn, procedure definition may be easier than I anticipated!]
+
+[Should have procedures to manually push or pop a env.]
+
+[1.0 will only release at the end of my life, after I will have thoroughly tested the language.]
+
 

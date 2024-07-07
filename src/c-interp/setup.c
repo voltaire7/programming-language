@@ -7,6 +7,6 @@ void setup() {
     env = create_dictionary();
 
     Value val;
-    val.procedureValue = print;
-    upsert(env, "print", INT_TYPE, val);
+    val.procedureValue = PRINT;
+    upsert(env, "print", PROCEDURE_TYPE, val);
 }
