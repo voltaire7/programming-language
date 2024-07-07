@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 void PRINT();
-void PRINTF();
 void ITEM();
 
 #endif

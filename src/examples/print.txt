@@ -1,0 +1,15 @@
+[Quotes]
+print [Hello, World!\n]
+
+[Integers]
+print 0001
+print [\n]
+
+[Floats]
+print 2.74832
+print [\n]
+
+[Symbols]
+item [\n] [Symbols\n]
+print \n
+

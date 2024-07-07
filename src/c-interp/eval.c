@@ -4,6 +4,7 @@
 
 #include "env.h"
 #include "parse.h"
+#include "util.h"
 
 extern char*  token;
 extern size_t size;
@@ -32,25 +33,17 @@ void eval() {
             case QUOTE:
                 break;
             case SYMBOL: {
-                char* dest = malloc((end - start) + 1);
-                strncpy(dest, token + start, end - start);
-                dest[end - start] = '\0';
-
+                char* dest;
+                symbolcpy(&dest);
                 Entry* result = lookup(env, dest);
-                if (result != NULL)
+
+                if (result != NULL) {
                     result->value.procedureValue();
-                else {
-                    fprintf(
-                        stderr,
-                        "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
-                        dest
-                    );
-                    exit(1);
+                    break;
                 }
-                break;
+
+                error("Undefined symbol : '%s'", dest);
             }
-            default:
-                exit(1);
         }
     }
 }

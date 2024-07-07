@@ -1,8 +1,10 @@
 #include "parse.h"
 
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "env.h"
+#include "util.h"
 
 extern char*  token;
 extern size_t size;
@@ -24,7 +26,7 @@ void parse() {
     }
 
     start = end;
-    if (isdigit(token[end])) {
+    if (token[end] == '-' || isdigit(token[end])) {
         token_type = INTEGER;
         end++;
         while (isdigit((token[end]))) end++;
@@ -39,9 +41,11 @@ void parse() {
         int layer  = 1;
         do {
             end++;
+            if (token[end] == '\0')
+                error("Non-terminating quote : '%s'", token + start);
             if (token[end] == '[')
                 layer++;
-            else if (token[end] == ']')
+            else if (token[end] == ']' && token[end - 1] != '\\')
                 layer--;
         } while (token[end] != ']' || layer != 0);
         end++;

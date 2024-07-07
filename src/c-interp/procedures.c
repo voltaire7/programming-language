@@ -18,117 +18,28 @@ extern Dictionary* env;
 extern TokenType token_type;
 
 void PRINT() {
-    Value val;
-    while (isspace(token[end])) {
-        end++;
-    }
+    char* s;
+    parse();
 
-    if (end >= size) {
-        exit(0);
-    }
-
-    int offset = end;
-    if (isdigit(token[end])) {
-        end++;
-        while (isdigit((token[end]))) end++;
-        if (token[end] == '.')
-            while (isdigit(token[++end]))
-                ;
-
-        if (isspace(token[end]) || token[end] == '\0') {
-            printlen(token + offset, end - offset);
-        } else
-            goto symbol;
-
-    } else if (token[end] == '[') {
-        end++;
-        int layer = 0;
-        do {
-            if (token[end] == '[') layer++;
-            if (token[end] == ']') layer--;
-            end++;
-        } while (token[end] != ']' || layer != 0);
-        printlen(token + offset + 1, end - offset - 1);
-    } else {
-        end++;
-    symbol:
-        while (!isspace(token[end]) && token[end] != '0') {
-            end++;
-        }
-        char* dest = malloc(end - offset);
-        strncpy(dest, token + offset, end - offset);
-        dest[end - offset] = '\0';
-
-        Entry* result = lookup(env, dest);
-        if (result != NULL)
-            if (result->type == INT_TYPE)
-                printf("%d", result->value.intValue);
-            else
-                printf("%.2f", result->value.floatValue);
-        else {
-            fprintf(
-                stderr,
-                "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
-                dest
-            );
-            exit(1);
-        }
-    }
-}
-
-void PRINTF() {
-    Value val;
-    while (isspace(token[end])) {
-        end++;
-    }
-
-    if (end >= size) {
-        exit(0);
-    }
-
-    int offset = end;
-    if (isdigit(token[end])) {
-        end++;
-        while (isdigit((token[end]))) end++;
-        if (token[end] == '.')
-            while (isdigit(token[++end]))
-                ;
-
-        if (isspace(token[end]) || token[end] == '\0') {
-            printlen(token + offset, end - offset);
-        } else
-            goto symbol;
-
-    } else if (token[end] == '[') {
-        end++;
-        int layer = 0;
-        do {
-            if (token[end] == '[') layer++;
-            if (token[end] == ']') layer--;
-            end++;
-        } while (token[end] != ']' || layer != 0);
-        printlen(token + offset + 1, end - offset - 1);
-    } else {
-        end++;
-    symbol:
-        while (!isspace(token[end]) && token[end] != '0') {
-            end++;
-        }
-        char* dest = malloc(end - offset);
-        strncpy(dest, token + offset, end - offset);
-        dest[end - offset] = '\0';
-
-        Entry* result = lookup(env, dest);
-        if (result != NULL)
-            printf("%s", result->value.stringValue);
-        else {
-            fprintf(
-                stderr,
-                "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
-                dest
-            );
-            exit(1);
-        }
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            symbolcpy(&s);
+            printf("%s", s);
+            break;
+        case QUOTE:
+            quotecpy(&s);
+        quote:
+            process_str(s);
+            printf("%s", s);
+            break;
+        case SYMBOL:
+            symbolcpy(&s);
+            Entry* entry = lookup(env, s);
+            if (entry == NULL) error("Undefined symbol: '%s'", s);
+            s = entry->value.stringValue;
+            goto quote;
+            break;
     }
 }
 
@@ -140,21 +51,18 @@ label:
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            if (key != NULL) {
-                if (token_type == INTEGER) {
-                    val.intValue = atoi(token + start);
-                    upsert(env, key, INT_TYPE, val);
-                } else {
-                    val.floatValue = atof(token + start);
-                    upsert(env, key, FLOAT_TYPE, val);
-                }
-                return;
+            if (key == NULL) {
+                symbolcpy(&key);
+                error("Cannot assign number: '%s'", key);
             }
-            fprintf(stderr, "[\033[1;31mERROR\033[0m] Cannot assign number: '");
-            eprintlen(token + start, end - start);
-            fprintf(stderr, "'\n");
-            exit(1);
-            break;
+            if (token_type == INTEGER) {
+                val.intValue = atoi(token + start);
+                upsert(env, key, INT_TYPE, val);
+            } else {
+                val.floatValue = atof(token + start);
+                upsert(env, key, FLOAT_TYPE, val);
+            }
+            return;
         case QUOTE:
             if (key == NULL) {
                 quotecpy(&key);
@@ -162,21 +70,24 @@ label:
             }
             quotecpy(&val.stringValue);
             upsert(env, key, STRING_TYPE, val);
-            break;
-        case SYMBOL:
-            symbolcpy(&key);
-            Entry* entry = lookup(env, key);
-            if (entry != NULL) {
+            return;
+        case SYMBOL: {
+            Entry* entry;
+            if (key == NULL) {
+                symbolcpy(&key);
+                entry = lookup(env, key);
+                if (entry == NULL) error("Undefined symbol: '%s'", entry->key);
                 strcpy(key, entry->value.stringValue);
                 goto label;
             } else {
-                fprintf(
-                    stderr,
-                    "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
-                    entry->key
-                );
-                exit(1);
+                char* s;
+                symbolcpy(&s);
+                entry = lookup(env, s);
+                if (entry == NULL) error("Undefined symbol: '%s'", entry->key);
+                val.pointerValue = entry->value.procedureValue;
+                upsert(env, key, PROCEDURE_TYPE, val);
+                return;
             }
-            break;
+        }
     }
 }

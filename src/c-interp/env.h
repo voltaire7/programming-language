@@ -9,14 +9,6 @@
 
 typedef void (*proc)(void);
 
-typedef enum {
-    INT_TYPE,
-    FLOAT_TYPE,
-    POINTER_TYPE,
-    STRING_TYPE,
-    PROCEDURE_TYPE,
-} ValueType;
-
 typedef union {
     int   intValue;
     float floatValue;
@@ -24,6 +16,14 @@ typedef union {
     char* stringValue;
     proc  procedureValue;
 } Value;
+
+typedef enum {
+    INT_TYPE,
+    FLOAT_TYPE,
+    POINTER_TYPE,
+    STRING_TYPE,
+    PROCEDURE_TYPE,
+} ValueType;
 
 typedef struct Entry {
     char*         key;

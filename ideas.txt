@@ -1257,4 +1257,15 @@ without doing recursion.]
 [Wait, couldn't I just use [goto]? no need for procedures and all that – yeah, this language is
 getting worse by the second.]
 
+[If you want to redefine [eval] and use the new one, you can only do so by calling it on a [Quote].]
+proc [code] [
+    [do-things]
+] as [eval]
+eval [print [Hello, World!]]
+[or]
+read-file [main.txt] eval _
+[You know what? The procedure notation is growing on me. I don't know how to feel.]
+
+[Oh shit, I might have to manually [free] strings like in C, if I really don't want metadata...]
+
 
