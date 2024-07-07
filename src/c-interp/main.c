@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "env.c"
 #include "eval.c"
 #include "util.h"
 

@@ -2,15 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "env.c"
 #include "util.h"
 
 extern char*  fileContent;
 extern size_t contentSize;
 extern size_t position;
 
-int temp = 0;
+double temp = 0;
 
 void eval() {
+    Dictionary* env = create_dictionary();
+    Value       val;
     for (;; position++) {
         while (isspace(fileContent[position])) {
             position++;
@@ -20,19 +23,18 @@ void eval() {
             exit(0);
         }
 
-        int start = position;
+        int offset = position;
         if (isdigit(fileContent[position])) {
             position++;
             while (isdigit((fileContent[position]))) position++;
             if (fileContent[position] == '.')
-                while (isdigit(fileContent[++position])) position++;
+                while (isdigit(fileContent[++position]))
+                    ;
 
             if (isspace(fileContent[position])
                 || fileContent[position] == '\0') {
-                temp = atoi_len(fileContent + start, position - start);
-
-                printf("Number: ");
-                printlen(fileContent + start, position - start);
+                val.floatValue = atof(fileContent + offset);
+                upsert(env, "_", FLOAT_TYPE, val);
             } else
                 goto symbol;
 
@@ -44,8 +46,6 @@ void eval() {
                 if (fileContent[position] == ']') layer--;
                 position++;
             } while (fileContent[position] != ']' || layer != 0);
-            printf("Quote : ");
-            printlen(fileContent + start, ++position - start);
         } else {
             position++;
         symbol:
@@ -54,7 +54,7 @@ void eval() {
                 position++;
             }
             printf("Symbol: ");
-            printlen(fileContent + start, position - start);
+            printlen(fileContent + offset, position - offset);
         }
         putchar('\n');
     }

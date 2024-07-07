@@ -1219,4 +1219,8 @@ production, but I want to see what it would look like.]
 
 [btw, the way procedure calls are done, allows infinite recursion.]
 
+[When I finally figure out how vim works, I will make Control+S wall.]
+
+[Maybe [return] could assign the [_] of the outside scope!]
+
 
