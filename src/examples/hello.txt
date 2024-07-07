@@ -1,4 +1,2 @@
-item [hello] [test]
-item hello [test]
-printf test
+1 print _
 

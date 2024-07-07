@@ -15,6 +15,6 @@ int main(int argc, char** argv) {
     setup();
     eval();
 
-    free(fileContent);
+    free(token);
     return 0;
 }

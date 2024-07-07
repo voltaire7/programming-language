@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-char*  fileContent = NULL;
-size_t contentSize = 0;
-size_t position    = 0;
+char*  token = NULL;
+size_t size  = 0;
+
+size_t start = 0;
+size_t end   = 0;
 
 void readFileContent(const char* filename) {
     FILE* filePointer = fopen(filename, "r");
@@ -14,18 +16,18 @@ void readFileContent(const char* filename) {
     }
 
     fseek(filePointer, 0, SEEK_END);
-    contentSize = ftell(filePointer);
+    size = ftell(filePointer);
     fseek(filePointer, 0, SEEK_SET);
 
-    fileContent = malloc(contentSize + 1);
-    if (fileContent == NULL) {
+    token = malloc(size + 1);
+    if (token == NULL) {
         printf("Failed to allocate memory.\n");
         fclose(filePointer);
         exit(1);
     }
 
-    fread(fileContent, 1, contentSize, filePointer);
-    fileContent[contentSize] = '\0';
+    fread(token, 1, size, filePointer);
+    token[size] = '\0';
 
     fclose(filePointer);
 }

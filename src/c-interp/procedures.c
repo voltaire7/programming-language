@@ -5,54 +5,53 @@
 #include "env.h"
 #include "util.h"
 
-extern char*  fileContent;
-extern size_t contentSize;
-extern size_t token_end;
+extern char*  token;
+extern size_t size;
+extern size_t end;
 
 extern Dictionary* env;
 
 void PRINT() {
     Value val;
-    while (isspace(fileContent[token_end])) {
-        token_end++;
+    while (isspace(token[end])) {
+        end++;
     }
 
-    if (token_end >= contentSize) {
+    if (end >= size) {
         exit(0);
     }
 
-    int offset = token_end;
-    if (isdigit(fileContent[token_end])) {
-        token_end++;
-        while (isdigit((fileContent[token_end]))) token_end++;
-        if (fileContent[token_end] == '.')
-            while (isdigit(fileContent[++token_end]))
+    int offset = end;
+    if (isdigit(token[end])) {
+        end++;
+        while (isdigit((token[end]))) end++;
+        if (token[end] == '.')
+            while (isdigit(token[++end]))
                 ;
 
-        if (isspace(fileContent[token_end]) || fileContent[token_end] == '\0') {
-            printlen(fileContent + offset, token_end - offset);
+        if (isspace(token[end]) || token[end] == '\0') {
+            printlen(token + offset, end - offset);
         } else
             goto symbol;
 
-    } else if (fileContent[token_end] == '[') {
-        token_end++;
+    } else if (token[end] == '[') {
+        end++;
         int layer = 0;
         do {
-            if (fileContent[token_end] == '[') layer++;
-            if (fileContent[token_end] == ']') layer--;
-            token_end++;
-        } while (fileContent[token_end] != ']' || layer != 0);
-        printlen(fileContent + offset + 1, token_end - offset - 1);
+            if (token[end] == '[') layer++;
+            if (token[end] == ']') layer--;
+            end++;
+        } while (token[end] != ']' || layer != 0);
+        printlen(token + offset + 1, end - offset - 1);
     } else {
-        token_end++;
+        end++;
     symbol:
-        while (!isspace(fileContent[token_end]) && fileContent[token_end] != '0'
-        ) {
-            token_end++;
+        while (!isspace(token[end]) && token[end] != '0') {
+            end++;
         }
-        char* dest = malloc(token_end - offset);
-        strncpy(dest, fileContent + offset, token_end - offset);
-        dest[token_end - offset] = '\0';
+        char* dest = malloc(end - offset);
+        strncpy(dest, token + offset, end - offset);
+        dest[end - offset] = '\0';
 
         Entry* result = lookup(env, dest);
         if (result != NULL)
@@ -73,46 +72,45 @@ void PRINT() {
 
 void PRINTF() {
     Value val;
-    while (isspace(fileContent[token_end])) {
-        token_end++;
+    while (isspace(token[end])) {
+        end++;
     }
 
-    if (token_end >= contentSize) {
+    if (end >= size) {
         exit(0);
     }
 
-    int offset = token_end;
-    if (isdigit(fileContent[token_end])) {
-        token_end++;
-        while (isdigit((fileContent[token_end]))) token_end++;
-        if (fileContent[token_end] == '.')
-            while (isdigit(fileContent[++token_end]))
+    int offset = end;
+    if (isdigit(token[end])) {
+        end++;
+        while (isdigit((token[end]))) end++;
+        if (token[end] == '.')
+            while (isdigit(token[++end]))
                 ;
 
-        if (isspace(fileContent[token_end]) || fileContent[token_end] == '\0') {
-            printlen(fileContent + offset, token_end - offset);
+        if (isspace(token[end]) || token[end] == '\0') {
+            printlen(token + offset, end - offset);
         } else
             goto symbol;
 
-    } else if (fileContent[token_end] == '[') {
-        token_end++;
+    } else if (token[end] == '[') {
+        end++;
         int layer = 0;
         do {
-            if (fileContent[token_end] == '[') layer++;
-            if (fileContent[token_end] == ']') layer--;
-            token_end++;
-        } while (fileContent[token_end] != ']' || layer != 0);
-        printlen(fileContent + offset + 1, token_end - offset - 1);
+            if (token[end] == '[') layer++;
+            if (token[end] == ']') layer--;
+            end++;
+        } while (token[end] != ']' || layer != 0);
+        printlen(token + offset + 1, end - offset - 1);
     } else {
-        token_end++;
+        end++;
     symbol:
-        while (!isspace(fileContent[token_end]) && fileContent[token_end] != '0'
-        ) {
-            token_end++;
+        while (!isspace(token[end]) && token[end] != '0') {
+            end++;
         }
-        char* dest = malloc(token_end - offset);
-        strncpy(dest, fileContent + offset, token_end - offset);
-        dest[token_end - offset] = '\0';
+        char* dest = malloc(end - offset);
+        strncpy(dest, token + offset, end - offset);
+        dest[end - offset] = '\0';
 
         Entry* result = lookup(env, dest);
         if (result != NULL)
@@ -132,64 +130,59 @@ void ITEM() {
     Value val;
     char* key = NULL;
 start:
-    while (isspace(fileContent[token_end])) {
-        token_end++;
+    while (isspace(token[end])) {
+        end++;
     }
 
-    if (token_end >= contentSize) {
+    if (end >= size) {
         exit(0);
     }
 
-    int offset = token_end;
-    if (isdigit(fileContent[token_end])) {
-        token_end++;
-        while (isdigit((fileContent[token_end]))) token_end++;
-        if (fileContent[token_end] == '.')
-            while (isdigit(fileContent[++token_end]))
+    int offset = end;
+    if (isdigit(token[end])) {
+        end++;
+        while (isdigit((token[end]))) end++;
+        if (token[end] == '.')
+            while (isdigit(token[++end]))
                 ;
 
-        if (isspace(fileContent[token_end]) || fileContent[token_end] == '\0') {
+        if (isspace(token[end]) || token[end] == '\0') {
             fprintf(stderr, "[\033[1;31mERROR\033[0m] Cannot assign number: '");
-            eprintlen(fileContent + offset, token_end - offset);
+            eprintlen(token + offset, end - offset);
             fprintf(stderr, "'\n");
             exit(1);
         } else
             goto symbol;
 
-    } else if (fileContent[token_end] == '[') {
-        token_end++;
+    } else if (token[end] == '[') {
+        end++;
         int layer = 0;
         do {
-            if (fileContent[token_end] == '[') layer++;
-            if (fileContent[token_end] == ']') layer--;
-            token_end++;
-        } while (fileContent[token_end] != ']' || layer != 0);
+            if (token[end] == '[') layer++;
+            if (token[end] == ']') layer--;
+            end++;
+        } while (token[end] != ']' || layer != 0);
         if (key == NULL) {
-            key = malloc(token_end - offset);
-            strncpy(key, fileContent + offset + 1, token_end - offset - 1);
-            key[token_end - offset - 1] = '\0';
-            token_end++;
+            key = malloc(end - offset);
+            strncpy(key, token + offset + 1, end - offset - 1);
+            key[end - offset - 1] = '\0';
+            end++;
             goto start;
         }
-        val.stringValue = malloc(token_end - offset);
-        strncpy(
-            val.stringValue,
-            fileContent + offset + 1,
-            token_end - offset - 1
-        );
-        val.stringValue[token_end - offset - 1] = '\0';
-        token_end++;
+        val.stringValue = malloc(end - offset);
+        strncpy(val.stringValue, token + offset + 1, end - offset - 1);
+        val.stringValue[end - offset - 1] = '\0';
+        end++;
         upsert(env, key, STRING_TYPE, val);
     } else {
-        token_end++;
+        end++;
     symbol:
-        while (!isspace(fileContent[token_end]) && fileContent[token_end] != '0'
-        ) {
-            token_end++;
+        while (!isspace(token[end]) && token[end] != '0') {
+            end++;
         }
-        char* dest = malloc(token_end - offset);
-        strncpy(dest, fileContent + offset, token_end - offset);
-        dest[token_end - offset] = '\0';
+        char* dest = malloc(end - offset);
+        strncpy(dest, token + offset, end - offset);
+        dest[end - offset] = '\0';
 
         Entry* entry    = lookup(env, dest);
         val.stringValue = "test";

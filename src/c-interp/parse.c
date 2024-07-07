@@ -1,86 +1,60 @@
 #include <ctype.h>
+#include <stdio.h>
 
 #include "env.h"
 
+extern char*  token;
+extern size_t size;
+
+extern Dictionary* env;
+
+extern size_t start;
+extern size_t end;
+
 typedef enum {
-    NUMBER,
+    INTEGER,
+    FLOAT,
     QUOTE,
     SYMBOL,
 } TokenType;
 
-extern char*  fileContent;
-extern size_t contentSize;
-extern size_t token_end;
-
-extern Dictionary* env;
-
-int token_start = 0;
+TokenType token_type;
 
 void parse() {
-    Value val;
-    while (isspace(fileContent[token_end])) {
-        token_end++;
+    while (isspace(token[end])) {
+        end++;
     }
 
-    if (token_end >= contentSize) {
+    if (end >= size) {
         exit(0);
     }
 
-    int offset = token_end;
-    if (isdigit(fileContent[token_end])) {
-        token_end++;
-        ValueType type = INT_TYPE;
-        while (isdigit((fileContent[token_end]))) token_end++;
-        if (fileContent[token_end] == '.') {
-            while (isdigit(fileContent[++token_end]))
+    start = end;
+    if (isdigit(token[end])) {
+        token_type = INTEGER;
+        end++;
+        while (isdigit((token[end]))) end++;
+        if (token[end] == '.') {
+            while (isdigit(token[++end]))
                 ;
-            type = FLOAT_TYPE;
+            token_type = FLOAT;
         }
-
-        if (isspace(fileContent[token_end]) || fileContent[token_end] == '\0') {
-            switch (type) {
-                case INT_TYPE:
-                    val.intValue = atoi(fileContent + offset);
-                    break;
-                case FLOAT_TYPE:
-                    val.floatValue = atof(fileContent + offset);
-                    break;
-                default:
-                    exit(1);
-            }
-            upsert(env, "_", type, val);
-        } else
-            goto symbol;
-
-    } else if (fileContent[token_end] == '[') {
-        token_end++;
-        int layer = 0;
+        if (!isspace(token[end]) && token[end] != '\0') goto symbol;
+    } else if (token[end] == '[') {
+        token_type = QUOTE;
+        int layer  = 1;
         do {
-            if (fileContent[token_end] == '[') layer++;
-            if (fileContent[token_end] == ']') layer--;
-            token_end++;
-        } while (fileContent[token_end] != ']' || layer != 0);
+            end++;
+            if (token[end] == '[')
+                layer++;
+            else if (token[end] == ']')
+                layer--;
+        } while (token[end] != ']' || layer != 0);
+        end++;
     } else {
-        token_end++;
+        end++;
     symbol:
-        while (!isspace(fileContent[token_end]) && fileContent[token_end] != '0'
-        ) {
-            token_end++;
-        }
-        char* dest = malloc(token_end - offset);
-        strncpy(dest, fileContent + offset, token_end - offset);
-        dest[token_end - offset] = '\0';
-
-        Entry* result = lookup(env, dest);
-        if (result != NULL)
-            result->value.procedureValue();
-        else {
-            fprintf(
-                stderr,
-                "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
-                dest
-            );
-            exit(1);
-        }
+        while (!isspace(token[end]) && token[end] != '0') end++;
+        token_type = SYMBOL;
     }
 }
