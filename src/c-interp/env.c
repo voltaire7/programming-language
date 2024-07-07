@@ -1,29 +1,8 @@
+#include "env.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define TABLE_SIZE 100
-
-typedef enum { INT_TYPE, FLOAT_TYPE, POINTER_TYPE, STRING_TYPE } ValueType;
-
-typedef union {
-    int   intValue;
-    float floatValue;
-    void* pointerValue;
-    char* stringValue;
-} Value;
-
-typedef struct Entry {
-    char*         key;
-    ValueType     type;
-    Value         value;
-    struct Entry* next;
-} Entry;
-
-typedef struct Dictionary {
-    Entry*             table[TABLE_SIZE];
-    struct Dictionary* next; // Pointer to the next dictionary (for the stack)
-} Dictionary;
 
 unsigned int hash(const char* key) {
     unsigned long int value   = 0;

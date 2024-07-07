@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "eval.c"
+#include "setup.c"
 #include "util.h"
 
 int main(int argc, char** argv) {
@@ -11,6 +12,7 @@ int main(int argc, char** argv) {
     }
 
     readFileContent(argv[1]);
+    setup();
     eval();
 
     free(fileContent);

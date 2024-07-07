@@ -1,19 +1,19 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "env.c"
-#include "util.h"
+#include "env.h"
+#include "procedures.h"
 
 extern char*  fileContent;
 extern size_t contentSize;
 extern size_t position;
 
-double temp = 0;
+extern Dictionary* env;
 
 void eval() {
-    Dictionary* env = create_dictionary();
-    Value       val;
+    Value val;
     for (;; position++) {
         while (isspace(fileContent[position])) {
             position++;
@@ -53,8 +53,21 @@ void eval() {
                    && fileContent[position] != '0') {
                 position++;
             }
-            printf("Symbol: ");
-            printlen(fileContent + offset, position - offset);
+            char* dest = malloc(position - offset);
+            strncpy(dest, fileContent + offset, position - offset);
+            dest[position - offset] = '\0';
+
+            Entry* result = lookup(env, dest);
+            if (result != NULL)
+                result->value.procedureValue(0);
+            else {
+                fprintf(
+                    stderr,
+                    "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
+                    dest
+                );
+                exit(1);
+            }
         }
         putchar('\n');
     }
