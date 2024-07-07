@@ -1,3 +1,4 @@
+#include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,8 @@
 
 extern char*  token;
 extern size_t size;
+
+extern size_t start;
 extern size_t end;
 
 extern Dictionary* env;
@@ -130,20 +133,50 @@ void PRINTF() {
 }
 
 void ITEM() {
-            fprintf(stderr, "[\033[1;31mERROR\033[0m] Cannot assign number: '");
-            eprintlen(token + offset, end - offset);
-            fprintf(stderr, "'\n");
+    char* key = NULL;
+    Value val;
+label:
     parse();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
+            if (key != NULL) {
+                if (token_type == INTEGER) {
+                    val.intValue = atoi(token + start);
+                    upsert(env, key, INT_TYPE, val);
+                } else {
+                    val.floatValue = atof(token + start);
+                    upsert(env, key, FLOAT_TYPE, val);
+                }
+                return;
+            }
+            fprintf(stderr, "[\033[1;31mERROR\033[0m] Cannot assign number: '");
+            eprintlen(token + start, end - start);
+            fprintf(stderr, "'\n");
             exit(1);
             break;
         case QUOTE:
+            if (key == NULL) {
+                quotecpy(&key);
+                goto label;
+            }
+            quotecpy(&val.stringValue);
+            upsert(env, key, STRING_TYPE, val);
             break;
         case SYMBOL:
-            break;
-        default:
+            symbolcpy(&key);
+            Entry* entry = lookup(env, key);
+            if (entry != NULL) {
+                strcpy(key, entry->value.stringValue);
+                goto label;
+            } else {
+                fprintf(
+                    stderr,
+                    "[\033[1;31mERROR\033[0m] Undefined symbol: '%s'\n",
+                    entry->key
+                );
+                exit(1);
+            }
             break;
     }
 }

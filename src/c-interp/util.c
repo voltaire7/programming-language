@@ -39,3 +39,15 @@ void printlen(char* str, const int len) {
 void eprintlen(char* str, const int len) {
     for (char* max = str + len; str != max; str++) fputc(*str, stderr);
 }
+
+void quotecpy(char** dest) {
+    *dest = malloc((end - start - 2) + 1);
+    strncpy(*dest, token + start + 1, end - start - 2);
+    (*dest)[end - start] = '\0';
+}
+
+void symbolcpy(char** dest) {
+    *dest = malloc(end - start + 1);
+    strncpy(*dest, token + start, end - start);
+    (*dest)[end - start] = '\0';
+}

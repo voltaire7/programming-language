@@ -32,7 +32,7 @@ void eval() {
             case QUOTE:
                 break;
             case SYMBOL: {
-                char* dest = malloc(end - start + 1);
+                char* dest = malloc((end - start) + 1);
                 strncpy(dest, token + start, end - start);
                 dest[end - start] = '\0';
 

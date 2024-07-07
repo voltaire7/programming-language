@@ -1,2 +1,5 @@
-item 1 [test]
+item [x] [test]
+printf x
+item x [success]
+printf test
 

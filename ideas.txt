@@ -1254,4 +1254,7 @@ without doing recursion.]
 
 [I'm curious, just how different will the implementation turn out to be?]
 
+[Wait, couldn't I just use [goto]? no need for procedures and all that – yeah, this language is
+getting worse by the second.]
+
 
