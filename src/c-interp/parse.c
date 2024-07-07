@@ -1,5 +1,6 @@
+#include "parse.h"
+
 #include <ctype.h>
-#include <stdio.h>
 
 #include "env.h"
 
@@ -10,13 +11,6 @@ extern Dictionary* env;
 
 extern size_t start;
 extern size_t end;
-
-typedef enum {
-    INTEGER,
-    FLOAT,
-    QUOTE,
-    SYMBOL,
-} TokenType;
 
 TokenType token_type;
 

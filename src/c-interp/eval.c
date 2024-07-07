@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "env.h"
-#include "parse.c"
+#include "parse.h"
 
 extern char*  token;
 extern size_t size;
@@ -12,6 +12,8 @@ extern size_t start;
 extern size_t end;
 
 extern Dictionary* env;
+
+extern TokenType token_type;
 
 void eval() {
     Value val;
@@ -30,7 +32,7 @@ void eval() {
             case QUOTE:
                 break;
             case SYMBOL: {
-                char* dest = malloc(end - start);
+                char* dest = malloc(end - start + 1);
                 strncpy(dest, token + start, end - start);
                 dest[end - start] = '\0';
 

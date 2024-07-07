@@ -1,2 +1,2 @@
-1 print _
+item 1 [test]
 

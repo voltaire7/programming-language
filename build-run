@@ -18,7 +18,7 @@ switch $command
         cc src/bin-exec/main.c src/bin-exec/execute.c src/bin-exec/from_str.c
         ./a.out $args
     case c-interp
-        cc src/c-interp/main.c src/c-interp/util.c src/c-interp/env.c src/c-interp/procedures.c
+        cc src/c-interp/main.c src/c-interp/util.c src/c-interp/env.c src/c-interp/procedures.c src/c-interp/parse.c
         ./a.out $args
     case '*'
         echo "Unknown command: $command"
