@@ -35,6 +35,6 @@ void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
 void        free_dictionary(Dictionary* dict);
 void        push_scope(char* code);
-void        pop_scope(Dictionary** head);
+void        pop_scope();
 
 #endif

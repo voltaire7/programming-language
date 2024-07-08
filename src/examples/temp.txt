@@ -11,6 +11,8 @@ item [      code test    ] [
 ]
 2
 do code
+do code
+do code
 
 print [hello\n]
 print [%i\n] test

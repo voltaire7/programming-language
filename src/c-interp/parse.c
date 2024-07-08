@@ -26,17 +26,7 @@ parse:
     if (end >= size && env->next == NULL)
         exit(0);
     else if (end >= size && env->next != NULL) {
-        pop_scope(&env);
-        Entry* entry;
-
-        entry = lookup(env, "token");
-        if (entry == NULL) error("Undefined symbol: 'token'");
-        token = entry->value.stringValue;
-        size  = strlen(token);
-
-        entry = lookup(env, "end");
-        if (entry == NULL) error("Undefined symbol: 'end'");
-        end = entry->value.intValue;
+        pop_scope();
         goto parse;
     }
 

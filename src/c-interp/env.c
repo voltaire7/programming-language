@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "util.h"
+
 extern char*  token;
 extern size_t size;
 
@@ -117,8 +119,6 @@ void push_scope(char* code) {
     upsert(env, "token", val);
     val.intValue = end;
     upsert(env, "end", val);
-    val.intValue = size;
-    upsert(env, "size", val);
 
     Dictionary* new_dict = create_dictionary();
     new_dict->next       = env;
@@ -129,11 +129,22 @@ void push_scope(char* code) {
     start = end = -1;
 }
 
-void pop_scope(Dictionary** head) {
-    if (*head == NULL) return;
+void pop_scope() {
+    if (env == NULL) return;
 
-    Dictionary* temp = *head;
-    *head            = (*head)->next;
+    Dictionary* temp = env;
+    env              = env->next;
+
+    Entry* entry;
+
+    entry = lookup(env, "token");
+    if (entry == NULL) error("Undefined symbol: 'token'");
+    token = entry->value.stringValue;
+    size  = strlen(token);
+
+    entry = lookup(env, "end");
+    if (entry == NULL) error("Undefined symbol: 'end'");
+    end = entry->value.intValue;
 
     free_dictionary(temp);
 }
