@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "env.h"
 #include "util.h"
@@ -17,12 +18,26 @@ extern size_t end;
 TokenType token_type;
 
 void parse() {
+parse:
     while (isspace(token[end])) {
         end++;
     }
 
-    if (end >= size) {
+    if (end >= size && env->next == NULL)
         exit(0);
+    else if (end >= size && env->next != NULL) {
+        pop_scope(&env);
+        Entry* entry;
+
+        entry = lookup(env, "token");
+        if (entry == NULL) error("Undefined symbol: 'token'");
+        token = entry->value.stringValue;
+        size  = strlen(token);
+
+        entry = lookup(env, "end");
+        if (entry == NULL) error("Undefined symbol: 'end'");
+        end = entry->value.intValue;
+        goto parse;
     }
 
     start = end;

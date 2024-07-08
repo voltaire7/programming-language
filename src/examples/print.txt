@@ -13,3 +13,9 @@ print [\n]
 item [\n] [Symbols\n]
 print \n
 
+[Args]
+item [x] 5
+item [y] 86.234
+item [z] [test2]
+print [%i % %f % %s\n] x [test] y 4 z
+

@@ -5,5 +5,7 @@
 
 void PRINT();
 void ITEM();
+void FREE();
+void DO();
 
 #endif

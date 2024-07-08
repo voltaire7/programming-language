@@ -8,11 +8,14 @@ void setup() {
     Value val;
 
     val.procedureValue = PRINT;
-    upsert(env, "print", PROCEDURE_TYPE, val);
+    upsert(env, "print", val);
 
     val.procedureValue = ITEM;
-    upsert(env, "item", PROCEDURE_TYPE, val);
+    upsert(env, "item", val);
 
-    val.stringValue = "Hello, World!\n";
-    upsert(env, "hello", STRING_TYPE, val);
+    val.procedureValue = FREE;
+    upsert(env, "free", val);
+
+    val.procedureValue = DO;
+    upsert(env, "do", val);
 }

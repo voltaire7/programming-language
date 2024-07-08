@@ -9,8 +9,8 @@
 extern char*  token;
 extern size_t size;
 
-extern size_t start;
-extern size_t end;
+extern long start;
+extern long end;
 
 extern Dictionary* env;
 
@@ -24,11 +24,11 @@ void eval() {
         switch (token_type) {
             case INTEGER:
                 val.intValue = atoi(token + start);
-                upsert(env, "_", INT_TYPE, val);
+                upsert(env, "_", val);
                 break;
             case FLOAT:
                 val.floatValue = atof(token + start);
-                upsert(env, "_", FLOAT_TYPE, val);
+                upsert(env, "_", val);
                 break;
             case QUOTE:
                 break;
@@ -36,13 +36,9 @@ void eval() {
                 char* dest;
                 symbolcpy(&dest);
                 Entry* result = lookup(env, dest);
-
-                if (result != NULL) {
-                    result->value.procedureValue();
-                    break;
-                }
-
-                error("Undefined symbol : '%s'", dest);
+                if (result == NULL) error("Undefined symbol : '%s'", dest);
+                result->value.procedureValue();
+                break;
             }
         }
     }

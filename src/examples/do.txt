@@ -1,0 +1,13 @@
+[Evaluate a string litteral.]
+do [
+    print 5
+    print
+]
+[\na string\n]
+
+[Evaluate a variable]
+item [code] [
+    print [another string\n]
+]
+do code
+

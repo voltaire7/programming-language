@@ -6,11 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+void error(char* msg, ...);
 void readFileContent(const char* filename);
 void printlen(char* str, const int len);
 void quotecpy(char** dest);
 void symbolcpy(char** dest);
 void process_str(char* s);
-void error(char* msg, ...);
+long len();
 
 #endif

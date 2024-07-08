@@ -1,0 +1,12 @@
+[assign string]
+item [s] [this is a string\n]
+
+[print string]
+print s
+
+[free string]
+free s
+
+[fail to print string]
+print s
+

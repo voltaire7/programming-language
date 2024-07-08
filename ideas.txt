@@ -1268,4 +1268,32 @@ read-file [main.txt] eval _
 
 [Oh shit, I might have to manually [free] strings like in C, if I really don't want metadata...]
 
+[Maybe I should use [mark] instead of [label]?]
+
+proc [e] [
+    print [%s\n] e
+    exit 1
+] as [error]
+[where [e] is a pointer to a string. It has a unique id and error message!]
+item [index-out-of-bounds] [Index %i is larger than the maximum %i\n]
+throw index-out-of-bounds
+[wait no]
+proc [e] [
+    item [err] e
+] as [throw]
+[It should do something like assigning to the super env. Like [return] but for errors, and instead
+of using [_], we use [err] or [e].]
+
+[Holy!]
+item [code] [
+    print [hello\n]
+]
+do code
+[This looks good!]
+
+[Recursive printing?]
+item [x] [%\n]
+print [%s] x 5
+[prints [5\n]]
+
 

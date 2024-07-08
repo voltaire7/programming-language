@@ -31,21 +31,19 @@ Entry* lookup(Dictionary* dict, const char* key) {
     return NULL;
 }
 
-void upsert(Dictionary* dict, const char* key, ValueType type, Value value) {
+void upsert(Dictionary* dict, const char* key, Value value) {
     unsigned int slot = hash(key);
 
     Entry* entry = dict->table[slot];
     if (entry == NULL) {
         dict->table[slot]        = (Entry*) malloc(sizeof(Entry));
         dict->table[slot]->key   = strdup(key);
-        dict->table[slot]->type  = type;
         dict->table[slot]->value = value;
         dict->table[slot]->next  = NULL;
     } else {
         Entry* prev;
         while (entry != NULL) {
             if (strcmp(entry->key, key) == 0) {
-                entry->type  = type;
                 entry->value = value;
                 return;
             }
@@ -54,7 +52,6 @@ void upsert(Dictionary* dict, const char* key, ValueType type, Value value) {
         }
         entry        = (Entry*) malloc(sizeof(Entry));
         entry->key   = strdup(key);
-        entry->type  = type;
         entry->value = value;
         entry->next  = NULL;
         prev->next   = entry;
@@ -75,11 +72,7 @@ void delete(Dictionary* dict, const char* key) {
             } else {
                 prev->next = entry->next;
             }
-
             free(entry->key);
-            if (entry->type == STRING_TYPE) {
-                free(entry->value.stringValue);
-            }
             free(entry);
             return;
         }
@@ -104,9 +97,6 @@ void free_dictionary(Dictionary* dict) {
             Entry* temp = entry;
             entry       = entry->next;
             free(temp->key);
-            if (temp->type == STRING_TYPE) {
-                free(temp->value.stringValue);
-            }
             free(temp);
         }
     }

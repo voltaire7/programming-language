@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-char*  token = NULL;
-size_t size  = 0;
+char* token = NULL;
+long  size  = 0;
 
-size_t start = 0;
-size_t end   = 0;
+long start = 0;
+long end   = 0;
 
 void error(char* msg, ...) {
     va_list args;
@@ -56,19 +56,26 @@ void symbolcpy(char** dest) {
 }
 
 void process_str(char* s) {
-    // Unknown escape sequence: '\w'
     int i = 0, j = 0;
     for (; s[i] != '\0'; i++, j++) {
         if (s[i] == '\\') {
             i++;
             switch (s[i]) {
+                case '\\':
+                    s[j] = '\\';
+                    break;
                 case 'n':
                     s[j] = '\n';
                     break;
                 default:
                     error("Unknown escape sequence: '\\%c'", s[i]);
             }
-        }
+        } else
+            s[j] = s[i];
     }
     s[j] = '\0';
+}
+
+long len() {
+    return end - start;
 }
