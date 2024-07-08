@@ -4,6 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern char*  token;
+extern size_t size;
+
+extern size_t start;
+extern size_t end;
+
+extern Dictionary* env;
+
 unsigned int hash(const char* key) {
     unsigned long int value   = 0;
     unsigned int      i       = 0;
@@ -103,10 +111,22 @@ void free_dictionary(Dictionary* dict) {
     free(dict);
 }
 
-void push_scope(Dictionary** head) {
+void push_scope(char* code) {
+    Value val;
+    val.stringValue = token;
+    upsert(env, "token", val);
+    val.intValue = end;
+    upsert(env, "end", val);
+    val.intValue = size;
+    upsert(env, "size", val);
+
     Dictionary* new_dict = create_dictionary();
-    new_dict->next       = *head;
-    *head                = new_dict;
+    new_dict->next       = env;
+    env                  = new_dict;
+
+    token = code;
+    size  = strlen(code);
+    start = end = -1;
 }
 
 void pop_scope(Dictionary** head) {

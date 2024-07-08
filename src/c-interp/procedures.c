@@ -1,4 +1,4 @@
-#include <stdatomic.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,49 +80,64 @@ void PRINT() {
 }
 
 void ITEM() {
-    char* key = NULL;
-    Value val;
-label:
+    char*  keys;
+    Value  val;
+    Entry* entry;
+
     parse();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            if (key == NULL) {
-                symbolcpy(&key);
-                error("Cannot assign number: '%s'", key);
-            }
-            if (token_type == INTEGER) {
-                val.intValue = atoi(token + start);
-                upsert(env, key, val);
-            } else {
-                val.floatValue = atof(token + start);
-                upsert(env, key, val);
-            }
-            return;
+            symbolcpy(&keys);
+            error("Cannot assign number: '%s'", keys);
+            break;
         case QUOTE:
-            if (key == NULL) {
-                quotecpy(&key);
-                goto label;
-            }
-            quotecpy(&val.stringValue);
-            upsert(env, key, val);
-            return;
+            quotecpy(&keys);
+            break;
         case SYMBOL: {
-            Entry* entry;
-            if (key == NULL) {
-                symbolcpy(&key);
-                entry = lookup(env, key);
-                if (entry == NULL) error("Undefined symbol: '%s'", entry->key);
-                strcpy(key, entry->value.stringValue);
-                goto label;
-            } else {
+            symbolcpy(&keys);
+            entry = lookup(env, keys);
+            if (entry == NULL) error("Undefined symbol: '%s'", entry->key);
+            strcpy(keys, entry->value.stringValue);
+            break;
+        }
+    }
+
+    long keys_len = strlen(keys);
+    for (int i = 0; i < keys_len; i++) {
+        if (isspace(keys[i])) continue;
+
+        int l = 0;
+        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++)
+            ;
+        char* key = malloc(l + 1);
+        strncpy(key, keys + i - l, l);
+        key[i] = '\0';
+
+        parse();
+        switch (token_type) {
+            case INTEGER:
+            case FLOAT:
+                if (token_type == INTEGER) {
+                    val.intValue = atoi(token + start);
+                    upsert(env, key, val);
+                } else {
+                    val.floatValue = atof(token + start);
+                    upsert(env, key, val);
+                }
+                break;
+            case QUOTE:
+                quotecpy(&val.stringValue);
+                upsert(env, key, val);
+                break;
+            case SYMBOL: {
                 char* s;
                 symbolcpy(&s);
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", entry->key);
                 val.pointerValue = entry->value.procedureValue;
-                upsert(env, key, val);
-                return;
+                upsert(env, s, val);
+                break;
             }
         }
     }
@@ -148,26 +163,13 @@ void DO() {
             break;
         case QUOTE:
             quotecpy(&s);
-            Value val;
-            val.stringValue = token;
-            upsert(env, "token", val);
-            val.intValue = end;
-            upsert(env, "end", val);
-            val.intValue = size;
-            upsert(env, "size", val);
-            push_scope(&env);
-
-            token = s;
-            size  = strlen(token);
-            start = end = -1;
+            push_scope(s);
             break;
         case SYMBOL: {
             symbolcpy(&s);
             Entry* entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol: '%s'", s);
-            token = entry->value.stringValue;
-            size  = strlen(token);
-            start = end = -1;
+            push_scope(entry->value.stringValue);
             break;
         }
     }

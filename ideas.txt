@@ -1296,4 +1296,32 @@ item [x] [%\n]
 print [%s] x 5
 [prints [5\n]]
 
+[I think I should really make separate procedures for [insert] and [update]...]
+
+[Damn, I'm seriously considering adding metadata...]
+1 + 1 print _ [Can't even do that!]
+[Adding metadata would be exceedingly simple: just another field in [Entry].]
+[... Yeah, I going to do it – Or at least try it, the same way I tried upsert.]
+[maybe [let] for upsert, and [set] for update? Also, I could make it so both are insert in there is
+no existing variable in either self or super?]
+[No, there would be two upsert, but they behave differently: one first checks if a variable exists
+anywhere, the other calls upsert immediately.]
+
+[Perhaps I'm giving myself too much of a headache?]
+item-in 1 [a] 42
+[^ this assigns one layer higher.]
+
+[what if [meta] is just a string to for code to be executed?]
+
+[I shouldn't forget to implement library like numpy, sciki-learn, tensorflow, pyplot, pandas,
+lodash; maybe some minimal js frameworks like htmx or alpine.js; i don't know. Anything that seems
+pertinent. Oh and also things like SDL2 and/or raylib]
+
+[I don't think I will do this:]
+item [name] [World]
+print [Hello, [name]!\n]
+[Too much nesting.]
+print [Hello, %!\n] name
+[better]
+
 

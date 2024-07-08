@@ -6,8 +6,14 @@ do [
 [\na string\n]
 
 [Evaluate a variable]
-item [code] [
+item [      code test    ] [
     print [another string\n]
 ]
+2
 do code
+
+print [hello\n]
+print [%i\n] test
+item [x] 7
+print [%i\n] x
 

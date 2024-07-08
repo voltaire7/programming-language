@@ -33,11 +33,11 @@ void eval() {
             case QUOTE:
                 break;
             case SYMBOL: {
-                char* dest;
-                symbolcpy(&dest);
-                Entry* result = lookup(env, dest);
-                if (result == NULL) error("Undefined symbol : '%s'", dest);
-                result->value.procedureValue();
+                char* s;
+                symbolcpy(&s);
+                Entry* entry = lookup(env, s);
+                if (entry == NULL) error("Undefined symbol : '%s'", s);
+                entry->value.procedureValue();
                 break;
             }
         }
