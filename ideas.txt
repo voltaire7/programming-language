@@ -1324,4 +1324,45 @@ print [Hello, [name]!\n]
 print [Hello, %!\n] name
 [better]
 
+[maybe a procedure [do-here] that doesn't push another environment?]
+
+[Do I really need a [meta]? The only reason you might want it is because floats are weird, that and
+nicer syntax. If you really cave in and add them, a lot of other doors open, which should remain
+closed...]
+1 + 1 print [%i] _ [Can't even do that!]
+[^ this is equivalent to the earlier code; and it's what I do in C. This isn't Hitler or anything.]
+[My goal is to make the compiler as small as possible, while still having the performance of C, and
+the capabilities of Scheme. I should hold myself to higher standards.]
+[This will be really awkward when I do decide to add metadata...]
+
+[I need a [format] procedure for [print]. And I need to malloc and copy a string. I can't print
+character by character, since when I encounter an error, it will have printed until the error.
+Still, I makes it harder when you don't know the final size of it. Maybe malloc every time I
+encounter a %?]
+
+[I will probably put something like as an example, but I want to put it here because of how nice it
+look.]
+proc [x y] [
+    print [Hello, World!\n]
+] as [proc]
+
+proc [name] [
+    print [Hello, %!\n] name
+] as [greet]
+greet [World]
+
+print greet [
+    will output:
+    [parse copy-token item [name] _ print [Hello, %!\n] name]
+    and maybe:
+    [iter [k] keys [parse copy-token item k _] free keys print [Hello, %!\n] name]
+    also [do-here] to evaluate iter block without creating a new environment – or maybe I should
+    instead do [item-in]?
+]
+[How many programming languages can you do that in? I mean the [item k _]; in C you could create a
+hashmap, but I this language this is the default. I like.]
+
+[[parse] and [copy-token] and the like should only be usable in a higher scope. Otherwise, things
+get really messy. Further experimentation is needed.]
+
 

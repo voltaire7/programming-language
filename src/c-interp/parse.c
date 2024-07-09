@@ -1,19 +1,20 @@
 #include "parse.h"
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "env.h"
 #include "util.h"
 
-extern char*  token;
-extern size_t size;
+extern char* token;
+extern long  size;
 
 extern Dictionary* env;
 
-extern size_t start;
-extern size_t end;
+extern long start;
+extern long end;
 
 TokenType token_type;
 

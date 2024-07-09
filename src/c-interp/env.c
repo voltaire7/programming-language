@@ -117,6 +117,8 @@ void push_scope(char* code) {
     Value val;
     val.stringValue = token;
     upsert(env, "token", val);
+    val.intValue = start;
+    upsert(env, "start", val);
     val.intValue = end;
     upsert(env, "end", val);
 

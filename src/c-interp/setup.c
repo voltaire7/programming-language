@@ -18,4 +18,19 @@ void setup() {
 
     val.procedureValue = DO;
     upsert(env, "do", val);
+
+    val.procedureValue = PROC;
+    upsert(env, "proc", val);
+
+    val.procedureValue = ITEM_IN;
+    upsert(env, "item-in", val);
+
+    val.procedureValue = ITER;
+    upsert(env, "iter", val);
+
+    val.procedureValue = PARSE;
+    upsert(env, "parse", val);
+
+    val.procedureValue = COPY_TOKEN;
+    upsert(env, "copy-token", val);
 }

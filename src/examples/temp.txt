@@ -1,21 +1,6 @@
-[Evaluate a string litteral.]
 do [
-    print 5
-    print
+    parse copy-token
 ]
-[\na string\n]
-
-[Evaluate a variable]
-item [      code test    ] [
-    print [another string\n]
-]
-2
-do code
-do code
-do code
-
-print [hello\n]
-print [%i\n] test
-item [x] 7
-print [%i\n] x
+Hello
+print _
 
