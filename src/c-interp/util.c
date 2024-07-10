@@ -67,6 +67,12 @@ void process_str(char* s) {
                 case 'n':
                     s[j] = '\n';
                     break;
+                case '[':
+                    s[j] = '[';
+                    break;
+                case ']':
+                    s[j] = ']';
+                    break;
                 default:
                     error("Unknown escape sequence: '\\%c'", s[i]);
             }
