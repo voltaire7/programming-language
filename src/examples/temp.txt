@@ -1,5 +1,11 @@
-iter [k] [a b c d] [
+item [list] [a b c d]
+iter [k] list [
     item-in 1 k k
 ]
+print a
+print b
+print c
+print d
 
+do [print] 1
 

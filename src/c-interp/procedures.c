@@ -328,6 +328,7 @@ void ITER() {
             break;
         }
     }
+    long ret = start;
 
     Value val;
     long  keys_len = strlen(keys);
@@ -347,12 +348,14 @@ void ITER() {
         upsert(env, symbol, val);
 
         parse();
-        eval();
-        parse();
+        while (token == s) {
+            eval();
+            parse();
+        }
+        end = ret;
     }
 
     free(symbol);
-    free(keys);
 }
 
 void PARSE() {

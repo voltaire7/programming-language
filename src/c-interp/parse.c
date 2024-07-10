@@ -27,6 +27,7 @@ void parse() {
         exit(0);
     else if (end >= size && env->next != NULL) {
         pop_scope();
+        parse();
         return;
     }
 
