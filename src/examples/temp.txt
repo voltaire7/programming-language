@@ -1,11 +1,4 @@
-item [list] [a b c d]
-iter [k] list [
-    item-in 1 k k
-]
-print a
-print b
-print c
-print d
+proc [a b] [print [Hello, %s and %s!\n] a b]
+do _ 1 2
 
-do [print] 1
 

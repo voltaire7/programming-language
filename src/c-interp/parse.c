@@ -49,7 +49,7 @@ void parse() {
             end++;
             if (token[end] == '\0')
                 error("Non-terminating quote : '%s'", token + start);
-            if (token[end] == '[')
+            if (token[end] == '[' && token[end - 1] != '\\')
                 layer++;
             else if (token[end] == ']' && token[end - 1] != '\\')
                 layer--;

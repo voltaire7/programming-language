@@ -177,7 +177,73 @@ void DO() {
     }
 }
 
-void PROC() {}
+char* concat(char* dest, char* src) {
+    int dest_len = strlen(dest);
+    int src_len  = strlen(src);
+    char* new    = malloc(dest_len + src_len + 1);
+
+    int i = 0;
+    for (; i < dest_len; i++) new[i] = dest[i];
+    for (int j = 0; i < dest_len + src_len; i++, j++) new[i] = src[j];
+    new[dest_len + src_len] = '\0';
+
+    return new;
+}
+
+void PROC() {
+    char*  keys;
+    Entry* entry;
+    parse();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            symbolcpy(&keys);
+            error("Cannot assign number: '%s'", keys);
+            break;
+        case QUOTE:
+            quotecpy(&keys);
+            break;
+        case SYMBOL: {
+            symbolcpy(&keys);
+            entry = lookup(env, keys);
+            if (entry == NULL) error("Undefined symbol: '%s'", keys);
+            strcpy(keys, entry->value.stringValue);
+            break;
+        }
+    }
+
+    parse();
+    char* code5;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            symbolcpy(&code5);
+            error("Cannot assign number: '%s'", keys);
+            break;
+        case QUOTE:
+            quotecpy(&code5);
+            break;
+        case SYMBOL: {
+            symbolcpy(&code5);
+            entry = lookup(env, code5);
+            if (entry == NULL) error("Undefined symbol: '%s'", code5);
+            strcpy(code5, entry->value.stringValue);
+            break;
+        }
+    }
+
+    char* code1 = "item [keys] [";
+    char* code2 = concat(code1, keys);
+    char* code3 = "] iter [k] keys [parse copy-token item-in 1 k _] free keys ";
+    char* code4 = concat(code2, code3);
+    Value val;
+    val.stringValue = concat(code4, code5);
+    upsert(env, "_", val);
+
+    free(keys);
+    free(code2);
+    free(code4);
+}
 
 void ITEM_IN() {
     Entry* entry;
@@ -364,13 +430,13 @@ void PARSE() {
     Entry*    entry;
     TokenType inner_token_type;
 
-    entry = lookup(env->next, "token");
+    entry = lookup(env->next->next, "token");
     if (entry == NULL) error("Undefined symbol: '%s'", "token");
     inner_token = entry->value.stringValue;
-    entry       = lookup(env->next, "start");
+    entry       = lookup(env->next->next, "start");
     if (entry == NULL) error("Undefined symbol: '%s'", "start");
     inner_start = entry->value.intValue;
-    entry       = lookup(env->next, "end");
+    entry       = lookup(env->next->next, "end");
     if (entry == NULL) error("Undefined symbol: '%s'", "end");
     inner_end = entry->value.intValue;
 
@@ -426,11 +492,11 @@ parse:
     }
     Value val;
     val.stringValue = inner_token;
-    upsert(env->next, "token", val);
+    upsert(env->next->next, "token", val);
     val.intValue = inner_start;
-    upsert(env->next, "start", val);
+    upsert(env->next->next, "start", val);
     val.intValue = inner_end;
-    upsert(env->next, "end", val);
+    upsert(env->next->next, "end", val);
 }
 
 void COPY_TOKEN() {
@@ -438,13 +504,13 @@ void COPY_TOKEN() {
     long   inner_start, inner_end;
     Entry* entry;
 
-    entry = lookup(env, "token");
+    entry = lookup(env->next->next, "token");
     if (entry == NULL) error("Undefined symbol: '%s'", "token");
     inner_token = entry->value.stringValue;
-    entry       = lookup(env, "start");
+    entry       = lookup(env->next->next, "start");
     if (entry == NULL) error("Undefined symbol: '%s'", "start");
     inner_start = entry->value.intValue;
-    entry       = lookup(env, "end");
+    entry       = lookup(env->next->next, "end");
     if (entry == NULL) error("Undefined symbol: '%s'", "end");
     inner_end = entry->value.intValue;
 
