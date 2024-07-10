@@ -1329,7 +1329,7 @@ print [Hello, %!\n] name
 [Do I really need a [meta]? The only reason you might want it is because floats are weird, that and
 nicer syntax. If you really cave in and add them, a lot of other doors open, which should remain
 closed...]
-1 + 1 print [%i] _ [Can't even do that!]
+1 + 1 print [%i] _
 [^ this is equivalent to the earlier code; and it's what I do in C. This isn't Hitler or anything.]
 [My goal is to make the compiler as small as possible, while still having the performance of C, and
 the capabilities of Scheme. I should hold myself to higher standards.]
@@ -1371,5 +1371,17 @@ do []
 [^ need to do this to see changes.]
 item 1 [do] [stuff as well...]
 [the change is immediately noticeable, since the rest of the code is executed using this [do].]
+
+[As scuffed as procedures are now, I can't make them in another way without adding metadata, but
+adding metadata is worthless since I eventually plan to compile these things.]
+
+[The more I think about, the more difficult compiled symbolic programming sounds. I suppose that why
+it hasn't been done yet, in the straightforward I'm trying to do it, I mean. Or has it. Probably
+some LISP dialect.]
+
+[Fuck it. I want to simulate compiled procedures. I don't call write [do] everytime, so I will use
+metadata, but only for this specific case; and then, I will naturally remove it once I can compile
+them. The only other alternative to using [do] is to write C files, compile them and run them from
+the CLI – something I want to absolutely avoid.]
 
 

@@ -1,4 +1,4 @@
 proc [a b] [print [Hello, %s and %s!\n] a b]
-do _ 1 2
+_ 1 2
 
 

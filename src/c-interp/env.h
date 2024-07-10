@@ -17,9 +17,16 @@ typedef union {
     proc   procedureValue;
 } Value;
 
+typedef enum {
+    NEITHER,
+    STRING,
+    PROCEDURE,
+} ValueType;
+
 typedef struct Entry {
     char*         key;
     Value         value;
+    ValueType     type;
     struct Entry* next;
 } Entry;
 
@@ -30,7 +37,7 @@ typedef struct Dictionary {
 
 unsigned int hash(const char* key);
 Entry*       lookup(Dictionary* dict, const char* key);
-void         upsert(Dictionary* dict, const char* key, Value value);
+void upsert(Dictionary* dict, const char* key, Value value, ValueType type);
 void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
 void        free_dictionary(Dictionary* dict);

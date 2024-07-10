@@ -120,15 +120,15 @@ void ITEM() {
             case FLOAT:
                 if (token_type == INTEGER) {
                     val.intValue = atoi(token + start);
-                    upsert(env, key, val);
+                    upsert(env, key, val, NEITHER);
                 } else {
                     val.floatValue = atof(token + start);
-                    upsert(env, key, val);
+                    upsert(env, key, val, NEITHER);
                 }
                 break;
             case QUOTE:
                 quotecpy(&val.stringValue);
-                upsert(env, key, val);
+                upsert(env, key, val, NEITHER);
                 break;
             case SYMBOL: {
                 char* s;
@@ -136,7 +136,10 @@ void ITEM() {
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", s);
                 val.pointerValue = entry->value.procedureValue;
-                upsert(env, key, val);
+                if (entry->type == PROCEDURE)
+                    upsert(env, key, val, PROCEDURE);
+                else
+                    upsert(env, key, val, STRING);
                 break;
             }
         }
@@ -156,8 +159,8 @@ void FREE() {
 }
 
 void DO() {
-    parse();
     char* s;
+    parse();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -239,8 +242,7 @@ void PROC() {
     char* code4 = concat(code2, code3);
     Value val;
     val.stringValue = concat(code4, code5);
-    upsert(env, "_", val);
-    printf("%s\n", val.stringValue);
+    upsert(env, "_", val, STRING);
 
     free(keys);
     free(code2);
@@ -309,6 +311,7 @@ void ITEM_IN() {
         key[i] = '\0';
 
         parse();
+        ValueType type = NEITHER;
         switch (token_type) {
             case INTEGER:
             case FLOAT:
@@ -327,10 +330,11 @@ void ITEM_IN() {
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", s);
                 val.pointerValue = entry->value.procedureValue;
+                type             = entry->type;
                 break;
             }
         }
-        upsert(env_target, key, val);
+        upsert(env_target, key, val, type);
     }
 
     free(keys);
@@ -413,7 +417,7 @@ void ITER() {
         push_scope(s);
 
         val.stringValue = key;
-        upsert(env, symbol, val);
+        upsert(env, symbol, val, NEITHER);
 
         parse();
         while (token == s) {
@@ -475,9 +479,9 @@ parse:
         inner_end++;
     }
 
-    if (inner_end >= inner_size && env->next == NULL)
+    if (inner_end >= inner_size && env_target == NULL)
         exit(0);
-    else if (inner_end >= inner_size && env->next != NULL) {
+    else if (inner_end >= inner_size && env_target != NULL) {
         pop_scope();
         goto parse;
     }
@@ -520,11 +524,11 @@ parse:
     }
     Value val;
     val.stringValue = inner_token;
-    upsert(env_target, "token", val);
+    upsert(env_target, "token", val, NEITHER);
     val.intValue = inner_start;
-    upsert(env_target, "start", val);
+    upsert(env_target, "start", val, NEITHER);
     val.intValue = inner_end;
-    upsert(env_target, "end", val);
+    upsert(env_target, "end", val, NEITHER);
 }
 
 void COPY_TOKEN() {
@@ -574,5 +578,5 @@ void COPY_TOKEN() {
 
     Value val;
     val.stringValue = s;
-    upsert(env, "_", val);
+    upsert(env, "_", val, NEITHER);
 }

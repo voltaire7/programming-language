@@ -4,6 +4,7 @@
 
 #include "env.h"
 #include "parse.h"
+#include "procedures.h"
 #include "util.h"
 
 extern char* token;
@@ -21,11 +22,11 @@ void eval() {
     switch (token_type) {
         case INTEGER:
             val.intValue = atoi(token + start);
-            upsert(env, "_", val);
+            upsert(env, "_", val, NEITHER);
             break;
         case FLOAT:
             val.floatValue = atof(token + start);
-            upsert(env, "_", val);
+            upsert(env, "_", val, NEITHER);
             break;
         case QUOTE:
             break;
@@ -34,7 +35,12 @@ void eval() {
             symbolcpy(&s);
             Entry* entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol : '%s'", s);
-            entry->value.procedureValue();
+            if (entry->type == PROCEDURE)
+                entry->value.procedureValue();
+            else {
+                end = start;
+                DO();
+            }
             break;
         }
     }

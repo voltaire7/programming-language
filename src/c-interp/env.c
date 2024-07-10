@@ -41,7 +41,7 @@ Entry* lookup(Dictionary* dict, const char* key) {
     return NULL;
 }
 
-void upsert(Dictionary* dict, const char* key, Value value) {
+void upsert(Dictionary* dict, const char* key, Value value, ValueType type) {
     unsigned int slot = hash(key);
 
     Entry* entry = dict->table[slot];
@@ -49,6 +49,7 @@ void upsert(Dictionary* dict, const char* key, Value value) {
         dict->table[slot]        = (Entry*) malloc(sizeof(Entry));
         dict->table[slot]->key   = strdup(key);
         dict->table[slot]->value = value;
+        dict->table[slot]->type  = type;
         dict->table[slot]->next  = NULL;
     } else {
         Entry* prev;
@@ -63,6 +64,7 @@ void upsert(Dictionary* dict, const char* key, Value value) {
         entry        = (Entry*) malloc(sizeof(Entry));
         entry->key   = strdup(key);
         entry->value = value;
+        entry->type  = type;
         entry->next  = NULL;
         prev->next   = entry;
     }
@@ -116,11 +118,11 @@ void free_dictionary(Dictionary* dict) {
 void push_scope(char* code) {
     Value val;
     val.stringValue = token;
-    upsert(env, "token", val);
+    upsert(env, "token", val, NEITHER);
     val.intValue = start;
-    upsert(env, "start", val);
+    upsert(env, "start", val, NEITHER);
     val.intValue = end;
-    upsert(env, "end", val);
+    upsert(env, "end", val, NEITHER);
 
     Dictionary* new_dict = create_dictionary();
     new_dict->next       = env;
