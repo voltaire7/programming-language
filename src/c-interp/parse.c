@@ -18,7 +18,10 @@ extern long end;
 
 TokenType token_type;
 
+int test = 0;
+
 void parse() {
+parse:
     while (isspace(token[end])) {
         end++;
     }
@@ -27,8 +30,7 @@ void parse() {
         exit(0);
     else if (end >= size && env->next != NULL) {
         pop_scope();
-        parse();
-        return;
+        goto parse;
     }
 
     start = end;
@@ -56,9 +58,10 @@ void parse() {
         } while (token[end] != ']' || layer != 0);
         end++;
     } else {
-        end++;
     symbol:
-        while (!isspace(token[end]) && token[end] != '0') end++;
+        while (!isspace(token[end]) && token[end] != '\0') {
+            end++;
+        }
         token_type = SYMBOL;
     }
 }
