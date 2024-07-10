@@ -19,7 +19,6 @@ extern long end;
 TokenType token_type;
 
 void parse() {
-parse:
     while (isspace(token[end])) {
         end++;
     }
@@ -28,7 +27,7 @@ parse:
         exit(0);
     else if (end >= size && env->next != NULL) {
         pop_scope();
-        goto parse;
+        return;
     }
 
     start = end;

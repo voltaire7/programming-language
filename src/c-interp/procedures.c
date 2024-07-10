@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "env.h"
+#include "eval.h"
 #include "parse.h"
 #include "util.h"
 
@@ -186,8 +187,7 @@ void ITEM_IN() {
     switch (token_type) {
         char* s;
         case INTEGER:
-            symbolcpy(&s);
-            in = atol(s);
+            in = atol(token + start);
             break;
         case FLOAT:
         case QUOTE:
@@ -268,7 +268,92 @@ void ITEM_IN() {
     free(keys);
 }
 
-void ITER() {}
+void ITER() {
+    char*  symbol;
+    Entry* entry;
+    parse();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            symbolcpy(&symbol);
+            error("Cannot assign number: '%s'", symbol);
+            break;
+        case QUOTE:
+            quotecpy(&symbol);
+            break;
+        case SYMBOL: {
+            symbolcpy(&symbol);
+            entry = lookup(env, symbol);
+            if (entry == NULL) error("Undefined symbol: '%s'", symbol);
+            strcpy(symbol, entry->value.stringValue);
+            break;
+        }
+    }
+
+    char* keys;
+    parse();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            symbolcpy(&keys);
+            error("Cannot assign number: '%s'", keys);
+            break;
+        case QUOTE:
+            quotecpy(&keys);
+            break;
+        case SYMBOL: {
+            symbolcpy(&keys);
+            entry = lookup(env, keys);
+            if (entry == NULL) error("Undefined symbol: '%s'", keys);
+            strcpy(keys, entry->value.stringValue);
+            break;
+        }
+    }
+
+    parse();
+    char* s;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            error("Cannot evaluate a number.");
+            break;
+        case QUOTE:
+            quotecpy(&s);
+            break;
+        case SYMBOL: {
+            symbolcpy(&s);
+            Entry* entry = lookup(env, s);
+            if (entry == NULL) error("Undefined symbol: '%s'", s);
+            s = entry->value.stringValue;
+            break;
+        }
+    }
+
+    Value val;
+    long  keys_len = strlen(keys);
+    for (int i = 0; i < keys_len; i++) {
+        if (isspace(keys[i])) continue;
+
+        int l = 0;
+        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++)
+            ;
+        char* key = malloc(l + 1);
+        strncpy(key, keys + i - l, l);
+        key[i] = '\0';
+
+        push_scope(s);
+
+        val.stringValue = key;
+        upsert(env, symbol, val);
+
+        parse();
+        eval();
+        parse();
+    }
+
+    free(symbol);
+    free(keys);
+}
 
 void PARSE() {
     char *    s, *inner_token;

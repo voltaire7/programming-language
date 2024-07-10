@@ -1,6 +1,5 @@
-do [
-    parse copy-token
+iter [k] [a b c d] [
+    item-in 1 k k
 ]
-Hello
-print _
+
 

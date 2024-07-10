@@ -128,7 +128,7 @@ void push_scope(char* code) {
 
     token = code;
     size  = strlen(code);
-    start = end = -1;
+    start = end = 0;
 }
 
 void pop_scope() {

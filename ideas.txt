@@ -1365,4 +1365,11 @@ hashmap, but I this language this is the default. I like.]
 [[parse] and [copy-token] and the like should only be usable in a higher scope. Otherwise, things
 get really messy. Further experimentation is needed.]
 
+[Maybe I can have two different [do]?]
+item [do] [stuff...]
+do []
+[^ need to do this to see changes.]
+item 1 [do] [stuff as well...]
+[the change is immediately noticeable, since the rest of the code is executed using this [do].]
+
 
