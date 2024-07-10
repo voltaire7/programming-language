@@ -234,11 +234,13 @@ void PROC() {
 
     char* code1 = "item [keys] [";
     char* code2 = concat(code1, keys);
-    char* code3 = "] iter [k] keys [parse copy-token item-in 1 k _] free keys ";
+    char* code3 =
+        "] iter [k] keys [parse 2 copy-token 2 item-in 1 k _] free keys ";
     char* code4 = concat(code2, code3);
     Value val;
     val.stringValue = concat(code4, code5);
     upsert(env, "_", val);
+    printf("%s\n", val.stringValue);
 
     free(keys);
     free(code2);
@@ -430,13 +432,39 @@ void PARSE() {
     Entry*    entry;
     TokenType inner_token_type;
 
-    entry = lookup(env->next->next, "token");
+    long in = 0;
+    parse();
+    switch (token_type) {
+        char* s;
+        case INTEGER:
+            in = atol(token + start);
+            break;
+        case FLOAT:
+        case QUOTE:
+            error("Can only accept integers or symbols to integers.");
+            break;
+        case SYMBOL: {
+            symbolcpy(&s);
+            entry = lookup(env, s);
+            if (entry == NULL) error("Undefined symbol: '%s'", s);
+            in = entry->value.intValue;
+            break;
+        }
+    }
+
+    Dictionary* env_target = env;
+    for (int i = in; i != 0; i--) {
+        env_target = env_target->next;
+        if (env_target == NULL) error("Non existent scope: %d", in);
+    }
+
+    entry = lookup(env_target, "token");
     if (entry == NULL) error("Undefined symbol: '%s'", "token");
     inner_token = entry->value.stringValue;
-    entry       = lookup(env->next->next, "start");
+    entry       = lookup(env_target, "start");
     if (entry == NULL) error("Undefined symbol: '%s'", "start");
     inner_start = entry->value.intValue;
-    entry       = lookup(env->next->next, "end");
+    entry       = lookup(env_target, "end");
     if (entry == NULL) error("Undefined symbol: '%s'", "end");
     inner_end = entry->value.intValue;
 
@@ -492,11 +520,11 @@ parse:
     }
     Value val;
     val.stringValue = inner_token;
-    upsert(env->next->next, "token", val);
+    upsert(env_target, "token", val);
     val.intValue = inner_start;
-    upsert(env->next->next, "start", val);
+    upsert(env_target, "start", val);
     val.intValue = inner_end;
-    upsert(env->next->next, "end", val);
+    upsert(env_target, "end", val);
 }
 
 void COPY_TOKEN() {
@@ -504,13 +532,39 @@ void COPY_TOKEN() {
     long   inner_start, inner_end;
     Entry* entry;
 
-    entry = lookup(env->next->next, "token");
+    long in = 0;
+    parse();
+    switch (token_type) {
+        char* s;
+        case INTEGER:
+            in = atol(token + start);
+            break;
+        case FLOAT:
+        case QUOTE:
+            error("Can only accept integers or symbols to integers.");
+            break;
+        case SYMBOL: {
+            symbolcpy(&s);
+            entry = lookup(env, s);
+            if (entry == NULL) error("Undefined symbol: '%s'", s);
+            in = entry->value.intValue;
+            break;
+        }
+    }
+
+    Dictionary* env_target = env;
+    for (int i = in; i != 0; i--) {
+        env_target = env_target->next;
+        if (env_target == NULL) error("Non existent scope: %d", in);
+    }
+
+    entry = lookup(env_target, "token");
     if (entry == NULL) error("Undefined symbol: '%s'", "token");
     inner_token = entry->value.stringValue;
-    entry       = lookup(env->next->next, "start");
+    entry       = lookup(env_target, "start");
     if (entry == NULL) error("Undefined symbol: '%s'", "start");
     inner_start = entry->value.intValue;
-    entry       = lookup(env->next->next, "end");
+    entry       = lookup(env_target, "end");
     if (entry == NULL) error("Undefined symbol: '%s'", "end");
     inner_end = entry->value.intValue;
 
@@ -520,5 +574,5 @@ void COPY_TOKEN() {
 
     Value val;
     val.stringValue = s;
-    upsert(env->next, "_", val);
+    upsert(env, "_", val);
 }
