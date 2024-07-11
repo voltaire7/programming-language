@@ -10,9 +10,6 @@ void setup() {
     val.procedureValue = PRINT;
     upsert(env, "print", val, true);
 
-    val.procedureValue = ITEM;
-    upsert(env, "item", val, true);
-
     val.procedureValue = FREE;
     upsert(env, "free", val, true);
 

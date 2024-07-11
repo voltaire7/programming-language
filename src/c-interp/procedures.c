@@ -48,9 +48,7 @@ void PRINT() {
                             symbolcpy(&t);
                             if (token_type != SYMBOL)
                                 error("Not a symbol: '%s'", t);
-                            Entry* entry = lookup(env, t);
-                            if (entry == NULL)
-                                error("Undefined symbol: '%s'", t);
+                            Entry* entry = lookup_or_error(env, t);
 
                             if (s[i] == 'i')
                                 printf("%ld", entry->value.intValue);
@@ -73,77 +71,10 @@ void PRINT() {
             break;
         case SYMBOL:
             symbolcpy(&s);
-            Entry* entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            s = entry->value.stringValue;
+            s = lookup_or_error(env, s)->value.stringValue;
             goto quote;
             break;
     }
-}
-
-void ITEM() {
-    char*  keys;
-    Entry* entry;
-    parse();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            symbolcpy(&keys);
-            error("Cannot assign number: '%s'", keys);
-            break;
-        case QUOTE:
-            quotecpy(&keys);
-            break;
-        case SYMBOL: {
-            symbolcpy(&keys);
-            entry = lookup(env, keys);
-            if (entry == NULL) error("Undefined symbol: '%s'", keys);
-            strcpy(keys, entry->value.stringValue);
-            break;
-        }
-    }
-
-    Value val;
-    long  keys_len = strlen(keys);
-    for (int i = 0; i < keys_len; i++) {
-        if (isspace(keys[i])) continue;
-
-        int l = 0;
-        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++)
-            ;
-        char* key = malloc(l + 1);
-        strncpy(key, keys + i - l, l);
-        key[i] = '\0';
-
-        parse();
-        switch (token_type) {
-            case INTEGER:
-            case FLOAT:
-                if (token_type == INTEGER) {
-                    val.intValue = atol(token + start);
-                    upsert(env, key, val, false);
-                } else {
-                    val.floatValue = atof(token + start);
-                    upsert(env, key, val, false);
-                }
-                break;
-            case QUOTE:
-                quotecpy(&val.stringValue);
-                upsert(env, key, val, false);
-                break;
-            case SYMBOL: {
-                char* s;
-                symbolcpy(&s);
-                entry = lookup(env, s);
-                if (entry == NULL) error("Undefined symbol: '%s'", s);
-                val.pointerValue = entry->value.pointerValue;
-                upsert(env, key, val, entry->is_procedure);
-                break;
-            }
-        }
-    }
-
-    free(keys);
 }
 
 void FREE() {
@@ -151,9 +82,7 @@ void FREE() {
     char* s;
     symbolcpy(&s);
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
-    Entry* entry = lookup(env, s);
-    if (entry == NULL) error("Undefined symbol: '%s'", s);
-    free(entry->value.stringValue);
+    free(lookup_or_error(env, s)->value.stringValue);
 }
 
 void DO() {
@@ -170,9 +99,7 @@ void DO() {
             break;
         case SYMBOL: {
             symbolcpy(&s);
-            Entry* entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            push_scope(entry->value.stringValue);
+            push_scope(lookup_or_error(env, s)->value.stringValue);
             break;
         }
     }
@@ -193,9 +120,7 @@ void PROC() {
             break;
         case SYMBOL: {
             symbolcpy(&keys);
-            entry = lookup(env, keys);
-            if (entry == NULL) error("Undefined symbol: '%s'", keys);
-            strcpy(keys, entry->value.stringValue);
+            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
     }
@@ -213,14 +138,12 @@ void PROC() {
             break;
         case SYMBOL: {
             symbolcpy(&code5);
-            entry = lookup(env, code5);
-            if (entry == NULL) error("Undefined symbol: '%s'", code5);
-            strcpy(code5, entry->value.stringValue);
+            strcpy(code5, lookup_or_error(env, code5)->value.stringValue);
             break;
         }
     }
 
-    char* code1 = "item [keys] [";
+    char* code1 = "item-in 0 [keys] [";
     char* code2 = concat(code1, keys);
     char* code3 =
         "] iter [k] keys [parse 2 copy-token 2 item-in 1 k _] free keys ";
@@ -250,9 +173,7 @@ void ITEM_IN() {
             break;
         case SYMBOL: {
             symbolcpy(&s);
-            entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            in = entry->value.intValue;
+            in = lookup_or_error(env, s)->value.intValue;
             break;
         }
     }
@@ -270,9 +191,7 @@ void ITEM_IN() {
             break;
         case SYMBOL: {
             symbolcpy(&keys);
-            entry = lookup(env, keys);
-            if (entry == NULL) error("Undefined symbol: '%s'", keys);
-            strcpy(keys, entry->value.stringValue);
+            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
     }
@@ -312,9 +231,8 @@ void ITEM_IN() {
             case SYMBOL: {
                 char* s;
                 symbolcpy(&s);
-                entry = lookup(env, s);
-                if (entry == NULL) error("Undefined symbol: '%s'", s);
-                val.pointerValue = entry->value.procedureValue;
+                entry            = lookup_or_error(env, s);
+                val.pointerValue = entry->value.pointerValue;
                 is_procedure     = entry->is_procedure;
                 break;
             }
@@ -340,9 +258,7 @@ void ITER() {
             break;
         case SYMBOL: {
             symbolcpy(&symbol);
-            entry = lookup(env, symbol);
-            if (entry == NULL) error("Undefined symbol: '%s'", symbol);
-            strcpy(symbol, entry->value.stringValue);
+            strcpy(symbol, lookup_or_error(env, symbol)->value.stringValue);
             break;
         }
     }
@@ -360,9 +276,7 @@ void ITER() {
             break;
         case SYMBOL: {
             symbolcpy(&keys);
-            entry = lookup(env, keys);
-            if (entry == NULL) error("Undefined symbol: '%s'", keys);
-            strcpy(keys, entry->value.stringValue);
+            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
     }
@@ -379,9 +293,7 @@ void ITER() {
             break;
         case SYMBOL: {
             symbolcpy(&s);
-            Entry* entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            s = entry->value.stringValue;
+            s = lookup_or_error(env, s)->value.stringValue;
             break;
         }
     }
@@ -434,9 +346,7 @@ void PARSE() {
             break;
         case SYMBOL: {
             symbolcpy(&s);
-            entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            in = entry->value.intValue;
+            in = lookup_or_error(env, s)->value.intValue;
             break;
         }
     }
@@ -447,15 +357,9 @@ void PARSE() {
         if (env_target == NULL) error("Non existent scope: %d", in);
     }
 
-    entry = lookup(env_target, "token");
-    if (entry == NULL) error("Undefined symbol: '%s'", "token");
-    inner_token = entry->value.stringValue;
-    entry       = lookup(env_target, "start");
-    if (entry == NULL) error("Undefined symbol: '%s'", "start");
-    inner_start = entry->value.intValue;
-    entry       = lookup(env_target, "end");
-    if (entry == NULL) error("Undefined symbol: '%s'", "end");
-    inner_end = entry->value.intValue;
+    inner_token = lookup_or_error(env_target, "token")->value.stringValue;
+    inner_start = lookup_or_error(env_target, "start")->value.intValue;
+    inner_end   = lookup_or_error(env_target, "end")->value.intValue;
 
     inner_size = strlen(inner_token);
 
@@ -539,7 +443,7 @@ void COPY_TOKEN() {
             symbolcpy(&s);
             entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol: '%s'", s);
-            in = entry->value.intValue;
+            in = lookup_or_error(env, s)->value.intValue;
             break;
         }
     }
@@ -550,18 +454,11 @@ void COPY_TOKEN() {
         if (env_target == NULL) error("Non existent scope: %d", in);
     }
 
-    entry = lookup(env_target, "token");
-    if (entry == NULL) error("Undefined symbol: '%s'", "token");
-    inner_token = entry->value.stringValue;
-    entry       = lookup(env_target, "start");
-    if (entry == NULL) error("Undefined symbol: '%s'", "start");
-    inner_start = entry->value.intValue;
-    entry       = lookup(env_target, "end");
-    if (entry == NULL) error("Undefined symbol: '%s'", "end");
-    inner_end = entry->value.intValue;
-    entry     = lookup(env_target, "token-type");
-    if (entry == NULL) error("Undefined symbol: '%s'", "token-type");
-    inner_token_type = entry->value.intValue;
+    inner_token = lookup_or_error(env_target, "token")->value.stringValue;
+    inner_start = lookup_or_error(env_target, "start")->value.intValue;
+    inner_end   = lookup_or_error(env_target, "end")->value.intValue;
+    inner_token_type =
+        lookup_or_error(env_target, "token-type")->value.intValue;
 
     Value val;
     switch (inner_token_type) {
@@ -571,7 +468,6 @@ void COPY_TOKEN() {
                 val.intValue = atol(inner_token + inner_start);
             else
                 val.floatValue = atof(inner_token + inner_start);
-
             break;
         case QUOTE:
             val.stringValue = malloc((inner_end - inner_start - 2) + 1);
@@ -588,9 +484,7 @@ void COPY_TOKEN() {
             strncpy(s, inner_token + inner_start, inner_end - inner_start);
             s[inner_end - inner_start] = '\0';
 
-            entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            val.pointerValue = entry->value.procedureValue;
+            val.pointerValue = lookup_or_error(env, s)->value.procedureValue;
             upsert(env, "_", val, entry->is_procedure);
             return;
         }

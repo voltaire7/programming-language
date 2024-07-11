@@ -42,6 +42,12 @@ Entry* lookup(Dictionary* dict, const char* key) {
     return NULL;
 }
 
+Entry* lookup_or_error(Dictionary* dict, const char* key) {
+    Entry* entry = lookup(dict, key);
+    if (entry == NULL) error("Undefined symbol: '%s'", key);
+    return entry;
+}
+
 void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure) {
     unsigned int slot = hash(key);
 

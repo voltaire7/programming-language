@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 void PRINT();
-void ITEM();
 void FREE();
 void DO();
 void PROC();

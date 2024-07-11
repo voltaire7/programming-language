@@ -1408,4 +1408,12 @@ bc [-e 'sqrt(121)']
 
 [Just found out about realloc. Should use it to concatenate strings.]
 
+[Shit, how do I malloc?]
+item str [hello]
+item-at 0 str [H]
+print str [outputs Hello]
+[Maybe it's no that difficult?]
+
+[Man, being able to define procedures opens so many doors!]
+
 

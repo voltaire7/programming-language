@@ -32,6 +32,7 @@ typedef struct Dictionary {
 
 unsigned int hash(const char* key);
 Entry*       lookup(Dictionary* dict, const char* key);
+Entry*       lookup_or_error(Dictionary* dict, const char* key);
 void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure);
 void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
