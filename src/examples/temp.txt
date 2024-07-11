@@ -1,6 +1,9 @@
-proc [a b] [print [Hello, %i and %i!\n] a b]
-_ 1 2
+proc [symbol] [item-in 1 symbol _] item [as] _
 
-do [parse 1 copy-token 1 _ 3 4] _
+proc [] [
+    print [Hello, % and %!\n]
+] as [print-hello]
+
+print-hello 1 2
 
 

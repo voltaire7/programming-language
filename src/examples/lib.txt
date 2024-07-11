@@ -1,0 +1,2 @@
+proc [symbol] [item-in 1 symbol _] item [as] _
+
