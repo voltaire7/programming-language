@@ -9,8 +9,8 @@
 void  error(char* msg, ...);
 void  readFileContent(const char* filename);
 void  printlen(char* str, const int len);
-void  quotecpy(char** dest);
-void  symbolcpy(char** dest);
+char* quotecpy();
+char* symbolcpy();
 void  process_str(char* s);
 char* concat(char* dest, char* src);
 

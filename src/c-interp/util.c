@@ -43,16 +43,18 @@ void printlen(char* str, const int len) {
     for (char* max = str + len; str != max; str++) putchar(*str);
 }
 
-void quotecpy(char** dest) {
-    *dest = malloc((end - start - 2) + 1);
-    strncpy(*dest, token + start + 1, end - start - 2);
-    (*dest)[end - start - 2] = '\0';
+char* quotecpy() {
+    char* dest = malloc((end - start - 2) + 1);
+    strncpy(dest, token + start + 1, end - start - 2);
+    (dest)[end - start - 2] = '\0';
+    return dest;
 }
 
-void symbolcpy(char** dest) {
-    *dest = malloc((end - start) + 1);
-    strncpy(*dest, token + start, end - start);
-    (*dest)[end - start] = '\0';
+char* symbolcpy() {
+    char* dest = malloc((end - start) + 1);
+    strncpy(dest, token + start, end - start);
+    (dest)[end - start] = '\0';
+    return dest;
 }
 
 void process_str(char* s) {

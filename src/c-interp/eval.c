@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "env.h"
 #include "parse.h"
@@ -31,10 +29,8 @@ void eval() {
         case QUOTE:
             break;
         case SYMBOL: {
-            char* s;
-            symbolcpy(&s);
-            Entry* entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol : '%s'", s);
+            char*  s     = symbolcpy();
+            Entry* entry = lookup_or_error(env, s);
             if (entry->is_procedure)
                 entry->value.procedureValue();
             else {

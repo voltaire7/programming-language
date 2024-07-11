@@ -26,11 +26,11 @@ void PRINT() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&s);
+            s = symbolcpy();
             printf("%s", s);
             break;
         case QUOTE:
-            quotecpy(&s);
+            s = quotecpy();
         quote:
             process_str(s);
             for (int i = 0; s[i] != '\0'; i++) {
@@ -45,7 +45,7 @@ void PRINT() {
                         case 'f':
                         case 's': {
                             char* t;
-                            symbolcpy(&t);
+                            t = symbolcpy();
                             if (token_type != SYMBOL)
                                 error("Not a symbol: '%s'", t);
                             Entry* entry = lookup_or_error(env, t);
@@ -70,7 +70,7 @@ void PRINT() {
             }
             break;
         case SYMBOL:
-            symbolcpy(&s);
+            s = symbolcpy();
             s = lookup_or_error(env, s)->value.stringValue;
             goto quote;
             break;
@@ -80,7 +80,7 @@ void PRINT() {
 void FREE() {
     parse();
     char* s;
-    symbolcpy(&s);
+    s = symbolcpy();
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
     free(lookup_or_error(env, s)->value.stringValue);
 }
@@ -94,11 +94,11 @@ void DO() {
             error("Cannot evaluate a number.");
             break;
         case QUOTE:
-            quotecpy(&s);
+            s = quotecpy();
             push_scope(s);
             break;
         case SYMBOL: {
-            symbolcpy(&s);
+            s = symbolcpy();
             push_scope(lookup_or_error(env, s)->value.stringValue);
             break;
         }
@@ -112,14 +112,14 @@ void PROC() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&keys);
+            keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
         case QUOTE:
-            quotecpy(&keys);
+            keys = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&keys);
+            keys = symbolcpy();
             strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
@@ -130,14 +130,14 @@ void PROC() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&code5);
+            code5 = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
         case QUOTE:
-            quotecpy(&code5);
+            code5 = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&code5);
+            code5 = symbolcpy();
             strcpy(code5, lookup_or_error(env, code5)->value.stringValue);
             break;
         }
@@ -172,7 +172,7 @@ void ITEM_IN() {
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            symbolcpy(&s);
+            s  = symbolcpy();
             in = lookup_or_error(env, s)->value.intValue;
             break;
         }
@@ -183,14 +183,14 @@ void ITEM_IN() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&keys);
+            keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
         case QUOTE:
-            quotecpy(&keys);
+            keys = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&keys);
+            keys = symbolcpy();
             strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
@@ -226,11 +226,10 @@ void ITEM_IN() {
                 }
                 break;
             case QUOTE:
-                quotecpy(&val.stringValue);
+                val.stringValue = quotecpy();
                 break;
             case SYMBOL: {
-                char* s;
-                symbolcpy(&s);
+                char* s          = symbolcpy();
                 entry            = lookup_or_error(env, s);
                 val.pointerValue = entry->value.pointerValue;
                 is_procedure     = entry->is_procedure;
@@ -250,14 +249,14 @@ void ITER() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&symbol);
+            symbol = symbolcpy();
             error("Cannot assign number: '%s'", symbol);
             break;
         case QUOTE:
-            quotecpy(&symbol);
+            symbol = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&symbol);
+            symbol = symbolcpy();
             strcpy(symbol, lookup_or_error(env, symbol)->value.stringValue);
             break;
         }
@@ -268,14 +267,14 @@ void ITER() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbolcpy(&keys);
+            keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
         case QUOTE:
-            quotecpy(&keys);
+            keys = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&keys);
+            keys = symbolcpy();
             strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
             break;
         }
@@ -289,10 +288,10 @@ void ITER() {
             error("Cannot evaluate a number.");
             break;
         case QUOTE:
-            quotecpy(&s);
+            s = quotecpy();
             break;
         case SYMBOL: {
-            symbolcpy(&s);
+            s = symbolcpy();
             s = lookup_or_error(env, s)->value.stringValue;
             break;
         }
@@ -345,7 +344,7 @@ void PARSE() {
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            symbolcpy(&s);
+            s  = symbolcpy();
             in = lookup_or_error(env, s)->value.intValue;
             break;
         }
@@ -440,7 +439,7 @@ void COPY_TOKEN() {
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            symbolcpy(&s);
+            s     = symbolcpy();
             entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol: '%s'", s);
             in = lookup_or_error(env, s)->value.intValue;
