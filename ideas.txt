@@ -1406,4 +1406,6 @@ bc [-e 'sqrt(121)']
 
 [Do I say S-Statements instead of S-Expressions?]
 
+[Just found out about realloc. Should use it to concatenate strings.]
+
 

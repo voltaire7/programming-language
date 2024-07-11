@@ -1,9 +1,13 @@
 proc [symbol] [item-in 1 symbol _] item [as] _
 
 proc [] [
-    print [Hello, % and %!\n]
+    n [Hello, % and %!\n]
 ] as [print-hello]
 
+item [n] print
 print-hello 1 2
+
+item [print] print-hello
+print 3 4
 
 

@@ -136,7 +136,7 @@ void ITEM() {
                 symbolcpy(&s);
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", s);
-                val.pointerValue = entry->value.procedureValue;
+                val.pointerValue = entry->value.pointerValue;
                 upsert(env, key, val, entry->is_procedure);
                 break;
             }

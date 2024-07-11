@@ -56,7 +56,8 @@ void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure) {
         Entry* prev;
         while (entry != NULL) {
             if (strcmp(entry->key, key) == 0) {
-                entry->value = value;
+                entry->value        = value;
+                entry->is_procedure = is_procedure;
                 return;
             }
             prev  = entry;
