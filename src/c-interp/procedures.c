@@ -119,7 +119,7 @@ void ITEM() {
             case INTEGER:
             case FLOAT:
                 if (token_type == INTEGER) {
-                    val.intValue = atoi(token + start);
+                    val.intValue = atol(token + start);
                     upsert(env, key, val, NEITHER);
                 } else {
                     val.floatValue = atof(token + start);
@@ -516,12 +516,15 @@ parse:
     upsert(env_target, "start", val, NEITHER);
     val.intValue = inner_end;
     upsert(env_target, "end", val, NEITHER);
+    val.intValue = inner_token_type;
+    upsert(env_target, "token-type", val, NEITHER);
 }
 
 void COPY_TOKEN() {
-    char * s, *inner_token;
-    long   inner_start, inner_end;
-    Entry* entry;
+    char *    s, *inner_token;
+    long      inner_start, inner_end;
+    Entry*    entry;
+    TokenType inner_token_type;
 
     long in = 0;
     parse();
@@ -558,12 +561,44 @@ void COPY_TOKEN() {
     entry       = lookup(env_target, "end");
     if (entry == NULL) error("Undefined symbol: '%s'", "end");
     inner_end = entry->value.intValue;
-
-    s = malloc((inner_end - inner_start) + 1);
-    strncpy(s, inner_token + inner_start, inner_end - inner_start);
-    s[inner_end - inner_start] = '\0';
+    entry     = lookup(env_target, "token-type");
+    if (entry == NULL) error("Undefined symbol: '%s'", "token-type");
+    inner_token_type = entry->value.intValue;
 
     Value val;
-    val.stringValue = s;
+    switch (inner_token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (inner_token_type == INTEGER)
+                val.intValue = atol(inner_token + inner_start);
+            else
+                val.floatValue = atof(inner_token + inner_start);
+
+            break;
+        case QUOTE:
+            val.stringValue = malloc((inner_end - inner_start - 2) + 1);
+            strncpy(
+                val.stringValue,
+                inner_token + inner_start + 1,
+                inner_end - inner_start - 2
+            );
+            val.stringValue[inner_end - inner_start - 2] = '\0';
+            break;
+        case SYMBOL: {
+            char* s;
+            s = malloc((inner_end - inner_start) + 1);
+            strncpy(s, inner_token + inner_start, inner_end - inner_start);
+            s[inner_end - inner_start] = '\0';
+
+            entry = lookup(env, s);
+            if (entry == NULL) error("Undefined symbol: '%s'", s);
+            val.pointerValue = entry->value.procedureValue;
+            if (entry->type == PROCEDURE)
+                upsert(env, "_", val, PROCEDURE);
+            else
+                upsert(env, "_", val, STRING);
+            return;
+        }
+    }
     upsert(env, "_", val, NEITHER);
 }

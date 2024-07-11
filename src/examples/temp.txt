@@ -1,4 +1,6 @@
-proc [a b] [print [Hello, %s and %s!\n] a b]
+proc [a b] [print [Hello, %i and %i!\n] a b]
 _ 1 2
+
+do [parse 1 copy-token 1 _ 3 4] _
 
 

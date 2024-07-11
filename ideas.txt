@@ -1379,9 +1379,31 @@ adding metadata is worthless since I eventually plan to compile these things.]
 it hasn't been done yet, in the straightforward I'm trying to do it, I mean. Or has it. Probably
 some LISP dialect.]
 
-[Fuck it. I want to simulate compiled procedures. I don't call write [do] everytime, so I will use
-metadata, but only for this specific case; and then, I will naturally remove it once I can compile
-them. The only other alternative to using [do] is to write C files, compile them and run them from
-the CLI – something I want to absolutely avoid.]
+[Fuck it. I want to simulate compiled procedures. I don't want to write [do] everytime, so I will
+use metadata, but only for this specific case; and then, I will naturally remove it once I can
+compile them. The only other alternative to using [do] is to write C files, compile them and run
+them from the CLI – something I want to absolutely avoid.]
+
+[I don't just want to make the interpreter as small as possible; I want to follow the unix
+philosophy in general.]
+
+[Damn, I make a lot of typos.]
+
+[Wait...]
+for 0 10 print [%i\n] it
+[this could work because [for] remembers the start of [print]; once [print] finished executing,
+[for] continues executing, and returns the pointer back to the start of [print].]
+[I should really consider it, so I can avoid nesting as much as possible.]
+
+[For using the REPL of this programming language like a shell, I would need a way to import binaries
+and call them.]
+load-bin [/usr/bin/]
+bc [-e sqrt(121)]
+[this should print 11]
+[although, I might need quotation like in the shell]
+bc [-e 'sqrt(121)']
+[maybe I can also load individual binaries or entire folder accordingly]
+
+[Do I say S-Statements instead of S-Expressions?]
 
 

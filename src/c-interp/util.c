@@ -46,7 +46,7 @@ void printlen(char* str, const int len) {
 void quotecpy(char** dest) {
     *dest = malloc((end - start - 2) + 1);
     strncpy(*dest, token + start + 1, end - start - 2);
-    (*dest)[end - start] = '\0';
+    (*dest)[end - start - 2] = '\0';
 }
 
 void symbolcpy(char** dest) {
