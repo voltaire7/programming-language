@@ -61,9 +61,9 @@ void PRINT() {
                         }
                         default:
                             if (token_type == QUOTE)
-                                printlen(token + start + 1, len() - 2);
+                                printlen(token + start + 1, (end - start) - 2);
                             else
-                                printlen(token + start, len());
+                                printlen(token + start, end - start);
                             putchar(s[i]);
                     }
                 } else
@@ -178,19 +178,6 @@ void DO() {
             break;
         }
     }
-}
-
-char* concat(char* dest, char* src) {
-    int dest_len = strlen(dest);
-    int src_len  = strlen(src);
-    char* new    = malloc(dest_len + src_len + 1);
-
-    int i = 0;
-    for (; i < dest_len; i++) new[i] = dest[i];
-    for (int j = 0; i < dest_len + src_len; i++, j++) new[i] = src[j];
-    new[dest_len + src_len] = '\0';
-
-    return new;
 }
 
 void PROC() {

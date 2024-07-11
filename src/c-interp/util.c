@@ -82,6 +82,15 @@ void process_str(char* s) {
     s[j] = '\0';
 }
 
-long len() {
-    return end - start;
+char* concat(char* dest, char* src) {
+    int dest_len = strlen(dest);
+    int src_len  = strlen(src);
+    char* new    = malloc(dest_len + src_len + 1);
+
+    int i = 0;
+    for (; i < dest_len; i++) new[i] = dest[i];
+    for (int j = 0; i < dest_len + src_len; i++, j++) new[i] = src[j];
+    new[dest_len + src_len] = '\0';
+
+    return new;
 }
