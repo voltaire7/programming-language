@@ -1,5 +1,6 @@
 #include "env.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,16 +42,16 @@ Entry* lookup(Dictionary* dict, const char* key) {
     return NULL;
 }
 
-void upsert(Dictionary* dict, const char* key, Value value, ValueType type) {
+void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure) {
     unsigned int slot = hash(key);
 
     Entry* entry = dict->table[slot];
     if (entry == NULL) {
-        dict->table[slot]        = (Entry*) malloc(sizeof(Entry));
-        dict->table[slot]->key   = strdup(key);
-        dict->table[slot]->value = value;
-        dict->table[slot]->type  = type;
-        dict->table[slot]->next  = NULL;
+        dict->table[slot]               = (Entry*) malloc(sizeof(Entry));
+        dict->table[slot]->key          = strdup(key);
+        dict->table[slot]->value        = value;
+        dict->table[slot]->is_procedure = is_procedure;
+        dict->table[slot]->next         = NULL;
     } else {
         Entry* prev;
         while (entry != NULL) {
@@ -61,12 +62,12 @@ void upsert(Dictionary* dict, const char* key, Value value, ValueType type) {
             prev  = entry;
             entry = entry->next;
         }
-        entry        = (Entry*) malloc(sizeof(Entry));
-        entry->key   = strdup(key);
-        entry->value = value;
-        entry->type  = type;
-        entry->next  = NULL;
-        prev->next   = entry;
+        entry               = (Entry*) malloc(sizeof(Entry));
+        entry->key          = strdup(key);
+        entry->value        = value;
+        entry->is_procedure = is_procedure;
+        entry->next         = NULL;
+        prev->next          = entry;
     }
 }
 
@@ -118,11 +119,11 @@ void free_dictionary(Dictionary* dict) {
 void push_scope(char* code) {
     Value val;
     val.stringValue = token;
-    upsert(env, "token", val, NEITHER);
+    upsert(env, "token", val, false);
     val.intValue = start;
-    upsert(env, "start", val, NEITHER);
+    upsert(env, "start", val, false);
     val.intValue = end;
-    upsert(env, "end", val, NEITHER);
+    upsert(env, "end", val, false);
 
     Dictionary* new_dict = create_dictionary();
     new_dict->next       = env;

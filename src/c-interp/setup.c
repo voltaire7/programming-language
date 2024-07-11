@@ -8,29 +8,29 @@ void setup() {
     Value val;
 
     val.procedureValue = PRINT;
-    upsert(env, "print", val, PROCEDURE);
+    upsert(env, "print", val, true);
 
     val.procedureValue = ITEM;
-    upsert(env, "item", val, PROCEDURE);
+    upsert(env, "item", val, true);
 
     val.procedureValue = FREE;
-    upsert(env, "free", val, PROCEDURE);
+    upsert(env, "free", val, true);
 
     val.procedureValue = DO;
-    upsert(env, "do", val, PROCEDURE);
+    upsert(env, "do", val, true);
 
     val.procedureValue = PROC;
-    upsert(env, "proc", val, PROCEDURE);
+    upsert(env, "proc", val, true);
 
     val.procedureValue = ITEM_IN;
-    upsert(env, "item-in", val, PROCEDURE);
+    upsert(env, "item-in", val, true);
 
     val.procedureValue = ITER;
-    upsert(env, "iter", val, PROCEDURE);
+    upsert(env, "iter", val, true);
 
     val.procedureValue = PARSE;
-    upsert(env, "parse", val, PROCEDURE);
+    upsert(env, "parse", val, true);
 
     val.procedureValue = COPY_TOKEN;
-    upsert(env, "copy-token", val, PROCEDURE);
+    upsert(env, "copy-token", val, true);
 }

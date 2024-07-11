@@ -22,11 +22,11 @@ void eval() {
     switch (token_type) {
         case INTEGER:
             val.intValue = atoi(token + start);
-            upsert(env, "_", val, NEITHER);
+            upsert(env, "_", val, false);
             break;
         case FLOAT:
             val.floatValue = atof(token + start);
-            upsert(env, "_", val, NEITHER);
+            upsert(env, "_", val, false);
             break;
         case QUOTE:
             break;
@@ -35,7 +35,7 @@ void eval() {
             symbolcpy(&s);
             Entry* entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol : '%s'", s);
-            if (entry->type == PROCEDURE)
+            if (entry->is_procedure)
                 entry->value.procedureValue();
             else {
                 end = start;

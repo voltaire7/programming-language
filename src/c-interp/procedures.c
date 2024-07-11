@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,15 +121,15 @@ void ITEM() {
             case FLOAT:
                 if (token_type == INTEGER) {
                     val.intValue = atol(token + start);
-                    upsert(env, key, val, NEITHER);
+                    upsert(env, key, val, false);
                 } else {
                     val.floatValue = atof(token + start);
-                    upsert(env, key, val, NEITHER);
+                    upsert(env, key, val, false);
                 }
                 break;
             case QUOTE:
                 quotecpy(&val.stringValue);
-                upsert(env, key, val, NEITHER);
+                upsert(env, key, val, false);
                 break;
             case SYMBOL: {
                 char* s;
@@ -136,10 +137,7 @@ void ITEM() {
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", s);
                 val.pointerValue = entry->value.procedureValue;
-                if (entry->type == PROCEDURE)
-                    upsert(env, key, val, PROCEDURE);
-                else
-                    upsert(env, key, val, STRING);
+                upsert(env, key, val, entry->is_procedure);
                 break;
             }
         }
@@ -229,7 +227,7 @@ void PROC() {
     char* code4 = concat(code2, code3);
     Value val;
     val.stringValue = concat(code4, code5);
-    upsert(env, "_", val, STRING);
+    upsert(env, "_", val, false);
 
     free(keys);
     free(code2);
@@ -298,7 +296,7 @@ void ITEM_IN() {
         key[i] = '\0';
 
         parse();
-        ValueType type = NEITHER;
+        bool is_procedure = false;
         switch (token_type) {
             case INTEGER:
             case FLOAT:
@@ -317,11 +315,11 @@ void ITEM_IN() {
                 entry = lookup(env, s);
                 if (entry == NULL) error("Undefined symbol: '%s'", s);
                 val.pointerValue = entry->value.procedureValue;
-                type             = entry->type;
+                is_procedure     = entry->is_procedure;
                 break;
             }
         }
-        upsert(env_target, key, val, type);
+        upsert(env_target, key, val, is_procedure);
     }
 
     free(keys);
@@ -404,7 +402,7 @@ void ITER() {
         push_scope(s);
 
         val.stringValue = key;
-        upsert(env, symbol, val, NEITHER);
+        upsert(env, symbol, val, false);
 
         parse();
         while (token == s) {
@@ -511,13 +509,13 @@ parse:
     }
     Value val;
     val.stringValue = inner_token;
-    upsert(env_target, "token", val, NEITHER);
+    upsert(env_target, "token", val, false);
     val.intValue = inner_start;
-    upsert(env_target, "start", val, NEITHER);
+    upsert(env_target, "start", val, false);
     val.intValue = inner_end;
-    upsert(env_target, "end", val, NEITHER);
+    upsert(env_target, "end", val, false);
     val.intValue = inner_token_type;
-    upsert(env_target, "token-type", val, NEITHER);
+    upsert(env_target, "token-type", val, false);
 }
 
 void COPY_TOKEN() {
@@ -593,12 +591,9 @@ void COPY_TOKEN() {
             entry = lookup(env, s);
             if (entry == NULL) error("Undefined symbol: '%s'", s);
             val.pointerValue = entry->value.procedureValue;
-            if (entry->type == PROCEDURE)
-                upsert(env, "_", val, PROCEDURE);
-            else
-                upsert(env, "_", val, STRING);
+            upsert(env, "_", val, entry->is_procedure);
             return;
         }
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(env, "_", val, false);
 }

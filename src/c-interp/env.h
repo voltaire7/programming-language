@@ -1,6 +1,7 @@
 #ifndef ENV_H
 #define ENV_H
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,16 +18,10 @@ typedef union {
     proc   procedureValue;
 } Value;
 
-typedef enum {
-    NEITHER,
-    STRING,
-    PROCEDURE,
-} ValueType;
-
 typedef struct Entry {
     char*         key;
     Value         value;
-    ValueType     type;
+    bool          is_procedure;
     struct Entry* next;
 } Entry;
 
@@ -37,7 +32,7 @@ typedef struct Dictionary {
 
 unsigned int hash(const char* key);
 Entry*       lookup(Dictionary* dict, const char* key);
-void upsert(Dictionary* dict, const char* key, Value value, ValueType type);
+void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure);
 void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
 void        free_dictionary(Dictionary* dict);
