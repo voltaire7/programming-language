@@ -12,6 +12,6 @@ void  printlen(char* str, const int len);
 char* quotecpy();
 char* symbolcpy();
 void  process_str(char* s);
-char* concat(char* dest, char* src);
+void  concat(char** dest, const char* src);
 
 #endif

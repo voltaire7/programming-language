@@ -84,15 +84,10 @@ void process_str(char* s) {
     s[j] = '\0';
 }
 
-char* concat(char* dest, char* src) {
-    int dest_len = strlen(dest);
-    int src_len  = strlen(src);
-    char* new    = malloc(dest_len + src_len + 1);
-
-    int i = 0;
-    for (; i < dest_len; i++) new[i] = dest[i];
-    for (int j = 0; i < dest_len + src_len; i++, j++) new[i] = src[j];
-    new[dest_len + src_len] = '\0';
-
-    return new;
+void concat(char** dest, const char* src) {
+    size_t new_size = strlen(*dest) + strlen(src) + 1;
+    char*  new_str  = (char*) realloc(*dest, new_size);
+    if (new_str == NULL) error("Failed to realloc string.");
+    *dest = new_str;
+    strcat(*dest, src);
 }

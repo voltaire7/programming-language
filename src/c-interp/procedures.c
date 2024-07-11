@@ -126,35 +126,41 @@ void PROC() {
     }
 
     parse();
-    char* code5;
+    char* code_block;
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            code5 = symbolcpy();
+            code_block = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
         case QUOTE:
-            code5 = quotecpy();
+            code_block = quotecpy();
             break;
         case SYMBOL: {
-            code5 = symbolcpy();
-            strcpy(code5, lookup_or_error(env, code5)->value.stringValue);
+            code_block = symbolcpy();
+            strcpy(
+                code_block,
+                lookup_or_error(env, code_block)->value.stringValue
+            );
             break;
         }
     }
 
-    char* code1 = "item-in 0 [keys] [";
-    char* code2 = concat(code1, keys);
-    char* code3 =
-        "] iter [k] keys [parse 2 copy-token 2 item-in 1 k _] free keys ";
-    char* code4 = concat(code2, code3);
+    char* full_code = malloc(1);
+    full_code[0]    = '\0';
+    concat(&full_code, "item-in 0 [keys] [");
+    concat(&full_code, keys);
+    concat(
+        &full_code,
+        "] iter [k] keys [parse 2 copy-token 2 item-in 1 k _] free keys "
+    );
+    concat(&full_code, code_block);
     Value val;
-    val.stringValue = concat(code4, code5);
+    val.stringValue = full_code;
     upsert(env, "_", val, false);
 
     free(keys);
-    free(code2);
-    free(code4);
+    free(code_block);
 }
 
 void ITEM_IN() {
