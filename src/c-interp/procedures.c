@@ -44,8 +44,7 @@ void PRINT() {
                         case 'i':
                         case 'f':
                         case 's': {
-                            char* t;
-                            t = symbolcpy();
+                            char* t = symbolcpy();
                             if (token_type != SYMBOL)
                                 error("Not a symbol: '%s'", t);
                             Entry* entry = lookup_or_error(env, t);
@@ -70,8 +69,7 @@ void PRINT() {
             }
             break;
         case SYMBOL:
-            s = symbolcpy();
-            s = lookup_or_error(env, s)->value.stringValue;
+            s = lookup_or_error(env, symbolcpy())->value.stringValue;
             goto quote;
             break;
     }
@@ -79,8 +77,7 @@ void PRINT() {
 
 void FREE() {
     scan_token(token, &start, &end, size, &token_type);
-    char* s;
-    s = symbolcpy();
+    char* s = symbolcpy();
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
     free(lookup_or_error(env, s)->value.stringValue);
 }
@@ -155,9 +152,7 @@ void PROC() {
         "] iter [k] keys [scan-token 2 copy-token 2 item-in 1 k _] free keys "
     );
     concat(&full_code, code_block);
-    Value val;
-    val.stringValue = full_code;
-    upsert(env, "_", val, false);
+    upsert(env, "_", (Value) full_code, false);
 
     free(keys);
     free(code_block);
@@ -214,31 +209,30 @@ void ITEM_IN() {
             ;
         char* key = malloc(l + 1);
         strncpy(key, keys + i - l, l);
-        key[i] = '\0';
+        key[l] = '\0';
 
         scan_token(token, &start, &end, size, &token_type);
-        bool is_procedure = false;
+        bool is_proc = false;
         switch (token_type) {
             case INTEGER:
             case FLOAT:
                 if (token_type == INTEGER) {
-                    val.intValue = atoi(token + start);
+                    val = (Value) atol(token + start);
                 } else {
-                    val.floatValue = atof(token + start);
+                    val = (Value) atof(token + start);
                 }
                 break;
             case QUOTE:
-                val.stringValue = quotecpy();
+                val = (Value) quotecpy();
                 break;
             case SYMBOL: {
-                char* s          = symbolcpy();
-                entry            = lookup_or_error(env, s);
-                val.pointerValue = entry->value.pointerValue;
-                is_procedure     = entry->is_procedure;
+                entry   = lookup_or_error(env, symbolcpy());
+                val     = (Value) entry->value.pointerValue;
+                is_proc = entry->is_procedure;
                 break;
             }
         }
-        upsert(env_target, key, val, is_procedure);
+        upsert(env_target, key, val, is_proc);
     }
 
     free(keys);
@@ -293,16 +287,14 @@ void ITER() {
             s = quotecpy();
             break;
         case SYMBOL: {
-            s = symbolcpy();
-            s = lookup_or_error(env, s)->value.stringValue;
+            s = lookup_or_error(env, symbolcpy())->value.stringValue;
             break;
         }
     }
-    long ret = start;
 
-    Value val;
-    long  keys_len = strlen(keys);
-    for (int i = 0; i < keys_len; i++) {
+    long ret = start;
+    long len = strlen(keys);
+    for (int i = 0; i < len; i++) {
         if (isspace(keys[i])) continue;
 
         int l = 0;
@@ -313,10 +305,7 @@ void ITER() {
         key[i] = '\0';
 
         push_scope(s);
-
-        val.stringValue = key;
-        upsert(env, symbol, val, false);
-
+        upsert(env, symbol, (Value) key, false);
         scan_token(token, &start, &end, size, &token_type);
         while (token == s) {
             eval();
@@ -364,44 +353,35 @@ void SCAN_TOKEN() {
         &inner_token_type
     );
 
-    Value val;
-    val.stringValue = inner_token;
-    upsert(env_target, "token", val, false);
-    val.intValue = inner_start;
-    upsert(env_target, "start", val, false);
-    val.intValue = inner_end;
-    upsert(env_target, "end", val, false);
-    val.intValue = inner_token_type;
-    upsert(env_target, "token-type", val, false);
+    upsert(env_target, "token", (Value) inner_token, false);
+    upsert(env_target, "start", (Value) inner_start, false);
+    upsert(env_target, "end", (Value) inner_end, false);
+    upsert(env_target, "token-type", (Value) inner_token_type, false);
 }
 
 void COPY_TOKEN() {
     char *    s, *inner_token;
     long      inner_start, inner_end;
-    Entry*    entry;
     TokenType inner_token_type;
 
-    long in = 0;
+    long layer = 0;
     scan_token(token, &start, &end, size, &token_type);
     switch (token_type) {
         char* s;
         case INTEGER:
-            in = atol(token + start);
+            layer = atol(token + start);
             break;
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            s     = symbolcpy();
-            entry = lookup(env, s);
-            if (entry == NULL) error("Undefined symbol: '%s'", s);
-            in = lookup_or_error(env, s)->value.intValue;
+            layer = lookup_or_error(env, symbolcpy())->value.intValue;
             break;
         }
     }
 
-    Dictionary* env_target = get_env(in);
+    Dictionary* env_target = get_env(layer);
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.intValue;
@@ -414,12 +394,12 @@ void COPY_TOKEN() {
         case INTEGER:
         case FLOAT:
             if (inner_token_type == INTEGER)
-                val.intValue = atol(inner_token + inner_start);
+                val = (Value) atol(inner_token + inner_start);
             else
-                val.floatValue = atof(inner_token + inner_start);
+                val = (Value) atof(inner_token + inner_start);
             break;
         case QUOTE:
-            val.stringValue = malloc((inner_end - inner_start - 2) + 1);
+            val = (Value) malloc((inner_end - inner_start - 2) + 1);
             strncpy(
                 val.stringValue,
                 inner_token + inner_start + 1,
@@ -433,8 +413,13 @@ void COPY_TOKEN() {
             strncpy(s, inner_token + inner_start, inner_end - inner_start);
             s[inner_end - inner_start] = '\0';
 
-            val.pointerValue = lookup_or_error(env, s)->value.procedureValue;
-            upsert(env, "_", val, entry->is_procedure);
+            Entry* entry = lookup_or_error(env, s);
+            upsert(
+                env,
+                "_",
+                (Value) entry->value.procedureValue,
+                entry->is_procedure
+            );
             return;
         }
     }

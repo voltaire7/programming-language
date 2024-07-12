@@ -6,16 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "scan-token.h"
+
 #define TABLE_SIZE 100
 
 typedef void (*proc)(void);
 
 typedef union {
-    long   intValue;
-    double floatValue;
-    void*  pointerValue;
-    char*  stringValue;
-    proc   procedureValue;
+    long      intValue;
+    double    floatValue;
+    void*     pointerValue;
+    char*     stringValue;
+    proc      procedureValue;
+    TokenType token_type;
 } Value;
 
 typedef struct Entry {
