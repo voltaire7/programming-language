@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "eval.c"
-#include "parse.h"
+#include "scan-token.h"
 #include "setup.c"
 #include "util.h"
 
@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     readFileContent(argv[1]);
     setup();
     for (;;) {
-        parse(token, &start, &end, size, &token_type);
+        scan_token(token, &start, &end, size, &token_type);
         eval();
     }
 

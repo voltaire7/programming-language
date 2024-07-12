@@ -25,8 +25,8 @@ void setup() {
     val.procedureValue = ITER;
     upsert(env, "iter", val, true);
 
-    val.procedureValue = PARSE;
-    upsert(env, "parse", val, true);
+    val.procedureValue = SCAN_TOKEN;
+    upsert(env, "scan-token", val, true);
 
     val.procedureValue = COPY_TOKEN;
     upsert(env, "copy-token", val, true);

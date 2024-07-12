@@ -1,5 +1,5 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef SCAN_TOKEN_H
+#define SCAN_TOKEN_H
 
 typedef enum {
     INTEGER,
@@ -8,7 +8,7 @@ typedef enum {
     SYMBOL,
 } TokenType;
 
-void parse(
+void scan_token(
     char*      inner_token,
     long*      inner_start,
     long*      inner_end,

@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "scan-token.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -20,7 +20,7 @@ TokenType token_type;
 
 int test = 0;
 
-void parse(
+void scan_token(
     char*      inner_token,
     long*      inner_start,
     long*      inner_end,
@@ -36,7 +36,7 @@ void parse(
         exit(0);
     else if ((*inner_end) >= inner_size && env->next != NULL) {
         pop_scope();
-        parse(token, &start, &end, size, &token_type);
+        scan_token(token, &start, &end, size, &token_type);
         return;
     }
 

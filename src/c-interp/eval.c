@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
 #include "env.h"
-#include "parse.h"
 #include "procedures.h"
+#include "scan-token.h"
 #include "util.h"
 
 extern char* token;

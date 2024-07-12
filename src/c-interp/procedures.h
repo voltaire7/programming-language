@@ -9,7 +9,7 @@ void DO();
 void PROC();
 void ITEM_IN();
 void ITER();
-void PARSE();
+void SCAN_TOKEN();
 void COPY_TOKEN();
 
 #endif
