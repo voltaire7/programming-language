@@ -48,33 +48,33 @@ Entry* lookup_or_error(Dictionary* dict, const char* key) {
     return entry;
 }
 
-void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure) {
+void upsert(Dictionary* dict, const char* key, Value value, PointerType type) {
     unsigned int slot = hash(key);
 
     Entry* entry = dict->table[slot];
     if (entry == NULL) {
-        dict->table[slot]               = (Entry*) malloc(sizeof(Entry));
-        dict->table[slot]->key          = strdup(key);
-        dict->table[slot]->value        = value;
-        dict->table[slot]->is_procedure = is_procedure;
-        dict->table[slot]->next         = NULL;
+        dict->table[slot]        = (Entry*) malloc(sizeof(Entry));
+        dict->table[slot]->key   = strdup(key);
+        dict->table[slot]->value = value;
+        dict->table[slot]->type  = type;
+        dict->table[slot]->next  = NULL;
     } else {
         Entry* prev;
         while (entry != NULL) {
             if (strcmp(entry->key, key) == 0) {
-                entry->value        = value;
-                entry->is_procedure = is_procedure;
+                entry->value = value;
+                entry->type  = type;
                 return;
             }
             prev  = entry;
             entry = entry->next;
         }
-        entry               = (Entry*) malloc(sizeof(Entry));
-        entry->key          = strdup(key);
-        entry->value        = value;
-        entry->is_procedure = is_procedure;
-        entry->next         = NULL;
-        prev->next          = entry;
+        entry        = (Entry*) malloc(sizeof(Entry));
+        entry->key   = strdup(key);
+        entry->value = value;
+        entry->type  = type;
+        entry->next  = NULL;
+        prev->next   = entry;
     }
 }
 
@@ -149,14 +149,10 @@ void pop_scope() {
 
     Entry* entry;
 
-    entry = lookup(env, "token");
-    if (entry == NULL) error("Undefined symbol: 'token'");
-    token = entry->value.stringValue;
+    token = lookup_or_error(env, "token")->value.stringValue;
+    start = lookup_or_error(env, "start")->value.intValue;
+    end   = lookup_or_error(env, "end")->value.intValue;
     size  = strlen(token);
-
-    entry = lookup(env, "end");
-    if (entry == NULL) error("Undefined symbol: 'end'");
-    end = entry->value.intValue;
 
     free_dictionary(temp);
 }

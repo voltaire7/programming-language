@@ -29,14 +29,14 @@ void eval() {
         case QUOTE:
             break;
         case SYMBOL: {
-            char*  s     = symbolcpy();
-            Entry* entry = lookup_or_error(env, s);
-            if (entry->is_procedure)
+            Entry* entry = lookup_or_error(env, symbolcpy());
+            if (entry->type == PROCEDURE)
                 entry->value.procedureValue();
-            else {
+            else if (entry->type == STRING) {
                 end = start;
                 DO();
-            }
+            } else
+                error("Cannot evaluate symbol: %s\n", entry->key);
             break;
         }
     }

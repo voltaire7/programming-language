@@ -10,7 +10,11 @@
 
 #define TABLE_SIZE 100
 
-typedef void (*proc)(void);
+typedef enum {
+    PROCEDURE,
+    STRING,
+    NEITHER,
+} PointerType;
 
 typedef union {
     long      intValue;
@@ -24,7 +28,7 @@ typedef union {
 typedef struct Entry {
     char*         key;
     Value         value;
-    bool          is_procedure;
+    PointerType   type;
     struct Entry* next;
 } Entry;
 
@@ -36,7 +40,7 @@ typedef struct Dictionary {
 unsigned int hash(const char* key);
 Entry*       lookup(Dictionary* dict, const char* key);
 Entry*       lookup_or_error(Dictionary* dict, const char* key);
-void upsert(Dictionary* dict, const char* key, Value value, bool is_procedure);
+void upsert(Dictionary* dict, const char* key, Value value, PointerType type);
 void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
 void        free_dictionary(Dictionary* dict);

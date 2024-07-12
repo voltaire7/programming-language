@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     readFileContent(argv[1]);
     setup();
     for (;;) {
-        scan_token(token, &start, &end, size, &token_type);
+        scan_token_default();
         eval();
     }
 

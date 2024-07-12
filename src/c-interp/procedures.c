@@ -150,7 +150,7 @@ void PROC() {
         "] iter [k] keys [scan-token 2 copy-token 2 item-in 1 k _] free keys "
     );
     concat(&full_code, code_block);
-    upsert(env, "_", (Value) full_code, false);
+    upsert(env, "_", (Value) full_code, STRING);
 
     free(keys);
     free(code_block);
@@ -159,20 +159,20 @@ void PROC() {
 void ITEM_IN() {
     Entry* entry;
 
-    long in = 0;
+    long layer = 0;
     scan_token_default();
     switch (token_type) {
         char* s;
         case INTEGER:
-            in = atol(token + start);
+            layer = atol(token + start);
             break;
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            s  = symbolcpy();
-            in = lookup_or_error(env, s)->value.intValue;
+            s     = symbolcpy();
+            layer = lookup_or_error(env, s)->value.intValue;
             break;
         }
     }
@@ -195,7 +195,7 @@ void ITEM_IN() {
         }
     }
 
-    Dictionary* env_target = get_env(in);
+    Dictionary* env_target = get_env(layer);
 
     Value val;
     long  keys_len = strlen(keys);
@@ -210,7 +210,7 @@ void ITEM_IN() {
         key[l] = '\0';
 
         scan_token_default();
-        bool is_proc = false;
+        PointerType type = NEITHER;
         switch (token_type) {
             case INTEGER:
             case FLOAT:
@@ -224,13 +224,14 @@ void ITEM_IN() {
                 val = (Value) quotecpy();
                 break;
             case SYMBOL: {
-                entry   = lookup_or_error(env, symbolcpy());
-                val     = (Value) entry->value.pointerValue;
-                is_proc = entry->is_procedure;
+                entry = lookup_or_error(env, symbolcpy());
+                val   = (Value) entry->value.pointerValue;
+                type  = entry->type;
                 break;
             }
         }
-        upsert(env_target, key, val, is_proc);
+        if (!strcmp(key, "test")) printf("key: %s, %d\n", key, NEITHER == type);
+        upsert(env_target, key, val, type);
     }
 
     free(keys);
@@ -303,7 +304,7 @@ void ITER() {
         key[i] = '\0';
 
         push_scope(s);
-        upsert(env, symbol, (Value) key, false);
+        upsert(env, symbol, (Value) key, NEITHER);
         scan_token(token, &start, &end, size, &token_type);
         while (token == s) {
             eval();
@@ -351,10 +352,10 @@ void SCAN_TOKEN() {
         &inner_token_type
     );
 
-    upsert(env_target, "token", (Value) inner_token, false);
-    upsert(env_target, "start", (Value) inner_start, false);
-    upsert(env_target, "end", (Value) inner_end, false);
-    upsert(env_target, "token-type", (Value) inner_token_type, false);
+    upsert(env_target, "token", (Value) inner_token, NEITHER);
+    upsert(env_target, "start", (Value) inner_start, NEITHER);
+    upsert(env_target, "end", (Value) inner_end, NEITHER);
+    upsert(env_target, "token-type", (Value) inner_token_type, NEITHER);
 }
 
 void COPY_TOKEN() {
@@ -412,23 +413,25 @@ void COPY_TOKEN() {
             s[inner_end - inner_start] = '\0';
 
             Entry* entry = lookup_or_error(env, s);
-            upsert(
-                env,
-                "_",
-                (Value) entry->value.procedureValue,
-                entry->is_procedure
-            );
+            upsert(env, "_", (Value) entry->value.procedureValue, entry->type);
             return;
         }
     }
-    upsert(env, "_", val, false);
+    upsert(env, "_", val, NEITHER);
 }
 
 void IF() {
     bool cond = lookup_or_error(env, "_")->value.intValue;
-    if (cond)
-        ;
-    else
+    if (cond) {
+        char* old = token;
+        DO();
+        for (;;) {
+            scan_token_default();
+            if (token == old) break;
+            eval();
+        }
+    } else {
         scan_token_default();
-    DO();
+        DO();
+    }
 }

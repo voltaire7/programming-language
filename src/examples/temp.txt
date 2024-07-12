@@ -6,8 +6,14 @@ proc [] [
     item-in 0
 ] as [item]
 
-item [if-true] [print 1]
-item [if-false] [print 2]
-0 ? if-true if-false
+proc [if-true] [
+    ? if-true []
+] as [then]
+
+proc [if-false] [
+    ? [] if-false
+] as [else]
+
+1 ? [print 1] [print 2] then [print [yes]] else [print [no]]
 
 

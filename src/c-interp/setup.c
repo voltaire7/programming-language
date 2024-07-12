@@ -6,13 +6,13 @@ Dictionary* env;
 void setup() {
     env = create_dictionary();
 
-    upsert(env, "print", (Value) PRINT, true);
-    upsert(env, "free", (Value) FREE, true);
-    upsert(env, "do", (Value) DO, true);
-    upsert(env, "proc", (Value) PROC, true);
-    upsert(env, "item-in", (Value) ITEM_IN, true);
-    upsert(env, "iter", (Value) ITER, true);
-    upsert(env, "scan-token", (Value) SCAN_TOKEN, true);
-    upsert(env, "copy-token", (Value) COPY_TOKEN, true);
-    upsert(env, "?", (Value) IF, true);
+    upsert(env, "print", (Value) PRINT, PROCEDURE);
+    upsert(env, "free", (Value) FREE, PROCEDURE);
+    upsert(env, "do", (Value) DO, PROCEDURE);
+    upsert(env, "proc", (Value) PROC, PROCEDURE);
+    upsert(env, "item-in", (Value) ITEM_IN, PROCEDURE);
+    upsert(env, "iter", (Value) ITER, PROCEDURE);
+    upsert(env, "scan-token", (Value) SCAN_TOKEN, PROCEDURE);
+    upsert(env, "copy-token", (Value) COPY_TOKEN, PROCEDURE);
+    upsert(env, "?", (Value) IF, PROCEDURE);
 }
