@@ -17,7 +17,7 @@ typedef union {
     double    floatValue;
     void*     pointerValue;
     char*     stringValue;
-    proc      procedureValue;
+    void      (*procedureValue)();
     TokenType token_type;
 } Value;
 

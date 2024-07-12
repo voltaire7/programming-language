@@ -79,3 +79,7 @@ void scan_token(
         *inner_token_type = SYMBOL;
     }
 }
+
+void scan_token_default() {
+    scan_token(token, &start, &end, size, &token_type);
+}

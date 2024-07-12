@@ -16,4 +16,6 @@ void scan_token(
     TokenType* inner_token_type
 );
 
+void scan_token_default();
+
 #endif

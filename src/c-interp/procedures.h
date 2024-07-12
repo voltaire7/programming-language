@@ -11,5 +11,6 @@ void ITEM_IN();
 void ITER();
 void SCAN_TOKEN();
 void COPY_TOKEN();
+void IF();
 
 #endif

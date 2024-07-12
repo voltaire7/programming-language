@@ -21,7 +21,7 @@ extern TokenType token_type;
 
 void PRINT() {
     char* s;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
 
     switch (token_type) {
         case INTEGER:
@@ -76,7 +76,7 @@ void PRINT() {
 }
 
 void FREE() {
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     char* s = symbolcpy();
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
     free(lookup_or_error(env, s)->value.stringValue);
@@ -84,19 +84,17 @@ void FREE() {
 
 void DO() {
     char* s;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
             error("Cannot evaluate a number.");
             break;
         case QUOTE:
-            s = quotecpy();
-            push_scope(s);
+            push_scope(quotecpy());
             break;
         case SYMBOL: {
-            s = symbolcpy();
-            push_scope(lookup_or_error(env, s)->value.stringValue);
+            push_scope(lookup_or_error(env, symbolcpy())->value.stringValue);
             break;
         }
     }
@@ -105,7 +103,7 @@ void DO() {
 void PROC() {
     char*  keys;
     Entry* entry;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -122,7 +120,7 @@ void PROC() {
         }
     }
 
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     char* code_block;
     switch (token_type) {
         case INTEGER:
@@ -162,7 +160,7 @@ void ITEM_IN() {
     Entry* entry;
 
     long in = 0;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         char* s;
         case INTEGER:
@@ -180,7 +178,7 @@ void ITEM_IN() {
     }
 
     char* keys;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -211,7 +209,7 @@ void ITEM_IN() {
         strncpy(key, keys + i - l, l);
         key[l] = '\0';
 
-        scan_token(token, &start, &end, size, &token_type);
+        scan_token_default();
         bool is_proc = false;
         switch (token_type) {
             case INTEGER:
@@ -241,7 +239,7 @@ void ITEM_IN() {
 void ITER() {
     char*  symbol;
     Entry* entry;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -259,7 +257,7 @@ void ITER() {
     }
 
     char* keys;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -276,7 +274,7 @@ void ITER() {
         }
     }
 
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     char* s;
     switch (token_type) {
         case INTEGER:
@@ -319,7 +317,7 @@ void ITER() {
 
 void SCAN_TOKEN() {
     long layer = 0;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         char* s;
         case INTEGER:
@@ -365,7 +363,7 @@ void COPY_TOKEN() {
     TokenType inner_token_type;
 
     long layer = 0;
-    scan_token(token, &start, &end, size, &token_type);
+    scan_token_default();
     switch (token_type) {
         char* s;
         case INTEGER:
@@ -424,4 +422,13 @@ void COPY_TOKEN() {
         }
     }
     upsert(env, "_", val, false);
+}
+
+void IF() {
+    bool cond = lookup_or_error(env, "_")->value.intValue;
+    if (cond)
+        ;
+    else
+        scan_token_default();
+    DO();
 }
