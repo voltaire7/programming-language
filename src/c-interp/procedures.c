@@ -9,11 +9,11 @@
 #include "parse.h"
 #include "util.h"
 
-extern char*  token;
-extern size_t size;
+extern char* token;
+extern long  size;
 
-extern size_t start;
-extern size_t end;
+extern long start;
+extern long end;
 
 extern Dictionary* env;
 
@@ -21,7 +21,7 @@ extern TokenType token_type;
 
 void PRINT() {
     char* s;
-    parse();
+    parse(token, &start, &end, size, &token_type);
 
     switch (token_type) {
         case INTEGER:
@@ -36,7 +36,7 @@ void PRINT() {
             for (int i = 0; s[i] != '\0'; i++) {
                 if (s[i] == '%') {
                     i++;
-                    parse();
+                    parse(token, &start, &end, size, &token_type);
                     switch (s[i]) {
                         case '%':
                             printf("%%");
@@ -78,7 +78,7 @@ void PRINT() {
 }
 
 void FREE() {
-    parse();
+    parse(token, &start, &end, size, &token_type);
     char* s;
     s = symbolcpy();
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
@@ -87,7 +87,7 @@ void FREE() {
 
 void DO() {
     char* s;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -108,7 +108,7 @@ void DO() {
 void PROC() {
     char*  keys;
     Entry* entry;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -125,7 +125,7 @@ void PROC() {
         }
     }
 
-    parse();
+    parse(token, &start, &end, size, &token_type);
     char* code_block;
     switch (token_type) {
         case INTEGER:
@@ -167,7 +167,7 @@ void ITEM_IN() {
     Entry* entry;
 
     long in = 0;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         char* s;
         case INTEGER:
@@ -185,7 +185,7 @@ void ITEM_IN() {
     }
 
     char* keys;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -216,7 +216,7 @@ void ITEM_IN() {
         strncpy(key, keys + i - l, l);
         key[i] = '\0';
 
-        parse();
+        parse(token, &start, &end, size, &token_type);
         bool is_procedure = false;
         switch (token_type) {
             case INTEGER:
@@ -247,7 +247,7 @@ void ITEM_IN() {
 void ITER() {
     char*  symbol;
     Entry* entry;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -265,7 +265,7 @@ void ITER() {
     }
 
     char* keys;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -282,7 +282,7 @@ void ITER() {
         }
     }
 
-    parse();
+    parse(token, &start, &end, size, &token_type);
     char* s;
     switch (token_type) {
         case INTEGER:
@@ -317,10 +317,10 @@ void ITER() {
         val.stringValue = key;
         upsert(env, symbol, val, false);
 
-        parse();
+        parse(token, &start, &end, size, &token_type);
         while (token == s) {
             eval();
-            parse();
+            parse(token, &start, &end, size, &token_type);
         }
         end = ret;
     }
@@ -329,85 +329,35 @@ void ITER() {
 }
 
 void PARSE() {
-    char *    s, *inner_token;
-    long      inner_size, inner_start, inner_end;
-    Entry*    entry;
-    TokenType inner_token_type;
-
-    long in = 0;
-    parse();
+    long layer = 0;
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         char* s;
         case INTEGER:
-            in = atol(token + start);
+            layer = atol(token + start);
             break;
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            s  = symbolcpy();
-            in = lookup_or_error(env, s)->value.intValue;
+            s     = symbolcpy();
+            layer = lookup_or_error(env, s)->value.intValue;
             break;
         }
     }
 
-    Dictionary* env_target = get_env(in);
+    Dictionary* env_target = get_env(layer);
 
-    inner_token = lookup_or_error(env_target, "token")->value.stringValue;
-    inner_start = lookup_or_error(env_target, "start")->value.intValue;
-    inner_end   = lookup_or_error(env_target, "end")->value.intValue;
+    char* inner_token = lookup_or_error(env_target, "token")->value.stringValue;
+    long  inner_start = lookup_or_error(env_target, "start")->value.intValue;
+    long  inner_end   = lookup_or_error(env_target, "end")->value.intValue;
 
-    inner_size = strlen(inner_token);
+    long      inner_size = strlen(inner_token);
+    TokenType inner_token_type;
 
-parse:
-    while (isspace(inner_token[inner_end])) {
-        inner_end++;
-    }
+    parse(inner_token, &inner_start, &inner_end, inner_size, &inner_token_type);
 
-    if (inner_end >= inner_size && env_target == NULL)
-        exit(0);
-    else if (inner_end >= inner_size && env_target != NULL) {
-        pop_scope();
-        goto parse;
-    }
-
-    inner_start = inner_end;
-    if (inner_token[inner_end] == '-' || isdigit(inner_token[inner_end])) {
-        inner_token_type = INTEGER;
-        inner_end++;
-        while (isdigit((inner_token[inner_end]))) inner_end++;
-        if (inner_token[inner_end] == '.') {
-            while (isdigit(inner_token[++inner_end]))
-                ;
-            inner_token_type = FLOAT;
-        }
-        if (!isspace(inner_token[inner_end]) && inner_token[inner_end] != '\0')
-            goto symbol;
-    } else if (inner_token[inner_end] == '[') {
-        inner_token_type = QUOTE;
-        int layer        = 1;
-        do {
-            inner_end++;
-            if (inner_token[inner_end] == '\0')
-                error(
-                    "Non-terminating quote : '%s'",
-                    inner_token + inner_start
-                );
-            if (inner_token[inner_end] == '[')
-                layer++;
-            else if (inner_token[inner_end] == ']' && inner_token[inner_end - 1] != '\\')
-                layer--;
-        } while (inner_token[inner_end] != ']' || layer != 0);
-        inner_end++;
-    } else {
-        inner_end++;
-    symbol:
-        while (!isspace(inner_token[inner_end]) && inner_token[inner_end] != '0'
-        )
-            inner_end++;
-        inner_token_type = SYMBOL;
-    }
     Value val;
     val.stringValue = inner_token;
     upsert(env_target, "token", val, false);
@@ -426,7 +376,7 @@ void COPY_TOKEN() {
     TokenType inner_token_type;
 
     long in = 0;
-    parse();
+    parse(token, &start, &end, size, &token_type);
     switch (token_type) {
         char* s;
         case INTEGER:

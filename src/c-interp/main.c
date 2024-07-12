@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     readFileContent(argv[1]);
     setup();
     for (;;) {
-        parse();
+        parse(token, &start, &end, size, &token_type);
         eval();
     }
 

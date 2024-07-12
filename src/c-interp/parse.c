@@ -20,48 +20,62 @@ TokenType token_type;
 
 int test = 0;
 
-void parse() {
-parse:
-    while (isspace(token[end])) {
-        end++;
+void parse(
+    char*      inner_token,
+    long*      inner_start,
+    long*      inner_end,
+    long       inner_size,
+    TokenType* inner_token_type
+) {
+    while (isspace(inner_token[*inner_end])) {
+        (*inner_end)++;
     }
 
-    if (end >= size && env->next == NULL)
+    // printf("token: %s\n", token + *start);
+    if ((*inner_end) >= inner_size && env->next == NULL)
         exit(0);
-    else if (end >= size && env->next != NULL) {
+    else if ((*inner_end) >= inner_size && env->next != NULL) {
         pop_scope();
-        goto parse;
+        parse(token, &start, &end, size, &token_type);
+        return;
     }
 
-    start = end;
-    if (token[end] == '-' || isdigit(token[end])) {
-        token_type = INTEGER;
-        end++;
-        while (isdigit((token[end]))) end++;
-        if (token[end] == '.') {
-            while (isdigit(token[++end]))
+    *inner_start = *inner_end;
+    if (inner_token[*inner_end] == '-' || isdigit(inner_token[*inner_end])) {
+        *inner_token_type = INTEGER;
+        (*inner_end)++;
+        while (isdigit((inner_token[*inner_end]))) (*inner_end)++;
+        if (inner_token[*inner_end] == '.') {
+            while (isdigit(inner_token[++(*inner_end)]))
                 ;
-            token_type = FLOAT;
+            *inner_token_type = FLOAT;
         }
-        if (!isspace(token[end]) && token[end] != '\0') goto symbol;
-    } else if (token[end] == '[') {
-        token_type = QUOTE;
-        int layer  = 1;
+        if (!isspace(inner_token[*inner_end])
+            && inner_token[*inner_end] != '\0')
+            goto symbol;
+    } else if (inner_token[*inner_end] == '[') {
+        *inner_token_type = QUOTE;
+        int layer         = 1;
         do {
-            end++;
-            if (token[end] == '\0')
-                error("Non-terminating quote : '%s'", token + start);
-            if (token[end] == '[' && token[end - 1] != '\\')
+            (*inner_end)++;
+            if (inner_token[*inner_end] == '\0')
+                error(
+                    "Non-terminating quote : '%s'",
+                    inner_token + *inner_start
+                );
+            if (inner_token[*inner_end] == '['
+                && inner_token[*inner_end - 1] != '\\')
                 layer++;
-            else if (token[end] == ']' && token[end - 1] != '\\')
+            else if (inner_token[*inner_end] == ']' && inner_token[*inner_end - 1] != '\\')
                 layer--;
-        } while (token[end] != ']' || layer != 0);
-        end++;
+        } while (inner_token[*inner_end] != ']' || layer != 0);
+        (*inner_end)++;
     } else {
     symbol:
-        while (!isspace(token[end]) && token[end] != '\0') {
-            end++;
+        while (!isspace(inner_token[*inner_end])
+               && inner_token[*inner_end] != '\0') {
+            (*inner_end)++;
         }
-        token_type = SYMBOL;
+        *inner_token_type = SYMBOL;
     }
 }

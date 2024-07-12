@@ -1416,4 +1416,28 @@ print str [outputs Hello]
 
 [Man, being able to define procedures opens so many doors!]
 
+[I can make a [format] procedure with the new concat function.]
+
+[I should be [get] and [set]]
+item [str] [Hello]
+get 1 str print [%c\n] _ [outputs 'e']
+set 1 str [E] print str [outputs 'HEllo']
+
+[Should I have a special syntax for characters?]
+[or maybe]
+item [char] [x]
+[if the value is a single character long, it just interprets it as a char? No need for malloc?]
+
+[Still, I would have to be mindful when implementing string manipulation.]
+
+[Wait a second...]
+proc [] [
+    + 1 repeat _ [parse 2] do
+] as [?]
+5 == 5 ? [] []
+[^ an interesting way to implement if statements.]
+
+[Numbers have to be treated specially, otherwise...]
+item [a] 1 [throws error, undefined symbol]
+
 
