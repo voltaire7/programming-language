@@ -36,7 +36,7 @@ void eval() {
                 end = start;
                 DO();
             } else
-                error("Cannot evaluate symbol: %s\n", entry->key);
+                error("Cannot evaluate symbol: '%s'\n", entry->key);
             break;
         }
     }

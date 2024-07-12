@@ -41,7 +41,8 @@ void scan_token(
     }
 
     *inner_start = *inner_end;
-    if (inner_token[*inner_end] == '-' || isdigit(inner_token[*inner_end])) {
+    if (inner_token[*inner_end] == '-' && isdigit(inner_token[*inner_end + 1])
+        || isdigit(inner_token[*inner_end])) {
         *inner_token_type = INTEGER;
         (*inner_end)++;
         while (isdigit((inner_token[*inner_end]))) (*inner_end)++;

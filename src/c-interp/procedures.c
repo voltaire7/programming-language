@@ -230,7 +230,6 @@ void ITEM_IN() {
                 break;
             }
         }
-        if (!strcmp(key, "test")) printf("key: %s, %d\n", key, NEITHER == type);
         upsert(env_target, key, val, type);
     }
 
@@ -434,4 +433,178 @@ void IF() {
         scan_token_default();
         DO();
     }
+}
+
+void ADD() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val = (Value) (val.intValue + atol(token + start));
+            else
+                val = (Value) (val.floatValue + atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '+' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) (val.intValue
+                           + lookup_or_error(env, symbolcpy())->value.intValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void SUB() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val = (Value) (val.intValue - atol(token + start));
+            else
+                val = (Value) (val.floatValue - atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '-' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) (val.intValue
+                           - lookup_or_error(env, symbolcpy())->value.intValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void MUL() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue * atol(token + start));
+            } else {
+                val = (Value) (val.floatValue * atof(token + start));
+            }
+            break;
+        case QUOTE:
+            error("Cannot '*' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) (val.intValue
+                           * lookup_or_error(env, symbolcpy())->value.intValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void DIV() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue / atol(token + start));
+            } else
+                val = (Value) (val.floatValue / atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '/' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) (val.intValue
+                           / lookup_or_error(env, symbolcpy())->value.intValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void ADD_FLOAT() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val = (Value) (val.intValue + atol(token + start));
+            else
+                val = (Value) (val.floatValue + atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '+' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val =
+                (Value) (val.floatValue
+                         + lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void SUB_FLOAT() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val = (Value) (val.intValue - atol(token + start));
+            else
+                val = (Value) (val.floatValue - atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '-' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val =
+                (Value) (val.floatValue
+                         - lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void MUL_FLOAT() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue * atol(token + start));
+            } else {
+                val = (Value) (val.floatValue * atof(token + start));
+            }
+            break;
+        case QUOTE:
+            error("Cannot '*' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val =
+                (Value) (val.floatValue
+                         * lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void DIV_FLOAT() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue / atol(token + start));
+            } else
+                val = (Value) (val.floatValue / atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '/' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val =
+                (Value) (val.floatValue
+                         / lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(env, "_", val, NEITHER);
 }
