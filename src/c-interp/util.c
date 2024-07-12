@@ -3,11 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "env.h"
+
 char* token = NULL;
 long  size  = 0;
 
 long start = 0;
 long end   = 0;
+
+extern Dictionary* env;
 
 void error(char* msg, ...) {
     va_list args;
@@ -90,4 +94,13 @@ void concat(char** dest, const char* src) {
     if (new_str == NULL) error("Failed to realloc string.");
     *dest = new_str;
     strcat(*dest, src);
+}
+
+Dictionary* get_env(int layer) {
+    Dictionary* env_target = env;
+    for (int i = layer; i != 0; i--) {
+        env_target = env_target->next;
+        if (env_target == NULL) error("Non existent scope: %d", layer);
+    }
+    return env_target;
 }

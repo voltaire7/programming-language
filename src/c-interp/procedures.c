@@ -202,11 +202,7 @@ void ITEM_IN() {
         }
     }
 
-    Dictionary* env_target = env;
-    for (int i = in; i != 0; i--) {
-        env_target = env_target->next;
-        if (env_target == NULL) error("Non existent scope: %d", in);
-    }
+    Dictionary* env_target = get_env(in);
 
     Value val;
     long  keys_len = strlen(keys);
@@ -356,11 +352,7 @@ void PARSE() {
         }
     }
 
-    Dictionary* env_target = env;
-    for (int i = in; i != 0; i--) {
-        env_target = env_target->next;
-        if (env_target == NULL) error("Non existent scope: %d", in);
-    }
+    Dictionary* env_target = get_env(in);
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.intValue;
@@ -453,11 +445,7 @@ void COPY_TOKEN() {
         }
     }
 
-    Dictionary* env_target = env;
-    for (int i = in; i != 0; i--) {
-        env_target = env_target->next;
-        if (env_target == NULL) error("Non existent scope: %d", in);
-    }
+    Dictionary* env_target = get_env(in);
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.intValue;

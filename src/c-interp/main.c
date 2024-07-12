@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "eval.c"
 #include "parse.h"
@@ -19,6 +18,5 @@ int main(int argc, char** argv) {
         eval();
     }
 
-    free(token);
     return 0;
 }
