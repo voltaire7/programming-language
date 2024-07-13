@@ -10,7 +10,7 @@ proc [] [
     item-in 1 [_]
 ] as [ch]
 
-item [x] 10.0
-ch x + 5.0 - 1.0 * 2.0 /f x print [%f] _
+item [x] .10
+ch x + 5. - 1. * 2. /f x print [%f] _
 
 
