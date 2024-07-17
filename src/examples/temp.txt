@@ -11,6 +11,6 @@ proc [] [
 ] as [ch]
 
 item [x] .10
-ch x + 5. - 1. * 2. /f x print [%f] _
+ch x + 5. - 1. * 2. /f x / 2 print [%g] _
 
 

@@ -43,6 +43,8 @@ void PRINT() {
                             break;
                         case 'i':
                         case 'f':
+                        case 'e':
+                        case 'g':
                         case 's': {
                             char* t = symbolcpy();
                             if (token_type != SYMBOL)
@@ -53,6 +55,10 @@ void PRINT() {
                                 printf("%ld", entry->value.intValue);
                             else if (s[i] == 'f')
                                 printf("%f", entry->value.floatValue);
+                            else if (s[i] == 'e')
+                                printf("%e", entry->value.floatValue);
+                            else if (s[i] == 'g')
+                                printf("%g", entry->value.floatValue);
                             else if (s[i] == 's')
                                 printf("%s", entry->value.stringValue);
                             break;

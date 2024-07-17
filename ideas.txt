@@ -1440,4 +1440,45 @@ proc [] [
 [Numbers have to be treated specially, otherwise...]
 item [a] 1 [throws error, undefined symbol]
 
+[Should I make it so that [return] pops the scope?]
+proc [i list len] [
+    for [n] list [
+        ch n == i ? [return 3 n] [++ len]
+    ]
+]
+[Maybe something similar for [continue]? Like, it's equivalent to [goto 0], or something?]
+[Perhaps break as well, but it returns nothing?]
+
+[I'm starting to think that i need special notation for char.]
+item [c] 'c'
+[^ the string [c] is equal to the char 'c']
+[I could make it so a string of length 1 becomes a character automatically, but right now, I don't
+know.]
+char [a] item [a] _
+[^ maybe?]
+
+[Just realized that my language simulates function currying.]
+
+[For [do-here], I don't need anything special; just don't create a new [env], change the [start] and
+[end] positions.]
+proc [x y] [
+    do-here func x y
+] as [func]
+func 1 2
+[First call creates a new [env] because of [do], second+ calls do not.]
+
+[Btw, [type?] is impossible.]
+
+[Everything I say here will probably change once I actually compile the procedures, but whatever.]
+
+[There no point to [then]/[else]]
+1 ? [print 1] []
+1 then [print 1]
+[^ same length]
+[I would have to rename [then] to something shorter.]
+
+[Wait, [del] instead of [delete]]
+
+[Create new scope should always be opt-in. So there should be a [do []] inside of all procedures.]
+
 
