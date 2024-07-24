@@ -1314,8 +1314,8 @@ item-in 1 [a] 42
 [what if [meta] is just a string to for code to be executed?]
 
 [I shouldn't forget to implement library like numpy, sciki-learn, tensorflow, pyplot, pandas,
-lodash; maybe some minimal js frameworks like htmx or alpine.js; i don't know. Anything that seems
-pertinent. Oh and also things like SDL2 and/or raylib]
+matplotlib, lodash; maybe some minimal js frameworks like htmx or alpine.js; i don't know. Anything
+that seems pertinent. Oh and also things like SDL2 and/or raylib]
 
 [I don't think I will do this:]
 item [name] [World]
@@ -1480,5 +1480,23 @@ func 1 2
 [Wait, [del] instead of [delete]]
 
 [Create new scope should always be opt-in. So there should be a [do []] inside of all procedures.]
+
+[I will probably have to figure out how to make procedures reference eachother.]
+
+[Perhaps it should just be in [proc] that things are compiled, but everywhere. Like, every statement
+is compiled first, then executed. [proc] just makes it so that every statement in the block is
+compiled ahead-of-time.]
+
+[Maybe I could take this to my advantage?]
+for [][][] [
+    print [Hello\n]
+]
+[you know, how quotes don't check if there're a space at the end?]
+
+[What if the procedure needs the inputs as strings or to invalidate inputs depending on type? Then
+you you the arguments to be assigned strings, and the procedures calls inside will malipulate those
+string into the desired data.]
+
+[I might need a macro key word that goes does process the parameters.]
 
 
