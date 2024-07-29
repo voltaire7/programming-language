@@ -1494,9 +1494,35 @@ for [][][] [
 [you know, how quotes don't check if there're a space at the end?]
 
 [What if the procedure needs the inputs as strings or to invalidate inputs depending on type? Then
-you you the arguments to be assigned strings, and the procedures calls inside will malipulate those
+you you the arguments to be assigned strings, and the procedures calls inside will manipulate those
 string into the desired data.]
 
 [I might need a macro key word that goes does process the parameters.]
+
+syscall 4 [] [is good idea because:]
+proc [] [
+    syscall 4
+] as [write]
+write [1 [Hello, World!] 14]
+
+[With my design, even when compiled, [1 + 2 + 3] is too instruction heavy.]
+1 + 2 + 3
+[is equivalent to ]
+[atoi on '1', load into register x0]
+[atoi on '2', load into register x1]
+add x0, x0, x1
+[logic for computing hash]
+str x0, [memory location]
+[repeat for '3']
+[lots of unnecessary steps...]
+
+[Wait]
+proc [fd buf n] [
+    syscall 4 [fd buf n]
+] as [write]
+item [str] [Hello, World!\n]
+strlen str
+write 1 str _
+[[write] should not take a variable number of arguments.]
 
 
