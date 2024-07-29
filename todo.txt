@@ -1,0 +1,18 @@
+todo:
+
+[ ] boolean logic (==, !=, >, <, >=, <=, ||, &&, !)
+[+] +=, etc.
+[ ] for, while
+[ ] syscall
+[ ] repl
+[ ] bin-exec
+[ ] assembly
+[ ] ref, deref
+[ ] char types
+[ ] defer
+[ ] compile
+[ ] bitwise operators
+[ ] debugger
+[ ] std lib
+
+
