@@ -14,5 +14,6 @@ todo:
 [ ] bitwise operators
 [ ] debugger
 [ ] std lib
+[ ] interop with C
 
 

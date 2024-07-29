@@ -1525,4 +1525,33 @@ strlen str
 write 1 str _
 [[write] should not take a variable number of arguments.]
 
+[Yeah, I'm not doing [+=]. Too confusing.]
++= x 2
+[or]
++= [x] 2
+[? Both are valid and invalid. I don't like it.]
+[Well, in any case, it should be easy to define, if you insist on having it.]
+
+[I wasn't initially interested in [defer], but after seeing an example of how [free] could have a
+lot of repetition, I reconsidered it. I should try it, at least.]
+
+[Man, I really dug myself in a hole with 64 bit unions. Now I have not way of doing [strcpy], or
+whatever.]
+
+[I guess this is a solution.]
+load 1 str
+stor 1 str 'c'
+
+[I guess, it's also a [goto] vs [defer] thing. Though, people will absolutely hate [goto],
+no doubt.]
+
+[It should be the interpreter itself that assigns [_] at the end of a procedure call. The procedure
+itself should not concern itself with that.]
+
+[I should figure out how to stuff on the stack... for procedure calls and such.]
+
+[[free] should keep track of what was freed and what wasn't. Avoid double free, basically. I mean,
+[free] isn't actually a syscall, apparently. Let's take advantage of that.]
+[Then again, it's also an overhead...]
+
 

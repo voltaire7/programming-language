@@ -1,3 +1,5 @@
+#include "procedures.h"
+
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -209,8 +211,7 @@ void ITEM_IN() {
         if (isspace(keys[i])) continue;
 
         int l = 0;
-        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++)
-            ;
+        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++);
         char* key = malloc(l + 1);
         strncpy(key, keys + i - l, l);
         key[l] = '\0';
@@ -302,8 +303,7 @@ void ITER() {
         if (isspace(keys[i])) continue;
 
         int l = 0;
-        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++)
-            ;
+        for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++);
         char* key = malloc(l + 1);
         strncpy(key, keys + i - l, l);
         key[i] = '\0';
@@ -611,6 +611,189 @@ void DIV_FLOAT() {
             val =
                 (Value) (val.floatValue
                          / lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void EQUAL() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue == atol(token + start);
+            else
+                val.intValue = val.floatValue == atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '==' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                == lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void NOT_EQUAL() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue != atol(token + start);
+            else
+                val.intValue = val.floatValue != atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '!=' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                != lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void GREATER() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue > atol(token + start);
+            else
+                val.intValue = val.floatValue > atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '>' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                > lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void SMALLER() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue < atol(token + start);
+            else
+                val.intValue = val.floatValue < atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '<' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                < lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void GREATER_EQUAL() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue >= atol(token + start);
+            else
+                val.intValue = val.floatValue >= atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '>=' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                >= lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void SMALLER_EQUAL() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue <= atol(token + start);
+            else
+                val.intValue = val.floatValue <= atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '<=' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                <= lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void OR() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue || atol(token + start);
+            else
+                val.intValue = val.floatValue || atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '||' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                || lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void AND() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER)
+                val.intValue = val.intValue && atol(token + start);
+            else
+                val.intValue = val.floatValue && atof(token + start);
+            break;
+        case QUOTE:
+            error("Cannot '&&' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val.intValue = val.intValue
+                && lookup_or_error(env, symbolcpy())->value.intValue;
+    }
+    upsert(env, "_", val, NEITHER);
+}
+
+void NOT() {
+    Value val = lookup_or_error(env, "_")->value;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+        case SYMBOL:
+            val.intValue = !val.intValue;
+            break;
+        case QUOTE:
+            error("Cannot '!' string litterals: '%s'", quotecpy());
+            break;
     }
     upsert(env, "_", val, NEITHER);
 }
