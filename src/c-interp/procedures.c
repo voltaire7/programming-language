@@ -797,3 +797,9 @@ void NOT() {
     }
     upsert(env, "_", val, NEITHER);
 }
+
+void FOR() {}
+
+void WHILE() {}
+
+void DO_HERE() {}

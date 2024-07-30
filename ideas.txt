@@ -1554,4 +1554,17 @@ itself should not concern itself with that.]
 [free] isn't actually a syscall, apparently. Let's take advantage of that.]
 [Then again, it's also an overhead...]
 
+[I can use the [ret] instruction to calculate the size of a procedure!]
+
+[I suppose procedures should concern themselves with processing the tokens into data, and instead
+just look at the stack?]
+
+[I should build the disassembler in parallel to the assembler, as the code is basically the
+reverse.]
+
+[[proc-len]... hehe.]
+
+[I could just use the args to define the header of a procedure?]
+[Then, I just need to trim the header and stuff. I don't know.]
+
 

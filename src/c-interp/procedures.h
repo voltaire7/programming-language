@@ -34,4 +34,8 @@ void OR();
 void AND();
 void NOT();
 
+void FOR();
+void WHILE();
+void DO_HERE();
+
 #endif

@@ -1,8 +1,10 @@
 todo:
 
-[ ] boolean logic (==, !=, >, <, >=, <=, ||, &&, !)
+[+] boolean logic (==, !=, >, <, >=, <=, ||, &&, !)
 [+] +=, etc.
+[ ] % (modulo, forgot it)
 [ ] for, while
+[ ] delete
 [ ] syscall
 [ ] repl
 [ ] bin-exec
@@ -15,5 +17,6 @@ todo:
 [ ] debugger
 [ ] std lib
 [ ] interop with C
+[ ] decompiler
 
 

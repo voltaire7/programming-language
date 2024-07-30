@@ -50,8 +50,7 @@ void scan_token(
         while (isdigit((token[*end]))) (*end)++;
 
         if (token[*end] == '.') {
-            while (isdigit(token[++(*end)]))
-                ;
+            while (isdigit(token[++(*end)]));
             *token_type = FLOAT;
         }
 
