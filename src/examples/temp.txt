@@ -1,13 +1,14 @@
 do [
     do-here [
         do-here [
+            do []
             do [
-                item-in 0 [x] [hello\n]
+                item-in 2 [x] [hello\n]
             ]
-            print [other test\n]
         ]
     ]
-    print x
 ]
-print [test\n]
+print x
+item-in 0 [x] [not hello\n]
+print x
 

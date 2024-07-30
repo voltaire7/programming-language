@@ -21,7 +21,7 @@ extern Dictionary* env;
 
 extern TokenType token_type;
 
-extern bool should_pop;
+long layer_offset = 0;
 
 void PRINT() {
     char* s;
@@ -109,9 +109,14 @@ void DO() {
             break;
         }
     }
+    upsert(env, "decrement-layer?", (Value) 0l, NEITHER);
 }
 
-void DO_HERE() {}
+void DO_HERE() {
+    layer_offset++;
+    DO();
+    upsert(env, "decrement-layer?", (Value) 1l, NEITHER);
+}
 
 void PROC() {
     char*  keys;
@@ -208,7 +213,7 @@ void ITEM_IN() {
         }
     }
 
-    Dictionary* env_target = get_env(layer);
+    Dictionary* env_target = get_env(layer + layer_offset);
 
     Value val;
     long  keys_len = strlen(keys);
