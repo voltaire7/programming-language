@@ -147,8 +147,6 @@ void pop_scope() {
     Dictionary* temp = env;
     env              = env->next;
 
-    Entry* entry;
-
     token = lookup_or_error(env, "token")->value.stringValue;
     start = lookup_or_error(env, "start")->value.intValue;
     end   = lookup_or_error(env, "end")->value.intValue;

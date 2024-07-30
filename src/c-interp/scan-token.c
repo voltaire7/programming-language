@@ -18,7 +18,7 @@ extern long end;
 
 TokenType token_type;
 
-int test = 0;
+bool should_pop = true;
 
 void scan_token(
     char*      token,
@@ -31,7 +31,6 @@ void scan_token(
         (*end)++;
     }
 
-    // printf("token: %s\n", token + *start);
     if ((*end) >= size && env->next == NULL)
         exit(0);
     else if ((*end) >= size && env->next != NULL) {
