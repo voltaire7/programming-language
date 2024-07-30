@@ -6,6 +6,7 @@
 void PRINT();
 void FREE();
 void DO();
+void DO_HERE();
 void PROC();
 void ITEM_IN();
 void ITER();
@@ -36,6 +37,5 @@ void NOT();
 
 void FOR();
 void WHILE();
-void DO_HERE();
 
 #endif

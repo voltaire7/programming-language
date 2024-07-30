@@ -44,7 +44,11 @@ void upsert(Dictionary* dict, const char* key, Value value, PointerType type);
 void delete(Dictionary* dict, const char* key);
 Dictionary* create_dictionary();
 void        free_dictionary(Dictionary* dict);
-void        push_scope(char* code);
-void        pop_scope();
+
+void save_state();
+void update_code(char* code);
+void push_scope(char* code);
+void recover_state();
+void pop_scope();
 
 #endif

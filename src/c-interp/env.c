@@ -123,22 +123,35 @@ void free_dictionary(Dictionary* dict) {
     free(dict);
 }
 
-void push_scope(char* code) {
+void save_state() {
     Value val;
     val.stringValue = token;
-    upsert(env, "token", val, false);
+    upsert(env, "token", val, STRING);
     val.intValue = start;
-    upsert(env, "start", val, false);
+    upsert(env, "start", val, STRING);
     val.intValue = end;
-    upsert(env, "end", val, false);
+    upsert(env, "end", val, STRING);
+}
 
+void update_code(char* code) {
+    token = code;
+    size  = strlen(code);
+    start = end = 0;
+}
+
+void push_scope(char* code) {
     Dictionary* new_dict = create_dictionary();
     new_dict->next       = env;
     env                  = new_dict;
 
-    token = code;
-    size  = strlen(code);
-    start = end = 0;
+    update_code(code);
+}
+
+void recover_state() {
+    token = lookup_or_error(env, "token")->value.stringValue;
+    start = lookup_or_error(env, "start")->value.intValue;
+    end   = lookup_or_error(env, "end")->value.intValue;
+    size  = strlen(token);
 }
 
 void pop_scope() {
@@ -146,11 +159,6 @@ void pop_scope() {
 
     Dictionary* temp = env;
     env              = env->next;
-
-    token = lookup_or_error(env, "token")->value.stringValue;
-    start = lookup_or_error(env, "start")->value.intValue;
-    end   = lookup_or_error(env, "end")->value.intValue;
-    size  = strlen(token);
 
     free_dictionary(temp);
 }

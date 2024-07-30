@@ -11,6 +11,7 @@ void setup() {
     UPSERT("print", PRINT)
     UPSERT("free", FREE)
     UPSERT("do", DO)
+    UPSERT("do-here", DO_HERE)
     UPSERT("proc", PROC)
     UPSERT("item-in", ITEM_IN)
     UPSERT("iter", ITER)
@@ -41,5 +42,4 @@ void setup() {
 
     UPSERT("for", FOR)
     UPSERT("!", WHILE)
-    UPSERT("do-here", DO_HERE)
 }

@@ -1567,4 +1567,6 @@ reverse.]
 [I could just use the args to define the header of a procedure?]
 [Then, I just need to trim the header and stuff. I don't know.]
 
+[So what if I shoot myself in the foot? I still have the other one!]
+
 

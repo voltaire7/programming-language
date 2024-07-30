@@ -21,6 +21,8 @@ extern Dictionary* env;
 
 extern TokenType token_type;
 
+extern bool should_pop;
+
 void PRINT() {
     char* s;
     scan_token_default();
@@ -93,6 +95,7 @@ void FREE() {
 void DO() {
     char* s;
     scan_token_default();
+    save_state();
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -107,6 +110,8 @@ void DO() {
         }
     }
 }
+
+void DO_HERE() {}
 
 void PROC() {
     char*  keys;
@@ -308,6 +313,7 @@ void ITER() {
         strncpy(key, keys + i - l, l);
         key[i] = '\0';
 
+        save_state();
         push_scope(s);
         upsert(env, symbol, (Value) key, NEITHER);
         scan_token(token, &start, &end, size, &token_type);
@@ -801,5 +807,3 @@ void NOT() {
 void FOR() {}
 
 void WHILE() {}
-
-void DO_HERE() {}
