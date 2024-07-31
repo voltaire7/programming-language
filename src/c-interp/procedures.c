@@ -440,12 +440,7 @@ void IF() {
     bool cond = lookup_or_error(env, "_")->value.intValue;
     if (cond) {
         char* old = token;
-        DO();
-        for (;;) {
-            scan_token_default();
-            if (token == old) break;
-            eval();
-        }
+        DO_HERE();
     } else {
         scan_token_default();
         DO_HERE();
@@ -828,9 +823,15 @@ void GOTO() {
         case FLOAT:
             error("Cannot goto with float: '%s'", symbolcpy());
             break;
-        case SYMBOL:
-            end = lookup_or_error(env, symbolcpy())->value.intValue;
+        case SYMBOL: {
+            Entry* entry;
+            for (; !(entry = lookup_here(env, symbolcpy())); pop_scope())
+                if (lookup_or_error(env, "decrement-layer?")->value.intValue)
+                    layer_offset--;
+            recover_state();
+            end = entry->value.intValue;
             break;
+        }
         case QUOTE:
             error("Cannot goto using quote: '%s'", symbolcpy());
             break;

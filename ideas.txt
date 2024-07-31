@@ -1573,4 +1573,6 @@ reverse.]
 lower levels.]
 [Captures to make code more pure.]
 
+[I found a way to implement [goto] elegantly (said no one)]
+
 

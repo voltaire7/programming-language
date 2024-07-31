@@ -22,4 +22,36 @@ proc [if-false] [
     ? [] if-false
 ] as [else]
 
+proc [init cond incr body] [
+    do-here init
+    label [loop]
+    do-here cond ? [
+        do-here body
+        do-here incr
+
+        goto loop
+    ] []
+] as [for]
+
+proc [cond body] [
+    label [loop]
+    do-here cond ? [
+        do-here body
+
+        goto loop
+    ] []
+] as [while]
+
+proc [cond body] [
+    label [loop]
+    do-here body
+    do-here cond ? [goto loop] []
+] as [do-while]
+
+proc [body] [
+    label [loop]
+    do-here body
+    ? [goto loop] []
+] as [loop]
+
 

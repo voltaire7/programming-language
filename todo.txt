@@ -4,6 +4,8 @@ todo:
 [+] +=, etc.
 [ ] % (modulo, forgot it)
 [ ] for, while
+[ ] better errors
+[ ] macros
 [ ] delete
 [ ] syscall
 [ ] repl

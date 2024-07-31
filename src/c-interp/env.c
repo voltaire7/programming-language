@@ -26,6 +26,19 @@ unsigned int hash(const char* key) {
     return value % TABLE_SIZE;
 }
 
+Entry* lookup_here(Dictionary* dict, const char* key) {
+    unsigned int slot  = hash(key);
+    Entry*       entry = dict->table[slot];
+
+    while (entry != NULL) {
+        if (strcmp(entry->key, key) == 0) {
+            return entry;
+        }
+        entry = entry->next;
+    }
+    return NULL;
+}
+
 Entry* lookup(Dictionary* dict, const char* key) {
     while (dict != NULL) {
         unsigned int slot  = hash(key);

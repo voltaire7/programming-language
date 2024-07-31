@@ -38,6 +38,7 @@ typedef struct Dictionary {
 } Dictionary;
 
 unsigned int hash(const char* key);
+Entry*       lookup_here(Dictionary* dict, const char* key);
 Entry*       lookup(Dictionary* dict, const char* key);
 Entry*       lookup_or_error(Dictionary* dict, const char* key);
 void upsert(Dictionary* dict, const char* key, Value value, PointerType type);
