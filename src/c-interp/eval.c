@@ -20,11 +20,11 @@ void eval() {
     switch (token_type) {
         case INTEGER:
             val.intValue = atoi(token + start);
-            upsert(env, "_", val, false);
+            upsert(get_env(0), "_", val, NEITHER);
             break;
         case FLOAT:
             val.floatValue = atof(token + start);
-            upsert(env, "_", val, false);
+            upsert(get_env(0), "_", val, NEITHER);
             break;
         case QUOTE:
             break;

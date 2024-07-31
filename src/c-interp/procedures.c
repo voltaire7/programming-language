@@ -175,12 +175,9 @@ void PROC() {
 }
 
 void ITEM_IN() {
-    Entry* entry;
-
     long layer = 0;
     scan_token_default();
     switch (token_type) {
-        char* s;
         case INTEGER:
             layer = atol(token + start);
             break;
@@ -189,8 +186,9 @@ void ITEM_IN() {
             error("Can only accept integers or symbols to integers.");
             break;
         case SYMBOL: {
-            s     = symbolcpy();
-            layer = lookup_or_error(env, s)->value.intValue;
+            char* s = symbolcpy();
+            layer   = lookup_or_error(env, s)->value.intValue;
+            free(s);
             break;
         }
     }
@@ -207,8 +205,9 @@ void ITEM_IN() {
             keys = quotecpy();
             break;
         case SYMBOL: {
-            keys = symbolcpy();
-            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
+            char* temp = symbolcpy();
+            keys       = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             break;
         }
     }
@@ -241,6 +240,7 @@ void ITEM_IN() {
                 val = (Value) quotecpy();
                 break;
             case SYMBOL: {
+                Entry* entry;
                 entry = lookup_or_error(env, symbolcpy());
                 val   = (Value) entry->value.pointerValue;
                 type  = entry->type;
@@ -351,7 +351,7 @@ void SCAN_TOKEN() {
         }
     }
 
-    Dictionary* env_target = get_env(layer);
+    Dictionary* env_target = get_env(layer - layer_offset);
 
     char* inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     long  inner_start = lookup_or_error(env_target, "start")->value.intValue;
@@ -396,7 +396,7 @@ void COPY_TOKEN() {
         }
     }
 
-    Dictionary* env_target = get_env(layer);
+    Dictionary* env_target = get_env(layer - layer_offset);
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.intValue;

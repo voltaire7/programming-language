@@ -2,6 +2,13 @@ proc [symbol] [
     item-in 1 symbol _
 ] item-in 0 [as] _
 
+do-here [
+    3 + 1 print [%i\n] _ as [x]
+] print [%i\n] x
+
+
+
+[
 proc [] [
     item-in 0
 ] as [item]
@@ -19,5 +26,5 @@ proc [init cond incr code] [
 ] as [for]
 
 for [item [i] 5] [ch i != 0 ! print [%i\n] _] [incr\n] [code\n]
-
+]
 
