@@ -1569,4 +1569,8 @@ reverse.]
 
 [So what if I shoot myself in the foot? I still have the other one!]
 
+[I could probably create a capture type of mecanism with a different lookup that doesn't search
+lower levels.]
+[Captures to make code more pure.]
+
 
