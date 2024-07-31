@@ -3,7 +3,7 @@ todo:
 [+] boolean logic (==, !=, >, <, >=, <=, ||, &&, !)
 [+] +=, etc.
 [ ] % (modulo, forgot it)
-[ ] for, while
+[+] for, while
 [ ] better errors
 [ ] macros
 [ ] delete

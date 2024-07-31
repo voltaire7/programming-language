@@ -12,60 +12,13 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [init cond incr body] [
-    do-here init
-    label [loop]
-    do-here cond ? [
-        do-here body
-        do-here incr
-
-        goto loop
-    ] []
-] as [for]
-
-print [for loop:\n]
-for [item [i] 0] [ch i < 10] [ch i + 1 as [i]] [
-    print [%i\n] i
-]
-
-proc [cond body] [
-    label [loop]
-    do-here cond ? [
-        do-here body
-
-        goto loop
-    ] []
-] as [while]
-
-print [\nwhile loop:\n]
-item [i] 0
-while [ch i < 10] [
-    print [%i\n] i
-    ch i + 1 as [i]
-]
-
-proc [cond body] [
-    label [loop]
-    do-here body
-    do-here cond ? [goto loop] []
-] as [do-while]
-
-print [\ndo-while loop:\n]
-item [i] 0
-while [ch i < 10] [
-    print [%i\n] i
-    ch i + 1 as [i]
-]
-
 proc [body] [
     label [loop]
     do-here body
     ? [goto loop] []
 ] as [loop]
 
-print [\nloop:\n]
-item [i] 10
-loop [print [%i\n] i ch i - 1 as [i]]
-[^ now that's interesting!]
+10
+loop [print [%i\n] _ - 1]
 
 

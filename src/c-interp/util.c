@@ -102,8 +102,7 @@ Dictionary* get_env(int layer) {
     Dictionary* env_target = env;
     for (int i = layer + layer_offset; i != 0; i--) {
         env_target = env_target->next;
-        if (env_target == NULL)
-            error("Non existent scope: %d", layer + layer_offset);
+        if (env_target == NULL) error("Non existent scope: %d", layer);
     }
     return env_target;
 }
