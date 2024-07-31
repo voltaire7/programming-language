@@ -1,14 +1,24 @@
-do [
-    do-here [
-        do-here [
-            do []
-            do [
-                item-in 2 [x] [hello\n]
-            ]
-        ]
-    ]
-]
-print x
-item-in 0 [x] [not hello\n]
-print x
+proc [symbol] [
+    item-in 1 symbol _
+] item-in 0 [as] _
+
+proc [] [
+    item-in 0
+] as [item]
+
+proc [] [
+    item-in 1 [_]
+] as [ch]
+
+[––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
+
+1 + 1 print [%i\n] _
+proc [init cond incr code] [
+    do-here init
+    do-here cond
+    print [%i\n] _
+] as [for]
+
+for [item [i] 5] [ch i != 0 print [%i\n] _] [incr\n] [code\n]
+
 

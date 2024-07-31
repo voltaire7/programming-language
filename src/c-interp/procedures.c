@@ -168,7 +168,7 @@ void PROC() {
         "] iter [k] keys [scan-token 2 copy-token 2 item-in 1 k _] free keys "
     );
     concat(&full_code, code_block);
-    upsert(env, "_", (Value) full_code, STRING);
+    upsert(get_env(0), "_", (Value) full_code, STRING);
 
     free(keys);
     free(code_block);
@@ -213,7 +213,7 @@ void ITEM_IN() {
         }
     }
 
-    Dictionary* env_target = get_env(layer + layer_offset);
+    Dictionary* env_target = get_env(layer);
 
     Value val;
     long  keys_len = strlen(keys);
@@ -254,8 +254,7 @@ void ITEM_IN() {
 }
 
 void ITER() {
-    char*  symbol;
-    Entry* entry;
+    char* symbol;
     scan_token_default();
     switch (token_type) {
         case INTEGER:
@@ -285,8 +284,9 @@ void ITER() {
             keys = quotecpy();
             break;
         case SYMBOL: {
-            keys = symbolcpy();
-            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
+            char* temp = symbolcpy();
+            keys       = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             break;
         }
     }
@@ -316,15 +316,15 @@ void ITER() {
         for (; !isspace(keys[i]) && keys[i] != '\0'; i++, l++);
         char* key = malloc(l + 1);
         strncpy(key, keys + i - l, l);
-        key[i] = '\0';
+        key[l] = '\0';
 
         save_state();
         push_scope(s);
         upsert(env, symbol, (Value) key, NEITHER);
-        scan_token(token, &start, &end, size, &token_type);
+        scan_token_default();
         while (token == s) {
             eval();
-            scan_token(token, &start, &end, size, &token_type);
+            scan_token_default();
         }
         end = ret;
     }
@@ -448,7 +448,7 @@ void IF() {
         }
     } else {
         scan_token_default();
-        DO();
+        DO_HERE();
     }
 }
 
@@ -807,6 +807,44 @@ void NOT() {
             break;
     }
     upsert(env, "_", val, NEITHER);
+}
+
+void LABEL() {
+    scan_token_default();
+    char* name;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            error("Cannot create with number: '%s'", symbolcpy());
+            break;
+        case SYMBOL:
+            name = lookup_or_error(env, symbolcpy())->value.stringValue;
+            break;
+        case QUOTE:
+            name = quotecpy();
+            break;
+    }
+    upsert(get_env(0), name, (Value) end, NEITHER);
+}
+
+void GOTO() {
+    scan_token_default();
+    char* name;
+    switch (token_type) {
+        case INTEGER: {
+            end = atol(token + start);
+            break;
+        }
+        case FLOAT:
+            error("Cannot goto with float: '%s'", symbolcpy());
+            break;
+        case SYMBOL:
+            end = lookup_or_error(env, symbolcpy())->value.intValue;
+            break;
+        case QUOTE:
+            error("Cannot goto using quote: '%s'", symbolcpy());
+            break;
+    }
 }
 
 void FOR() {}

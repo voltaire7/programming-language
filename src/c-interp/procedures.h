@@ -35,6 +35,8 @@ void OR();
 void AND();
 void NOT();
 
+void LABEL();
+void GOTO();
 void FOR();
 void WHILE();
 

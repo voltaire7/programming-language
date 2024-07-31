@@ -9,11 +9,11 @@ typedef enum {
 } TokenType;
 
 void scan_token(
-    char*      inner_token,
-    long*      inner_start,
-    long*      inner_end,
-    long       inner_size,
-    TokenType* inner_token_type
+    char*      token,
+    long*      start,
+    long*      end,
+    long       size,
+    TokenType* token_type
 );
 
 void scan_token_default();

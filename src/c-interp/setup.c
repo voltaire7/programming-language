@@ -40,6 +40,8 @@ void setup() {
     UPSERT("&&", AND)
     UPSERT("!", NOT)
 
+    UPSERT("label", LABEL)
+    UPSERT("goto", GOTO)
     UPSERT("for", FOR)
     UPSERT("!", WHILE)
 }
