@@ -12,13 +12,12 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-1 + 1 print [%i\n] _
 proc [init cond incr code] [
     do-here init
     do-here cond
     print [%i\n] _
 ] as [for]
 
-for [item [i] 5] [ch i != 0 print [%i\n] _] [incr\n] [code\n]
+for [item [i] 5] [ch i != 0 ! print [%i\n] _] [incr\n] [code\n]
 
 

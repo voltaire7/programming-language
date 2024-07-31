@@ -43,5 +43,5 @@ void setup() {
     UPSERT("label", LABEL)
     UPSERT("goto", GOTO)
     UPSERT("for", FOR)
-    UPSERT("!", WHILE)
+    UPSERT("while", WHILE)
 }

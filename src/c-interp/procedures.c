@@ -470,7 +470,7 @@ void ADD() {
             val = (Value) (val.intValue
                            + lookup_or_error(env, symbolcpy())->value.intValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void SUB() {
@@ -491,7 +491,7 @@ void SUB() {
             val = (Value) (val.intValue
                            - lookup_or_error(env, symbolcpy())->value.intValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void MUL() {
@@ -513,7 +513,7 @@ void MUL() {
             val = (Value) (val.intValue
                            * lookup_or_error(env, symbolcpy())->value.intValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void DIV() {
@@ -534,7 +534,7 @@ void DIV() {
             val = (Value) (val.intValue
                            / lookup_or_error(env, symbolcpy())->value.intValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void ADD_FLOAT() {
@@ -556,7 +556,7 @@ void ADD_FLOAT() {
                 (Value) (val.floatValue
                          + lookup_or_error(env, symbolcpy())->value.floatValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void SUB_FLOAT() {
@@ -578,7 +578,7 @@ void SUB_FLOAT() {
                 (Value) (val.floatValue
                          - lookup_or_error(env, symbolcpy())->value.floatValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void MUL_FLOAT() {
@@ -601,7 +601,7 @@ void MUL_FLOAT() {
                 (Value) (val.floatValue
                          * lookup_or_error(env, symbolcpy())->value.floatValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void DIV_FLOAT() {
@@ -623,7 +623,7 @@ void DIV_FLOAT() {
                 (Value) (val.floatValue
                          / lookup_or_error(env, symbolcpy())->value.floatValue);
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void EQUAL() {
@@ -644,7 +644,7 @@ void EQUAL() {
             val.intValue = val.intValue
                 == lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void NOT_EQUAL() {
@@ -665,7 +665,7 @@ void NOT_EQUAL() {
             val.intValue = val.intValue
                 != lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void GREATER() {
@@ -686,7 +686,7 @@ void GREATER() {
             val.intValue = val.intValue
                 > lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void SMALLER() {
@@ -707,7 +707,7 @@ void SMALLER() {
             val.intValue = val.intValue
                 < lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void GREATER_EQUAL() {
@@ -728,7 +728,7 @@ void GREATER_EQUAL() {
             val.intValue = val.intValue
                 >= lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void SMALLER_EQUAL() {
@@ -749,7 +749,7 @@ void SMALLER_EQUAL() {
             val.intValue = val.intValue
                 <= lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void OR() {
@@ -770,7 +770,7 @@ void OR() {
             val.intValue = val.intValue
                 || lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void AND() {
@@ -791,22 +791,12 @@ void AND() {
             val.intValue = val.intValue
                 && lookup_or_error(env, symbolcpy())->value.intValue;
     }
-    upsert(env, "_", val, NEITHER);
+    upsert(get_env(0), "_", val, NEITHER);
 }
 
 void NOT() {
-    Value val = lookup_or_error(env, "_")->value;
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-        case SYMBOL:
-            val.intValue = !val.intValue;
-            break;
-        case QUOTE:
-            error("Cannot '!' string litterals: '%s'", quotecpy());
-            break;
-    }
-    upsert(env, "_", val, NEITHER);
+    long val = !lookup_or_error(env, "_")->value.intValue;
+    upsert(get_env(0), "_", (Value) val, NEITHER);
 }
 
 void LABEL() {
