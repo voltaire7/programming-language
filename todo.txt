@@ -2,7 +2,7 @@ todo:
 
 [+] boolean logic (==, !=, >, <, >=, <=, ||, &&, !)
 [+] +=, etc.
-[ ] % (modulo, forgot it)
+[+] % (modulo, forgot it)
 [+] for, while
 [ ] better errors
 [ ] macros
