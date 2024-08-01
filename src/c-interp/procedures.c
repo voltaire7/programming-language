@@ -461,7 +461,7 @@ void ADD() {
                 val = (Value) (val.floatValue + atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '+' string litterals: '%s'", quotecpy());
+            error("Cannot '+' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) (val.intValue
@@ -482,7 +482,7 @@ void SUB() {
                 val = (Value) (val.floatValue - atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '-' string litterals: '%s'", quotecpy());
+            error("Cannot '-' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) (val.intValue
@@ -504,7 +504,7 @@ void MUL() {
             }
             break;
         case QUOTE:
-            error("Cannot '*' string litterals: '%s'", quotecpy());
+            error("Cannot '*' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) (val.intValue
@@ -525,7 +525,7 @@ void DIV() {
                 val = (Value) (val.floatValue / atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '/' string litterals: '%s'", quotecpy());
+            error("Cannot '/' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) (val.intValue
@@ -546,7 +546,7 @@ void MODULO() {
                 val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '%' string litterals: '%s'", quotecpy());
+            error("Cannot '%%' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) (val.intValue
@@ -567,7 +567,7 @@ void ADD_FLOAT() {
                 val = (Value) (val.floatValue + atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '+f' string litterals: '%s'", quotecpy());
+            error("Cannot '+f' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -589,7 +589,7 @@ void SUB_FLOAT() {
                 val = (Value) (val.floatValue - atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '-f' string litterals: '%s'", quotecpy());
+            error("Cannot '-f' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -612,7 +612,7 @@ void MUL_FLOAT() {
             }
             break;
         case QUOTE:
-            error("Cannot '*f' string litterals: '%s'", quotecpy());
+            error("Cannot '*f' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -634,7 +634,7 @@ void DIV_FLOAT() {
                 val = (Value) (val.floatValue / atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '/f' string litterals: '%s'", quotecpy());
+            error("Cannot '/f' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -656,7 +656,7 @@ void MODULO_FLOAT() {
                 val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '%f' string litterals: '%s'", quotecpy());
+            error("Cannot '%%f' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val = (Value) fmod(
@@ -679,7 +679,7 @@ void EQUAL() {
                 val.intValue = val.floatValue == atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '==' string litterals: '%s'", quotecpy());
+            error("Cannot '==' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -700,7 +700,7 @@ void NOT_EQUAL() {
                 val.intValue = val.floatValue != atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '!=' string litterals: '%s'", quotecpy());
+            error("Cannot '!=' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -721,7 +721,7 @@ void GREATER() {
                 val.intValue = val.floatValue > atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '>' string litterals: '%s'", quotecpy());
+            error("Cannot '>' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -742,7 +742,7 @@ void SMALLER() {
                 val.intValue = val.floatValue < atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '<' string litterals: '%s'", quotecpy());
+            error("Cannot '<' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -763,7 +763,7 @@ void GREATER_EQUAL() {
                 val.intValue = val.floatValue >= atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '>=' string litterals: '%s'", quotecpy());
+            error("Cannot '>=' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -784,7 +784,7 @@ void SMALLER_EQUAL() {
                 val.intValue = val.floatValue <= atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '<=' string litterals: '%s'", quotecpy());
+            error("Cannot '<=' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -805,7 +805,7 @@ void OR() {
                 val.intValue = val.floatValue || atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '||' string litterals: '%s'", quotecpy());
+            error("Cannot '||' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
@@ -826,7 +826,7 @@ void AND() {
                 val.intValue = val.floatValue && atof(token + start);
             break;
         case QUOTE:
-            error("Cannot '&&' string litterals: '%s'", quotecpy());
+            error("Cannot '&&' string literals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val.intValue = val.intValue
