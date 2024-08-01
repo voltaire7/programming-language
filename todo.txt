@@ -20,5 +20,7 @@ todo:
 [ ] std lib
 [ ] interop with C
 [ ] decompiler
+[ ] lsp
+[ ] plugins
 
 

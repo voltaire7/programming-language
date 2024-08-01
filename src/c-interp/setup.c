@@ -24,11 +24,13 @@ void setup() {
     UPSERT("-", SUB)
     UPSERT("*", MUL)
     UPSERT("/", DIV)
+    UPSERT("%", MODULO)
 
     UPSERT("+f", ADD_FLOAT)
     UPSERT("-f", SUB_FLOAT)
     UPSERT("*f", MUL_FLOAT)
     UPSERT("/f", DIV_FLOAT)
+    UPSERT("%f", MODULO_FLOAT)
 
     UPSERT("==", EQUAL)
     UPSERT("!=", NOT_EQUAL)

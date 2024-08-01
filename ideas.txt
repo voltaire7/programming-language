@@ -1575,4 +1575,13 @@ lower levels.]
 
 [I found a way to implement [goto] elegantly (said no one)]
 
+[The language is like water: it can take whatever shape you want it to. And because it can take
+whatever shape you want it to, you only need to change the behavior of the LSP to contain to shape
+of the language. That way it can behave as if it had types, without actually having types.]
+
+[Or not? I don't know. I will have to see when I get to implementing plugins.]
+
+[I could maybe call the capture procedure [with]? maybe [using]? though the second doesn't sound
+right.]
+
 

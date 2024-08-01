@@ -19,11 +19,13 @@ void ADD();
 void SUB();
 void MUL();
 void DIV();
+void MODULO();
 
 void ADD_FLOAT();
 void SUB_FLOAT();
 void MUL_FLOAT();
 void DIV_FLOAT();
+void MODULO_FLOAT();
 
 void EQUAL();
 void NOT_EQUAL();

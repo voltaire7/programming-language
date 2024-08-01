@@ -1,6 +1,7 @@
 #include "procedures.h"
 
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +41,6 @@ void PRINT() {
             for (int i = 0; s[i] != '\0'; i++) {
                 if (s[i] == '%') {
                     i++;
-                    scan_token(token, &start, &end, size, &token_type);
                     switch (s[i]) {
                         case '%':
                             printf("%%");
@@ -50,6 +50,7 @@ void PRINT() {
                         case 'e':
                         case 'g':
                         case 's': {
+                            scan_token_default();
                             char* t = symbolcpy();
                             if (token_type != SYMBOL)
                                 error("Not a symbol: '%s'", t);
@@ -68,6 +69,7 @@ void PRINT() {
                             break;
                         }
                         default:
+                            scan_token_default();
                             if (token_type == QUOTE)
                                 printlen(token + start + 1, (end - start) - 2);
                             else
@@ -532,6 +534,27 @@ void DIV() {
     upsert(get_env(0), "_", val, NEITHER);
 }
 
+void MODULO() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue % atol(token + start));
+            } else
+                val = (Value) fmod(val.floatValue, atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '%' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) (val.intValue
+                           % lookup_or_error(env, symbolcpy())->value.intValue);
+    }
+    upsert(get_env(0), "_", val, NEITHER);
+}
+
 void ADD_FLOAT() {
     Value val = lookup_or_error(env, "_")->value;
     scan_token_default();
@@ -544,7 +567,7 @@ void ADD_FLOAT() {
                 val = (Value) (val.floatValue + atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '+' string litterals: '%s'", quotecpy());
+            error("Cannot '+f' string litterals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -566,7 +589,7 @@ void SUB_FLOAT() {
                 val = (Value) (val.floatValue - atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '-' string litterals: '%s'", quotecpy());
+            error("Cannot '-f' string litterals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -589,7 +612,7 @@ void MUL_FLOAT() {
             }
             break;
         case QUOTE:
-            error("Cannot '*' string litterals: '%s'", quotecpy());
+            error("Cannot '*f' string litterals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
@@ -611,12 +634,35 @@ void DIV_FLOAT() {
                 val = (Value) (val.floatValue / atof(token + start));
             break;
         case QUOTE:
-            error("Cannot '/' string litterals: '%s'", quotecpy());
+            error("Cannot '/f' string litterals: '%s'", quotecpy());
             break;
         case SYMBOL:
             val =
                 (Value) (val.floatValue
                          / lookup_or_error(env, symbolcpy())->value.floatValue);
+    }
+    upsert(get_env(0), "_", val, NEITHER);
+}
+
+void MODULO_FLOAT() {
+    Value val = lookup_or_error(env, "_")->value;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            if (token_type == INTEGER) {
+                val = (Value) (val.intValue % atol(token + start));
+            } else
+                val = (Value) fmod(val.floatValue, atof(token + start));
+            break;
+        case QUOTE:
+            error("Cannot '%f' string litterals: '%s'", quotecpy());
+            break;
+        case SYMBOL:
+            val = (Value) fmod(
+                val.floatValue,
+                lookup_or_error(env, symbolcpy())->value.floatValue
+            );
     }
     upsert(get_env(0), "_", val, NEITHER);
 }

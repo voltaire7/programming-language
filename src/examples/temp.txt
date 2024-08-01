@@ -12,13 +12,7 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [body] [
-    label [loop]
-    do-here body
-    ? [goto loop] []
-] as [loop]
-
-10
-loop [print [%i\n] _ - 1]
+item [x] 4
+5 % x print [modulo: 5 %% 4 = %i\n] _
 
 
