@@ -4,7 +4,6 @@ todo:
 [+] +=, etc.
 [+] % (modulo, forgot it)
 [+] for, while
-[ ] better errors
 [ ] macros
 [ ] delete
 [ ] syscall
@@ -22,5 +21,6 @@ todo:
 [ ] decompiler
 [ ] lsp
 [ ] plugins
+[-] better errors
 
 

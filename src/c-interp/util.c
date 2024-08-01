@@ -16,8 +16,6 @@ extern Dictionary* env;
 extern long layer_offset;
 
 extern char* filename;
-extern int   line_count;
-extern int   line_offset;
 
 #define WHITE "\033[0m"
 #define RED   "\033[1;31m"
@@ -38,6 +36,18 @@ void print_line(int line) {
 }
 
 void error(char* msg, ...) {
+    int line_count  = 1;
+    int line_offset = 1;
+    while (env->next) {
+        recover_state();
+        pop_scope();
+    }
+    for (int i = 0; i < start; i++, line_offset++)
+        if (token[i] == '\n') {
+            line_count++;
+            line_offset = 0;
+        };
+
     va_list args;
     va_start(args, msg);
     fprintf(stderr, "[" RED "ERROR" WHITE "] ");
@@ -54,7 +64,7 @@ void error(char* msg, ...) {
     );
     for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
     fprintf(stderr, BLUE "|\n %d | " WHITE, line_count);
-    print_line(16);
+    print_line(line_count);
     for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
     fprintf(stderr, BLUE "|\n" WHITE);
     fprintf(stderr, "1 error generated\n");
@@ -64,7 +74,12 @@ void error(char* msg, ...) {
 
 void readFileContent(const char* filename) {
     FILE* filePointer = fopen(filename, "r");
-    if (filePointer == NULL) error("Failed to open the file: '%s'", filename);
+    if (filePointer == NULL)
+        fprintf(
+            stderr,
+            "[" RED "ERROR" WHITE "] Failed to open the file: '%s'\n",
+            filename
+        );
 
     fseek(filePointer, 0, SEEK_END);
     size = ftell(filePointer);

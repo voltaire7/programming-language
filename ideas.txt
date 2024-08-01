@@ -1584,4 +1584,15 @@ of the language. That way it can behave as if it had types, without actually hav
 [I could maybe call the capture procedure [with]? maybe [using]? though the second doesn't sound
 right.]
 
+[I just realized how insanely difficult these error messages are going to be...]
+
+[Yeah, I'll probably to postpone the implementation of proper errors, since when procedures actually
+compile, it will probably change anyway.]
+
+[Anyway, I had an idea: procedures should have a head, body and foot. When you chain calls in a
+newly defined procedure, these things get removed. I don't know how I will implement errors with
+that, but whatever. I'm going to resist metadata until it's no longer feasible.]
+
+[This would be so much easier if I could just add metadata...]
+
 

@@ -92,6 +92,7 @@ void FREE() {
     char* s = symbolcpy();
     if (token_type != SYMBOL) error("Not a symbol: '%s'", s);
     free(lookup_or_error(env, s)->value.stringValue);
+    free(s);
 }
 
 void DO() {
