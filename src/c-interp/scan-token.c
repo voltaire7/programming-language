@@ -20,6 +20,9 @@ TokenType token_type;
 
 extern long layer_offset;
 
+int line_count  = 1;
+int line_offset = 1;
+
 void scan_token(
     char*      token,
     long*      start,
@@ -28,6 +31,11 @@ void scan_token(
     TokenType* token_type
 ) {
     while (isspace(token[*end])) {
+        if (token[*end] == '\n') {
+            line_count++;
+            line_offset = 0;
+        }
+        line_offset++;
         (*end)++;
     }
 
@@ -62,7 +70,9 @@ void scan_token(
         do {
             (*end)++;
             if (token[*end] == '\0')
-                error("Non-terminating quote : '%s'", token + *start);
+                error("this file contains an unclosed delimiter."
+
+                );
             if (token[*end] == '[' && token[*end - 1] != '\\')
                 layer++;
             else if (token[*end] == ']' && token[*end - 1] != '\\')

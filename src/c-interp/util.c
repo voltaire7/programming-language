@@ -15,13 +15,50 @@ extern Dictionary* env;
 
 extern long layer_offset;
 
+extern char* filename;
+extern int   line_count;
+extern int   line_offset;
+
+#define WHITE "\033[0m"
+#define RED   "\033[1;31m"
+#define BLUE  "\033[1;34m"
+
+void print_line(int line) {
+    int i = 0;
+    while (line - 1 && token[i])
+        if (token[i++] == '\n') line--;
+    while (token[i] != '\n' && token[i]) {
+        if (i == start)
+            fprintf(stderr, RED);
+        else if (i == end)
+            fprintf(stderr, WHITE);
+        putc(token[i++], stderr);
+    }
+    putc('\n', stderr);
+}
+
 void error(char* msg, ...) {
     va_list args;
     va_start(args, msg);
-    fprintf(stderr, "[\033[1;31mERROR\033[0m] ");
+    fprintf(stderr, "[" RED "ERROR" WHITE "] ");
     vfprintf(stderr, msg, args);
     fprintf(stderr, "\n");
     va_end(args);
+
+    fprintf(
+        stderr,
+        BLUE " --> " WHITE "%s:%d:%d\n",
+        filename,
+        line_count,
+        line_offset
+    );
+    for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
+    fprintf(stderr, BLUE "|\n %d | " WHITE, line_count);
+    print_line(16);
+    for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
+    fprintf(stderr, BLUE "|\n" WHITE);
+    fprintf(stderr, "1 error generated\n");
+
     exit(1);
 }
 
