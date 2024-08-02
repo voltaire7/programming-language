@@ -15,8 +15,6 @@ void setup() {
     UPSERT("proc", PROC)
     UPSERT("item-in", ITEM_IN)
     UPSERT("iter", ITER)
-    UPSERT("scan-token", SCAN_TOKEN)
-    UPSERT("copy-token", COPY_TOKEN)
 
     UPSERT("?", IF)
 
@@ -46,6 +44,9 @@ void setup() {
     UPSERT("goto", GOTO)
 
     UPSERT("delete", DELETE)
-    UPSERT("copy-token2", COPY_TOKEN2)
+    UPSERT("scan-token", SCAN_TOKEN)
+    UPSERT("copy-token", COPY_TOKEN)
     UPSERT("parse", PARSE)
+
+    UPSERT("macro", MACRO)
 }

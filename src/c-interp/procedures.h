@@ -8,8 +8,6 @@ void DO_HERE();
 void PROC();
 void ITEM_IN();
 void ITER();
-void SCAN_TOKEN();
-void COPY_TOKEN();
 
 void IF();
 
@@ -39,7 +37,10 @@ void LABEL();
 void GOTO();
 
 void DELETE();
-void COPY_TOKEN2();
+void SCAN_TOKEN();
+void COPY_TOKEN();
 void PARSE();
+
+void MACRO();
 
 #endif
