@@ -1,9 +1,11 @@
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "env.h"
+#include "scan-token.h"
 
 char* token = NULL;
 long  size  = 0;
@@ -150,4 +152,50 @@ Dictionary* get_env(int layer) {
         if (env_target == NULL) error("Non existent scope: %d", layer);
     }
     return env_target;
+}
+
+TokenType type_of(char* symbol) {
+    int len = strlen(symbol);
+    if (len == 0) error("Empty symbol");
+
+    int       end  = 0;
+    TokenType type = -1;
+
+    bool cond =
+        (symbol[end] == '.' || symbol[end] == '-') && isdigit(symbol[end + 1])
+        || isdigit(symbol[end]);
+    if (cond) {
+        type = INTEGER;
+        if (symbol[end] != '.') end++;
+        while (isdigit((symbol[end]))) end++;
+
+        if (symbol[end] == '.') {
+            while (isdigit(symbol[++end]));
+            type = FLOAT;
+        }
+
+        if (!isspace(symbol[end]) && symbol[end] != '\0') goto symbol;
+    } else if (symbol[end] == '[') {
+        type      = QUOTE;
+        int layer = 1;
+        do {
+            end++;
+            if (symbol[end] == '\0')
+                error("this file contains an unclosed delimiter."
+
+                );
+            if (symbol[end] == '[' && symbol[end - 1] != '\\')
+                layer++;
+            else if (symbol[end] == ']' && symbol[end - 1] != '\\')
+                layer--;
+        } while (symbol[end] != ']' || layer != 0);
+        end++;
+    } else {
+    symbol:
+        while (!isspace(symbol[end]) && symbol[end] != '\0') {
+            end++;
+        }
+        type = SYMBOL;
+    }
+    return type;
 }

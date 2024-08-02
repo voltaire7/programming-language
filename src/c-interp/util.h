@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "env.h"
+#include "scan-token.h"
 
 void        error(char* msg, ...);
 void        readFileContent(const char* filename);
@@ -16,5 +17,6 @@ char*       symbolcpy();
 void        process_str(char* s);
 void        concat(char** dest, const char* src);
 Dictionary* get_env(int layer);
+TokenType   type_of(char* symbol);
 
 #endif

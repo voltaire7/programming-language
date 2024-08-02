@@ -1605,4 +1605,6 @@ of a procedure, just by default, using some sort of algorithm.]
 [So [proc] should be able to detect but ahead-of-time? Or the LSP? Because otherwise, everything is
 runtime...]
 
+[Maybe I should rename [quote] to [text] and [symbol] to [name]? but what about numbers?]
+
 

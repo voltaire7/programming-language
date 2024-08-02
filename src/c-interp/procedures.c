@@ -169,7 +169,7 @@ void PROC() {
     concat(
         &full_code,
         "] iter [k] keys ["
-        "scan-token 2 copy-token 2 parse item-in 1 k _"
+        "scan-token 2 copy-token 2 parse _ item-in 1 k _"
         "] free keys "
     );
     concat(&full_code, code_block);
@@ -874,52 +874,53 @@ void COPY_TOKEN() {
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.intValue;
     inner_end   = lookup_or_error(env_target, "end")->value.intValue;
-    inner_token_type =
-        lookup_or_error(env_target, "token-type")->value.intValue;
 
     Value val;
-    switch (inner_token_type) {
-        case INTEGER:
-        case FLOAT:
-        case SYMBOL:
-            val.stringValue = malloc((inner_end - inner_start) + 1);
-            strncpy(
-                val.stringValue,
-                inner_token + inner_start,
-                inner_end - inner_start
-            );
-            val.stringValue[inner_end - inner_start] = '\0';
-            break;
-        case QUOTE:
-            val = (Value) malloc((inner_end - inner_start - 2) + 1);
-            strncpy(
-                val.stringValue,
-                inner_token + inner_start + 1,
-                inner_end - inner_start - 2
-            );
-            val.stringValue[inner_end - inner_start - 2] = '\0';
-            break;
-    }
+    val.stringValue = malloc((inner_end - inner_start) + 1);
+    strncpy(
+        val.stringValue,
+        inner_token + inner_start,
+        inner_end - inner_start
+    );
+    val.stringValue[inner_end - inner_start] = '\0';
     upsert(env, "_", val, NEITHER);
 }
 
 void PARSE() {
-    char*     symbol = lookup_or_error(env, "_")->value.stringValue;
-    TokenType type   = lookup_or_error(env, "token-type")->value.intValue;
-
+    scan_token_default();
+    char* symbol = symbolcpy();
     Value val;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+        case QUOTE:
+            error("Procedure 'parse' only accepts symbols: '%s'", symbol);
+            break;
+        case SYMBOL:
+            val.stringValue = lookup_or_error(env, symbol)->value.stringValue;
+            break;
+    }
+    free(symbol);
+
+    TokenType type = type_of(val.stringValue);
     switch (type) {
         case INTEGER:
         case FLOAT:
             if (type == INTEGER)
-                val = (Value) atol(symbol);
+                val = (Value) atol(val.stringValue);
             else
-                val = (Value) atof(symbol);
+                val = (Value) atof(val.stringValue);
             break;
-        case QUOTE:
-            return;
+        case QUOTE: {
+            int   len = strlen(val.stringValue);
+            char* s   = malloc(len - 1);
+            strncpy(s, val.stringValue + 1, len - 2);
+            s[len - 2]      = '\0';
+            val.stringValue = s;
+            break;
+        }
         case SYMBOL: {
-            Entry* entry = lookup_or_error(env, symbol);
+            Entry* entry = lookup_or_error(env, val.stringValue);
             upsert(env, "_", (Value) entry->value.procedureValue, entry->type);
             return;
         }

@@ -16,7 +16,6 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-macro [arg1 arg2] [print arg1 print arg2]
-_ test 4
-ch 5 as [test] print [%i\n] test
+ch [123lkj] as [txt] print txt
+
 
