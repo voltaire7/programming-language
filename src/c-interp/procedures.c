@@ -906,3 +906,83 @@ void DELETE() {
     delete (env, name);
     free(name);
 }
+
+void COPY_TOKEN2() {
+    char *    s, *inner_token;
+    long      inner_start, inner_end;
+    TokenType inner_token_type;
+
+    long layer = 0;
+    scan_token_default();
+    switch (token_type) {
+        char* s;
+        case INTEGER:
+            layer = atol(token + start);
+            break;
+        case FLOAT:
+        case QUOTE:
+            error("Can only accept integers or symbols to integers.");
+            break;
+        case SYMBOL: {
+            layer = lookup_or_error(env, symbolcpy())->value.intValue;
+            break;
+        }
+    }
+
+    Dictionary* env_target = get_env(layer - layer_offset);
+
+    inner_token = lookup_or_error(env_target, "token")->value.stringValue;
+    inner_start = lookup_or_error(env_target, "start")->value.intValue;
+    inner_end   = lookup_or_error(env_target, "end")->value.intValue;
+    inner_token_type =
+        lookup_or_error(env_target, "token-type")->value.intValue;
+
+    Value val;
+    switch (inner_token_type) {
+        case INTEGER:
+        case FLOAT:
+        case SYMBOL:
+            val.stringValue = malloc((inner_end - inner_start) + 1);
+            strncpy(
+                val.stringValue,
+                inner_token + inner_start,
+                inner_end - inner_start
+            );
+            val.stringValue[inner_end - inner_start] = '\0';
+            break;
+        case QUOTE:
+            val = (Value) malloc((inner_end - inner_start - 2) + 1);
+            strncpy(
+                val.stringValue,
+                inner_token + inner_start + 1,
+                inner_end - inner_start - 2
+            );
+            val.stringValue[inner_end - inner_start - 2] = '\0';
+            break;
+    }
+    upsert(env, "_", val, STRING);
+}
+
+void PARSE() {
+    char*     symbol = lookup_or_error(env, "_")->value.stringValue;
+    TokenType type   = lookup_or_error(env, "token-type")->value.intValue;
+
+    Value val;
+    switch (type) {
+        case INTEGER:
+        case FLOAT:
+            if (type == INTEGER)
+                val = (Value) atol(symbol);
+            else
+                val = (Value) atof(symbol);
+            break;
+        case QUOTE:
+            return;
+        case SYMBOL: {
+            Entry* entry = lookup_or_error(env, symbol);
+            upsert(env, "_", (Value) entry->value.procedureValue, entry->type);
+            return;
+        }
+    }
+    upsert(env, "_", val, NEITHER);
+}

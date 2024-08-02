@@ -39,5 +39,7 @@ void LABEL();
 void GOTO();
 
 void DELETE();
+void COPY_TOKEN2();
+void PARSE();
 
 #endif

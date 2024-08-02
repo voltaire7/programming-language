@@ -6,13 +6,13 @@ todo:
 [+] for, while
 [+] delete
 [ ] macros
+[ ] defer
 [ ] syscall
 [ ] repl
 [ ] bin-exec
 [ ] assembly
 [ ] ref, deref
 [ ] char types
-[ ] defer
 [ ] compile
 [ ] bitwise operators
 [ ] debugger

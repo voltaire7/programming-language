@@ -46,4 +46,6 @@ void setup() {
     UPSERT("goto", GOTO)
 
     UPSERT("delete", DELETE)
+    UPSERT("copy-token2", COPY_TOKEN2)
+    UPSERT("parse", PARSE)
 }

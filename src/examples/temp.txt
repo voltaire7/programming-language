@@ -12,9 +12,9 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [arg] [
-    1 + arg print [%i\n] _ func _
-] as [func]
-func 0
+do [
+    scan-token 1 copy-token2 1 parse
+    print [%i\n] _ _ [test\n]
+] print
 
 
