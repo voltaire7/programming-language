@@ -16,10 +16,6 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-do [return [test\n]] print _
-.1 + .2 as [val]
-do [
-    scan-token 1 copy-token 1 parse _ print [%f\n] _
-] val
+syscall 4 [1 [Hello, World!] 13] print [test] item [x] [df]
 
 

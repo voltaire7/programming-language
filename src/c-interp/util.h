@@ -19,4 +19,6 @@ void        concat(char** dest, const char* src);
 Dictionary* get_env(int layer);
 TokenType   type_of(char* symbol);
 
+long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5);
+
 #endif

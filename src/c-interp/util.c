@@ -158,11 +158,11 @@ TokenType type_of(char* symbol) {
     int len = strlen(symbol);
     if (len == 0) error("Empty symbol");
 
-    int       i = 0;
-    TokenType type;
+    int  i    = 0;
     bool cond = (symbol[i] == '.' || symbol[i] == '-') && isdigit(symbol[i + 1])
         || isdigit(symbol[i]);
     if (cond) {
+        TokenType type;
         type = INTEGER;
         if (symbol[i] != '.') i++;
         while (isdigit((symbol[i]))) i++;
@@ -173,9 +173,37 @@ TokenType type_of(char* symbol) {
         }
 
         if (!isspace(symbol[i]) && symbol[i] != '\0') return SYMBOL;
+        return type;
     } else if (symbol[i] == '[')
         return QUOTE;
     else
         return SYMBOL;
-    return type;
+}
+
+long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5) {
+    long ret;
+    asm volatile(
+        "mov x0, %1\n"
+        "mov x1, %2\n"
+        "mov x2, %3\n"
+        "mov x3, %4\n"
+        "mov x4, %5\n"
+        "mov x5, %6\n"
+
+        "mov x16, %7\n"
+        "svc #0\n"
+        "mov %0, x0\n"
+
+        : "=r"(ret)
+        : "r"(x0),
+          "r"(x1),
+          "r"(x2),
+          "r"(x3),
+          "r"(x4),
+          "r"(x5),
+
+          "r"(x16)
+    );
+
+    return ret;
 }

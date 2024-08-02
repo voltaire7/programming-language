@@ -34,7 +34,8 @@ void scan_token(
     if ((*end) >= size && env->next == NULL)
         exit(0);
     else if ((*end) >= size && env->next != NULL) {
-        if (lookup(env, "decrement-layer?")->value.intValue) layer_offset--;
+        if (lookup_or_error(env, "decrement-layer?")->value.intValue)
+            layer_offset--;
         pop_scope();
         recover_state();
         scan_token_default();

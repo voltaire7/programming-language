@@ -107,10 +107,9 @@ void DO() {
         case QUOTE:
             push_scope(quotecpy());
             break;
-        case SYMBOL: {
+        case SYMBOL:
             push_scope(lookup_or_error(env, symbolcpy())->value.stringValue);
             break;
-        }
     }
     upsert(env, "decrement-layer?", (Value) 0l, NEITHER);
 }
@@ -984,4 +983,77 @@ void MACRO() {
 
     free(keys);
     free(code_block);
+}
+
+void SYSCALL() {
+    scan_token_default();
+    Value x16;
+    char* temp;
+    switch (token_type) {
+        case INTEGER:
+            temp = symbolcpy();
+            x16  = (Value) atol(temp);
+            free(temp);
+            break;
+        case FLOAT:
+            temp = symbolcpy();
+            x16  = (Value) atof(temp);
+            free(temp);
+            break;
+        case QUOTE:
+            x16 = (Value) quotecpy();
+            break;
+        case SYMBOL: {
+            temp = symbolcpy();
+            x16  = lookup_or_error(env, temp)->value;
+            free(temp);
+            break;
+        }
+    }
+
+    scan_token_default();
+    if (token_type != QUOTE) error("Invalid argument for register values.");
+    char* args = quotecpy();
+
+    save_state();
+    push_scope(args);
+    upsert(env, "decrement-layer?", (Value) 0l, NEITHER);
+
+    Value x[8] = {0};
+    for (int i = 0; scan_token_default(), token == args; i++) {
+        if (i > 5)
+            error("The maximum number of arguments (8) has been exceeded.");
+        switch (token_type) {
+            case INTEGER:
+                temp = symbolcpy();
+                x[i] = (Value) atol(temp);
+                free(temp);
+                break;
+            case FLOAT:
+                temp = symbolcpy();
+                x[i] = (Value) atof(temp);
+                free(temp);
+                break;
+            case QUOTE:
+                x[i] = (Value) quotecpy();
+                break;
+            case SYMBOL: {
+                temp = symbolcpy();
+                x[i] = lookup_or_error(env, temp)->value;
+                free(temp);
+                break;
+            }
+        }
+    }
+
+    long ret = syscall(
+        x16.intValue,
+        x[0].intValue,
+        x[1].intValue,
+        x[2].intValue,
+        x[3].intValue,
+        x[4].intValue,
+        x[5].intValue
+    );
+    upsert(env, "_", (Value) ret, NEITHER);
 }

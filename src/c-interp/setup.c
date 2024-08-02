@@ -49,4 +49,5 @@ void setup() {
     UPSERT("parse", PARSE)
 
     UPSERT("macro", MACRO)
+    UPSERT("syscall", SYSCALL)
 }

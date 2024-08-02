@@ -42,5 +42,6 @@ void COPY_TOKEN();
 void PARSE();
 
 void MACRO();
+void SYSCALL();
 
 #endif

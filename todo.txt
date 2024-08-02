@@ -5,9 +5,9 @@ todo:
 [+] % (modulo, forgot it)
 [+] for, while
 [+] delete
-[ ] macros
-[ ] defer
+[+] macros
 [ ] syscall
+[ ] defer
 [ ] repl
 [ ] bin-exec
 [ ] assembly
