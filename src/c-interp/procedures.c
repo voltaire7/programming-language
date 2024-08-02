@@ -1012,15 +1012,30 @@ void SYSCALL() {
     }
 
     scan_token_default();
-    if (token_type != QUOTE) error("Invalid argument for register values.");
-    char* args = quotecpy();
+    char* args;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            error("Invalid arguments for syscall.");
+            break;
+        case QUOTE:
+            args = quotecpy();
+            break;
+        case SYMBOL: {
+            temp = symbolcpy();
+            args = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
+            break;
+        }
+    }
 
     save_state();
     push_scope(args);
     upsert(env, "decrement-layer?", (Value) 0l, NEITHER);
 
     Value x[8] = {0};
-    for (int i = 0; scan_token_default(), token == args; i++) {
+    for (int i = 0; end < size; i++) {
+        scan_token_default();
         if (i > 5)
             error("The maximum number of arguments (8) has been exceeded.");
         switch (token_type) {

@@ -6,7 +6,7 @@ todo:
 [+] for, while
 [+] delete
 [+] macros
-[ ] syscall
+[+] syscall
 [ ] defer
 [ ] repl
 [ ] bin-exec

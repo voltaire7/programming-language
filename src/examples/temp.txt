@@ -16,6 +16,10 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-syscall 4 [1 [Hello, World!] 13] print [test] item [x] [df]
+proc [args] [
+    syscall 4 args
+] as [write]
+
+write [1 [Hello, World!] 13]
 
 

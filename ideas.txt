@@ -1609,4 +1609,6 @@ runtime...]
 
 [prelude, interlude and epilogue? nah, I don't have to be so fancy. I'm not a haskeller.]
 
+[My [goto]s are actually quite lame, aren't they?]
+
 
