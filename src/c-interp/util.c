@@ -55,19 +55,12 @@ void error(char* msg, ...) {
     fprintf(stderr, "\n");
     va_end(args);
 
-    fprintf(
-        stderr,
-        BLUE " --> " WHITE "%s:%d:%d\n",
-        filename,
-        line_count,
-        line_offset
-    );
     for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
     fprintf(stderr, BLUE "|\n %d | " WHITE, line_count);
     print_line(line_count);
     for (int n = line_count * 100; n; n /= 10) putc(' ', stderr);
     fprintf(stderr, BLUE "|\n" WHITE);
-    fprintf(stderr, "1 error generated\n");
+    fprintf(stderr, "%s:%d:%d\n", filename, line_count, line_offset);
 
     exit(1);
 }

@@ -1595,4 +1595,14 @@ that, but whatever. I'm going to resist metadata until it's no longer feasible.]
 
 [This would be so much easier if I could just add metadata...]
 
+[Right, iteresting idea as well:]
+"\x1b[58;2;255;0;0m\x1b[60mcurly\x1b[0mnormal"
+[instead of making my code read. But idk, couldn't make it work with printf.]
+
+[[proc] should be a wrapping, a macro? a wrapping over something, that does define the head and foot
+of a procedure, just by default, using some sort of algorithm.]
+
+[So [proc] should be able to detect but ahead-of-time? Or the LSP? Because otherwise, everything is
+runtime...]
+
 

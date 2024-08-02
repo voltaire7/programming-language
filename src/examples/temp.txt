@@ -12,10 +12,9 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [] [free []] as [test]
-test
-
-item [x] 4
-5 % [x] print [modulo: 5 %% 4 = %i\n] _
+print [hello\n]
+item [item] [print]
+delete item
+print [Hello again\n]
 
 

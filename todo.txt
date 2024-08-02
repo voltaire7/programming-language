@@ -4,8 +4,8 @@ todo:
 [+] +=, etc.
 [+] % (modulo, forgot it)
 [+] for, while
-[ ] macros
 [ ] delete
+[ ] macros
 [ ] syscall
 [ ] repl
 [ ] bin-exec

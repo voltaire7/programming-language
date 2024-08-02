@@ -885,6 +885,24 @@ void GOTO() {
     }
 }
 
-void FOR() {}
-
-void WHILE() {}
+void DELETE() {
+    scan_token_default();
+    char* name;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+            error("Cannot delete a number: '%s'", symbolcpy());
+            break;
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            name       = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
+            break;
+        }
+        case QUOTE:
+            name = quotecpy();
+            break;
+    }
+    delete (env, name);
+    free(name);
+}

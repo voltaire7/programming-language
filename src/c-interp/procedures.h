@@ -1,8 +1,6 @@
 #ifndef PROCEDURES_H
 #define PROCEDURES_H
 
-#include <stdio.h>
-
 void PRINT();
 void FREE();
 void DO();
@@ -39,7 +37,7 @@ void NOT();
 
 void LABEL();
 void GOTO();
-void FOR();
-void WHILE();
+
+void DELETE();
 
 #endif
