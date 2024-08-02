@@ -11,11 +11,15 @@ proc [] [
 ] as [ch]
 
 proc [] [
-    item-in 1 [_]
+    item-in 2 [_]
 ] as [return]
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-ch [123lkj] as [txt] print txt
+do [return [test\n]] print _
+.1 + .2 as [val]
+do [
+    scan-token 1 copy-token 1 parse _ print [%f\n] _
+] val
 
 

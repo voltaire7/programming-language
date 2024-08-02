@@ -1607,4 +1607,6 @@ runtime...]
 
 [Maybe I should rename [quote] to [text] and [symbol] to [name]? but what about numbers?]
 
+[prelude, interlude and epilogue? nah, I don't have to be so fancy. I'm not a haskeller.]
+
 

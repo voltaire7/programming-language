@@ -158,44 +158,24 @@ TokenType type_of(char* symbol) {
     int len = strlen(symbol);
     if (len == 0) error("Empty symbol");
 
-    int       end  = 0;
-    TokenType type = -1;
-
-    bool cond =
-        (symbol[end] == '.' || symbol[end] == '-') && isdigit(symbol[end + 1])
-        || isdigit(symbol[end]);
+    int       i = 0;
+    TokenType type;
+    bool cond = (symbol[i] == '.' || symbol[i] == '-') && isdigit(symbol[i + 1])
+        || isdigit(symbol[i]);
     if (cond) {
         type = INTEGER;
-        if (symbol[end] != '.') end++;
-        while (isdigit((symbol[end]))) end++;
+        if (symbol[i] != '.') i++;
+        while (isdigit((symbol[i]))) i++;
 
-        if (symbol[end] == '.') {
-            while (isdigit(symbol[++end]));
+        if (symbol[i] == '.') {
+            while (isdigit(symbol[++i]));
             type = FLOAT;
         }
 
-        if (!isspace(symbol[end]) && symbol[end] != '\0') goto symbol;
-    } else if (symbol[end] == '[') {
-        type      = QUOTE;
-        int layer = 1;
-        do {
-            end++;
-            if (symbol[end] == '\0')
-                error("this file contains an unclosed delimiter."
-
-                );
-            if (symbol[end] == '[' && symbol[end - 1] != '\\')
-                layer++;
-            else if (symbol[end] == ']' && symbol[end - 1] != '\\')
-                layer--;
-        } while (symbol[end] != ']' || layer != 0);
-        end++;
-    } else {
-    symbol:
-        while (!isspace(symbol[end]) && symbol[end] != '\0') {
-            end++;
-        }
-        type = SYMBOL;
-    }
+        if (!isspace(symbol[i]) && symbol[i] != '\0') return SYMBOL;
+    } else if (symbol[i] == '[')
+        return QUOTE;
+    else
+        return SYMBOL;
     return type;
 }
