@@ -4,7 +4,7 @@ todo:
 [+] +=, etc.
 [+] % (modulo, forgot it)
 [+] for, while
-[ ] delete
+[+] delete
 [ ] macros
 [ ] syscall
 [ ] repl

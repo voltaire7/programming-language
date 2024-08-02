@@ -12,9 +12,9 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-print [hello\n]
-item [item] [print]
-delete item
-print [Hello again\n]
+proc [arg] [
+    1 + arg print [%i\n] _ func _
+] as [func]
+func 0
 
 
