@@ -4,6 +4,7 @@
 typedef enum {
     INTEGER,
     FLOAT,
+    CHAR,
     QUOTE,
     SYMBOL,
 } TokenType;

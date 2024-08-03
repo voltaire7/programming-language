@@ -72,6 +72,15 @@ void scan_token(
                 layer--;
         } while (token[*end] != ']' || layer != 0);
         (*end)++;
+    } else if (token[*start] == '\'') {
+        *token_type = CHAR;
+        ++(*end);
+        if (token[*end] == '\\') ++(*end);
+        if (token[++(*end)] != '\'') {
+            ++(*end);
+            error("Invalid character.");
+        }
+        ++(*end);
     } else {
     symbol:
         while (!isspace(token[*end]) && token[*end] != '\0') {

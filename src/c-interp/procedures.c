@@ -34,6 +34,8 @@ void PRINT() {
             s = symbolcpy();
             printf("%s", s);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             s = quotecpy();
         quote:
@@ -104,6 +106,8 @@ void DO() {
         case FLOAT:
             error("Cannot evaluate a number.");
             break;
+        case CHAR:
+            break;
         case QUOTE:
             push_scope(quotecpy());
             break;
@@ -130,6 +134,8 @@ void PROC() {
             keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             keys = quotecpy();
             break;
@@ -147,6 +153,8 @@ void PROC() {
         case FLOAT:
             code_block = symbolcpy();
             error("Cannot assign number: '%s'", keys);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             code_block = quotecpy();
@@ -185,6 +193,8 @@ void ITEM_IN() {
         case INTEGER:
             layer = atol(token + start);
             break;
+        case CHAR:
+            break;
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
@@ -204,6 +214,8 @@ void ITEM_IN() {
         case FLOAT:
             keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             keys = quotecpy();
@@ -240,6 +252,8 @@ void ITEM_IN() {
                     val = (Value) atof(token + start);
                 }
                 break;
+            case CHAR:
+                break;
             case QUOTE:
                 val = (Value) quotecpy();
                 break;
@@ -266,6 +280,8 @@ void ITER() {
             symbol = symbolcpy();
             error("Cannot assign number: '%s'", symbol);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             symbol = quotecpy();
             break;
@@ -284,6 +300,8 @@ void ITER() {
             keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             keys = quotecpy();
             break;
@@ -301,6 +319,8 @@ void ITER() {
         case INTEGER:
         case FLOAT:
             error("Cannot evaluate a number.");
+            break;
+        case CHAR:
             break;
         case QUOTE:
             s = quotecpy();
@@ -358,6 +378,8 @@ void ADD() {
             else
                 val = (Value) (val.floatValue + atof(token + start));
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '+' string literals: '%s'", quotecpy());
             break;
@@ -378,6 +400,8 @@ void SUB() {
                 val = (Value) (val.intValue - atol(token + start));
             else
                 val = (Value) (val.floatValue - atof(token + start));
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '-' string literals: '%s'", quotecpy());
@@ -401,6 +425,8 @@ void MUL() {
                 val = (Value) (val.floatValue * atof(token + start));
             }
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '*' string literals: '%s'", quotecpy());
             break;
@@ -421,6 +447,8 @@ void DIV() {
                 val = (Value) (val.intValue / atol(token + start));
             } else
                 val = (Value) (val.floatValue / atof(token + start));
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '/' string literals: '%s'", quotecpy());
@@ -443,6 +471,8 @@ void MODULO() {
             } else
                 val = (Value) fmod(val.floatValue, atof(token + start));
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '%%' string literals: '%s'", quotecpy());
             break;
@@ -463,6 +493,8 @@ void ADD_FLOAT() {
                 val = (Value) (val.intValue + atol(token + start));
             else
                 val = (Value) (val.floatValue + atof(token + start));
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '+f' string literals: '%s'", quotecpy());
@@ -485,6 +517,8 @@ void SUB_FLOAT() {
                 val = (Value) (val.intValue - atol(token + start));
             else
                 val = (Value) (val.floatValue - atof(token + start));
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '-f' string literals: '%s'", quotecpy());
@@ -509,6 +543,8 @@ void MUL_FLOAT() {
                 val = (Value) (val.floatValue * atof(token + start));
             }
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '*f' string literals: '%s'", quotecpy());
             break;
@@ -531,6 +567,8 @@ void DIV_FLOAT() {
             } else
                 val = (Value) (val.floatValue / atof(token + start));
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '/f' string literals: '%s'", quotecpy());
             break;
@@ -552,6 +590,8 @@ void MODULO_FLOAT() {
                 val = (Value) (val.intValue % atol(token + start));
             } else
                 val = (Value) fmod(val.floatValue, atof(token + start));
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '%%f' string literals: '%s'", quotecpy());
@@ -576,6 +616,8 @@ void EQUAL() {
             else
                 val.intValue = val.floatValue == atof(token + start);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '==' string literals: '%s'", quotecpy());
             break;
@@ -596,6 +638,8 @@ void NOT_EQUAL() {
                 val.intValue = val.intValue != atol(token + start);
             else
                 val.intValue = val.floatValue != atof(token + start);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '!=' string literals: '%s'", quotecpy());
@@ -618,6 +662,8 @@ void GREATER() {
             else
                 val.intValue = val.floatValue > atof(token + start);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '>' string literals: '%s'", quotecpy());
             break;
@@ -638,6 +684,8 @@ void SMALLER() {
                 val.intValue = val.intValue < atol(token + start);
             else
                 val.intValue = val.floatValue < atof(token + start);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '<' string literals: '%s'", quotecpy());
@@ -660,6 +708,8 @@ void GREATER_EQUAL() {
             else
                 val.intValue = val.floatValue >= atof(token + start);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '>=' string literals: '%s'", quotecpy());
             break;
@@ -680,6 +730,8 @@ void SMALLER_EQUAL() {
                 val.intValue = val.intValue <= atol(token + start);
             else
                 val.intValue = val.floatValue <= atof(token + start);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '<=' string literals: '%s'", quotecpy());
@@ -702,6 +754,8 @@ void OR() {
             else
                 val.intValue = val.floatValue || atof(token + start);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             error("Cannot '||' string literals: '%s'", quotecpy());
             break;
@@ -722,6 +776,8 @@ void AND() {
                 val.intValue = val.intValue && atol(token + start);
             else
                 val.intValue = val.floatValue && atof(token + start);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             error("Cannot '&&' string literals: '%s'", quotecpy());
@@ -749,6 +805,8 @@ void LABEL() {
         case SYMBOL:
             name = lookup_or_error(env, symbolcpy())->value.stringValue;
             break;
+        case CHAR:
+            break;
         case QUOTE:
             name = quotecpy();
             break;
@@ -767,6 +825,11 @@ void GOTO() {
         case FLOAT:
             error("Cannot goto with float: '%s'", symbolcpy());
             break;
+        case CHAR:
+            break;
+        case QUOTE:
+            error("Cannot goto using quote: '%s'", symbolcpy());
+            break;
         case SYMBOL: {
             Entry* entry;
             for (; !(entry = lookup_here(env, symbolcpy())); pop_scope())
@@ -776,9 +839,6 @@ void GOTO() {
             end = entry->value.intValue;
             break;
         }
-        case QUOTE:
-            error("Cannot goto using quote: '%s'", symbolcpy());
-            break;
     }
 }
 
@@ -790,15 +850,17 @@ void DELETE() {
         case FLOAT:
             error("Cannot delete a number: '%s'", symbolcpy());
             break;
+        case CHAR:
+            break;
+        case QUOTE:
+            name = quotecpy();
+            break;
         case SYMBOL: {
             char* temp = symbolcpy();
             name       = lookup_or_error(env, temp)->value.stringValue;
             free(temp);
             break;
         }
-        case QUOTE:
-            name = quotecpy();
-            break;
     }
     delete (env, name);
     free(name);
@@ -813,6 +875,8 @@ void SCAN_TOKEN() {
             layer = atol(token + start);
             break;
         case FLOAT:
+        case CHAR:
+            break;
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
             break;
@@ -859,6 +923,8 @@ void COPY_TOKEN() {
             layer = atol(token + start);
             break;
         case FLOAT:
+        case CHAR:
+            break;
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
             break;
@@ -892,6 +958,8 @@ void PARSE() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
+        case CHAR:
+            break;
         case QUOTE:
             error("Procedure 'parse' only accepts symbols: '%s'", symbol);
             break;
@@ -909,6 +977,8 @@ void PARSE() {
                 val = (Value) atol(val.stringValue);
             else
                 val = (Value) atof(val.stringValue);
+            break;
+        case CHAR:
             break;
         case QUOTE: {
             int   len = strlen(val.stringValue);
@@ -937,6 +1007,8 @@ void MACRO() {
             keys = symbolcpy();
             error("Cannot assign number: '%s'", keys);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             keys = quotecpy();
             break;
@@ -954,6 +1026,8 @@ void MACRO() {
         case FLOAT:
             code_block = symbolcpy();
             error("Cannot assign number: '%s'", keys);
+            break;
+        case CHAR:
             break;
         case QUOTE:
             code_block = quotecpy();
@@ -1000,6 +1074,8 @@ void SYSCALL() {
             x16  = (Value) atof(temp);
             free(temp);
             break;
+        case CHAR:
+            break;
         case QUOTE:
             x16 = (Value) quotecpy();
             break;
@@ -1017,6 +1093,8 @@ void SYSCALL() {
         case INTEGER:
         case FLOAT:
             error("Invalid arguments for syscall.");
+            break;
+        case CHAR:
             break;
         case QUOTE:
             args = quotecpy();
@@ -1048,6 +1126,8 @@ void SYSCALL() {
                 temp = symbolcpy();
                 x[i] = (Value) atof(temp);
                 free(temp);
+                break;
+            case CHAR:
                 break;
             case QUOTE:
                 x[i] = (Value) quotecpy();

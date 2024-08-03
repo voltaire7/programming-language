@@ -26,6 +26,11 @@ void eval() {
             val.floatValue = atof(token + start);
             upsert(get_env(0), "_", val, NEITHER);
             break;
+        case CHAR:
+            if (token[start + 1] != '\\') val.charValue = token[start + 1];
+            putchar(val.charValue);
+            upsert(get_env(0), "_", val, NEITHER);
+            break;
         case QUOTE:
             break;
         case SYMBOL: {

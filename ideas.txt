@@ -1611,4 +1611,58 @@ runtime...]
 
 [My [goto]s are actually quite lame, aren't they?]
 
+[Another reason for [meta]:]
+item [a] [test]
+item [b] [test]
+a == b
+[this works because the language knows the type and can decide weither to call it or push it on the
+stack.]
+
+[Also]
+a b 1 1.4142135623
+[these value should know be in the hashmap, with the key [_], they should be in the stack, back to
+back. Though, I don't know how the procedure knows to access the stack. Oh wait!]
+ldr x0, [sp]
+[for latest? it has to be in asm otherwise you'll waste time searching the hashmap.]
+
+[hmm]
+let [a] = 5
+[[let] pushes [a] in the stack, [=] upserts in the hashmap.]
+
+[if the head of a procedure is a single instruction, it will be easy to trim. Something like [bl] to
+a procedure called [push] that takes a number as arguments, and scans said number of arguments in
+the source code.]
+
+[shouldn't forget to add [proc-len] and [debug-proc].]
+
+[at this point, why not just make it stack-oriented?]
+1 2 3 4 + + + 10 == [true]
+a b c d + + + [also works]
+
+[i should really do asm instructions proc; they are stripped of the register saving instruction whem compiled]
+mov x0 #5 [moves number 5 to register x0; saves register info on the stack for later use]
+init-asm [saves all registers on the stack?]
+quit-asm [pop all registers on the stack?]
+proc [] [
+    mov x0 #42
+    mov x16 #1
+    svc #0
+] as [test-exit]
+test-exit [works as intented, but no need to save registers.]
+
+[also, inline proc that inlines stuff]
+proc [] [
+    inline test-exit
+]
+debug-proc _ [print the instructions of [test-exit] since there is no [bl]]
+[still, that means that some procedures within [proc] get executed?]
+
+[another reason to avoid meta: it encourages stack oriented programming... or is that a plus? the
+stack *is* fast.]
+
+[inline asm should be as easy as possible]
+
+[creating a programming language is such a skill issue. meanwhile computing can write code in
+binary. pathetic.]
+
 

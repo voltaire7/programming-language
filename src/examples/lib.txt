@@ -54,4 +54,9 @@ proc [body] [
     ? [goto loop] []
 ] as [loop]
 
+[syscalls]
+macro [exit-code] [
+    syscall 1 exit-code
+] as [exit]
+
 

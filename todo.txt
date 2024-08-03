@@ -7,12 +7,12 @@ todo:
 [+] delete
 [+] macros
 [+] syscall
+[ ] char types
+[ ] ref, deref
 [ ] defer
 [ ] repl
 [ ] bin-exec
 [ ] assembly
-[ ] ref, deref
-[ ] char types
 [ ] compile
 [ ] bitwise operators
 [ ] debugger

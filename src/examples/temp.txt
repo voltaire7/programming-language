@@ -16,10 +16,13 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [args] [
-    syscall 4 args
-] as [write]
+macro [fd buf nbytes] [
+    syscall 1 [fd buf nbytes]
+] as [exit]
 
-write [1 [Hello, World!] 13]
+macro [exit-code] [
+    syscall 1 exit-code
+] as [exit]
+exit 42
 
 
