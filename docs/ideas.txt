@@ -1676,4 +1676,119 @@ implement the assembly first, then decide.]
 
 [[proc] is basically a mini-compiler.]
 
+[You know... I could actually do [str == [a string]] – and I mean why not right?]
+
+[Maybe I should do [struct], just not the typed kind.]
+struct [Car] [
+    [make]
+    [model]
+    [year]
+    [engine size]
+    [price]
+    [color]
+    [is-electric]
+]
+Car::new [test-car] [
+    [Tesla]
+    [Model S]
+    [2024]
+    0.0
+    79999.99
+    [Red]
+    1
+]
+print test-car.make  [outputs [Tesla]]
+print test-car.model [outputs [Model S]]
+
+[I guess [struct] defines the [Car::new] procedure? And [Car::new] does:]
+item [test-car.make test-car.model ...] [Tesla] [Model S]
+
+[And then, we have this]
+test-car.delete
+[which deletes all the fields. I also remembers to free the strings? I don't know.]
+
+[or maybe]
+struct [test-car] [
+    [make]        [Tesla]
+    [model]       [Model S]
+    [year]        [2024]
+    [engine size] 0.0
+    [price]       79999.99
+    [color]       [Red]
+    [is-electric] 1
+]
+[which does the same as the above code]
+
+[hmm]
+struct [Vector3] [[x][y][z]]
+Vector3 [test] [1 2 3]
+print [x = %i\n] test.x [outputs [x = 1]]
+print [y = %i\n] test.y [outputs [y = 2]]
+print [z = %i\n] test.z [outputs [z = 3]]
+
+[or]
+struct [test] [[x] 1 [y] 2 [z] 3]
+print [x = %i\n] test.x [outputs [x = 1]]
+print [y = %i\n] test.y [outputs [y = 2]]
+print [z = %i\n] test.z [outputs [z = 3]]
+
+[...]
+struct [Vector3] [[x][y][y]] Vector3 [test] [1 2 3]
+struct [test] [[x] 1 [y] 2 [z] 3]
+[the second one is clearly more terse, but that's only because this example only does it once.]
+
+[I could do both, like:]
+struct [] []
+object [] []
+
+[Alright. I'm going with this. It looks too sexy not to.]
+
+[Oh, and I'm dropping the [::new]. Don't know why it was there. I felt right, I guess. Rust muscle
+memory?]
+
+[Also, if I am very much following the prototype-based route. No OOP here pls.]
+[then again, is there any point in doing something like [Person.clone]?]
+[and can I nest structure?]
+
+struct [Vector2] [[x] [y]]
+struct [Vector3] [[inner] [y]]
+Vector2 [test1] [1 2]
+Vector3 [test2] [
+    test1
+    3
+]
+print [x = %i\n] test2.inner.x [outputs [x = 1]]
+print [y = %i\n] test2.inner.y [outputs [y = 2]]
+print [z = %i\n] test2.z       [outputs [z = 3]]
+
+[...]
+struct [Vector2] [[x] [y]]
+struct [Vector3] [[y]]
+
+proc [name args] [
+    get 0 args as [x]
+    get 1 args as [y]
+    get 2 args as [z]
+    strcat name [.inner]
+    Vector2-in 1 _ [x y]
+    Vector3-in 1 name [z]
+] as [Vector3]
+
+Vector3 [test] [1 2 3]
+print [x = %i\n] test2.inner.x [outputs [x = 1]]
+print [y = %i\n] test2.inner.y [outputs [y = 2]]
+print [z = %i\n] test2.z       [outputs [z = 3]]
+[this is hella scuffed... doesn't even have [.delete]]
+
+[well, I'll figure it out eventually.]
+
+_.err?
+
+[I guess I could also have this:]
+test.meta
+[which is a list of the fields?]
+[and you know]
+delete-struct [test]
+[which iterates over [test.meta]]
+
 

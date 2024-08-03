@@ -81,10 +81,11 @@ void PRINT() {
                         }
                         case 'r':
                             scan_token_default();
-                            if (token_type == QUOTE)
-                                printlen(token + start + 1, (end - start) - 2);
-                            else
-                                printlen(token + start, end - start);
+                            printlen(token + start, end - start);
+                            break;
+                        case 'q':
+                            scan_token_default();
+                            printlen(token + start + 1, (end - start) - 2);
                             break;
                         default:
                             error("Unknown format specifier '%%%c'", s[i]);
@@ -203,7 +204,6 @@ void ITEM_IN() {
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
-            break;
         case SYMBOL: {
             char* s = symbolcpy();
             layer   = lookup_or_error(env, s)->value.intValue;
@@ -218,9 +218,10 @@ void ITEM_IN() {
         case INTEGER:
         case FLOAT:
         case CHAR:
-            keys = symbolcpy();
-            error("Can only assign quotes or symbols to quotes: '%s'", keys);
-            break;
+            error(
+                "Can only assign quotes or symbols to quotes: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
             keys = quotecpy();
             break;
@@ -282,11 +283,11 @@ void ITER() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            symbol = symbolcpy();
-            error("Cannot assign number: '%s'", symbol);
-            break;
         case CHAR:
-            break;
+            error(
+                "Can only assign quote or symbol to quote: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
             symbol = quotecpy();
             break;
@@ -302,11 +303,11 @@ void ITER() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            keys = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
-            break;
+            error(
+                "Can only iterate over quote or symbol to quote: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
             keys = quotecpy();
             break;
@@ -323,10 +324,8 @@ void ITER() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            error("Cannot evaluate a number.");
-            break;
         case CHAR:
-            break;
+            error("Can only evaluate quote or symbol to quote.");
         case QUOTE:
             s = quotecpy();
             break;
@@ -372,256 +371,166 @@ void IF() {
     }
 }
 
-void ADD() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val = (Value) (val.intValue + atol(token + start));
-            else
-                val = (Value) (val.floatValue + atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '+' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val = (Value) (val.intValue
-                           + lookup_or_error(env, symbolcpy())->value.intValue);
-    }
+#define ARITHMETIC(op) \
+    Value val = lookup_or_error(env, "_")->value; \
+    scan_token_default(); \
+\
+    switch (token_type) { \
+        case INTEGER: \
+            val = (Value) (val.intValue op atol(token + start)); \
+            break; \
+        case FLOAT: \
+            val = (Value) (val.floatValue op atof(token + start)); \
+            break; \
+        case CHAR: \
+            val = (Value) ((long) val.charValue op parse_char()); \
+            break; \
+        case QUOTE: \
+            error("Invalid operand: '%s'", symbolcpy()); \
+            break; \
+        case SYMBOL: { \
+            char* temp = symbolcpy(); \
+            val        = (Value) (val.intValue op lookup_or_error(env, temp) \
+                               ->value.intValue); \
+            free(temp); \
+        } \
+    } \
+\
     upsert(get_env(0), "_", val, NEITHER);
+
+void ADD() {
+    ARITHMETIC(+)
 }
 
 void SUB() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val = (Value) (val.intValue - atol(token + start));
-            else
-                val = (Value) (val.floatValue - atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '-' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val = (Value) (val.intValue
-                           - lookup_or_error(env, symbolcpy())->value.intValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(-)
 }
 
 void MUL() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue * atol(token + start));
-            } else {
-                val = (Value) (val.floatValue * atof(token + start));
-            }
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '*' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val = (Value) (val.intValue
-                           * lookup_or_error(env, symbolcpy())->value.intValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(*)
 }
 
 void DIV() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue / atol(token + start));
-            } else
-                val = (Value) (val.floatValue / atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '/' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val = (Value) (val.intValue
-                           / lookup_or_error(env, symbolcpy())->value.intValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(/)
 }
+
+#undef ARITHMETIC
 
 void MODULO() {
     Value val = lookup_or_error(env, "_")->value;
     scan_token_default();
     switch (token_type) {
         case INTEGER:
+            val = (Value) (val.intValue % atol(token + start));
+            break;
         case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue % atol(token + start));
-            } else
-                val = (Value) fmod(val.floatValue, atof(token + start));
+            val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case CHAR:
+            val = (Value) ((long) val.charValue % parse_char());
             break;
         case QUOTE:
-            error("Cannot '%%' string literals: '%s'", quotecpy());
+            error("Invalid operand: '%s'", symbolcpy());
             break;
-        case SYMBOL:
-            val = (Value) (val.intValue
-                           % lookup_or_error(env, symbolcpy())->value.intValue);
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            val        = (Value) (val.intValue
+                           % lookup_or_error(env, temp)->value.intValue);
+            free(temp);
+        }
     }
+
     upsert(get_env(0), "_", val, NEITHER);
 }
 
-void ADD_FLOAT() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val = (Value) (val.intValue + atol(token + start));
-            else
-                val = (Value) (val.floatValue + atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '+f' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val =
-                (Value) (val.floatValue
-                         + lookup_or_error(env, symbolcpy())->value.floatValue);
-    }
+#define ARITHMETIC(op) \
+    Value val = lookup_or_error(env, "_")->value; \
+    scan_token_default(); \
+\
+    switch (token_type) { \
+        case INTEGER: \
+            val = (Value) (val.intValue op atol(token + start)); \
+            break; \
+        case FLOAT: \
+            val = (Value) (val.floatValue op atof(token + start)); \
+            break; \
+        case CHAR: \
+            val = (Value) ((long) val.charValue op parse_char()); \
+            break; \
+        case QUOTE: \
+            error("Invalid operand: '%s'", symbolcpy()); \
+            break; \
+        case SYMBOL: { \
+            char* temp = symbolcpy(); \
+            val        = (Value) (val.floatValue op lookup_or_error(env, temp) \
+                               ->value.floatValue); \
+            free(temp); \
+        } \
+    } \
+\
     upsert(get_env(0), "_", val, NEITHER);
+
+void ADD_FLOAT() {
+    ARITHMETIC(+)
 }
 
 void SUB_FLOAT() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val = (Value) (val.intValue - atol(token + start));
-            else
-                val = (Value) (val.floatValue - atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '-f' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val =
-                (Value) (val.floatValue
-                         - lookup_or_error(env, symbolcpy())->value.floatValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(-)
 }
 
 void MUL_FLOAT() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue * atol(token + start));
-            } else {
-                val = (Value) (val.floatValue * atof(token + start));
-            }
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '*f' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val =
-                (Value) (val.floatValue
-                         * lookup_or_error(env, symbolcpy())->value.floatValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(*)
 }
 
 void DIV_FLOAT() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue / atol(token + start));
-            } else
-                val = (Value) (val.floatValue / atof(token + start));
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '/f' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val =
-                (Value) (val.floatValue
-                         / lookup_or_error(env, symbolcpy())->value.floatValue);
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    ARITHMETIC(/)
 }
+
+#undef ARITHMETIC
 
 void MODULO_FLOAT() {
     Value val = lookup_or_error(env, "_")->value;
     scan_token_default();
     switch (token_type) {
         case INTEGER:
+            val = (Value) (val.intValue % atol(token + start));
+            break;
         case FLOAT:
-            if (token_type == INTEGER) {
-                val = (Value) (val.intValue % atol(token + start));
-            } else
-                val = (Value) fmod(val.floatValue, atof(token + start));
+            val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case CHAR:
+            val = (Value) ((long) val.charValue % parse_char());
             break;
         case QUOTE:
-            error("Cannot '%%f' string literals: '%s'", quotecpy());
+            error("Invalid operand: '%s'", symbolcpy());
             break;
-        case SYMBOL:
-            val = (Value) fmod(
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            val        = (Value) fmod(
                 val.floatValue,
-                lookup_or_error(env, symbolcpy())->value.floatValue
+                lookup_or_error(env, temp)->value.floatValue
+
             );
+            free(temp);
+        }
     }
     upsert(get_env(0), "_", val, NEITHER);
 }
+
+#define BOOLEAN(op)
 
 void EQUAL() {
     Value val = lookup_or_error(env, "_")->value;
     scan_token_default();
     switch (token_type) {
         case INTEGER:
+            val.intValue = val.intValue == atol(token + start);
+            break;
         case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue == atol(token + start);
-            else
-                val.intValue = val.floatValue == atof(token + start);
+            val.intValue = val.floatValue == atof(token + start);
             break;
         case CHAR:
+            val.intValue = val.charValue == parse_char();
             break;
         case QUOTE:
             error("Cannot '==' string literals: '%s'", quotecpy());
