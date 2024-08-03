@@ -16,13 +16,11 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-macro [fd buf nbytes] [
-    syscall 1 [fd buf nbytes]
-] as [exit]
-
-macro [exit-code] [
-    syscall 1 exit-code
-] as [exit]
-exit 42
+proc [fd buf nbytes] [
+    syscall 3 [fd buf nbytes]
+] as [read]
+item [buf] [hello, world!]
+write 0 buf 4
+print buf
 
 

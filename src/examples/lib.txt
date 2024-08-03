@@ -22,6 +22,7 @@ proc [if-false] [
     ? [] if-false
 ] as [else]
 
+[LOOPS]
 proc [init cond incr body] [
     do-here init
     label [loop]
@@ -54,9 +55,17 @@ proc [body] [
     ? [goto loop] []
 ] as [loop]
 
-[syscalls]
+[SYSCALLS]
 macro [exit-code] [
     syscall 1 exit-code
 ] as [exit]
+
+proc [fd buf nbytes] [
+    syscall 3 [fd buf nbytes]
+] as [read]
+
+proc [fd buf nbytes] [
+    syscall 4 [fd buf nbytes]
+] as [write]
 
 
