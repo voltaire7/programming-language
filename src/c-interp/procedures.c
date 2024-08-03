@@ -811,7 +811,7 @@ void LABEL() {
             name = quotecpy();
             break;
     }
-    upsert(get_env(0), name, (Value) end, NEITHER);
+    upsert(get_env(0 - layer_offset), name, (Value) end, NEITHER);
 }
 
 void GOTO() {

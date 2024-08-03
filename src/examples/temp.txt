@@ -18,7 +18,7 @@ proc [] [
 
 proc [it body] [
     label [top]
-    do body
+    do-here body
     -1 + it as [it] ? [goto top] []
 ] as [repeat]
 [hmm, it will break if body has a it variable?]
@@ -28,7 +28,7 @@ repeat 3 [print [Hello, World!\n]]
 
 [still...]
 repeat 3 [
-    repeat 3 [print [%i\n] it item-in 4 [x] [final test\n]]
+    repeat 3 [print [%i\n] it item-in 2 [x] [final test\n]]
 ]
 [it has to be [do] instead of [do-here]...]
 

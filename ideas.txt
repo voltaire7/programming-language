@@ -1665,4 +1665,6 @@ stack *is* fast.]
 [creating a programming language is such a skill issue. meanwhile computing can write code in
 binary. pathetic.]
 
+[I need a raw [item-in] that is unaffected by [layer-offset].]
+
 
