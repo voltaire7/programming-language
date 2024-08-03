@@ -207,3 +207,31 @@ long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5) {
 
     return ret;
 }
+
+char parse_char() {
+    if (token[start + 1] == '\\') switch (token[start + 2]) {
+            case 'a':
+                return '\a';
+            case 'b':
+                return '\b';
+            case 'f':
+                return '\f';
+            case 'n':
+                return '\n';
+            case 'r':
+                return '\r';
+            case 't':
+                return '\t';
+            case 'v':
+                return '\v';
+            case '\\':
+                return '\\';
+            case '\'':
+                return '\'';
+            case '0':
+                return '\0';
+            default:
+                error("Unknown character: '%s'", token[start + 1]);
+        };
+    return token[start + 1];
+}

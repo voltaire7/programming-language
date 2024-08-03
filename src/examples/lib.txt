@@ -50,7 +50,7 @@ proc [body] [
 
 proc [it body] [
     label [top]
-    do body
+    do-here body
     -1 + it as [it] ? [goto top] []
 ] as [repeat]
 

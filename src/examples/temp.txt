@@ -16,23 +16,10 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [it body] [
-    label [top]
-    do-here body
-    -1 + it as [it] ? [goto top] []
-] as [repeat]
-[hmm, it will break if body has a it variable?]
-
-repeat 3 [print [Hello, World!\n]]
-[well, whatever. it's good that the body can interact with it (lol). just make it a convention.]
-
-[still...]
-repeat 3 [
-    repeat 3 [print [%i\n] it item-in 2 [x] [final test\n]]
-]
-[it has to be [do] instead of [do-here]...]
-
-[damn... that's not good. gotta fix this.]
-print x
+item [x] '\t'
+item [x] 'c'
+print [%r\n] [x] 5
+print 't'
+print 0.5
 
 

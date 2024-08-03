@@ -31,10 +31,10 @@ void PRINT() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            s = symbolcpy();
-            printf("%s", s);
+            printlen(token + start, end - start);
             break;
         case CHAR:
+            putchar(parse_char());
             break;
         case QUOTE:
             s = quotecpy();
@@ -45,47 +45,61 @@ void PRINT() {
                     i++;
                     switch (s[i]) {
                         case '%':
-                            printf("%%");
+                            putchar('%');
                             break;
-                        case 'i':
-                        case 'f':
+                        case 'c':
                         case 'e':
+                        case 'f':
                         case 'g':
-                        case 's': {
+                        case 'i':
+                        case 'p':
+                        case 's':
+                        case 'x': {
                             scan_token_default();
                             char* t = symbolcpy();
                             if (token_type != SYMBOL)
                                 error("Not a symbol: '%s'", t);
                             Entry* entry = lookup_or_error(env, t);
 
-                            if (s[i] == 'i')
-                                printf("%ld", entry->value.intValue);
-                            else if (s[i] == 'f')
-                                printf("%f", entry->value.floatValue);
+                            if (s[i] == 'c')
+                                printf("%c", entry->value.charValue);
                             else if (s[i] == 'e')
                                 printf("%e", entry->value.floatValue);
+                            else if (s[i] == 'f')
+                                printf("%f", entry->value.floatValue);
                             else if (s[i] == 'g')
                                 printf("%g", entry->value.floatValue);
+                            else if (s[i] == 'i')
+                                printf("%ld", entry->value.intValue);
+                            else if (s[i] == 'p')
+                                printf("%p", (void*) entry->value.intValue);
                             else if (s[i] == 's')
                                 printf("%s", entry->value.stringValue);
+                            else if (s[i] == 'x')
+                                printf("%lx", entry->value.intValue);
                             break;
                         }
-                        default:
+                        case 'r':
                             scan_token_default();
                             if (token_type == QUOTE)
                                 printlen(token + start + 1, (end - start) - 2);
                             else
                                 printlen(token + start, end - start);
-                            putchar(s[i]);
+                            break;
+                        default:
+                            error("Unknown format specifier '%%%c'", s[i]);
                     }
                 } else
                     putchar(s[i]);
             }
+            free(s);
             break;
-        case SYMBOL:
-            s = lookup_or_error(env, symbolcpy())->value.stringValue;
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            s          = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             goto quote;
-            break;
+        }
     }
 }
 
@@ -194,7 +208,6 @@ void ITEM_IN() {
             layer = atol(token + start);
             break;
         case CHAR:
-            break;
         case FLOAT:
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
@@ -212,10 +225,9 @@ void ITEM_IN() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            keys = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
+            keys = symbolcpy();
+            error("Can only assign quotes or symbols to quotes: '%s'", keys);
             break;
         case QUOTE:
             keys = quotecpy();
@@ -253,6 +265,7 @@ void ITEM_IN() {
                 }
                 break;
             case CHAR:
+                val = (Value) parse_char();
                 break;
             case QUOTE:
                 val = (Value) quotecpy();
@@ -981,11 +994,10 @@ void PARSE() {
         case CHAR:
             break;
         case QUOTE: {
-            int   len = strlen(val.stringValue);
-            char* s   = malloc(len - 1);
-            strncpy(s, val.stringValue + 1, len - 2);
-            s[len - 2]      = '\0';
-            val.stringValue = s;
+            int len = strlen(val.stringValue);
+            for (int i = 0, j = 1; i < len - 2; i++, j++)
+                val.stringValue[i] = val.stringValue[j];
+            val.stringValue[len - 2] = '\0';
             break;
         }
         case SYMBOL: {

@@ -1667,4 +1667,11 @@ binary. pathetic.]
 
 [I need a raw [item-in] that is unaffected by [layer-offset].]
 
+[Ah shit, it's because [repeat] does create a new scope – that's why!]
+
+[I've been thinking a lot about loops (as you do), and isn't [goto] the simplest way of doing it? I
+mean, damn. It makes me gag having to say (write) this, but recursion doesn't make that much sense
+for this programming language. This... Yeah, I don't know where I'm going with this. I need to
+implement the assembly first, then decide.]
+
 
