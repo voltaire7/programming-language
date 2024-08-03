@@ -1674,4 +1674,6 @@ mean, damn. It makes me gag having to say (write) this, but recursion doesn't ma
 for this programming language. This... Yeah, I don't know where I'm going with this. I need to
 implement the assembly first, then decide.]
 
+[[proc] is basically a mini-compiler.]
+
 

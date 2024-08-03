@@ -27,9 +27,7 @@ void eval() {
             upsert(get_env(0), "_", val, NEITHER);
             break;
         case CHAR:
-            if (token[start + 1] != '\\') val.charValue = token[start + 1];
-            putchar(val.charValue);
-            upsert(get_env(0), "_", val, NEITHER);
+            upsert(get_env(0), "_", (Value) parse_char(), NEITHER);
             break;
         case QUOTE:
             break;

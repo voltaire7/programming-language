@@ -118,10 +118,8 @@ void DO() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            error("Cannot evaluate a number.");
-            break;
         case CHAR:
-            break;
+            error("Can only evaluate quote or symbol to quote.");
         case QUOTE:
             push_scope(quotecpy());
             break;
@@ -145,11 +143,9 @@ void PROC() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            keys = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
-            break;
+            keys = symbolcpy();
+            error("Can only assign quote or symbol to quotes.");
         case QUOTE:
             keys = quotecpy();
             break;
@@ -165,20 +161,16 @@ void PROC() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            code_block = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
-            break;
+            code_block = symbolcpy();
+            error("Invalid procedure body: '%s'", code_block);
         case QUOTE:
             code_block = quotecpy();
             break;
         case SYMBOL: {
-            code_block = symbolcpy();
-            strcpy(
-                code_block,
-                lookup_or_error(env, code_block)->value.stringValue
-            );
+            char* temp = symbolcpy();
+            code_block = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             break;
         }
     }
