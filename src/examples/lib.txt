@@ -55,6 +55,12 @@ proc [body] [
     ? [goto loop] []
 ] as [loop]
 
+proc [it body] [
+    label [top]
+    do body
+    -1 + it as [it] ? [goto top] []
+] as [repeat]
+
 [SYSCALLS]
 macro [exit-code] [
     syscall 1 exit-code
