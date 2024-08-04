@@ -6,16 +6,48 @@ proc [] [
     item-in 0
 ] as [item]
 
+proc [] [
+    item-in 1 [_]
+] as [ch]
+
+item [stdin]  0
+item [stdout] 1
+
+proc [exit-code] [
+    syscall 1 [exit-code]
+] as [exit]
+
+proc [fd buf nbytes] [
+    syscall 3 [fd buf nbytes]
+] as [read]
+
+proc [fd buf nbytes] [
+    syscall 4 [fd buf nbytes]
+] as [write]
+
+proc [] [
+    print [%c]
+] as [printc]
+
+proc [] [
+    print [%i]
+] as [printi]
+
 [+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
-item [str] [Hello, World!\n]
-1 + str
-get 1 _
-print [%c\n] _
-9 + str [nevermind. i remembered]
-item [x] '5'
-set 1 _ x
-+ 1 set 1 _ '\0'
-print str
+item [buf] [                                                                                                 ]
+item [layer] 0
+
+label [top]
+
+syscall 3 [stdin buf 1] as [ret]
+get 1 buf as [c] != '\n' ? [
+    -1 == c ? [print [yes\n]] [print [no\n]]
+    '[' == c ? [1 + layer as [layer]] [']' == c ? [-1 + layer as [layer]] []]
+
+    0 == layer ? [] []
+] []
+
+goto top
 
 

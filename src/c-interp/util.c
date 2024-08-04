@@ -206,7 +206,6 @@ long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5) {
 
           "r"(x16)
     );
-
     return ret;
 }
 

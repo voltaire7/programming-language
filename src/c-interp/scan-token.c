@@ -34,7 +34,7 @@ void scan_token(
     if ((*end) >= size && env->next == NULL)
         exit(0);
     else if ((*end) >= size && env->next != NULL) {
-        if (lookup_or_error(env, "decrement-layer?")->value.intValue)
+        if (lookup_or_error(env, "decrement-layer?")->value.longValue)
             layer_offset--;
         pop_scope();
         recover_state();
@@ -66,9 +66,11 @@ void scan_token(
                 error("this file contains an unclosed delimiter."
 
                 );
-            if (token[*end] == '[' && token[*end - 1] != '\\')
+            if (token[*end] == '[' && token[*end - 1] != '\\'
+                && token[*end - 1] != '\'')
                 layer++;
-            else if (token[*end] == ']' && token[*end - 1] != '\\')
+            else if (token[*end] == ']' && token[*end - 1] != '\\'
+                     && token[*end - 1] != '\'')
                 layer--;
         } while (token[*end] != ']' || layer != 0);
         (*end)++;

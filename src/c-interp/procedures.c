@@ -259,7 +259,7 @@ void ITEM_IN() {
                 }
                 break;
             case CHAR:
-                val = (Value) parse_char(token + start);
+                val.longValue = (long) parse_char(token + start);
                 break;
             case QUOTE:
                 val = (Value) quotecpy();
@@ -536,7 +536,7 @@ void EQUAL() {
 }
 
 void NOT_EQUAL() {
-    BOOLEAN(==)
+    BOOLEAN(!=)
 }
 
 void GREATER() {
@@ -916,7 +916,7 @@ void SYSCALL() {
         x[4].longValue,
         x[5].longValue
     );
-    upsert(env, "_", (Value) ret, NEITHER);
+    upsert(env->next, "_", (Value) ret, NEITHER);
 }
 
 void GET() {
@@ -955,13 +955,13 @@ void GET() {
         int_label:
             switch (bytes) {
                 case 1:
-                    val.charValue = *((char*) ptr);
+                    val.longValue = *((char*) ptr);
                     break;
                 case 2:
-                    val.shortValue = *((short*) ptr);
+                    val.longValue = *((short*) ptr);
                     break;
                 case 4:
-                    val.intValue = *((int*) ptr);
+                    val.longValue = *((int*) ptr);
                     break;
                 case 8:
                     val.longValue = *((long*) ptr);
