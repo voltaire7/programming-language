@@ -64,20 +64,24 @@ proc [it body] [
 [ SYSCALLS                                                                                        ]
 [-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
 
-item [stdin] 0
+item [stdin]  0
 item [stdout] 1
 item [stderr] 2
 
-macro [exit-code] [
-    syscall 1 exit-code
+item [SYS_EXIT]  1
+item [SYS_READ]  3
+item [SYS_WRITE] 4
+
+proc [exit-code] [
+    syscall SYS_EXIT [exit-code]
 ] as [exit]
 
 proc [fd buf nbytes] [
-    syscall 3 [fd buf nbytes]
+    syscall SYS_READ [fd buf nbytes]
 ] as [read]
 
 proc [fd buf nbytes] [
-    syscall 4 [fd buf nbytes]
+    syscall SYS_WRITE [fd buf nbytes]
 ] as [write]
 
 

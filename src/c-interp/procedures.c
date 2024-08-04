@@ -34,7 +34,7 @@ void PRINT() {
             printlen(token + start, end - start);
             break;
         case CHAR:
-            putchar(parse_char());
+            putchar(parse_char(token + start));
             break;
         case QUOTE:
             s = quotecpy();
@@ -258,7 +258,7 @@ void ITEM_IN() {
                 }
                 break;
             case CHAR:
-                val = (Value) parse_char();
+                val = (Value) parse_char(token + start);
                 break;
             case QUOTE:
                 val = (Value) quotecpy();
@@ -382,7 +382,7 @@ void IF() {
             val = (Value) (val.floatValue op atof(token + start)); \
             break; \
         case CHAR: \
-            val = (Value) ((long) val.charValue op parse_char()); \
+            val = (Value) ((long) val.charValue op parse_char(token + start)); \
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
@@ -424,7 +424,7 @@ void MODULO() {
             val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case CHAR:
-            val = (Value) ((long) val.charValue % parse_char());
+            val = (Value) ((long) val.charValue % parse_char(token + start));
             break;
         case QUOTE:
             error("Invalid operand: '%s'", symbolcpy());
@@ -449,7 +449,7 @@ void MODULO() {
             val = (Value) (val.floatValue op atof(token + start)); \
             break; \
         case CHAR: \
-            val = (Value) ((long) val.charValue op parse_char()); \
+            val = (Value) ((long) val.charValue op parse_char(token + start)); \
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
@@ -492,7 +492,7 @@ void MODULO_FLOAT() {
             val = (Value) fmod(val.floatValue, atof(token + start));
             break;
         case CHAR:
-            val = (Value) ((long) val.charValue % parse_char());
+            val = (Value) ((long) val.charValue % parse_char(token + start));
             break;
         case QUOTE:
             error("Invalid operand: '%s'", symbolcpy());
@@ -520,7 +520,7 @@ void MODULO_FLOAT() {
             val.intValue = val.floatValue op atof(token + start); \
             break; \
         case CHAR: \
-            val.intValue = val.charValue op parse_char(); \
+            val.intValue = val.charValue op parse_char(token + start); \
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
@@ -626,10 +626,11 @@ void DELETE() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            error("Cannot delete a number: '%s'", symbolcpy());
-            break;
         case CHAR:
-            break;
+            error(
+                "Can only delete variable using quote or symbol to quote: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
             name = quotecpy();
             break;
@@ -654,10 +655,8 @@ void SCAN_TOKEN() {
             break;
         case FLOAT:
         case CHAR:
-            break;
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
-            break;
         case SYMBOL: {
             s     = symbolcpy();
             layer = lookup_or_error(env, s)->value.intValue;
@@ -702,10 +701,8 @@ void COPY_TOKEN() {
             break;
         case FLOAT:
         case CHAR:
-            break;
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
-            break;
         case SYMBOL: {
             layer = lookup_or_error(env, symbolcpy())->value.intValue;
             break;
@@ -737,10 +734,8 @@ void PARSE() {
         case INTEGER:
         case FLOAT:
         case CHAR:
-            break;
         case QUOTE:
-            error("Procedure 'parse' only accepts symbols: '%s'", symbol);
-            break;
+            error("Can only accept symbols to string: '%s'", symbol);
         case SYMBOL:
             val.stringValue = lookup_or_error(env, symbol)->value.stringValue;
             break;
@@ -750,13 +745,13 @@ void PARSE() {
     TokenType type = type_of(val.stringValue);
     switch (type) {
         case INTEGER:
+            val = (Value) atol(val.stringValue);
+            break;
         case FLOAT:
-            if (type == INTEGER)
-                val = (Value) atol(val.stringValue);
-            else
-                val = (Value) atof(val.stringValue);
+            val = (Value) atof(val.stringValue);
             break;
         case CHAR:
+            val = (Value) parse_char(val.stringValue);
             break;
         case QUOTE: {
             int len = strlen(val.stringValue);
@@ -781,17 +776,17 @@ void MACRO() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            keys = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
-            break;
+            keys = symbolcpy();
+            error("Can only assign quote or symbol to quote: '%s'", keys);
         case QUOTE:
             keys = quotecpy();
             break;
         case SYMBOL: {
-            keys = symbolcpy();
-            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
+            keys         = symbolcpy();
+            Entry* entry = lookup_or_error(env, keys);
+            free(keys);
+            keys = entry->value.stringValue;
             break;
         }
     }
@@ -801,20 +796,16 @@ void MACRO() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            code_block = symbolcpy();
-            error("Cannot assign number: '%s'", keys);
-            break;
         case CHAR:
-            break;
+            code_block = symbolcpy();
+            error("Invalid macro body: '%s'", code_block);
         case QUOTE:
             code_block = quotecpy();
             break;
         case SYMBOL: {
-            code_block = symbolcpy();
-            strcpy(
-                code_block,
-                lookup_or_error(env, code_block)->value.stringValue
-            );
+            char* temp = symbolcpy();
+            code_block = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             break;
         }
     }
@@ -844,35 +835,29 @@ void SYSCALL() {
         case INTEGER:
             temp = symbolcpy();
             x16  = (Value) atol(temp);
-            free(temp);
             break;
         case FLOAT:
-            temp = symbolcpy();
-            x16  = (Value) atof(temp);
-            free(temp);
-            break;
         case CHAR:
-            break;
         case QUOTE:
-            x16 = (Value) quotecpy();
-            break;
+            error(
+                "Can only accept integer or symbol to integer: '%s'",
+                symbolcpy()
+            );
         case SYMBOL: {
             temp = symbolcpy();
             x16  = lookup_or_error(env, temp)->value;
-            free(temp);
             break;
         }
     }
+    free(temp);
 
     scan_token_default();
     char* args;
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            error("Invalid arguments for syscall.");
-            break;
         case CHAR:
-            break;
+            error("Invalid arguments for syscall.");
         case QUOTE:
             args = quotecpy();
             break;
@@ -905,6 +890,9 @@ void SYSCALL() {
                 free(temp);
                 break;
             case CHAR:
+                temp = symbolcpy();
+                x[i] = (Value) parse_char(temp);
+                free(temp);
                 break;
             case QUOTE:
                 x[i] = (Value) quotecpy();

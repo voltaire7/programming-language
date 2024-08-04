@@ -174,7 +174,9 @@ TokenType type_of(char* symbol) {
 
         if (!isspace(symbol[i]) && symbol[i] != '\0') return SYMBOL;
         return type;
-    } else if (symbol[i] == '[')
+    } else if (symbol[i] == '\'')
+        return CHAR;
+    else if (symbol[i] == '[')
         return QUOTE;
     else
         return SYMBOL;
@@ -208,8 +210,8 @@ long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5) {
     return ret;
 }
 
-char parse_char() {
-    if (token[start + 1] == '\\') switch (token[start + 2]) {
+char parse_char(char* c) {
+    if (c[1] == '\\') switch (c[2]) {
             case 'a':
                 return '\a';
             case 'b':
@@ -231,7 +233,7 @@ char parse_char() {
             case '0':
                 return '\0';
             default:
-                error("Unknown character: '%s'", token[start + 1]);
+                error("Unknown character: '%s'", c[1]);
         };
-    return token[start + 1];
+    return c[1];
 }

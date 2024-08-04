@@ -6,10 +6,18 @@ proc [] [
     item-in 0
 ] as [item]
 
-[––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
+[+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
-label [test]
-print [test]
-goto test
+proc [fd buf nbytes] [
+    syscall 3 [fd buf nbytes]
+] as [read]
+
+item [stdin] 0
+item [buf] [                                                                                      ]
+
+label [top]
+read stdin buf 1000
+do buf
+goto top
 
 

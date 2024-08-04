@@ -27,7 +27,7 @@ void eval() {
             upsert(get_env(0), "_", val, NEITHER);
             break;
         case CHAR:
-            upsert(get_env(0), "_", (Value) parse_char(), NEITHER);
+            upsert(get_env(0), "_", (Value) parse_char(token + start), NEITHER);
             break;
         case QUOTE:
             break;
