@@ -7,11 +7,13 @@ todo:
 [+] delete
 [+] macros
 [+] syscall
-[ ] char types
+[+] char types
 [ ] ref, deref
 [ ] defer
 [ ] repl
 [ ] bin-exec
+[ ] struct and object
+[ ] load and import (file open, do-here)
 [ ] assembly
 [ ] compile
 [ ] bitwise operators

@@ -1801,4 +1801,6 @@ delete-struct [test]
 
 [I need to do string manipulation before I can do the REPL. Otherwise, I will be too scuffed.]
 
+[Damn, that's right. I can't rename [.intValue] to [.int] because C is a pain in the ass sometimes]
+
 

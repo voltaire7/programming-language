@@ -112,6 +112,7 @@ void delete(Dictionary* dict, const char* key) {
         prev  = entry;
         entry = entry->next;
     }
+    error("Cannot delete, entry not found: '%s'", key);
 }
 
 Dictionary* create_dictionary() {

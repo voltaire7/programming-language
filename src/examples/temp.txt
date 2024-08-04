@@ -8,16 +8,8 @@ proc [] [
 
 [+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
-proc [fd buf nbytes] [
-    syscall 3 [fd buf nbytes]
-] as [read]
-
-item [stdin] 0
-item [buf] [                                                                                      ]
-
-label [top]
-read stdin buf 1000
-do buf
-goto top
-
-
+proc [] [print [hello\n]] as [say-hello]
+say-hello
+item [x] [say-hello]
+delete say-hello
+say-hello
