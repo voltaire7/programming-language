@@ -374,7 +374,6 @@ void IF() {
 #define ARITHMETIC(op) \
     Value val = lookup_or_error(env, "_")->value; \
     scan_token_default(); \
-\
     switch (token_type) { \
         case INTEGER: \
             val = (Value) (val.intValue op atol(token + start)); \
@@ -387,7 +386,6 @@ void IF() {
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
-            break; \
         case SYMBOL: { \
             char* temp = symbolcpy(); \
             val        = (Value) (val.intValue op lookup_or_error(env, temp) \
@@ -395,7 +393,6 @@ void IF() {
             free(temp); \
         } \
     } \
-\
     upsert(get_env(0), "_", val, NEITHER);
 
 void ADD() {
@@ -431,7 +428,6 @@ void MODULO() {
             break;
         case QUOTE:
             error("Invalid operand: '%s'", symbolcpy());
-            break;
         case SYMBOL: {
             char* temp = symbolcpy();
             val        = (Value) (val.intValue
@@ -439,14 +435,12 @@ void MODULO() {
             free(temp);
         }
     }
-
     upsert(get_env(0), "_", val, NEITHER);
 }
 
 #define ARITHMETIC(op) \
     Value val = lookup_or_error(env, "_")->value; \
     scan_token_default(); \
-\
     switch (token_type) { \
         case INTEGER: \
             val = (Value) (val.intValue op atol(token + start)); \
@@ -459,7 +453,6 @@ void MODULO() {
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
-            break; \
         case SYMBOL: { \
             char* temp = symbolcpy(); \
             val        = (Value) (val.floatValue op lookup_or_error(env, temp) \
@@ -503,7 +496,6 @@ void MODULO_FLOAT() {
             break;
         case QUOTE:
             error("Invalid operand: '%s'", symbolcpy());
-            break;
         case SYMBOL: {
             char* temp = symbolcpy();
             val        = (Value) fmod(
@@ -517,190 +509,57 @@ void MODULO_FLOAT() {
     upsert(get_env(0), "_", val, NEITHER);
 }
 
-#define BOOLEAN(op)
+#define BOOLEAN(op) \
+    Value val = lookup_or_error(env, "_")->value; \
+    scan_token_default(); \
+    switch (token_type) { \
+        case INTEGER: \
+            val.intValue = val.intValue op atol(token + start); \
+            break; \
+        case FLOAT: \
+            val.intValue = val.floatValue op atof(token + start); \
+            break; \
+        case CHAR: \
+            val.intValue = val.charValue op parse_char(); \
+            break; \
+        case QUOTE: \
+            error("Invalid operand: '%s'", symbolcpy()); \
+        case SYMBOL: \
+            val.intValue = val.intValue op lookup_or_error(env, symbolcpy()) \
+                               ->value.intValue; \
+    } \
+    upsert(get_env(0), "_", val, NEITHER);
 
 void EQUAL() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-            val.intValue = val.intValue == atol(token + start);
-            break;
-        case FLOAT:
-            val.intValue = val.floatValue == atof(token + start);
-            break;
-        case CHAR:
-            val.intValue = val.charValue == parse_char();
-            break;
-        case QUOTE:
-            error("Cannot '==' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                == lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(==)
 }
 
 void NOT_EQUAL() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue != atol(token + start);
-            else
-                val.intValue = val.floatValue != atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '!=' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                != lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(==)
 }
 
 void GREATER() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue > atol(token + start);
-            else
-                val.intValue = val.floatValue > atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '>' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                > lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(>)
 }
 
 void SMALLER() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue < atol(token + start);
-            else
-                val.intValue = val.floatValue < atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '<' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                < lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(<)
 }
 
 void GREATER_EQUAL() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue >= atol(token + start);
-            else
-                val.intValue = val.floatValue >= atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '>=' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                >= lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(>=)
 }
 
 void SMALLER_EQUAL() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue <= atol(token + start);
-            else
-                val.intValue = val.floatValue <= atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '<=' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                <= lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(<=)
 }
 
 void OR() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue || atol(token + start);
-            else
-                val.intValue = val.floatValue || atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '||' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                || lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(||)
 }
 
 void AND() {
-    Value val = lookup_or_error(env, "_")->value;
-    scan_token_default();
-    switch (token_type) {
-        case INTEGER:
-        case FLOAT:
-            if (token_type == INTEGER)
-                val.intValue = val.intValue && atol(token + start);
-            else
-                val.intValue = val.floatValue && atof(token + start);
-            break;
-        case CHAR:
-            break;
-        case QUOTE:
-            error("Cannot '&&' string literals: '%s'", quotecpy());
-            break;
-        case SYMBOL:
-            val.intValue = val.intValue
-                && lookup_or_error(env, symbolcpy())->value.intValue;
-    }
-    upsert(get_env(0), "_", val, NEITHER);
+    BOOLEAN(&&)
 }
 
 void NOT() {

@@ -1791,4 +1791,8 @@ test.meta
 delete-struct [test]
 [which iterates over [test.meta]]
 
+[bitwise instruction disassembler?]
+00100010 & 00000110 == 00000110 ? [[is mov instruction]] []
+[(rough example)]
+
 
