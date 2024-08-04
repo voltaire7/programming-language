@@ -573,16 +573,20 @@ void LABEL() {
     switch (token_type) {
         case INTEGER:
         case FLOAT:
-            error("Cannot create with number: '%s'", symbolcpy());
-            break;
-        case SYMBOL:
-            name = lookup_or_error(env, symbolcpy())->value.stringValue;
-            break;
         case CHAR:
-            break;
+            error(
+                "Can only assign to quote or symbol to quote: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
             name = quotecpy();
             break;
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            name       = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
+            break;
+        }
     }
     upsert(get_env(0 - layer_offset), name, (Value) end, NEITHER);
 }
@@ -596,18 +600,19 @@ void GOTO() {
             break;
         }
         case FLOAT:
-            error("Cannot goto with float: '%s'", symbolcpy());
-            break;
         case CHAR:
-            break;
         case QUOTE:
-            error("Cannot goto using quote: '%s'", symbolcpy());
-            break;
+            error(
+                "Can only goto with integer or symbol to integer: '%s'",
+                symbolcpy()
+            );
         case SYMBOL: {
             Entry* entry;
-            for (; !(entry = lookup_here(env, symbolcpy())); pop_scope())
+            char*  label = symbolcpy();
+            for (; !(entry = lookup_here(env, label)); pop_scope())
                 if (lookup_or_error(env, "decrement-layer?")->value.intValue)
                     layer_offset--;
+            free(label);
             recover_state();
             end = entry->value.intValue;
             break;

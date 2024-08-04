@@ -8,13 +8,8 @@ proc [] [
 
 [––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––]
 
-proc [fd buf nbytes] [
-    syscall 3 [fd buf nbytes]
-] as [read]
-
-item [stdin] 0
-item [buf] [                                                       ]
-read stdin buf 20
-do buf
+label [test]
+print [test]
+goto test
 
 

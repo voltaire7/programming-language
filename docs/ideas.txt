@@ -1795,4 +1795,8 @@ delete-struct [test]
 00100010 & 00000110 == 00000110 ? [[is mov instruction]] []
 [(rough example)]
 
+[I guess I should do the REPL in C then.]
+
+[Maybe the max line width should be 99?]
+
 
