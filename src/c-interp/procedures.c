@@ -1092,14 +1092,53 @@ void SET() {
     }
 }
 
-void BIT_AND() {}
+#define BIT_OPERATORS(op) \
+    Value val = lookup_or_error(env, "_")->value; \
+    scan_token_default(); \
+    switch (token_type) { \
+        case INTEGER: \
+            val.longValue = (val.longValue op atol(token + start)); \
+            break; \
+        case FLOAT: \
+            val.longValue = \
+                (val.longValue op((Value) atof(token + start)).longValue); \
+            break; \
+        case CHAR: \
+            val.longValue = val.charValue op parse_char(token + start); \
+            break; \
+        case QUOTE: \
+            error("Invalid operand: '%s'", symbolcpy()); \
+        case SYMBOL: { \
+            char* temp = symbolcpy(); \
+            val.longValue = \
+                (val.longValue op lookup_or_error(env, temp)->value.longValue \
+                ); \
+            free(temp); \
+        } \
+    } \
+    upsert(get_env(0), "_", val, NEITHER);
 
-void BIT_OR() {}
+void BIT_AND() {
+    BIT_OPERATORS(&)
+}
 
-void BIT_XOR() {}
+void BIT_OR() {
+    BIT_OPERATORS(|)
+}
 
-void BIT_NOT() {}
+void BIT_XOR() {
+    BIT_OPERATORS(^)
+}
 
-void BIT_SHIFTL() {}
+void BIT_NOT() {
+    long val = ~lookup_or_error(env, "_")->value.longValue;
+    upsert(get_env(0), "_", (Value) val, NEITHER);
+}
 
-void BIT_SHIFTR() {}
+void BIT_SHIFTL() {
+    BIT_OPERATORS(<<)
+}
+
+void BIT_SHIFTR() {
+    BIT_OPERATORS(>>)
+}
