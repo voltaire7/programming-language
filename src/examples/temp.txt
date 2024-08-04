@@ -3,12 +3,16 @@ proc [symbol] [
 ] item-in 0 [as] _
 
 proc [] [
+    item-in 1 [_]
+] as [ch]
+
+proc [] [
     item-in 0
 ] as [item]
 
 proc [] [
-    item-in 1 [_]
-] as [ch]
+    item-in 2 [_]
+] as [return]
 
 item [stdin]  0
 item [stdout] 1
@@ -19,10 +23,12 @@ proc [exit-code] [
 
 proc [fd buf nbytes] [
     syscall 3 [fd buf nbytes]
+    return _
 ] as [read]
 
 proc [fd buf nbytes] [
     syscall 4 [fd buf nbytes]
+    return _
 ] as [write]
 
 proc [] [
@@ -40,7 +46,7 @@ item [layer] 0
 
 label [top]
 
-syscall 3 [stdin buf 1] as [ret]
+read stdin buf 1 ! ? [exit 0] [] print [ret: %i\n] _
 get 1 buf as [c] != '\n' ? [
     -1 == c ? [print [yes\n]] [print [no\n]]
     '[' == c ? [1 + layer as [layer]] [']' == c ? [-1 + layer as [layer]] []]
