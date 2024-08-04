@@ -55,6 +55,10 @@ proc [it body] [
 ] as [repeat]
 
 [SYSCALLS]
+item [stdin] 0
+item [stdout] 1
+item [stderr] 2
+
 macro [exit-code] [
     syscall 1 exit-code
 ] as [exit]
