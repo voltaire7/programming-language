@@ -9,7 +9,7 @@ todo:
 [+] syscall
 [+] char types
 [+] get, set
-[ ] bitwise operators
+[+] bitwise operators
 [ ] malloc, free, etc.
 [ ] struct and object
 [-] repl
