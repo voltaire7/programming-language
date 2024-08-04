@@ -8,12 +8,16 @@ todo:
 [+] macros
 [+] syscall
 [+] char types
-[ ] ref, deref
+[+] get, set
+[ ] pop-scope, restore-state, etc.
 [ ] defer
 [ ] repl
 [ ] bin-exec
+[ ] more print %
 [ ] struct and object
 [ ] load and import (file open, do-here)
+[ ] format
+[ ] malloc, free, etc.
 [ ] assembly
 [ ] compile
 [ ] bitwise operators

@@ -44,4 +44,7 @@ void PARSE();
 void MACRO();
 void SYSCALL();
 
+void GET();
+void SET();
+
 #endif

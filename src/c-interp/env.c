@@ -141,9 +141,9 @@ void save_state() {
     Value val;
     val.stringValue = token;
     upsert(env, "token", val, STRING);
-    val.intValue = start;
+    val.longValue = start;
     upsert(env, "start", val, STRING);
-    val.intValue = end;
+    val.longValue = end;
     upsert(env, "end", val, STRING);
 }
 
@@ -163,8 +163,8 @@ void push_scope(char* code) {
 
 void recover_state() {
     token = lookup_or_error(env, "token")->value.stringValue;
-    start = lookup_or_error(env, "start")->value.intValue;
-    end   = lookup_or_error(env, "end")->value.intValue;
+    start = lookup_or_error(env, "start")->value.longValue;
+    end   = lookup_or_error(env, "end")->value.longValue;
     size  = strlen(token);
 }
 

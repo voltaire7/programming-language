@@ -50,4 +50,7 @@ void setup() {
 
     UPSERT("macro", MACRO)
     UPSERT("syscall", SYSCALL)
+
+    UPSERT("get", GET)
+    UPSERT("set", SET)
 }

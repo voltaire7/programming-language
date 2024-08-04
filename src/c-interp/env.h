@@ -17,12 +17,14 @@ typedef enum {
 } PointerType;
 
 typedef union {
-    long   intValue;
+    char   charValue;
+    short  shortValue;
+    int    intValue;
+    long   longValue;
     double floatValue;
     void*  pointerValue;
     char*  stringValue;
     void (*procedureValue)();
-    char      charValue;
     TokenType token_type;
 } Value;
 

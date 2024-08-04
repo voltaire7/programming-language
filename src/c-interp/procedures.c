@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,13 +71,13 @@ void PRINT() {
                             else if (s[i] == 'g')
                                 printf("%g", entry->value.floatValue);
                             else if (s[i] == 'i')
-                                printf("%ld", entry->value.intValue);
+                                printf("%ld", entry->value.longValue);
                             else if (s[i] == 'p')
-                                printf("%p", (void*) entry->value.intValue);
+                                printf("%p", (void*) entry->value.longValue);
                             else if (s[i] == 's')
                                 printf("%s", entry->value.stringValue);
                             else if (s[i] == 'x')
-                                printf("%lx", entry->value.intValue);
+                                printf("%lx", entry->value.longValue);
                             break;
                         }
                         case 'r':
@@ -206,7 +207,7 @@ void ITEM_IN() {
             error("Can only accept integers or symbols to integers.");
         case SYMBOL: {
             char* s = symbolcpy();
-            layer   = lookup_or_error(env, s)->value.intValue;
+            layer   = lookup_or_error(env, s)->value.longValue;
             free(s);
             break;
         }
@@ -361,7 +362,7 @@ void ITER() {
 }
 
 void IF() {
-    bool cond = lookup_or_error(env, "_")->value.intValue;
+    bool cond = lookup_or_error(env, "_")->value.longValue;
     if (cond) {
         char* old = token;
         DO_HERE();
@@ -376,7 +377,7 @@ void IF() {
     scan_token_default(); \
     switch (token_type) { \
         case INTEGER: \
-            val = (Value) (val.intValue op atol(token + start)); \
+            val = (Value) (val.longValue op atol(token + start)); \
             break; \
         case FLOAT: \
             val = (Value) (val.floatValue op atof(token + start)); \
@@ -388,8 +389,8 @@ void IF() {
             error("Invalid operand: '%s'", symbolcpy()); \
         case SYMBOL: { \
             char* temp = symbolcpy(); \
-            val        = (Value) (val.intValue op lookup_or_error(env, temp) \
-                               ->value.intValue); \
+            val        = (Value) (val.longValue op lookup_or_error(env, temp) \
+                               ->value.longValue); \
             free(temp); \
         } \
     } \
@@ -418,7 +419,7 @@ void MODULO() {
     scan_token_default();
     switch (token_type) {
         case INTEGER:
-            val = (Value) (val.intValue % atol(token + start));
+            val = (Value) (val.longValue % atol(token + start));
             break;
         case FLOAT:
             val = (Value) fmod(val.floatValue, atof(token + start));
@@ -430,8 +431,8 @@ void MODULO() {
             error("Invalid operand: '%s'", symbolcpy());
         case SYMBOL: {
             char* temp = symbolcpy();
-            val        = (Value) (val.intValue
-                           % lookup_or_error(env, temp)->value.intValue);
+            val        = (Value) (val.longValue
+                           % lookup_or_error(env, temp)->value.longValue);
             free(temp);
         }
     }
@@ -443,7 +444,7 @@ void MODULO() {
     scan_token_default(); \
     switch (token_type) { \
         case INTEGER: \
-            val = (Value) (val.intValue op atol(token + start)); \
+            val = (Value) (val.longValue op atol(token + start)); \
             break; \
         case FLOAT: \
             val = (Value) (val.floatValue op atof(token + start)); \
@@ -486,7 +487,7 @@ void MODULO_FLOAT() {
     scan_token_default();
     switch (token_type) {
         case INTEGER:
-            val = (Value) (val.intValue % atol(token + start));
+            val = (Value) (val.longValue % atol(token + start));
             break;
         case FLOAT:
             val = (Value) fmod(val.floatValue, atof(token + start));
@@ -514,19 +515,19 @@ void MODULO_FLOAT() {
     scan_token_default(); \
     switch (token_type) { \
         case INTEGER: \
-            val.intValue = val.intValue op atol(token + start); \
+            val.longValue = val.longValue op atol(token + start); \
             break; \
         case FLOAT: \
-            val.intValue = val.floatValue op atof(token + start); \
+            val.longValue = val.floatValue op atof(token + start); \
             break; \
         case CHAR: \
-            val.intValue = val.charValue op parse_char(token + start); \
+            val.longValue = val.charValue op parse_char(token + start); \
             break; \
         case QUOTE: \
             error("Invalid operand: '%s'", symbolcpy()); \
         case SYMBOL: \
-            val.intValue = val.intValue op lookup_or_error(env, symbolcpy()) \
-                               ->value.intValue; \
+            val.longValue = val.longValue op lookup_or_error(env, symbolcpy()) \
+                                ->value.longValue; \
     } \
     upsert(get_env(0), "_", val, NEITHER);
 
@@ -563,7 +564,7 @@ void AND() {
 }
 
 void NOT() {
-    long val = !lookup_or_error(env, "_")->value.intValue;
+    long val = !lookup_or_error(env, "_")->value.longValue;
     upsert(get_env(0), "_", (Value) val, NEITHER);
 }
 
@@ -610,11 +611,11 @@ void GOTO() {
             Entry* entry;
             char*  label = symbolcpy();
             for (; !(entry = lookup_here(env, label)); pop_scope())
-                if (lookup_or_error(env, "decrement-layer?")->value.intValue)
+                if (lookup_or_error(env, "decrement-layer?")->value.longValue)
                     layer_offset--;
             free(label);
             recover_state();
-            end = entry->value.intValue;
+            end = entry->value.longValue;
             break;
         }
     }
@@ -659,7 +660,7 @@ void SCAN_TOKEN() {
             error("Can only accept integers or symbols to integers.");
         case SYMBOL: {
             s     = symbolcpy();
-            layer = lookup_or_error(env, s)->value.intValue;
+            layer = lookup_or_error(env, s)->value.longValue;
             break;
         }
     }
@@ -667,8 +668,8 @@ void SCAN_TOKEN() {
     Dictionary* env_target = get_env(layer - layer_offset);
 
     char* inner_token = lookup_or_error(env_target, "token")->value.stringValue;
-    long  inner_start = lookup_or_error(env_target, "start")->value.intValue;
-    long  inner_end   = lookup_or_error(env_target, "end")->value.intValue;
+    long  inner_start = lookup_or_error(env_target, "start")->value.longValue;
+    long  inner_end   = lookup_or_error(env_target, "end")->value.longValue;
 
     long      inner_size = strlen(inner_token);
     TokenType inner_token_type;
@@ -704,7 +705,7 @@ void COPY_TOKEN() {
         case QUOTE:
             error("Can only accept integers or symbols to integers.");
         case SYMBOL: {
-            layer = lookup_or_error(env, symbolcpy())->value.intValue;
+            layer = lookup_or_error(env, symbolcpy())->value.longValue;
             break;
         }
     }
@@ -712,8 +713,8 @@ void COPY_TOKEN() {
     Dictionary* env_target = get_env(layer - layer_offset);
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
-    inner_start = lookup_or_error(env_target, "start")->value.intValue;
-    inner_end   = lookup_or_error(env_target, "end")->value.intValue;
+    inner_start = lookup_or_error(env_target, "start")->value.longValue;
+    inner_end   = lookup_or_error(env_target, "end")->value.longValue;
 
     Value val;
     val.stringValue = malloc((inner_end - inner_start) + 1);
@@ -907,13 +908,184 @@ void SYSCALL() {
     }
 
     long ret = syscall(
-        x16.intValue,
-        x[0].intValue,
-        x[1].intValue,
-        x[2].intValue,
-        x[3].intValue,
-        x[4].intValue,
-        x[5].intValue
+        x16.longValue,
+        x[0].longValue,
+        x[1].longValue,
+        x[2].longValue,
+        x[3].longValue,
+        x[4].longValue,
+        x[5].longValue
     );
     upsert(env, "_", (Value) ret, NEITHER);
+}
+
+void GET() {
+    scan_token_default();
+    char* temp;
+    char  bytes;
+    switch (token_type) {
+        case INTEGER:
+            temp  = symbolcpy();
+            bytes = atol(temp);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Can only accept integer or symbol to integer: '%s'",
+                symbolcpy()
+            );
+        case SYMBOL:
+            temp  = symbolcpy();
+            bytes = lookup_or_error(env, temp)->value.longValue;
+            break;
+    }
+    free(temp);
+
+    if (bytes - 1 && bytes - 2 && bytes - 4 && bytes - 8)
+        error("Invalid byte count, has to be a power of 2, max 8: '%i'", bytes);
+
+    scan_token_default();
+    Value val;
+    switch (token_type) {
+        void* ptr;
+        case INTEGER:
+            temp = symbolcpy();
+            ptr  = (void*) atol(temp);
+        int_label:
+            switch (bytes) {
+                case 1:
+                    val.charValue = *((char*) ptr);
+                    break;
+                case 2:
+                    val.shortValue = *((short*) ptr);
+                    break;
+                case 4:
+                    val.intValue = *((int*) ptr);
+                    break;
+                case 8:
+                    val.longValue = *((long*) ptr);
+                    break;
+            }
+            free(temp);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error("Can only get from a pointer: '%s'", symbolcpy());
+        case SYMBOL:
+            temp = symbolcpy();
+            ptr  = (void*) lookup_or_error(env, temp)->value.longValue;
+            goto int_label;
+    }
+    upsert(get_env(0), "_", val, NEITHER);
+}
+
+void SET() {
+    scan_token_default();
+    char* temp;
+    char  bytes;
+    switch (token_type) {
+        case INTEGER:
+            temp  = symbolcpy();
+            bytes = atol(temp);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Can only accept integer or symbol to integer: '%s'",
+                symbolcpy()
+            );
+        case SYMBOL:
+            temp  = symbolcpy();
+            bytes = lookup_or_error(env, temp)->value.longValue;
+            break;
+    }
+    free(temp);
+
+    if (bytes - 1 && bytes - 2 && bytes - 4 && bytes - 8)
+        error("Invalid byte count, has to be a power of 2, max 8: '%i'", bytes);
+
+    scan_token_default();
+    void* ptr;
+    switch (token_type) {
+        case INTEGER:
+            temp = symbolcpy();
+            ptr  = (void*) atol(temp);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error("Can only set a pointer: '%s'", symbolcpy());
+        case SYMBOL:
+            temp = symbolcpy();
+            ptr  = (void*) lookup_or_error(env, temp)->value.longValue;
+    }
+    free(temp);
+
+    scan_token_default();
+    switch (token_type) {
+        long n;
+        case INTEGER: {
+            n = atol(token + start);
+        int_label:
+            switch (bytes) {
+                case 1:
+                    *((char*) ptr) = n;
+                    break;
+                case 2:
+                    *((short*) ptr) = n;
+                    break;
+                case 4:
+                    *((int*) ptr) = n;
+                    break;
+                case 8:
+                    *((long*) ptr) = n;
+                    break;
+            }
+            break;
+        }
+        case FLOAT:
+            switch (bytes) {
+                double n = atof(token + start);
+                case 4:
+                    *((float*) ptr) = n;
+                    break;
+                case 8:
+                    *((double*) ptr) = n;
+                    break;
+                default:
+                    error(
+                        "Can only set 4 and 8 bytes for a float: '%i\n",
+                        bytes
+                    );
+            }
+            break;
+        case CHAR: {
+            char c = parse_char(token + start);
+            switch (bytes) {
+                case 1:
+                    *((char*) ptr) = c;
+                    break;
+                case 2:
+                    *((short*) ptr) = c;
+                    break;
+                case 4:
+                    *((int*) ptr) = c;
+                    break;
+                case 8:
+                    *((long*) ptr) = c;
+                    break;
+            }
+            break;
+        }
+        case QUOTE:
+            error("Can only set a pointer with a scalar: '%s'", symbolcpy());
+        case SYMBOL:
+            temp = symbolcpy();
+            n    = lookup_or_error(env, temp)->value.longValue;
+            free(temp);
+            goto int_label;
+    }
 }

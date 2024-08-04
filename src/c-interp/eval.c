@@ -19,7 +19,7 @@ void eval() {
     Value val;
     switch (token_type) {
         case INTEGER:
-            val.intValue = atoi(token + start);
+            val.longValue = atoi(token + start);
             upsert(get_env(0), "_", val, NEITHER);
             break;
         case FLOAT:

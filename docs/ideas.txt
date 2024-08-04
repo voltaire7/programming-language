@@ -1803,4 +1803,10 @@ delete-struct [test]
 
 [Damn, that's right. I can't rename [.intValue] to [.int] because C is a pain in the ass sometimes]
 
+[Even if a procedure ends in an infinite loop, or jumps to another procedure to finish, I should
+still have a [ret] instruction at the end. Otherwise, there is no way of calculating the length of
+a procedure.]
+
+[I should try implementing this thing (😂) eventually. I think it's called UTF-8?]
+
 

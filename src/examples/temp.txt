@@ -8,8 +8,13 @@ proc [] [
 
 [+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
-proc [] [print [hello\n]] as [say-hello]
-say-hello
-item [x] [say-hello]
-delete say-hello
-say-hello
+item [str] [Hello, World!\n]
+1 + str
+get 1 _
+print [%c\n] _
+8 + str [why?? I didn't add any feature for this!]
+item [x] '5'
+set 1 _ x
+print str
+
+
