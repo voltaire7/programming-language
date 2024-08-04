@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ttycom.h>
 
 #include "env.h"
 #include "eval.h"
@@ -38,7 +39,8 @@ void PRINT() {
             putchar(parse_char(token + start));
             break;
         case QUOTE:
-            s = quotecpy();
+            s       = quotecpy();
+            bool fr = 1;
         quote:
             process_str(s);
             for (int i = 0; s[i] != '\0'; i++) {
@@ -94,7 +96,7 @@ void PRINT() {
                 } else
                     putchar(s[i]);
             }
-            free(s);
+            if (fr) free(s);
             break;
         case SYMBOL: {
             char* temp = symbolcpy();

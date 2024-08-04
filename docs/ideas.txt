@@ -1809,4 +1809,9 @@ a procedure.]
 
 [I should try implementing this thing (😂) eventually. I think it's called UTF-8?]
 
+[Alright. So I thought about this stupid shit for a while now, and this [ioctl] thing is now really
+what I want. Instead of banging my head against a wall, I'll just disable canonical mode...]
+[Shit, I just found out that disabling canonical mode requires me to use [ioctl]. Well that's
+embarrassing. I should probably remove this piece of text... Later. Too lazy right now.]
+
 

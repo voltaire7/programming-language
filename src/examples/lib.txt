@@ -84,6 +84,10 @@ item [stdin]  0
 item [stdout] 1
 item [stderr] 2
 
+item [SYS_EXIT]  1
+item [SYS_READ]  3
+item [SYS_WRITE] 4
+
 proc [exit-code] [
     syscall 1 [exit-code]
 ] as [exit]

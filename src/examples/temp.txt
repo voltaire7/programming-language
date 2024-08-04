@@ -41,19 +41,29 @@ proc [] [
 
 [+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
-item [buf] [                                                                                                 ]
+item [buf] [ ]
+item [prompt] [>>> ]
 item [layer] 0
+item [i] -1
+item [code] [                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ]
 
 label [top]
 
-read stdin buf 1 ! ? [exit 0] [] print [ret: %i\n] _
-get 1 buf as [c] != '\n' ? [
-    -1 == c ? [print [yes\n]] [print [no\n]]
-    '[' == c ? [1 + layer as [layer]] [']' == c ? [-1 + layer as [layer]] []]
+read 0 buf 1 ! ? [exit 0] []
+get 1 buf as [c]
+write 1 buf 1
+'[' == c ? [1 + layer as [layer]] [']' == c ? [-1 + layer as [layer]] []]
 
-    0 == layer ? [] []
+1 + i as [i] + code set 1 _ c + 1 set 1 _ '\0'
+
+    print [error, too big: %i\n] i
+    syscall 54 [0 2147775504] print [ret: %i\n] _
+    exit 1
+
+
+'\n' == c as [b1] 0 == layer && b1 ? [
+    print [code: '%s'\n] code
 ] []
 
-goto top
 
 
