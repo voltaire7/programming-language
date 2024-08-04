@@ -47,4 +47,11 @@ void SYSCALL();
 void GET();
 void SET();
 
+void BIT_AND();
+void BIT_OR();
+void BIT_XOR();
+void BIT_NOT();
+void BIT_SHIFTL();
+void BIT_SHIFTR();
+
 #endif

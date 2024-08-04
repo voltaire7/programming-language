@@ -53,4 +53,11 @@ void setup() {
 
     UPSERT("get", GET)
     UPSERT("set", SET)
+
+    UPSERT("&", BIT_AND)
+    UPSERT("|", BIT_OR)
+    UPSERT("^", BIT_XOR)
+    UPSERT("~", BIT_NOT)
+    UPSERT("<<", BIT_SHIFTL)
+    UPSERT(">>", BIT_SHIFTR)
 }

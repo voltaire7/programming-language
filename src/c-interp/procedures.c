@@ -1091,3 +1091,15 @@ void SET() {
             goto int_label;
     }
 }
+
+void BIT_AND() {}
+
+void BIT_OR() {}
+
+void BIT_XOR() {}
+
+void BIT_NOT() {}
+
+void BIT_SHIFTL() {}
+
+void BIT_SHIFTR() {}

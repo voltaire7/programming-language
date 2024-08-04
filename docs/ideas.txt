@@ -1814,4 +1814,11 @@ what I want. Instead of banging my head against a wall, I'll just disable canoni
 [Shit, I just found out that disabling canonical mode requires me to use [ioctl]. Well that's
 embarrassing. I should probably remove this piece of text... Later. Too lazy right now.]
 
+[I should have to do this]
+1 == 1 as [b1] 2 == b && b1 ? [] []
+[[b1] should have been pushed on the stack, and the result of [2 == b] as well. [&&] would have
+popped them.]
+
+[I should add the ability to memoize procedures.]
+
 

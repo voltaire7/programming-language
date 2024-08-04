@@ -9,18 +9,18 @@ todo:
 [+] syscall
 [+] char types
 [+] get, set
+[ ] bitwise operators
+[ ] malloc, free, etc.
+[ ] struct and object
+[-] repl
 [ ] pop-scope, restore-state, etc.
 [ ] defer
-[ ] repl
 [ ] bin-exec
-[ ] more print %
-[ ] struct and object
+[ ] more prints %
 [ ] load and import (file open, do-here)
 [ ] format
-[ ] malloc, free, etc.
 [ ] assembly
 [ ] compile
-[ ] bitwise operators
 [ ] debugger
 [ ] std lib
 [ ] interop with C
@@ -28,5 +28,8 @@ todo:
 [ ] lsp
 [ ] plugins
 [-] better errors
+[ ] memoize
+[ ] switch endian
+[ ] inline
 
 
