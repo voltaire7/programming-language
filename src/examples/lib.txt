@@ -6,6 +6,12 @@ proc [symbol] [
     item-in 1 symbol _
 ] item-in 0 [as] _
 
+proc [layer symbol] [
+    item-in 0 [val] _
+    1 + layer
+    item-in _ symbol val
+] as [as-in]
+
 proc [] [
     item-in 1 [_]
 ] as [ch]
@@ -101,5 +107,19 @@ proc [fd buf nbytes] [
     syscall 4 [fd buf nbytes]
     return _
 ] as [write]
+
+[-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
+[ TEXT                                                                                            ]
+[-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
+
+proc [dest src] [
+    loop [
+        get 1 src set 1 dest _
+        1 + src as [src]
+        1 + dest as-in 1 [dest]
+        get 1 src
+    ]
+    set 1 dest '\0'
+] as [strcpy]
 
 

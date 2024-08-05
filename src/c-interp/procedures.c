@@ -30,6 +30,7 @@ void PRINT() {
     char* s;
     scan_token_default();
 
+    printf("%i", 2);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -154,8 +155,10 @@ void PROC() {
             keys = quotecpy();
             break;
         case SYMBOL: {
-            keys = symbolcpy();
-            strcpy(keys, lookup_or_error(env, keys)->value.stringValue);
+            char*  temp  = symbolcpy();
+            Entry* entry = lookup_or_error(env, temp);
+            strcpy(keys, entry->value.stringValue);
+            free(temp);
             break;
         }
     }
@@ -229,9 +232,11 @@ void ITEM_IN() {
             keys = quotecpy();
             break;
         case SYMBOL: {
-            char* temp = symbolcpy();
-            keys       = lookup_or_error(env, temp)->value.stringValue;
+            char* temp  = symbolcpy();
+            char* temp2 = lookup_or_error(env, temp)->value.stringValue;
             free(temp);
+            keys = malloc(sizeof(temp2));
+            strcpy(keys, temp2);
             break;
         }
     }
@@ -267,16 +272,17 @@ void ITEM_IN() {
                 val = (Value) quotecpy();
                 break;
             case SYMBOL: {
+                char*  temp = symbolcpy();
                 Entry* entry;
-                entry = lookup_or_error(env, symbolcpy());
-                val   = (Value) entry->value.pointerValue;
-                type  = entry->type;
+                entry = lookup_or_error(env, temp);
+                free(temp);
+                val  = (Value) entry->value.pointerValue;
+                type = entry->type;
                 break;
             }
         }
         upsert(env_target, key, val, type);
     }
-
     free(keys);
 }
 
@@ -333,7 +339,9 @@ void ITER() {
             s = quotecpy();
             break;
         case SYMBOL: {
-            s = lookup_or_error(env, symbolcpy())->value.stringValue;
+            char* temp = symbolcpy();
+            s          = lookup_or_error(env, temp)->value.stringValue;
+            free(temp);
             break;
         }
     }
@@ -564,6 +572,8 @@ void OR() {
 void AND() {
     BOOLEAN(&&)
 }
+
+#undef BOOLEAN
 
 void NOT() {
     long val = !lookup_or_error(env, "_")->value.longValue;

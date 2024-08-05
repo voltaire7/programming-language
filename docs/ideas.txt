@@ -1821,4 +1821,27 @@ popped them.]
 
 [I should add the ability to memoize procedures.]
 
+[I should, I should, I should... I should stop saying 'I should'.]
+
+[I should write a vim like text editor, where in normal mode, the cursor hovering over a symbol
+executes said proc. And when the procedure get executed, there is a cool effect with colors showing
+that the code is being executed.]
+
+[Instead of [item-in], I could do [=+]]
+=    [pi] 3.14159
+=+ 1 [pi] 3.14159
+[whatever.]
+
+[wait, could [_] be the stack pointer?]
+[when you lookup a value, you should really be getting a pointer to it. you know [table + hash]]
+[wait no.]
+
+[Okay, so I took a shower, and thought a little: I want procedures to be compiled. If I keep
+implementing features the interpreted way, it will become harder and harder to migrate; and
+honestly, runtime procedure compilation is one of the main features of this language. I have to get
+to it.]
+
+[I think I'm going insane. I don't how symbol can override the outer value... And why printf not
+print until a newline is shown??]
+
 

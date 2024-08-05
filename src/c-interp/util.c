@@ -122,6 +122,9 @@ void process_str(char* s) {
                 case 'n':
                     s[j] = '\n';
                     break;
+                case 't':
+                    s[j] = '\t';
+                    break;
                 case '[':
                     s[j] = '[';
                     break;
