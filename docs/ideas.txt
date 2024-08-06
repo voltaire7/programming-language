@@ -1857,4 +1857,14 @@ a defined size, and assigns it to [_].]
 [Damn, I don't know how to add things to the stack with all these function calls...]
 [I need to think.]
 
+[This may be a long shot, but I thing I need to rewrite the whole thing in assembly... Wait no, I
+can just use -S!]
+
+[Okay... I have to spend a long time trying to understand and trim the assembly code.]
+
+[Dear lord... This is so hard. The more I think about it, the more difficult it seems to be...]
+
+[You know what? One problem at a time. I'll start by figuring out how to read a file and then print
+it.]
+
 
