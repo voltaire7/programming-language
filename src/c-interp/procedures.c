@@ -1201,7 +1201,8 @@ void EXEC() {
                 symbolcpy()
             );
         case QUOTE:
-            from_str(quotecpy(), &size, base, 'E');
+            val.stringValue = quotecpy();
+            from_str(val.stringValue, &size, base, 'E');
             break;
         case SYMBOL: {
             char* temp = symbolcpy();
