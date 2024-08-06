@@ -1165,29 +1165,52 @@ void BIT_SHIFTR() {
     BIT_OPERATORS(>>)
 }
 
-void BIN_EXEC() {
+void EXEC() {
+    scan_token_default();
+    char base;
+    switch (token_type) {
+        case INTEGER:
+            base = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Can only accept integers or symbols to intergers: '%s'",
+                symbolcpy()
+            );
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            base       = lookup_or_error(env, temp)->value.charValue;
+            free(temp);
+            break;
+        }
+    }
+
+    if (base != 2 && base != 16) error("Unsupported base: '%i'", base);
+
     scan_token_default();
     Value val;
-    char* temp;
     int   size;
     switch (token_type) {
         case INTEGER:
-            val.longValue = atoi(token + start);
-            break;
         case FLOAT:
-            val.floatValue = atof(token + start);
-            break;
         case CHAR:
-            error("Can execute a character: '%c'", quotecpy());
+            error(
+                "Can only accept quotes or symbols to quotes: '%s'",
+                symbolcpy()
+            );
         case QUOTE:
-            val.pointerValue = from_str(quotecpy(), &size, 2, 'E');
+            from_str(quotecpy(), &size, base, 'E');
             break;
-        case SYMBOL:
-            temp        = symbolcpy();
-            char* temp2 = strdup(lookup_or_error(env, temp)->value.stringValue);
-            val.pointerValue = from_str(temp2, &size, 2, 'E');
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            val.stringValue =
+                strdup(lookup_or_error(env, temp)->value.stringValue);
             free(temp);
+            from_str(val.stringValue, &size, base, 'E');
             break;
+        }
     }
 
     execute(val.pointerValue, size);

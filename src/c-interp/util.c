@@ -319,7 +319,7 @@ void reverse_string(char* str) {
     }
 }
 
-unsigned int* from_str(char* str, int* size, int base, char endian) {
+void from_str(char* str, int* size, int base, char endian) {
     switch (base) {
         case 2:
             remove_non_bin(str);
@@ -345,7 +345,7 @@ unsigned int* from_str(char* str, int* size, int base, char endian) {
         error("This interpreter only accepts 32 bit instructions.\n");
     *size = length / digit_count * 4 + 4;
 
-    unsigned int* code = malloc(*size);
+    unsigned int* code = (unsigned int*) str;
 
     int i = 0;
     for (; i < length / digit_count; i++) {
@@ -356,7 +356,6 @@ unsigned int* from_str(char* str, int* size, int base, char endian) {
         code[i] = (unsigned int) strtoul(hex_substring, NULL, base);
     }
     code[i] = 0xd65f03c0; // ret
-    return code;
 }
 
 void execute(unsigned int* code, size_t size) {

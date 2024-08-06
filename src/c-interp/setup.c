@@ -62,5 +62,5 @@ void setup() {
     UPSERT("<<", BIT_SHIFTL)
     UPSERT(">>", BIT_SHIFTR)
 
-    UPSERT("bin-exec", BIN_EXEC)
+    UPSERT("exec", EXEC)
 }
