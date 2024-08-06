@@ -342,7 +342,13 @@ void from_str(char* str, int* size, int base, char endian) {
     int length      = strlen(str);
     int digit_count = ceil(log(pow(2, 32) - 1) / log(base));
     if (length % digit_count != 0 || length == 0)
-        error("This interpreter only accepts 32 bit instructions.\n");
+        error(
+            "Digit count to base mismatch: (length) %i %% (digits per "
+            "instructions) %i = %i",
+            length,
+            digit_count,
+            length % digit_count
+        );
     *size = length / digit_count * 4 + 4;
 
     unsigned int* code = (unsigned int*) str;
