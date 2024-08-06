@@ -61,4 +61,6 @@ void setup() {
     UPSERT("~", BIT_NOT)
     UPSERT("<<", BIT_SHIFTL)
     UPSERT(">>", BIT_SHIFTR)
+
+    UPSERT("bin-exec", BIN_EXEC)
 }

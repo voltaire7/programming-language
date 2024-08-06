@@ -23,4 +23,7 @@ long syscall(long x16, long x0, long x1, long x2, long x3, long x4, long x5);
 char parse_char(char* c);
 int  count_layers();
 
+unsigned int* from_str(char* str, int* size, int base, char endian);
+void          execute(unsigned int* code, size_t size);
+
 #endif

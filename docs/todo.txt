@@ -10,7 +10,7 @@ todo:
 [+] char types
 [+] get, set
 [+] bitwise operators
-[ ] bin-exec
+[+] bin-exec
 [ ] 123u32, 4.3f64, 0xFFF, etc.
 [ ] simulated stack?
 [ ] malloc, free, etc.

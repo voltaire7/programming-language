@@ -54,4 +54,6 @@ void BIT_NOT();
 void BIT_SHIFTL();
 void BIT_SHIFTR();
 
+void BIN_EXEC();
+
 #endif

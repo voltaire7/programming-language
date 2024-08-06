@@ -1,8 +1,10 @@
 #include <ctype.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include "env.h"
 #include "scan-token.h"
@@ -279,4 +281,97 @@ int count_layers() {
         temp = temp->next;
     }
     return count;
+}
+
+void remove_non_bin(char* str) {
+    int i, j = 0;
+    for (i = 0; str[i] != '\0'; i++) {
+        if (str[i] == '0' || str[i] == '1') {
+            str[j++] = str[i];
+        }
+    }
+    str[j] = '\0';
+}
+
+void remove_non_hex(char* str) {
+    int i, j = 0;
+    for (i = 0; str[i] != '\0'; i++) {
+        if ((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'a' && str[i] <= 'f')
+            || (str[i] >= 'A' && str[i] <= 'F')) {
+            str[j++] = str[i];
+        }
+    }
+    str[j] = '\0';
+}
+
+void reverse_string(char* str) {
+    int length = strlen(str);
+    int start  = 0;
+    int end    = length - 1;
+
+    while (start < end) {
+        char temp  = str[start];
+        str[start] = str[end];
+        str[end]   = temp;
+
+        start++;
+        end--;
+    }
+}
+
+unsigned int* from_str(char* str, int* size, int base, char endian) {
+    switch (base) {
+        case 2:
+            remove_non_bin(str);
+            break;
+        case 16:
+            remove_non_hex(str);
+            break;
+        default:
+            error("Unsupported base: '%d'\n", base);
+    }
+
+    if (endian == 'e') {
+        reverse_string(str);
+    } else if (endian != 'E')
+        error(
+            "Endian ('e' for little or 'E' for big) not specified: '%c'",
+            endian
+        );
+
+    int length      = strlen(str);
+    int digit_count = ceil(log(pow(2, 32) - 1) / log(base));
+    if (length % digit_count != 0 || length == 0)
+        error("This interpreter only accepts 32 bit instructions.\n");
+    *size = length / digit_count * 4 + 4;
+
+    unsigned int* code = malloc(*size);
+
+    int i = 0;
+    for (; i < length / digit_count; i++) {
+        char hex_substring[digit_count + 1];
+        strncpy(hex_substring, &str[i * digit_count], digit_count);
+        hex_substring[digit_count] = '\0';
+
+        code[i] = (unsigned int) strtoul(hex_substring, NULL, base);
+    }
+    code[i] = 0xd65f03c0; // ret
+    return code;
+}
+
+void execute(unsigned int* code, size_t size) {
+    int (*addr)() = NULL;
+    addr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (addr == MAP_FAILED) {
+        perror("mmap");
+    }
+    memcpy(addr, code, size);
+    if (mprotect(addr, size, PROT_EXEC) == -1) {
+        perror("mprotect");
+    }
+
+    addr();
+
+    free(code);
+    munmap(addr, size);
 }

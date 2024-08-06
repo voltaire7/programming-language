@@ -1164,3 +1164,31 @@ void BIT_SHIFTL() {
 void BIT_SHIFTR() {
     BIT_OPERATORS(>>)
 }
+
+void BIN_EXEC() {
+    scan_token_default();
+    Value val;
+    char* temp;
+    int   size;
+    switch (token_type) {
+        case INTEGER:
+            val.longValue = atoi(token + start);
+            break;
+        case FLOAT:
+            val.floatValue = atof(token + start);
+            break;
+        case CHAR:
+            error("Can execute a character: '%c'", quotecpy());
+        case QUOTE:
+            val.pointerValue = from_str(quotecpy(), &size, 2, 'E');
+            break;
+        case SYMBOL:
+            temp        = symbolcpy();
+            char* temp2 = strdup(lookup_or_error(env, temp)->value.stringValue);
+            val.pointerValue = from_str(temp2, &size, 2, 'E');
+            free(temp);
+            break;
+    }
+
+    execute(val.pointerValue, size);
+}
