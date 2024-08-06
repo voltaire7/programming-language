@@ -1854,4 +1854,7 @@ enter another command.]
 [Just as there is a [push arg-count], there's also a [pop size] that pops the stack for a value of
 a defined size, and assigns it to [_].]
 
+[Damn, I don't know how to add things to the stack with all these function calls...]
+[I need to think.]
+
 

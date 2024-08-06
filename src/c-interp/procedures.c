@@ -1234,7 +1234,7 @@ void DEBUG_PROC() {
     }
 
     do {
-        printf("%x\n", *proc);
+        printf("%lx: %x\n", (long) proc, *proc);
     } while (*proc++ != 0xd65f03c0);
 }
 
