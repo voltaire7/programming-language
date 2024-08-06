@@ -7,6 +7,7 @@ Dictionary* env;
 
 void setup() {
     env = create_dictionary();
+    upsert(env, "decrement-layer?", (Value) 0, NEITHER);
 
     UPSERT("print", PRINT)
     UPSERT("free", FREE)

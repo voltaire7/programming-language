@@ -30,7 +30,6 @@ void PRINT() {
     char* s;
     scan_token_default();
 
-    printf("%i", 2);
     switch (token_type) {
         case INTEGER:
         case FLOAT:
@@ -128,9 +127,12 @@ void DO() {
         case QUOTE:
             push_scope(quotecpy());
             break;
-        case SYMBOL:
-            push_scope(lookup_or_error(env, symbolcpy())->value.stringValue);
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            push_scope(lookup_or_error(env, temp)->value.stringValue);
+            free(temp);
             break;
+        }
     }
     upsert(env, "decrement-layer?", (Value) 0l, NEITHER);
 }
@@ -360,6 +362,7 @@ void ITER() {
         save_state();
         push_scope(s);
         upsert(env, symbol, (Value) key, NEITHER);
+        upsert(env, "decrement-layer?", (Value) 0, NEITHER);
         scan_token_default();
         while (token == s) {
             eval();
@@ -601,7 +604,7 @@ void LABEL() {
             break;
         }
     }
-    upsert(get_env(0 - layer_offset), name, (Value) end, NEITHER);
+    upsert(get_env(0), name, (Value) end, NEITHER);
 }
 
 void GOTO() {
@@ -673,11 +676,16 @@ void SCAN_TOKEN() {
         case SYMBOL: {
             s     = symbolcpy();
             layer = lookup_or_error(env, s)->value.longValue;
+            free(s);
             break;
         }
     }
 
-    Dictionary* env_target = get_env(layer - layer_offset);
+    Dictionary* env_target = env;
+    for (int i = layer; i; i--) {
+        if (!env_target->next) error("The scope does not exist: %i\n", layer);
+        env_target = env_target->next;
+    }
 
     char* inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     long  inner_start = lookup_or_error(env_target, "start")->value.longValue;
@@ -722,7 +730,11 @@ void COPY_TOKEN() {
         }
     }
 
-    Dictionary* env_target = get_env(layer - layer_offset);
+    Dictionary* env_target = env;
+    for (int i = layer; i; i--) {
+        if (!env_target->next) error("The scope does not exist: %i\n", layer);
+        env_target = env_target->next;
+    }
 
     inner_token = lookup_or_error(env_target, "token")->value.stringValue;
     inner_start = lookup_or_error(env_target, "start")->value.longValue;
@@ -774,7 +786,7 @@ void PARSE() {
             break;
         }
         case SYMBOL: {
-            Entry* entry = lookup_or_error(env, val.stringValue);
+            Entry* entry = lookup_or_error(env->next, val.stringValue);
             upsert(env, "_", (Value) entry->value.procedureValue, entry->type);
             return;
         }

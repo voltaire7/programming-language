@@ -7,7 +7,7 @@ proc [symbol] [
 ] item-in 0 [as] _
 
 proc [layer symbol] [
-    item-in 0 [val] _
+    as [val]
     1 + layer
     item-in _ symbol val
 ] as [as-in]
@@ -23,6 +23,17 @@ proc [] [
 proc [] [
     item-in 2 [_]
 ] as [return]
+
+proc [offset size ptr] [
+    ch offset + ptr
+    get size _
+    return _
+] as [get-at]
+
+proc [offset size ptr val] [
+    ch offset + ptr
+    set size _ val
+] as [set-at]
 
 [-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
 [ I/O
@@ -113,13 +124,14 @@ proc [fd buf nbytes] [
 [-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
 
 proc [dest src] [
+    item [i] 0
+    get 1 src
     loop [
-        get 1 src set 1 dest _
-        1 + src as [src]
-        1 + dest as-in 1 [dest]
-        get 1 src
+        set-at i 1 dest _
+        1 + i as-in 1 [i]
+        get-at i 1 src
     ]
-    set 1 dest '\0'
+    set-at i 1 dest '\0'
 ] as [strcpy]
 
 

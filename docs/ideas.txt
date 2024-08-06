@@ -1844,4 +1844,8 @@ to it.]
 [I think I'm going insane. I don't how symbol can override the outer value... And why printf not
 print until a newline is shown??]
 
+[Maybe for the editor thing, the cursor also move along. When finished, it's in position for you do enter another command.]
+
+[I'm adding features as I need them.]
+
 

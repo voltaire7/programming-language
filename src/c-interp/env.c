@@ -140,11 +140,11 @@ void free_dictionary(Dictionary* dict) {
 void save_state() {
     Value val;
     val.stringValue = token;
-    upsert(env, "token", val, STRING);
+    upsert(env, "token", val, NEITHER);
     val.longValue = start;
-    upsert(env, "start", val, STRING);
+    upsert(env, "start", val, NEITHER);
     val.longValue = end;
-    upsert(env, "end", val, STRING);
+    upsert(env, "end", val, NEITHER);
 }
 
 void update_code(char* code) {

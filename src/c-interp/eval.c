@@ -32,7 +32,9 @@ void eval() {
         case QUOTE:
             break;
         case SYMBOL: {
-            Entry* entry = lookup_or_error(env, symbolcpy());
+            char*  temp  = symbolcpy();
+            Entry* entry = lookup_or_error(env, temp);
+            free(temp);
             if (entry->type == PROCEDURE)
                 entry->value.procedureValue();
             else if (entry->type == STRING) {

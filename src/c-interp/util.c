@@ -150,10 +150,41 @@ void concat(char** dest, const char* src) {
 
 Dictionary* get_env(int layer) {
     Dictionary* env_target = env;
-    for (int i = layer + layer_offset; i != 0; i--) {
+
+    int i = layer;
+
+    Entry* entry = lookup_here(env_target, "decrement-layer?");
+    if (entry == NULL) error("'decrement-layer?' is undefined.");
+    if (entry->value.intValue) i++;
+
+    if (i) {
+        env_target = env_target->next;
+        if (env_target == NULL) error("Non existent scope: %d", layer);
+        i--;
+    }
+
+    for (; i != 0; i--) {
+        entry = lookup_here(env_target, "decrement-layer?");
+        if (entry == NULL) error("'decrement-layer?' is undefined.");
+        if (entry->value.intValue) i++;
+
         env_target = env_target->next;
         if (env_target == NULL) error("Non existent scope: %d", layer);
     }
+
+    entry = lookup_here(env_target, "decrement-layer?");
+    if (entry == NULL) error("'decrement-layer?' is undefined.");
+    if (entry->value.intValue) i++;
+
+    while (i--) {
+        env_target = env_target->next;
+        if (env_target == NULL) error("Non existent scope: %d", layer);
+
+        entry = lookup_here(env_target, "decrement-layer?");
+        if (entry == NULL) error("'decrement-layer?' is undefined.");
+        if (entry->value.intValue) i++;
+    }
+
     return env_target;
 }
 
@@ -238,4 +269,14 @@ char parse_char(char* c) {
                 error("Unknown character: '%s'", c[1]);
         };
     return c[1];
+}
+
+int count_layers() {
+    int         count = 0;
+    Dictionary* temp  = env;
+    while (temp != NULL) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
 }
