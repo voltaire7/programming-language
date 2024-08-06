@@ -63,4 +63,5 @@ void setup() {
     UPSERT(">>", BIT_SHIFTR)
 
     UPSERT("exec", EXEC)
+    UPSERT("debug-proc", DEBUG_PROC)
 }

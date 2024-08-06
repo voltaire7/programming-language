@@ -1216,3 +1216,32 @@ void EXEC() {
 
     execute(val.pointerValue, size);
 }
+
+void DEBUG_PROC() {
+    scan_token_default();
+    int* proc;
+    switch (token_type) {
+        case INTEGER:
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error("Can only debug a symbol to a procedure: '%s'", symbolcpy());
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            proc       = lookup_or_error(env, temp)->value.pointerValue;
+            break;
+        }
+    }
+
+    do {
+        printf("%x\n", *proc);
+    } while (*proc++ != 0xd65f03c0);
+}
+
+void REDUCE() {}
+
+void PUSH() {}
+
+void POP() {}
+
+void PROC2() {}

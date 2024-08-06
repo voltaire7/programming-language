@@ -55,5 +55,6 @@ void BIT_SHIFTL();
 void BIT_SHIFTR();
 
 void EXEC();
+void DEBUG_PROC();
 
 #endif
