@@ -351,7 +351,7 @@ void from_str(char* str, int* size, int base, char endian) {
         );
     *size = length / digit_count * 4 + 4;
 
-    unsigned int* code = (unsigned int*) str;
+    unsigned* code = (unsigned*) str;
 
     int i = 0;
     for (; i < length / digit_count; i++) {
@@ -359,12 +359,12 @@ void from_str(char* str, int* size, int base, char endian) {
         strncpy(hex_substring, &str[i * digit_count], digit_count);
         hex_substring[digit_count] = '\0';
 
-        code[i] = (unsigned int) strtoul(hex_substring, NULL, base);
+        code[i] = (unsigned) strtoul(hex_substring, NULL, base);
     }
     code[i] = 0xd65f03c0; // ret
 }
 
-void execute(unsigned int* code, size_t size) {
+void execute(unsigned* code, size_t size) {
     int (*addr)() = NULL;
     addr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (addr == MAP_FAILED) {

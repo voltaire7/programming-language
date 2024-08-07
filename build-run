@@ -21,7 +21,7 @@ switch $command
         zig cc -g src/c-interp/main.c src/c-interp/util.c src/c-interp/env.c src/c-interp/procedures.c src/c-interp/scan-token.c -Wno-deprecated-declarations -Werror
         ./a.out $args
     case s-interp
-        cc -g src/s-interp/main.s
+        cc -g src/s-interp/main.s src/s-interp/syscall.s
         ./a.out $args
     case '*'
         echo "Unknown command: $command"
