@@ -765,7 +765,6 @@ void PARSE() {
             val.stringValue = lookup_or_error(env, symbol)->value.stringValue;
             break;
     }
-    free(symbol);
 
     TokenType type = type_of(val.stringValue);
     switch (type) {
@@ -786,11 +785,13 @@ void PARSE() {
             break;
         }
         case SYMBOL: {
-            Entry* entry = lookup_or_error(env->next, val.stringValue);
+            Entry* entry =
+                lookup_or_error(env->next ? env->next : env, val.stringValue);
             upsert(env, "_", (Value) entry->value.procedureValue, entry->type);
             return;
         }
     }
+    free(symbol);
     upsert(env, "_", val, NEITHER);
 }
 

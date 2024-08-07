@@ -1914,4 +1914,19 @@ FFF:x
 2134.4:8
 [Okay. I think that's good.]
 
+[also]
+255:1 == -1:1
+
+[it kind of looks like a ratio... anyway, I like how it throws the syntax of other languages like
+rust on their head:]
+let n: u8 = 42;
+item [n] 42:1
+
+[Maybe I should also allow this:]
+item '[' [...]
+[I don't know... exactly how I'll implement this, but it sounds like a fun idea.]
+[I can even do this!]
+item ' ' [...]
+[Muahahahaha!]
+
 

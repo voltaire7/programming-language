@@ -1,4 +1,5 @@
-45.5 + 2.
-print [%f\n] _
+item-in 0 [_] [_]
+parse _
+print _
 
 
