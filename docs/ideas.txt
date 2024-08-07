@@ -1867,4 +1867,30 @@ can just use -S!]
 [You know what? One problem at a time. I'll start by figuring out how to read a file and then print
 it.]
 
+[I won't be getting very far without knowing how define malloc and free...]
+
+[I'm going to do assembly in the new directory I created, but I will also do the interpreted
+version. Instead of using the actually stack, though, I will create my own. If I don't do that...
+My progress may lag too hard...]
+
+[A lot of procedure have optionnal arguments?]
+compile main
+compile: [executable-type mach-o] main
+[or]
+item [args] [executable-type mach-o]
+compile: args main
+
+[heh.]
+1u64  [x16]
+42u64 [x0]
+4 + syscall _
+[skip [push n]]
+
+[I guess I don't really need a distinction between [i64] and [u64]?]
+
+[Shit, I was talking about push n and stuff, but how do I do this??]
+syscall 1 [0]
+[I guess I just put the pointer on the stack, and inside the [syscall] procedure, I'm extracting
+the info... But that had to be at runtime. Otherwise it will be too slow.]
+
 
