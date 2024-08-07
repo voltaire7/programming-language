@@ -1,32 +1,42 @@
 .global _main
 .align 2
 
-// entry point of the application
 _main:
+    // open
+    adr x0,  str
+    mov x1,  2
+    mov x16, 5
+    svc 0
+    mov x9, x0
+
+    // read
+    adrp x1, _buf@PAGE
+    add x1,  x1, _buf@PAGEOFF
+    mov x8,  x1
+    mov x2,  4096
+    mov x16, 3
+    svc 0
+
     // write
+    mov x2,  x0
     mov x0,  1
-    adr x1,  str
-    mov x2,  str_len
+    mov x1,  x8
     mov x16, 4
     svc 0
 
-    // prepare syscall
-    sub sp, sp, 64
-    mov x0, 1
-    str x0, [sp]
-    mov x0, 55
-    str x0, [sp, 8]
-
-    // call syscall
-    bl _syscall
+    // close
+    mov x0,  x9
+    mov x16, 6
+    svc 0
 
     // exit
-    mov x0,  0
     mov x16, 1
     svc 0
 
-// data
-str:      .asciz  "src/examples/temp.txt\n"
+str:      .ascii  "src/examples/temp.txt"
 str_len = . - str
+
+.globl _buf
+.zerofill __DATA, __common, _buf, 4096, 0
 
 

@@ -1893,4 +1893,10 @@ syscall 1 [0]
 [I guess I just put the pointer on the stack, and inside the [syscall] procedure, I'm extracting
 the info... But that had to be at runtime. Otherwise it will be too slow.]
 
+[[syscall] should be a macro for inline asm.]
+mov x0,  0
+mov x16, 1
+svc 0
+[^ too short for a procedure call.]
+
 
