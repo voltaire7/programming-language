@@ -1899,4 +1899,19 @@ mov x16, 1
 svc 0
 [^ too short for a procedure call.]
 
+[I have to actually think about numbers.]
+FFF:x
+1011_0010:b
+0o777:o
+543:d
+
+2134:1
+2134:2
+2134:4
+2134:8
+
+.2134:4
+2134.4:8
+[Okay. I think that's good.]
+
 

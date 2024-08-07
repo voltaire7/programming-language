@@ -21,7 +21,8 @@ typedef union {
     short  shortValue;
     int    intValue;
     long   longValue;
-    double floatValue;
+    float  floatValue;
+    double doubleValue;
     void*  pointerValue;
     char*  stringValue;
     void (*procedureValue)();

@@ -67,11 +67,11 @@ void PRINT() {
                             if (s[i] == 'c')
                                 printf("%c", entry->value.charValue);
                             else if (s[i] == 'e')
-                                printf("%e", entry->value.floatValue);
+                                printf("%e", entry->value.doubleValue);
                             else if (s[i] == 'f')
-                                printf("%f", entry->value.floatValue);
+                                printf("%f", entry->value.doubleValue);
                             else if (s[i] == 'g')
-                                printf("%g", entry->value.floatValue);
+                                printf("%g", entry->value.doubleValue);
                             else if (s[i] == 'i')
                                 printf("%ld", entry->value.longValue);
                             else if (s[i] == 'p')
@@ -393,7 +393,7 @@ void IF() {
             val = (Value) (val.longValue op atol(token + start)); \
             break; \
         case FLOAT: \
-            val = (Value) (val.floatValue op atof(token + start)); \
+            val = (Value) (val.doubleValue op atof(token + start)); \
             break; \
         case CHAR: \
             val = (Value) ((long) val.charValue op parse_char(token + start)); \
@@ -435,7 +435,7 @@ void MODULO() {
             val = (Value) (val.longValue % atol(token + start));
             break;
         case FLOAT:
-            val = (Value) fmod(val.floatValue, atof(token + start));
+            val = (Value) fmod(val.doubleValue, atof(token + start));
             break;
         case CHAR:
             val = (Value) ((long) val.charValue % parse_char(token + start));
@@ -460,7 +460,7 @@ void MODULO() {
             val = (Value) (val.longValue op atol(token + start)); \
             break; \
         case FLOAT: \
-            val = (Value) (val.floatValue op atof(token + start)); \
+            val = (Value) (val.doubleValue op atof(token + start)); \
             break; \
         case CHAR: \
             val = (Value) ((long) val.charValue op parse_char(token + start)); \
@@ -469,8 +469,8 @@ void MODULO() {
             error("Invalid operand: '%s'", symbolcpy()); \
         case SYMBOL: { \
             char* temp = symbolcpy(); \
-            val        = (Value) (val.floatValue op lookup_or_error(env, temp) \
-                               ->value.floatValue); \
+            val        = (Value) (val.doubleValue op lookup_or_error(env, temp) \
+                               ->value.doubleValue); \
             free(temp); \
         } \
     } \
@@ -503,7 +503,7 @@ void MODULO_FLOAT() {
             val = (Value) (val.longValue % atol(token + start));
             break;
         case FLOAT:
-            val = (Value) fmod(val.floatValue, atof(token + start));
+            val = (Value) fmod(val.doubleValue, atof(token + start));
             break;
         case CHAR:
             val = (Value) ((long) val.charValue % parse_char(token + start));
@@ -513,8 +513,8 @@ void MODULO_FLOAT() {
         case SYMBOL: {
             char* temp = symbolcpy();
             val        = (Value) fmod(
-                val.floatValue,
-                lookup_or_error(env, temp)->value.floatValue
+                val.doubleValue,
+                lookup_or_error(env, temp)->value.doubleValue
 
             );
             free(temp);
@@ -531,7 +531,7 @@ void MODULO_FLOAT() {
             val.longValue = val.longValue op atol(token + start); \
             break; \
         case FLOAT: \
-            val.longValue = val.floatValue op atof(token + start); \
+            val.longValue = val.doubleValue op atof(token + start); \
             break; \
         case CHAR: \
             val.longValue = val.charValue op parse_char(token + start); \

@@ -23,7 +23,7 @@ void eval() {
             upsert(get_env(0), "_", val, NEITHER);
             break;
         case FLOAT:
-            val.floatValue = atof(token + start);
+            val.doubleValue = atof(token + start);
             upsert(get_env(0), "_", val, NEITHER);
             break;
         case CHAR:
