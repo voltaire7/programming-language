@@ -65,4 +65,5 @@ void setup() {
     UPSERT("exec", EXEC)
     UPSERT("debug-proc", DEBUG_PROC)
     UPSERT("reduce", REDUCE)
+    UPSERT("proc2", PROC2)
 }

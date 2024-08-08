@@ -1245,4 +1245,6 @@ void PUSH() {}
 
 void POP() {}
 
-void PROC2() {}
+void PROC2() {
+    printf("hello\n");
+}

@@ -1929,4 +1929,81 @@ item '[' [...]
 item ' ' [...]
 [Muahahahaha!]
 
+[[defer] should execute in the opposite order.]
+[Maybe have a fraction struct?]
+[I need [parse] to be more reliable.]
+
+[I could do this:]
+item [env.next] [print "New code\n"]
+[So when EOF is reached, the app continues.]
+
+ch [filetype mach-o]
+compile: _ [print "Hello, World!\n"]
+
+[I feel like I can just do arbitrary precision.]
+item [x] 198412847120581251251209851281204981240912840192812057250129851029812308123409128
+[can't I just divide this into multiple longs?]
+
+[I should use i32 for default int, and f64 for default float, like rust.]
+[I need to make my code libc independant...]
+
+return 5 _
+
+[Is there a way to make a syscall macro in C?]
+
+proc [vector] [
+    Vector3.y vector
+    print "y = %i\n" _
+]
+[or maybe I just can't pass an struct to a proc?]
+[or maybe i don't need structs, just arrays?]
+[array programming?]
+
+[btw]
+print [Hello, World!\n]
+print "Hello, World!\n"
+
+item '"' [...]
+
+get-at x 4 vec1
+
+[The stack is increasingly more difficult without [meta].]
+[These vrariable length types are impossible to work with...]
+[I either do meta or things i push on the stack are the same length.]
+[Maybe low level should be more stack oriented, while high level uses the hashmap?]
+
+[Also, easy way to convert from one base to another.]
+print "%i\n" FFF:x
+
+[I should learn learn "vfprintf" and "strtox"]
+
+[Inline asm should only be doable in a "do" block, or similar, like in a procedure.]
+do [
+    mov x0,  0
+    mov x16, 1
+    svc 0
+]
+[^ this works because the block is first compiled, then executed as binary.]
+[while this doesn't:]
+mov x0,  0
+mov x16, 1
+svc 0
+[because the registers are messed around with before each procedure call.]
+
+[sure, you could ldp every register before the call, and stp after, but that's such ugly solution
+to the problem... just use a do proc at the top level. In a procedure, you don't need since
+everything is compiled first.]
+
+[Actually, stack-oriented programming may not be possible...]
+1 == ret as [b1] 2 == ret && b1 ? [] []
+[for this to work, it would need to not take any arguments...]
+1 == ret 2 == ret && ? [] []
+
+[The logical way to approach this, would be to convert the symbol to the pointers or values in the
+hashtable.]
+[But then I would be using the heap an awful lot...]
+[That's probably it, for now. I need to focus on compiling, anything.]
+
+[You know, everything was smooth sailing until I tried to compile. I made so much progress...]
+
 

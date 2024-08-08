@@ -1,5 +1,23 @@
-item-in 0 [_] [_]
-parse _
-print _
+proc [symbol] [
+    item-in 1 symbol _
+] item-in 0 [as] _
+
+[+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
+
+[Let's start simple.]
+proc2 [] [
+    print [Hello, World!\n]
+] as [say-hello]
+
+[Will not work]
+[debug-proc say-hello]
+
+[steps] [
+    - push [Hello, World!\n] on the stack
+    - bl _PRINT on new scope
+]
+[but how do we know it should be pushed on the stack and not just ignored?]
+[but then I have to redefine _PRINT...]
+[damn.]
 
 

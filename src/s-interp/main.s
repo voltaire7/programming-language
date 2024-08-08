@@ -3,7 +3,8 @@
 
 _main:
     // open
-    adr x0,  str
+    ldr x0,  [x1]
+    add x0,  x0, 8
     mov x1,  2
     mov x16, 5
     svc 0
@@ -32,9 +33,6 @@ _main:
     // exit
     mov x16, 1
     svc 0
-
-str:      .ascii  "src/examples/temp.txt"
-str_len = . - str
 
 .globl _buf
 .zerofill __DATA, __common, _buf, 4096, 0
