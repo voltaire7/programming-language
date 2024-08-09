@@ -1253,19 +1253,20 @@ void PROC2() {
     int old_sp = sp;
     scan_token_default();
     scan_token_default();
-    char* block     = quotecpy();
+    char* code      = quotecpy();
     char* old_token = token;
-    save_state();
-    push_scope(block);
-    upsert(env, "decrement-layer?", (Value) 0, NEITHER);
-    scan_token_default();
-    eval();
-    scan_token_default();
-    eval();
-    scan_token_default();
-    eval();
-    int size = (sp - old_sp + 1) * sizeof(int);
 
+    save_state();
+    push_scope(code);
+    upsert(env, "decrement-layer?", (Value) 0, NEITHER);
+
+    scan_token_default();
+    while (old_token != token) {
+        eval();
+        scan_token_default();
+    }
+
+    int  size = (sp - old_sp + 1) * sizeof(int);
     int* ptr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) perror("mmap");
 
@@ -1275,7 +1276,7 @@ void PROC2() {
     if (mprotect((void*) ptr, size, PROT_EXEC) == -1) perror("mprotect");
 
     sp = old_sp;
-    upsert(env->next, "_", (Value) (void*) ptr, PROCEDURE);
+    upsert(env, "_", (Value) (void*) ptr, PROCEDURE);
 }
 
 void MOV() {
