@@ -1,12 +1,10 @@
-mov x0 77
-svc 2
-
 proc2 [] [
     mov x0  77
     mov x16 1
     svc 0
 ]
 
-[debug-proc _]
+debug-proc _
+_
 
 

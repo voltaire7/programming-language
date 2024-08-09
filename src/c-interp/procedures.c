@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/ttycom.h>
 
 #include "env.h"
@@ -21,6 +22,9 @@ extern long start;
 extern long end;
 
 extern Dictionary* env;
+
+extern int stack[];
+extern int sp;
 
 extern TokenType token_type;
 
@@ -1246,28 +1250,55 @@ void PUSH() {}
 void POP() {}
 
 void PROC2() {
+    int old_sp = sp;
     scan_token_default();
     scan_token_default();
+    char* block     = quotecpy();
+    char* old_token = token;
+    save_state();
+    push_scope(block);
+    upsert(env, "decrement-layer?", (Value) 0, NEITHER);
+    scan_token_default();
+    eval();
+    scan_token_default();
+    eval();
+    scan_token_default();
+    eval();
+    int size = (sp - old_sp + 1) * sizeof(int);
+
+    int* ptr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (ptr == MAP_FAILED) perror("mmap");
+
+    memcpy(ptr, stack + old_sp, size);
+    ptr[sp - old_sp] = 0xd65f03c0;
+
+    if (mprotect((void*) ptr, size, PROT_EXEC) == -1) perror("mprotect");
+
+    sp = old_sp;
+    upsert(env->next, "_", (Value) (void*) ptr, PROCEDURE);
 }
 
-int MOV() {
+void MOV() {
     scan_token_default();
     char* reg = symbolcpy();
     if (!match_reg(reg)) error("Invalid register: '%s'", reg);
     char regn = atoi(token + start + 1);
+
     scan_token_default();
     unsigned imm = atoi(token + start);
     if (imm > 65535) error("Immediate too large: '%i'", imm);
+
     int inst = 0b11010010100000000000000000000000;
     inst += imm << 5;
     inst += regn;
-    return inst;
+    stack[sp++] = inst;
 }
 
-int SVC() {
+void SVC() {
     scan_token_default();
-    int imm  = atoi(token + start);
+    int imm = atoi(token + start);
+
     int inst = 0b11010100000000000000000000000001;
     inst += imm << 5;
-    return inst;
+    stack[sp++] = inst;
 }

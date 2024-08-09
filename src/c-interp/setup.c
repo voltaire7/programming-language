@@ -5,6 +5,9 @@
 
 Dictionary* env;
 
+int stack[4096];
+int sp = 0;
+
 void setup() {
     env = create_dictionary();
     upsert(env, "decrement-layer?", (Value) 0, NEITHER);
