@@ -1261,7 +1261,7 @@ void PROC2() {
     upsert(env, "decrement-layer?", (Value) 0, NEITHER);
 
     scan_token_default();
-    while (old_token != token) {
+    while (token != old_token) {
         eval();
         scan_token_default();
     }
@@ -1277,6 +1277,7 @@ void PROC2() {
 
     sp = old_sp;
     upsert(env, "_", (Value) (void*) ptr, PROCEDURE);
+    eval();
 }
 
 void MOV() {

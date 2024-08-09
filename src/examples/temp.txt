@@ -1,9 +1,10 @@
 proc2 [] [
-    mov x0  77
+    mov x0  7
     mov x16 1
     svc 0
-]
+] _
 
+print [Hello, World!\n]
 debug-proc _
 _
 
