@@ -34,5 +34,7 @@ todo:
 [ ] switch endian
 [ ] inline
 [ ] text editor
+[ ] x86
+[ ] no ret evaluation
 
 

@@ -2006,4 +2006,65 @@ hashtable.]
 
 [You know, everything was smooth sailing until I tried to compile. I made so much progress...]
 
+[I wonder if you could implement significant whitespace using this:]
+item ' ' [...]
+[Just to be unnecessarily evil.]
+
+[also]
+proc [str1 str2] [
+    print str1
+    print str2
+    print str1
+    print str2
+]
+_ [Hello, ] [World!\n]
+[it would be easy to malloc these strings, but they will on be used in this procedure...]
+[wait...]
+_ str1 str2
+[so they should be pointers??]
+
+[The ideal would be to neither put them on the stack, nor malloc them. I mean, they are already
+loaded in memory: "token[start]"!]
+[In other words, I should change print to not be null terminator dependant. At least for string
+literals.]
+
+[Then again... (I keep going back and forth) I guess I could also insert the string within the
+procedure... Because, I mean, what if you have a procedure that returns a procedure? And the scope
+of the procedure call gets popped? I need to make my procedures as portable as possible! And in any
+case, I plan to make every part of my binary either executable/readable or writable/readable. Or
+not? Maybe I should have the minimum? Whatever, later.]
+
+[Okay, but about this?]
+_ [Hello, ] [World!\n]
+[where are the strings?]
+[how should I always write a fixed number?]
+[the [write] syscall doesn't check for the null terminator anyway. and I will need to length then.]
+[In that case, I only need to push the pointer to the start of the quote on the stack?]
+
+[Maybe I should data after [ret]?]
+[If i don't put the string after [ret], i will have to [b]...]
+[But how will I now to compile the data as well when compiling to an executable file?]
+[Decisions, decisions.]
+
+[Wait, if I malloc something, then mmap it, then free it, will it still be mmap-ed?..]
+
+[Maybe I could push stuff on the stack, and then when I compile, I put the stack in a readonly
+section?]
+
+[Holy shit!]
+label [n]
+[is equivalent to]
+adr x0, 0
+[... I think.]
+str x0, [x29]
+add x29, 8
+br x0
+[hmm, needs testing]
+
+[I shouldn't forget the idea that procedures never return, instead they call eval on the next
+statement.]
+
+[Really like this syntax.]
+0 ~ print [%i\n] _
+
 

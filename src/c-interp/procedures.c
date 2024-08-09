@@ -1246,5 +1246,28 @@ void PUSH() {}
 void POP() {}
 
 void PROC2() {
-    printf("hello\n");
+    scan_token_default();
+    scan_token_default();
+}
+
+int MOV() {
+    scan_token_default();
+    char* reg = symbolcpy();
+    if (!match_reg(reg)) error("Invalid register: '%s'", reg);
+    char regn = atoi(token + start + 1);
+    scan_token_default();
+    unsigned imm = atoi(token + start);
+    if (imm > 65535) error("Immediate too large: '%i'", imm);
+    int inst = 0b11010010100000000000000000000000;
+    inst += imm << 5;
+    inst += regn;
+    return inst;
+}
+
+int SVC() {
+    scan_token_default();
+    int imm  = atoi(token + start);
+    int inst = 0b11010100000000000000000000000001;
+    inst += imm << 5;
+    return inst;
 }

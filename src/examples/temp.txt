@@ -1,23 +1,12 @@
-proc [symbol] [
-    item-in 1 symbol _
-] item-in 0 [as] _
+mov x0 77
+svc 2
 
-[+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
-
-[Let's start simple.]
 proc2 [] [
-    print [Hello, World!\n]
-] as [say-hello]
-
-[Will not work]
-[debug-proc say-hello]
-
-[steps] [
-    - push [Hello, World!\n] on the stack
-    - bl _PRINT on new scope
+    mov x0  77
+    mov x16 1
+    svc 0
 ]
-[but how do we know it should be pushed on the stack and not just ignored?]
-[but then I have to redefine _PRINT...]
-[damn.]
+
+[debug-proc _]
 
 

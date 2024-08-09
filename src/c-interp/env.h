@@ -26,6 +26,7 @@ typedef union {
     void*  pointerValue;
     char*  stringValue;
     void (*procedureValue)();
+    int (*experimental)();
     TokenType token_type;
 } Value;
 
