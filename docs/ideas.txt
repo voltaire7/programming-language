@@ -2067,4 +2067,140 @@ statement.]
 [Really like this syntax.]
 0 ~ print [%i\n] _
 
+item ' ' end++
+[I'm so funny aren't I?]
+
+[prepend on item names?]
+module [hello]
+item [x] [Hello, World!\n]
+[for other module]
+hello.x
+[this is really just string concatenations:]
+module-name ++ "." ++ item-name
+[something like that]
+
+[Some instruction parse the arguments, then put on the instructions on the stack, others parse
+arguments, evaluate them, then put the result on the stack. The former are procedures, the latter
+are macros.]
+[There really shouldn't be any syntactic difference between the two...]
+
+[hmm]
+1 == ret 2 == ret pop && _ ? [] []
+
+[runtime compilation (lol)]
+
+[The LSP throws an error when you're about to call a non-executable part of memory. The program
+still runs though.]
+[Do you bootstrap the LSP as well?]
+
+do [
+    proc [] [
+        print "hello"
+    ]
+    defer [free _]
+    _
+]
+[but you can't do that, because you're using mmap for this...]
+[i should try implementing it anyway. some way or another.]
+
+[Need macro push and pop]
+push(int, value);
+pop(int);
+
+[I don't think I need [adrp] for c. I can trim it. Or maybe it's already trimed?]
+[I should test [adrp] with inline in c.]
+[[adrp] will be such a pain in the to deal with...]
+[like how many bits is printf %x ptr?]
+
+[The interpreter should avoid [malloc] as much as possible.]
+[I'm still amazed I'm writing a lisp without really knowing lisp.]
+[...]
+
+[I could just chain procedures and never assign the first one, in the top scope, for lambdas; [as]
+within second proc.]
+[Maybe the next push pushes to _, but before that pushes whatever _ had to the stack?]
+[I'm thinking I really need to consider a size value attached to a variable...]
+[Maybe I don't need ''.]
+item [c] [Q]
+[what if [c] is a pointer where token[start] == 'Q'?]
+[maybe i don't need to malloc a new scope (it would make error messages so much easier if yes]
+
+[In the asm interpreter, I could just store globals in the stack and access them whenever I want,
+but for the C interpreter, I need a weird workaround.]
+item [str] [Hello, World!]
+do [
+    ch str & 0xFFF
+    movz x1 [_ 0]
+    ch str >> 12 & 0xFFF
+    movk x1 [_ 1]
+    ch str >> 24 & 0xFFF
+    movk x1 [_ 2]
+]
+[something like this?]
+[but I need to change the notation...]
+
+[hmm]
+mov x0 3
+bl PUSH
+[is equivalent to]
+mov x0, arg1
+mov x1, arg2
+mov x2, arg3
+[?]
+[so]
+mov x0 3
+bl PUSH
+svc 0
+[is all you need?]
+
+[okay, what is the notation?]
+mov [1] [3]
+[move x3 into x1?]
+mov [0] 77
+[move #77 into x0?]
+mov [0] [77 1]
+[move #77 << #16 into x0]
+mov r v
+[move value with possible shift pointed to by symbol [v] into register pointed to by symbol [r]]
+mov r [v s]
+[move value [v] with shift [s] into register [r], each pointed to by symbol]
+[i guess this works]
+
+[i still have no idea how I will do arguments...]
+
+[I could also do]
+item [x0] [0]
+item [x1] [1]
+[you know, to make it more like actual asm]
+
+[wait]
+mov [0] [[1] 1]
+[i guess that works]
+
+[I think I'm giving myself too much of a headache. A lot of these are aliases. movz will never move
+from one register to another.]
+[In other words, I can just use integers as inputs.]
+
+[There's a variable called this.]
+print this [prints the entire code of the first file.]
+item [this] [] [does nothing]
+item-in 1 [this] [] [breaks the program, because the source code got deleted]
+
+[oops, just remembered there is w0 and x0.]
+[maybe]
+movz 0:4 2
+[?]
+
+[wtf, why do you need w0? you're moving a halfword??]
+
+[Maybe I should always use exponential sizes?]
+1:0 [char ]
+1:1 [short]
+1:2 [int  ]
+1:3 [long ]
+[2 ^ x * 8 = number of bits]
+
+[i shouldn't forget about this]
+printf("%.5s\n", str);
+
 

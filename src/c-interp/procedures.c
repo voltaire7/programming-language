@@ -1280,20 +1280,246 @@ void PROC2() {
     eval();
 }
 
-void MOV() {
+void MOVZ() {
     scan_token_default();
-    char* reg = symbolcpy();
-    if (!match_reg(reg)) error("Invalid register: '%s'", reg);
-    char regn = atoi(token + start + 1);
+    int reg;
+    switch (token_type) {
+        case INTEGER:
+            reg = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Invalid register value, only integer or symbol to integer: "
+                "'%s'",
+                symbolcpy()
+            );
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            reg        = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (reg > 31 || reg < 0)
+        error("Invalid register value, has to be between 0 and 31: '%i'", reg);
 
     scan_token_default();
-    unsigned imm = atoi(token + start);
-    if (imm > 65535) error("Immediate too large: '%i'", imm);
+    int  imm;
+    int  shift       = 0;
+    bool should_eval = false;
+    switch (token_type) {
+        case INTEGER:
+            imm = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+            error(
+                "Invalid immediate value, only integer, list of 2 integers, or "
+                "symbol to those: '%s'",
+                symbolcpy()
+            );
+        case QUOTE: {
+            char* shift_scope = quotecpy();
+            save_state();
+            push_scope(shift_scope);
+            upsert(env, "decrement-layer?", (Value) 0, NEITHER);
+            should_eval = true;
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    imm = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid immediate value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    imm        = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    shift = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid immediate value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    shift      = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token == shift_scope) error("Too many arguments.");
+            free(shift_scope);
+            break;
+        not_enough:
+            error("Not enough arguments.");
+        }
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            imm        = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (imm > 65535 || imm < 0)
+        error(
+            "Invalid immediate value, has to be between 0 and 65535: '%i'",
+            imm
+        );
+    if (shift > 3 || shift < 0)
+        error("Invalid shift value, has to be between 0 and 3: '%i'", shift);
 
     int inst = 0b11010010100000000000000000000000;
+    inst += reg;
     inst += imm << 5;
-    inst += regn;
+    inst += shift << 21;
     stack[sp++] = inst;
+    if (should_eval) eval();
+}
+
+void MOVK() {
+    scan_token_default();
+    int reg;
+    switch (token_type) {
+        case INTEGER:
+            reg = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Invalid register value, only integer or symbol to integer: "
+                "'%s'",
+                symbolcpy()
+            );
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            reg        = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (reg > 31 || reg < 0)
+        error("Invalid register value, has to be between 0 and 31: '%i'", reg);
+
+    scan_token_default();
+    int  imm;
+    int  shift       = 0;
+    bool should_eval = false;
+    switch (token_type) {
+        case INTEGER:
+            imm = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+            error(
+                "Invalid immediate value, only integer, list of 2 integers, or "
+                "symbol to those: '%s'",
+                symbolcpy()
+            );
+        case QUOTE: {
+            char* shift_scope = quotecpy();
+            save_state();
+            push_scope(shift_scope);
+            upsert(env, "decrement-layer?", (Value) 0, NEITHER);
+            should_eval = true;
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    imm = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid immediate value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    imm        = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    shift = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid immediate value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    shift      = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token == shift_scope) error("Too many arguments.");
+            free(shift_scope);
+            break;
+        not_enough:
+            error("Not enough arguments.");
+        }
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            imm        = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (imm > 65535 || imm < 0)
+        error(
+            "Invalid immediate value, has to be between 0 and 65535: '%i'",
+            imm
+        );
+    if (shift > 3 || shift < 0)
+        error("Invalid shift value, has to be between 0 and 3: '%i'", shift);
+
+    int inst = 0b11110010100000000000000000000000;
+    inst += reg;
+    inst += imm << 5;
+    inst += shift << 21;
+    stack[sp++] = inst;
+    if (should_eval) eval();
 }
 
 void SVC() {

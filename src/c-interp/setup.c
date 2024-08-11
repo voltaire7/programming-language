@@ -5,7 +5,7 @@
 
 Dictionary* env;
 
-int stack[4096];
+int stack[BUFSIZ];
 int sp = 0;
 
 void setup() {
@@ -70,6 +70,7 @@ void setup() {
     UPSERT("reduce", REDUCE);
     UPSERT("proc2", PROC2);
 
-    UPSERT("mov", MOV);
+    UPSERT("movz", MOVZ);
+    UPSERT("movk", MOVK);
     UPSERT("svc", SVC);
 }

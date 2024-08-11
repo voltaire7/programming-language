@@ -59,7 +59,8 @@ void DEBUG_PROC();
 void REDUCE();
 void PROC2();
 
-void MOV();
+void MOVZ();
+void MOVK();
 void SVC();
 
 #endif
