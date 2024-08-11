@@ -1245,7 +1245,41 @@ void DEBUG_PROC() {
 
 void REDUCE() {}
 
-void PUSH() {}
+void PUSH() {
+    scan_token_default();
+    int argc;
+    switch (token_type) {
+        case INTEGER:
+            argc = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error("Invalid argument count: '%s'", symbolcpy());
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            argc       = lookup_or_error(env, temp)->value.longValue;
+            free(temp);
+            break;
+        }
+    }
+    int movz = 0b11010010100000000000000000000000;
+    int movk = 0b11110010100000000000000000000000;
+
+    stack[sp++] = movz + (argc << 5);
+    stack[sp++] =
+        movz + (((long) push_count >> 0 & 0xFFFF) << 5) + 1 + (0 << 21);
+    stack[sp++] =
+        movk + (((long) push_count >> 16 & 0xFFFF) << 5) + 1 + (1 << 21);
+    stack[sp++] =
+        movk + (((long) push_count >> 32 & 0xFFFF) << 5) + 1 + (2 << 21);
+
+    stack[sp++] = 0xd10043ff; // sub sp, sp, 16
+    stack[sp++] = 0xa9007bfd; // stp x29, x30, [sp]
+    stack[sp++] = 0b11010110001111110000000000100000;
+    stack[sp++] = 0xa9407bfd; // ldp x29, x30, [sp]
+    stack[sp++] = 0x910043ff; // add sp, sp, 16
+}
 
 void POP() {}
 
@@ -1265,6 +1299,7 @@ void PROC2() {
         eval();
         scan_token_default();
     }
+    free(code);
 
     int  size = (sp - old_sp + 1) * sizeof(int);
     int* ptr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -1525,6 +1560,11 @@ void MOVK() {
 void SVC() {
     scan_token_default();
     int imm = atoi(token + start);
+    if (imm > 65535 || imm < 0)
+        error(
+            "Invalid immediate value, has to be between 0 and 65535: '%i'",
+            imm
+        );
 
     int inst = 0b11010100000000000000000000000001;
     inst += imm << 5;

@@ -25,6 +25,6 @@ int  count_layers();
 
 void from_str(char* str, int* size, int base, char endian);
 void execute(unsigned int* code, size_t size);
-int  match_reg(const char* str);
+int  push_count(int argc);
 
 #endif

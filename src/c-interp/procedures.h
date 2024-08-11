@@ -57,6 +57,7 @@ void BIT_SHIFTR();
 void EXEC();
 void DEBUG_PROC();
 void REDUCE();
+void PUSH();
 void PROC2();
 
 void MOVZ();

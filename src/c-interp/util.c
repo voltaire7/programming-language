@@ -382,16 +382,7 @@ void execute(unsigned* code, size_t size) {
     munmap(addr, size);
 }
 
-int match_reg(const char* str) {
-    regex_t regex;
-    int     result;
-
-    const char* pattern = "^x([0-2]?[0-9]|3[01])$";
-
-    result = regcomp(&regex, pattern, REG_EXTENDED);
-    if (result) error("Could not compile regex");
-
-    result = regexec(&regex, str, 0, NULL, 0);
-    regfree(&regex);
-    return result == 0;
+int push_count(int argc) {
+    printf("%i\n", argc);
+    return 0;
 }

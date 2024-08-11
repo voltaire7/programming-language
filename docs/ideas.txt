@@ -2203,4 +2203,47 @@ movz 0:4 2
 [i shouldn't forget about this]
 printf("%.5s\n", str);
 
+proc! [] []
+[instead of]
+macro [] []
+[? well, it's the same length so whatever.]
+
+[There should probably be a register reserved for the [token] value.]
+
+[Also, nvm for "", I need to be better than this.]
+print "Hello, World!\n"
+[...]
+
+[wait a second]
+[a] = 2
+[I can do this because the quote is ignored, and [=] can backtrack... but do I want to? probably
+not.]
+
+[Okay.]
+proc [text len] [
+    write 1 text len
+]
+proc [fd buf nbytes] [
+    movr 9 0
+
+    ldr 0 9   [fd]
+    sub 9 9 8
+    ldr 1 9   [buf]
+    sub 9 9 8
+    ldr 2 9   [nbytes]
+
+    movz 0  fd
+    movz 1  text
+    movz 2 len
+    movz 16 4
+    svc 0
+]
+[or [ldr] with offset. idk]
+
+[Do you like driving without a seatbelt? Do you like being a menace to society? Well this is the
+language for you! No rules. The only limit is your imagination, and your ability to avoid law
+enforcement...]
+
+[maybe I should have a stack for executables?]
+
 
