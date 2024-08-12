@@ -63,5 +63,6 @@ void PROC2();
 void MOVZ();
 void MOVK();
 void SVC();
+void LDR();
 
 #endif

@@ -74,4 +74,5 @@ void setup() {
     UPSERT("movz", MOVZ);
     UPSERT("movk", MOVK);
     UPSERT("svc", SVC);
+    UPSERT("ldr", LDR);
 }

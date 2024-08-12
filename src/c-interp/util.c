@@ -18,9 +18,13 @@ long end   = 0;
 
 extern Dictionary* env;
 
-extern long layer_offset;
-
+extern long  layer_offset;
 extern char* filename;
+
+extern TokenType token_type;
+
+extern int stack[BUFSIZ];
+extern int sp;
 
 #define WHITE "\033[0m"
 #define RED   "\033[1;31m"
@@ -382,7 +386,29 @@ void execute(unsigned* code, size_t size) {
     munmap(addr, size);
 }
 
-int push_count(int argc) {
-    printf("%i\n", argc);
-    return 0;
+long push_count(int argc) {
+    int old_sp = sp;
+    while (argc--) {
+        scan_token_default();
+        switch (token_type) {
+            case INTEGER:
+                stack[sp++] = atoi(token + start);
+                break;
+            case FLOAT:
+                ((float*) stack)[sp++] = atof(token + start);
+                break;
+            case CHAR:
+                stack[sp++] = parse_char(token + start);
+                break;
+            case QUOTE:
+                error("Not implemented.");
+            case SYMBOL: {
+                char* temp  = symbolcpy();
+                stack[sp++] = lookup_or_error(env, temp)->value.intValue;
+                free(temp);
+                break;
+            }
+        }
+    }
+    return (long) stack + old_sp;
 }
