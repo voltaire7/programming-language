@@ -386,25 +386,27 @@ void execute(unsigned* code, size_t size) {
     munmap(addr, size);
 }
 
+#define PUSH_T(type, val) ((type*) stack)[sp++] = val
+
 long push_count(int argc) {
     int old_sp = sp;
     while (argc--) {
         scan_token_default();
         switch (token_type) {
             case INTEGER:
-                stack[sp++] = atoi(token + start);
+                PUSH_T(long, atoi(token + start));
                 break;
             case FLOAT:
-                ((float*) stack)[sp++] = atof(token + start);
+                PUSH_T(double, atof(token + start));
                 break;
             case CHAR:
-                stack[sp++] = parse_char(token + start);
+                PUSH_T(long, parse_char(token + start));
                 break;
             case QUOTE:
                 error("Not implemented.");
             case SYMBOL: {
-                char* temp  = symbolcpy();
-                stack[sp++] = lookup_or_error(env, temp)->value.intValue;
+                char* temp = symbolcpy();
+                PUSH_T(long, lookup_or_error(env, temp)->value.longValue);
                 free(temp);
                 break;
             }

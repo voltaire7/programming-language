@@ -23,7 +23,7 @@ extern long end;
 
 extern Dictionary* env;
 
-extern int stack[];
+extern int stack[BUFSIZ];
 extern int sp;
 
 extern TokenType token_type;
@@ -1245,6 +1245,8 @@ void DEBUG_PROC() {
 
 void REDUCE() {}
 
+#define PUSH_T(type, val) ((type*) stack)[sp++] = val
+
 void PUSH() {
     scan_token_default();
     int argc;
@@ -1266,19 +1268,25 @@ void PUSH() {
     int movz = 0b11010010100000000000000000000000;
     int movk = 0b11110010100000000000000000000000;
 
-    stack[sp++] = movz + (argc << 5);
-    stack[sp++] =
-        movz + (((long) push_count >> 0 & 0xFFFF) << 5) + 1 + (0 << 21);
-    stack[sp++] =
-        movk + (((long) push_count >> 16 & 0xFFFF) << 5) + 1 + (1 << 21);
-    stack[sp++] =
-        movk + (((long) push_count >> 32 & 0xFFFF) << 5) + 1 + (2 << 21);
+    PUSH_T(int, movz + (argc << 5));
+    PUSH_T(
+        int,
+        movz + (((long) push_count >> 0 & 0xFFFF) << 5) + 1 + (0 << 21)
+    );
+    PUSH_T(
+        int,
+        movk + (((long) push_count >> 16 & 0xFFFF) << 5) + 1 + (1 << 21)
+    );
+    PUSH_T(
+        int,
+        movk + (((long) push_count >> 32 & 0xFFFF) << 5) + 1 + (2 << 21)
+    );
 
-    stack[sp++] = 0xd10043ff; // sub sp, sp, 16
-    stack[sp++] = 0xa9007bfd; // stp x29, x30, [sp]
-    stack[sp++] = 0xd63f0020; // blr x1
-    stack[sp++] = 0xa9407bfd; // ldp x29, x30, [sp]
-    stack[sp++] = 0x910043ff; // add sp, sp, 16
+    PUSH_T(int, 0xd10043ff); // sub sp, sp, 16
+    PUSH_T(int, 0xa9007bfd); // stp x29, x30, [sp]
+    PUSH_T(int, 0xd63f0020); // blr x1
+    PUSH_T(int, 0xa9407bfd); // ldp x29, x30, [sp]
+    PUSH_T(int, 0x910043ff); // add sp, sp, 16
 }
 
 void POP() {}
@@ -1432,7 +1440,7 @@ void MOVZ() {
     inst += reg;
     inst += imm << 5;
     inst += shift << 21;
-    stack[sp++] = inst;
+    PUSH_T(int, inst);
     if (should_eval) eval();
 }
 
@@ -1553,7 +1561,7 @@ void MOVK() {
     inst += reg;
     inst += imm << 5;
     inst += shift << 21;
-    stack[sp++] = inst;
+    PUSH_T(int, inst);
     if (should_eval) eval();
 }
 
@@ -1568,7 +1576,7 @@ void SVC() {
 
     int inst = 0b11010100000000000000000000000001;
     inst += imm << 5;
-    stack[sp++] = inst;
+    PUSH_T(int, inst);
 }
 
 void LDR() {
@@ -1687,6 +1695,6 @@ void LDR() {
     inst += dest;
     inst += src << 5;
     inst += offset << 10;
-    stack[sp++] = inst;
+    PUSH_T(int, inst);
     if (should_eval) eval();
 }

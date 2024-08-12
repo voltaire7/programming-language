@@ -12,13 +12,17 @@ proc [] [
 
 [+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
 
+item [s] [Hello, World!
+]
 proc2 [] [
-    push 1
-    ldr 0 0
-    movz 16 1
+    push 3
+    ldr 1 [0 1]
+    ldr 2 [0 2]
+    ldr 0 [0 0]
+    movz 16 4
     svc  0
-] as [exit]
-exit 88
+] as [write]
+write 1 s 14
 
 syscall 1 [0]
 item [FFFF] 65535
