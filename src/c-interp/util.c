@@ -403,7 +403,8 @@ long push_count(int argc) {
                 PUSH_T(long, parse_char(token + start));
                 break;
             case QUOTE:
-                error("Not implemented.");
+                PUSH_T(char*, quotecpy());
+                break;
             case SYMBOL: {
                 char* temp = symbolcpy();
                 PUSH_T(long, lookup_or_error(env, temp)->value.longValue);
