@@ -23,8 +23,8 @@ extern char* filename;
 
 extern TokenType token_type;
 
-extern int stack[BUFSIZ];
-extern int sp;
+extern int   stack_arr[];
+extern void* stack;
 
 #define WHITE "\033[0m"
 #define RED   "\033[1;31m"
@@ -386,10 +386,12 @@ void execute(unsigned* code, size_t size) {
     munmap(addr, size);
 }
 
-#define PUSH_T(type, val) ((type*) stack)[sp++] = val
+#define PUSH_T(type, val) \
+    *((type*) stack) = val; \
+    stack += sizeof(type)
 
 long push_count(int argc) {
-    int old_sp = sp;
+    int* old = stack;
     while (argc--) {
         scan_token_default();
         switch (token_type) {
@@ -413,5 +415,5 @@ long push_count(int argc) {
             }
         }
     }
-    return (long) stack + old_sp;
+    return (long) old;
 }

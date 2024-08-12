@@ -5,8 +5,8 @@
 
 Dictionary* env;
 
-int stack[BUFSIZ];
-int sp = 0;
+int   stack_arr[BUFSIZ];
+void* stack = stack_arr;
 
 void setup() {
     env = create_dictionary();

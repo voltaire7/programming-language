@@ -20,7 +20,8 @@ proc2 [] [
     movz 16 4
     svc  0
 ] as [write]
-write 1 [Yello, World!
+[debug-proc write]
+write 1 [Hello, World!
 ] 14
 
 syscall 1 [0]

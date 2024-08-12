@@ -23,8 +23,8 @@ extern long end;
 
 extern Dictionary* env;
 
-extern int stack[BUFSIZ];
-extern int sp;
+extern int   stack_arr[];
+extern void* stack;
 
 extern TokenType token_type;
 
@@ -1244,8 +1244,9 @@ void DEBUG_PROC() {
 }
 
 void REDUCE() {}
-
-#define PUSH_T(type, val) ((type*) stack)[sp++] = val
+#define PUSH_T(type, val) \
+    *((type*) stack) = val; \
+    stack += sizeof(type)
 
 void PUSH() {
     scan_token_default();
@@ -1292,7 +1293,7 @@ void PUSH() {
 void POP() {}
 
 void PROC2() {
-    int old_sp = sp;
+    void* old = stack;
     scan_token_default();
     scan_token_default();
     char* code      = quotecpy();
@@ -1309,16 +1310,16 @@ void PROC2() {
     }
     free(code);
 
-    int  size = (sp - old_sp + 1) * sizeof(int);
+    int  size = stack - old + sizeof(int);
     int* ptr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (ptr == MAP_FAILED) perror("mmap");
 
-    memcpy(ptr, stack + old_sp, size);
-    ptr[sp - old_sp] = 0xd65f03c0;
+    memcpy(ptr, old, size);
+    ptr[(size - 1) / sizeof(int)] = 0xd65f03c0;
 
-    if (mprotect((void*) ptr, size, PROT_EXEC) == -1) perror("mprotect");
+    if (mprotect(ptr, size, PROT_EXEC) == -1) perror("mprotect");
 
-    sp = old_sp;
+    stack = old;
     upsert(env, "_", (Value) (void*) ptr, PROCEDURE);
     eval();
 }
