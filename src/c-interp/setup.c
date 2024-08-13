@@ -69,10 +69,12 @@ void setup() {
     UPSERT("debug-proc", DEBUG_PROC);
     UPSERT("reduce", REDUCE);
     UPSERT("push", PUSH);
+    UPSERT("pop", POP);
     UPSERT("proc2", PROC2);
 
     UPSERT("movz", MOVZ);
     UPSERT("movk", MOVK);
     UPSERT("svc", SVC);
     UPSERT("ldr", LDR);
+    UPSERT("movr", MOVR);
 }

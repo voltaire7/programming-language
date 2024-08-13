@@ -417,3 +417,7 @@ long push_count(int argc) {
     }
     return (long) old;
 }
+
+void pop(void* old) {
+    stack = old;
+}

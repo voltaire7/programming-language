@@ -58,11 +58,13 @@ void EXEC();
 void DEBUG_PROC();
 void REDUCE();
 void PUSH();
+void POP();
 void PROC2();
 
 void MOVZ();
 void MOVK();
 void SVC();
 void LDR();
+void MOVR();
 
 #endif
