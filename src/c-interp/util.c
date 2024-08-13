@@ -372,13 +372,10 @@ void from_str(char* str, int* size, int base, char endian) {
 void execute(unsigned* code, size_t size) {
     int (*addr)() = NULL;
     addr = mmap(NULL, size, PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (addr == MAP_FAILED) {
-        perror("mmap");
-    }
+    if (addr == MAP_FAILED) perror("mmap");
+
     memcpy(addr, code, size);
-    if (mprotect(addr, size, PROT_EXEC) == -1) {
-        perror("mprotect");
-    }
+    if (mprotect(addr, size, PROT_EXEC) == -1) perror("mprotect");
 
     addr();
 

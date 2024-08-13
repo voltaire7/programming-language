@@ -65,6 +65,7 @@ void MOVZ();
 void MOVK();
 void SVC();
 void LDR();
+void STR();
 void MOVR();
 
 #endif

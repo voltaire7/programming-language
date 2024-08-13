@@ -1713,6 +1713,126 @@ void LDR() {
     if (should_eval) eval();
 }
 
+void STR() {
+    scan_token_default();
+    int dest;
+    switch (token_type) {
+        case INTEGER:
+            dest = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Invalid register value, only integer or symbol to integer: "
+                "'%s'",
+                symbolcpy()
+            );
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            dest       = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (dest > 31 || dest < 0)
+        error("Invalid register value, has to be between 0 and 31: '%i'", dest);
+
+    scan_token_default();
+    int  src;
+    int  offset      = 0;
+    bool should_eval = false;
+    switch (token_type) {
+        case INTEGER:
+            src = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+            error(
+                "Invalid register value, only integer, list of 2 integers, or "
+                "symbol to those: '%s'",
+                symbolcpy()
+            );
+        case QUOTE: {
+            char* shift_scope = quotecpy();
+            save_state();
+            push_scope(shift_scope);
+            upsert(env, "decrement-layer?", (Value) 0, NEITHER);
+            should_eval = true;
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    src = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid register value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    src        = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token != shift_scope) goto not_enough;
+            switch (token_type) {
+                case INTEGER:
+                    offset = atoi(token + start);
+                    break;
+                case FLOAT:
+                case CHAR:
+                case QUOTE:
+                    error(
+                        "Invalid offset value, only integer or symbol to "
+                        "integer: '%s'",
+                        symbolcpy()
+                    );
+                case SYMBOL: {
+                    char* temp = symbolcpy();
+                    offset     = lookup_or_error(env, temp)->value.intValue;
+                    free(temp);
+                    break;
+                }
+            }
+
+            scan_token_default();
+            if (token == shift_scope) error("Too many arguments.");
+            free(shift_scope);
+            break;
+        not_enough:
+            error("Not enough arguments.");
+        }
+        case SYMBOL: {
+            char* temp = symbolcpy();
+            src        = lookup_or_error(env, temp)->value.intValue;
+            free(temp);
+            break;
+        }
+    }
+    if (src > 31 || src < 0)
+        error(
+            "Invalid register value, only integer or symbol to integer: "
+            "'%s'",
+            src
+        );
+
+    int inst = 0b11111001000000000000000000000000;
+    inst += dest;
+    inst += src << 5;
+    inst += offset << 10;
+    PUSH_T(int, inst);
+    if (should_eval) eval();
+}
+
 void MOVR() {
     scan_token_default();
     int dest;
