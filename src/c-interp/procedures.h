@@ -68,4 +68,6 @@ void LDR();
 void STR();
 void MOVR();
 
+void DOT();
+
 #endif

@@ -1950,3 +1950,7 @@ void MOVR() {
     PUSH_T(int, inst);
     if (should_eval) eval();
 }
+
+void DOT() {
+    upsert(env, "_", (Value) * (long*) stack, NEITHER);
+}

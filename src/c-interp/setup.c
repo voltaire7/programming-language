@@ -78,4 +78,6 @@ void setup() {
     UPSERT("ldr", LDR);
     UPSERT("str", STR);
     UPSERT("movr", MOVR);
+
+    UPSERT(".", DOT);
 }

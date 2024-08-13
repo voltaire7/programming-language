@@ -20,12 +20,15 @@ proc2 [] [
     ldr 0 [0 0]
     movz 16 4
     svc  0
+    str  0 8
     movr 0 8
     pop
-]
-[debug-proc _]
-_ 1 [Hello, World!
+] as [write]
+[debug-proc write]
+write 1 [Hello, World!
 ] 14
+.
+print [%i\n] _
 
 syscall 1 [0]
 item [FFFF] 65535
