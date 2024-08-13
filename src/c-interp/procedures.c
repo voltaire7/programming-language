@@ -1829,13 +1829,4 @@ void MOVR() {
     inst += shift << 22;
     PUSH_T(int, inst);
     if (should_eval) eval();
-
-    int dest2  = 0;
-    int src2   = 8;
-    int shift2 = 0;
-    int inst2  = 0b10101010000000000000001111100000;
-    inst2 += dest2;
-    inst2 += src2 << 16;
-    inst2 += shift2 << 22;
-    printf("%x\n", inst);
 }

@@ -22,9 +22,9 @@ proc2 [] [
     svc  0
     movr 0 8
     pop
-] as [write]
-[debug-proc write]
-write 1 [Hello, World!
+]
+[debug-proc _]
+_ 1 [Hello, World!
 ] 14
 
 syscall 1 [0]
