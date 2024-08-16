@@ -40,6 +40,8 @@ void eval() {
             else if (entry->type == STRING) {
                 end = start;
                 DO();
+            } else if (entry->type == EXPERIMENTAL) {
+                entry->value.procedureValue();
             } else
                 error("Cannot evaluate symbol: '%s'", entry->key);
             break;

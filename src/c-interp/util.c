@@ -23,7 +23,6 @@ extern char* filename;
 
 extern TokenType token_type;
 
-extern int   stack_arr[];
 extern void* stack;
 
 #define WHITE "\033[0m"

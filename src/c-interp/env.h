@@ -14,6 +14,7 @@ typedef enum {
     PROCEDURE,
     STRING,
     NEITHER,
+    EXPERIMENTAL,
 } PointerType;
 
 typedef union {

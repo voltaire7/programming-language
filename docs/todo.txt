@@ -11,8 +11,11 @@ todo:
 [+] get, set
 [+] bitwise operators
 [+] bin-exec
+[+] simulated stack?
+[-] assembly
+[ ] compile to file
+[ ] procedure compilation
 [ ] 123u32, 4.3f64, 0xFFF, etc.
-[ ] simulated stack?
 [ ] malloc, free, etc.
 [ ] struct and object
 [-] repl
@@ -21,8 +24,6 @@ todo:
 [ ] more prints %
 [ ] load and import (file open, do-here)
 [ ] format
-[ ] assembly
-[ ] compile
 [ ] debugger
 [ ] std lib
 [ ] interop with C

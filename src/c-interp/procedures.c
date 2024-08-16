@@ -23,7 +23,6 @@ extern long end;
 
 extern Dictionary* env;
 
-extern int   stack_arr[];
 extern void* stack;
 
 extern TokenType token_type;

@@ -24,30 +24,9 @@ proc2 [] [
     movr 0 8
     pop
 ] as [write]
-[debug-proc write]
-write 1 [Hello, World!
-] 14
-.
-print [%i\n] _
-
-syscall 1 [0]
-item [FFFF] 65535
-item [str] [Hello, World!
-]
-
-ch str       & FFFF as [s1]
-ch str >> 16 & FFFF as [s2]
-ch str >> 32 & FFFF as [s3]
-
 proc2 [] [
-    movz 0 1
-    movz 1 [s1 0]
-    movk 1 [s2 1]
-    movk 1 [s3 2]
-    movz 2 14
-    movz 16 4
-    svc  0
-] _
-[debug-proc _]
+    write 1 [Hello, World!
+] 14
+] as [say-hello]
 
 
