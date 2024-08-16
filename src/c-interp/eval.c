@@ -15,6 +15,8 @@ extern Dictionary* env;
 
 extern TokenType token_type;
 
+extern void* stack;
+
 void eval() {
     Value val;
     switch (token_type) {
