@@ -69,5 +69,6 @@ void STR();
 void MOVR();
 
 void DOT();
+void DEBUG_STACK();
 
 #endif

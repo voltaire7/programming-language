@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
+#include "defines.h"
 #include "env.h"
 #include "scan-token.h"
 
@@ -381,10 +382,6 @@ void execute(unsigned* code, size_t size) {
     free(code);
     munmap(addr, size);
 }
-
-#define PUSH_T(type, val) \
-    *((type*) stack) = val; \
-    stack += sizeof(type)
 
 long push_count(int argc) {
     int* old = stack;

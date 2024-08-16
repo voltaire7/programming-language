@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "defines.h"
 #include "env.h"
 #include "procedures.h"
 #include "scan-token.h"
@@ -23,10 +24,12 @@ void eval() {
         case INTEGER:
             val.longValue = atoi(token + start);
             upsert(get_env(0), "_", val, NEITHER);
+            PUSH_T(long, val.longValue);
             break;
         case FLOAT:
             val.doubleValue = atof(token + start);
             upsert(get_env(0), "_", val, NEITHER);
+            PUSH_T(double, val.doubleValue);
             break;
         case CHAR:
             upsert(get_env(0), "_", (Value) parse_char(token + start), NEITHER);

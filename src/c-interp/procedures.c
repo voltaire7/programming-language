@@ -24,6 +24,7 @@ extern long end;
 
 extern Dictionary* env;
 
+extern int   stack_arr[];
 extern void* stack;
 
 extern TokenType token_type;
@@ -1874,4 +1875,38 @@ void MOVR() {
 
 void DOT() {
     upsert(env, "_", (Value) * (long*) stack, NEITHER);
+}
+
+void DEBUG_STACK() {
+    long size;
+    scan_token_default();
+    switch (token_type) {
+        case INTEGER:
+            size = atoi(token + start);
+            break;
+        case FLOAT:
+        case CHAR:
+        case QUOTE:
+            error(
+                "Stack debugging only support integer sizes: '%s'",
+                symbolcpy()
+            );
+        case SYMBOL: {
+            char* temp;
+            size = lookup_or_error(env, temp)->value.longValue;
+            free(temp);
+            break;
+        }
+    }
+    if (size != 4 && size != 8)
+        error("Only 4 and 8 bytes are currently supported: '%li'", size);
+
+    void* temp = stack_arr;
+    while (temp < stack) {
+        if (size == 8) {
+            printf("%lx: %lx\n", (long) temp, *((long*) temp));
+        } else
+            printf("%lx: %x\n", (long) temp, *((int*) temp));
+        temp += size;
+    }
 }

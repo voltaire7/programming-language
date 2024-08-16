@@ -80,4 +80,5 @@ void setup() {
     UPSERT("movr", MOVR);
 
     UPSERT(".", DOT);
+    UPSERT("debug-stack", DEBUG_STACK);
 }
