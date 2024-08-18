@@ -50,8 +50,8 @@ void eval() {
             } else if (entry->type == EXPERIMENTAL) {
                 void* old = stack;
                 entry->value.procedureValue();
+                if (old == stack) return;
 
-                return;
                 int size     = stack - old + sizeof(int);
                 int (*ptr)() = mmap(
                     NULL,
