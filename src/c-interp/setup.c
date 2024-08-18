@@ -1,7 +1,8 @@
 #include "env.h"
 #include "procedures.h"
 
-#define UPSERT(symbol, proc) upsert(env, symbol, (Value) proc, PROCEDURE)
+#define UPSERT(symbol, proc)   upsert(env, symbol, (Value) proc, PROCEDURE)
+#define UPSERT_X(symbol, proc) upsert(env, symbol, (Value) proc, EXPERIMENTAL)
 
 Dictionary* env;
 
@@ -72,7 +73,7 @@ void setup() {
     UPSERT("pop", POP);
     UPSERT("proc2", PROC2);
 
-    UPSERT("movz", MOVZ);
+    UPSERT_X("movz", MOVZ);
     UPSERT("movk", MOVK);
     UPSERT("svc", SVC);
     UPSERT("ldr", LDR);

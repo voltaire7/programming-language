@@ -2257,4 +2257,48 @@ proc [] [
 
 [need a [debug-stack] procedure.]
 
+[I can actually implement dependent types... I mean, I just learned zig has them with comptime
+right? Like damn.]
+
+[Then again, maybe I want more than that? Because some search algorithms need sorted list as input,
+but what, I need to check whether the list is sorted everytime? If it's a runtime check, it becomes
+expensive real quick... Since there is no way to attach the fact that list is ordered onto a
+symbol, I can't prove that a procedure will always work. Not without types.]
+
+[Also, I really like the fact that you can write proofs with dependent types. It's so fucking
+cool!]
+
+[Then again... 'Ordered' could just be a wrapping over a List. You can't pass a List instead of an
+Ordered argument, but you can pass an Ordered to a List... I guess List is the wrapping here.]
+
+[Honestly, I will probably implement [meta]. Doing [get-at pos size from] is too long. But again,
+I'm going to try to make as far without it as possible. I need to see what it looks like.]
+
+[Alright, suppose I do have to implement types:]
+item [x] 12
+typeof x print [%s\n] _ [outputs [Number]]
+type [Number] [u8 u16 u32 u64 i8 i16 i32 i64]
+
+[but how do you express fixed size lists?]
+array [x] [1 2 3]
+typeof x print [%s] x [outputs [Array Number 3]]
+
+[So I guess]
+x == [
+    [value] [1 2 3]
+    [type] [Array Number 3]
+]
+[[type] doesn't have to be a string. It can be pointers to strings, and depending (lol) on the
+pointer, the size of [type] can vary. But how do I know which types take in arguments?]
+
+[wait]
+type [Array inner-type length] [Array inner-type length]
+[it seems redundant, though.]
+
+[but then you have to say everytime a procedure uses IO and stuff...]
+[and what happened to this]
+u32 [x] 11
+
+[A big reason to have types, that it makes operating on fractions so much easier.]
+
 
