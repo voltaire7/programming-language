@@ -1,0 +1,38 @@
+proc [symbol] [
+    item-in 1 symbol _
+] item-in 0 [as] _
+
+proc [] [
+    item-in 1 [_]
+] as [ch]
+
+proc [] [
+    item-in 0
+] as [item]
+
+[+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+]
+
+movz 0 0
+movz 0 0
+movz 0 0
+debug-stack 4
+
+syscall 1 [0]
+proc2 [] [
+    push 3
+    movr 8 0
+    ldr 1 [0 1]
+    ldr 2 [0 2]
+    ldr 0 [0 0]
+    movz 16 4
+    svc  0
+    str  0 8
+    movr 0 8
+    pop
+] as [write]
+proc2 [] [
+    write 1 [Hello, World!
+] 14
+] as [say-hello]
+
+

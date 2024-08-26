@@ -2301,4 +2301,329 @@ u32 [x] 11
 
 [A big reason to have types, that it makes operating on fractions so much easier.]
 
+[Need to think about this.]
+[So, in [proc], the procedures have something like [reduce] called on them, and the instructions
+are pushed on the stack without being evaluated. On the top-level, they are pushed as well, but
+popped and evaluated afterwards. Okay. But what instructions are pushed on the stack? If you define
+[write] for example, the instructions that are pushed on the instructions pushed on the stack are
+the instructions  for taking arguments, and then pushing instruction again with thoses arguments
+hardcoded to push on the stack as well. So when [write] has taken arguments, you now have a
+procedure that pushes the same thing on the stack everytime, and you can evaluate thoses
+instructions or insert them inside another procedure. Because you can insert them inside another
+procedure, you can't just push the data at the end of the procedure (after ret). You need to
+hardcode it as mov instructions or mix code with data, do a ldr offset from pc where you put some
+data, then jump the data with a branch instruction... This is going to be hard to implement. Not
+just for [write] but for everything.]
+
+[Okay. I wrote a lot.]
+
+[You know, it's a little funny to think about safety in a language that, a its core, is more unsafe
+than [strcpy].]
+
+[If I do something like Elm, I will probably remove h1, h2, etc. And just have text... Then again,
+accessibility and all that...]
+
+[Depending on the types, a procedure can have a different number arguments?]
+[Types should really be string, a least at first.]
+
+[Functional programming is, to my dismay, seeming more and more appealing.]
+&& < 0 val > 65535 val          [functional]
+0 < val as [b] 65525 > val && b [current model]
+0 < val 65535 > val . && _      [current with pop]
+0 val < 65535 val > &&          [stack oriented]
+[functional and stack oriented are the clear winners here]
+
+[I understand that I want to make this programming low-level and such, but some things are
+objectively better than others. Once I finish implementing a working procedural model, I will try
+types, then funcitonnal, and compare the implementations.]
+
+swap str + 1 str
+
+[Another good reason to have types: errors are so much easier to do.]
+
+[The language has to be built from the ground up with [x] feature, otherwise a plugin would be too
+awkward.]
+
+[Should I make it so that it only compile after the first use? That might solve the recursion
+issue.]
+
+[In functional, I could use [_] as a discard:]
+_ write 1 [Hello, World!] 13
+[write doesn't return anything this way.]
+
+[Division by zero should equal zero, like in [Gleam]]
+
+[Maybe I can do everything lazy, and where it only compiles when function is called?]
+item [f] [print [Hello, World!\n]]
+print [%s\n] f [outputs [print [Hello, World!\n]]]
+[Of course, [item] does not malloc the string like before. It only get a pointer to the start of it
+(token + start).]
+
+item [f2] [f f]
+print [%s\n] f2 [outputs [f f]]
+
+[but]
+f2 [will compile [f f] and therefore [print [Hello, World!\n]] as well]
+
+[also, when printing a function, you won't just be getting the function body. you still need to do
+the argument logic, and all that.]
+[and let's not forget]
+func [f x] x
+[is equivalent to]
+item [f] fn [x] x
+
+[still, that means that everything starts of lazy?? this might not work, since we need intrinsics
+to define the rest... damn, thought I figured it out for a second there!]
+[maybe recursion will forever be off the table...]
+
+(define [f x] [
+    print [Hello, World!\n]
+])
+[maybe I should just give up and do it like this... seems cleaner at this point.]
+
+(print [hey])
+
+[wait, what about function with not arguments?]
+(if (< 4 10)
+    [f1]
+    [(f2)]
+)
+[i suppose that works.]
+
+(define [f x] [(
+    print [Hello, World!\n]
+)])
+[lol, this is worse than lisp.]
+
+[no, a thing I really like about my language is that I can [scan-token] and [copy-token] and
+[parse] or none of the above, without any reservation about what actual arguments the caller gave
+you. in lisp, you're pretty much forced to take the arguments within parentheses. it's a tradeoff
+with its merits and demerits, but I prefer it.]
+
+[Suppose I implement the functional style, variables should also be functions with no arguments,
+that always push the same value on the stack.]
+item [f] lambda [x] [print x]
+func [f x] [print x]
+[ah, that brings back memories. right, if I do this]
+item [str] [Hello, World!\n]
+[how do I know that it's a string or function?]
+[and so one of the big reason to have functional style is thrown away just like that.]
+
+[i guess i could be more lispy?]
+define x 5
+define [f] 5
+print x [outputs 5]
+print f [outputs 0xffffffff (pointer to function)]
+[wait, how do you call?]
+print (f) [outputs 5]
+[hmm, so like the outer scope doesn't need a parentheses?]
+
+print f [outputs 5]
+print ptr [f] [outputs (pointer to 'f')]
+
+[wait]
+(define [f x] [
+    print [Hello, World!\n]
+])
+(f 5) [outputs [Hello, World!\n]]
+f [outputs [print [Hello, World!\n]]]
+[but how would that work?]
+
+[no]
+(define str [Hello, World!\n])
+(define [f x] [eval x])
+(print str) [outputs [Hello, World!\n]]
+(f [print str])
+[I have no idea.]
+
+[I don't even know why I'm exploring this shit... Man, it was so much easier when I was just interpreting.]
+
+[Maybe I could invert it?]
+define str [Hello, World!\n]
+define [f x] [eval x]
+print (str) [outputs [Hello, World!\n]]
+f [print str]
+[somehow, that's kind of nice?]
+[although]
+print $str [outputs [Hello, World!\n]]
+[no reason to use parentheses when it's not a list]
+
+[or]
+define str [Hello, World!\n]
+define [f x] [eval x]
+print str [outputs [Hello, World!\n]]
+f [print str]
+print ptr [f]
+[every symbol is a function]
+
+[I like how I'm basically pushing the problem from one place to another.]
+
+[parentheses will never be an option, because they will always be more verbose than procedural,
+losing the motivation to go for a functional style.]
+
+[The only serious alternative is]
+print + 1 2
+print ptr [+]
+[against]
+1 + 2 print _
+print +
+[I see. Procedural can be much shorter.]
+
+[The really beautiful thing about procedural is how you don't need an AST; everything is just
+text.]
+[But also, how you can actually implement functional in procedural.]
+[I feel like implementing procedural in functional would be a pain though.]
+
+[maybe]
+func [] []
+proc [] []
+[each parsing arguments in different ways?]
+[but the inconsistency could drive you mad...]
+[but it's similar to [macro] too?]
+[...]
+
+[no, [func] requires type metadata; [proc] does not.]
+[or rather, the way variables work would have to change for the two, and the only way to make the
+behavior consistent is to have metadata on variables.]
+
+[In the long run, functional may be more useful. And I also, need types. The key thing is to still
+use the procedural model, but parse stuff differently. I want [scan-token] and the gang.]
+
+item [x] [hello]
+item [x] fn [] []
+
+[I guess [fn] does compile, but only partially, and it compile the instructions to compile the rest
+of itself?]
+
+[but then again...]
+func [x] [print x] [input]
+proc [x] [print x] _ [input]
+[one is longer, sure, but it makes more sense.]
+[the other is simply not text based.]
+
+[for god's sake! this is such an impossible problem!]
+
+[another reason not to fully compile everytime, is faster runtime. otherwise, you would have to
+compile every imports everytime you run the app. this makes it so you only compile the things you
+actually use.]
+
+[Is recursion even possible without types? How can you tell it's the end of an array?]
+
+[I should create an actual lisp]
+[Probably built on top of python this time. See how far I can get.]
+
+[I should probably put the compilation on hold so that I can implement the rest of the language, so
+that I can then objdump the assembly and have a better idea of what to do. Also, I need to avoid
+using the standard library.]
+
+[Just had an idea:]
+rand-proc-call as [val err]
+[so like, instead of having [rand-proc-call] define variables that could clash with the lower
+scope, we just put the stuff on the stack, and [as] can assign multiple values from the stack.]
+
+[I should try to do C structs without [struct].]
+
+[I should try something like [do-set]:]
+proc [] []
+[here [_] is know a pointer to an executable part of memory that will call [do-set] on the start of
+the procedure block, compile it and reassign [_] the compiled code.]
+
+malloc Vector3
+[[Vector3] is the size of the structure.]
+[wait no]
+malloc Vector3.size
+Vector3 [1 2 3]
+
+[Functional may make more sense.]
+func [x] [print x] [input]
+proc [x] [print x] _ [input]
+[like what? does procedure assign [_] as well? Was it not supposed to be in the stack?]
+[no, this is small]
+proc [x] [print x] as [_] _ [input]
+[or]
+proc [x] [print x] . _ [input]
+[as always, very verbose.]
+[still I need return values to be on the stack as that is so much easier to work with for multiple return.]
+[or maybe]
+proc [x] [print x] ; _ [input]
+[I kind of like it?]
+
+extract [_ err] sp
+[similar to [as] but takes pointer?]
+
+[when I do the documentation, I really need it to start with:]
+exec 16 [very-long-hex]
+[which of course prints [Hello, World!\n]]
+
+[maybe meta is just a long, but that long can be anything, and the procedure decides?]
+[[size], [meta] and [value]:
+if [meta] is 0, then the symbol is an int, float, or whatever;
+if != 0, then it's a pointer to something and meta is size of [something]]
+
+[no, int for size and int for meta, to 64 bit total]
+
+[i should implement a meta circular evaluator.]
+[just to remind myself why I created this language,
+fix in lisp: right-to-left, parentheses, abstraction, nesting]
+
+[i need to list what types to implement, and features those types allow.]
+[like every variable has metadata to improve errors, and a size for the value, and a nullable size
+for referenced memory, with maybe whether or not that memory is executable?]
+
+declare [val1] [int]
+declare [val2] [Array int]
+[i don't know.]
+
+[the reason no one made this language is because of how unsafe it is...]
+[i think i read somewhere that mmap allocates an intire page every time? in other words: it's
+extremely inefficient...]
+
+[There's a sort of shit to my language, that wasn't there when it was just interpreted.]
+proc [] [
+    1 + 1 ;
+    print [%i\n] _
+]
+[how the fuck do I translate this to machine code, and how the fuck do I remove the need for
+symbols? like what, I lookup a hashtable in compiled/optimized code? I need to be better than
+this.]
+
+[Maybe I should drop the hashtable? I mean, the only reason I use it is because chatGPT said it's
+typical? But then [malloc] is bad. Also, I now have the stack and want to use it to put values in
+it.]
+
+[Also, I really need to learn the io programming language. I'm really thinking objects to the
+language, because with types, it's just a waste not to have objects. And we can have stuff like
+this:]
+object [String] [
+    [ptr] 0
+    [len] 0
+]
+new String [str] [[Hello, World!\n] 14]
+[... so awkward. need to think this through. Also, still not set in stone that I will use types and
+objects. I will resist it till the end!]
+
+[I can't continue programming until I figure this out:]
+proc [] [] _
+[vs]
+proc [] [] ; _
+
+[wait a second...]
+proc [] [
+    ch [hello\n]
+    print _
+]
+[this isn't a hard problem? ... I just do as normal, but when it actually compiles, [print]
+compiles, it doesn't compile with [_], but with the absolute value that of [_]. Am I for real? Is
+it really that easy? Am I missing something?...]
+
+[Also,]
+proc [] [] _
+proc [] [] as [val err]
+[are both valid?]
+[wait, no. [proc] needs to have a call that assign [_] at the end. like [return] or something.]
+
+[I suppose [ch] does not compile, but is already compiled? That's why I don't have to worry about
+it?]
+[Still, that means that [push] needs to work differently...]
+
 

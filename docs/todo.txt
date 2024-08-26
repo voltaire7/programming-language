@@ -38,5 +38,7 @@ todo:
 [ ] x86
 [ ] no ret evaluation
 [ ] ""
+[ ] module, end-module (?)
+[ ] meta-circular evaluator
 
 
