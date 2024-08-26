@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "eval.c"
 #include "scan-token.h"
 #include "setup.c"

@@ -1,12 +1,8 @@
 #include "procedures.h"
 
+#include <ctype.h>
 #include <math.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/mman.h>
-#include <sys/ttycom.h>
 
 #include "defines.h"
 #include "env.h"
