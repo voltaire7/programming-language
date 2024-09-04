@@ -2626,4 +2626,716 @@ proc [] [] as [val err]
 it?]
 [Still, that means that [push] needs to work differently...]
 
+[If I do modal programming, I could do it where things are both pushed on the stack and on the
+hashmap? I call the same procedure, but the procedure behave differently depending on the global
+state.]
+
+[Also, I feel like I can still do currying. Everytime I take an argument, I push something on the
+stack, and stuff, except the thing that I pushed is a procedure that take the remaining arguments,
+and then returns the actual body of the procedure.]
+
+[Types, types, types!]
+my-list to-iter
+[make like rust iterables? [.next] I mean. And more importantly, lazy and infinite.]
+0 -1 iter [is an infinite data structure?]
+map [x] [x * x]
+
+proc [] [type _ == [Vec 8] ? [logic] [Iter]] as [a-way-to-do-overloading]
+
+[The two most basic types are Code and Data. All other types are derived?]
+
+fork ? [] [
+    print [Hello, Async!\n]
+    exit 0
+]
+
+[Reference type]
+item [str1] [hello]
+item [str2] [hello]
+str1 == str2 [true]
+
+ref str1 as [str1]
+ref str2 as [str2]
+str1 != str2 [true]
+
+[Everytype is by value by default?]
+[Like, we have arbitrary sized integers, but with strings too. Strings are just very, very long
+integers. So they should behave the same.]
+
+[I should find a way to do a hashmap without malloc... Or just put everything on the stack?]
+Variable :: {
+    name : String
+    type : String
+    size : i32
+    value: Any
+}
+[I don't know...]
+
+struct [Variable] [
+    name String
+    type String
+    size Number
+    value Any
+]
+[Type could also just be [Structure]]
+[I guess [item] should then push this on the stack?]
+[Also, how do lookup in the outer scope? Also also, I guess I can't do [item-in] any more...]
+[No, the first variable of a scope is basically just metadata about the outer scope.]
+[Wait, I don't even need [item-in]! When the scope is gone, all my variables are still there! I
+just write over them, or be clever and write them where they should've been to begin with!!]
+
+[Okay. This is one of the most interesting ideas I've had in a while.]
+[I don't even think it's that much slower than a hashmap, despite being linear and stuff.]
+
+[But happens here?]
+1 + 1 dbg
+[is [name] equal to null?]
+
+[Also, an [env] could just be another variable on the stack, except its size is the size of every
+other variable combined?]
+
+a = 2 [is possible because] push a [is equal to]
+Variable [a] [Undefined] 0 []
+[or something like that]
+[and then, we simply reassign the value to 2.]
+
+[also, when we lookup the stack, we go from the of the stack.]
+[Damn! Just realized how easy looking up into multiple environments is with this model! Damn I'm smart!]
+[Also, if there is a [stack] variable, it is in the bottom of the stack everytime.]
+[Also also, shadowing.]
+
+[Honestly, it's probably nowhere near as fast as a hashmap... thinking about it for real, the
+bigger the application (and they get pretty big), the slower it will get, exponentially.]
+
+[Still, unlike a hashmap, I can define variable length values – scrath that. In a hashmap, I can do
+it as well.]
+[Wait, what about pushing pointer to the procedure you will use a lot in the start of a scope...]
+[No no no. Before that, isn't it the job of the programmer to ensure that the stack has no bloat
+that make the linear search take forever?]
+[Even before that! Procedures are compiled to begin with, so it should take that long?]
+[... Or maybe I should have multiple stacks?]
+
+4
+[==]
+Variable [_] [Number] 3 4
+
+[[Mutable] and [Immutable] types?]
+
+[Maybe [import] is a procedure that returns variables on the stack?]
+
+[If the language become so stack centric, should everything be a function that return their value
+to the stack? Even variables?]
+[^ Functional refuses to die.]
+
+i32 [name] 1
+[is equivalent to]
+Integer [name] 2 1
+[where 2 is the size]
+
+[don't forget]
+malloc(typeof(Entry) + entry.size)
+[or something like that.]
+
+eval fn [] []
+[maybe [_] is latest stack variable?]
+[damn, don't even need [return]]
+
+[since every variable has a type, you don't need to "call" a variable. but the syntax makes it look
+like you do.]
+
+[both item and as work for declaring a function]
+let [f] fn [] []
+fn [] [] as [f]
+
+[discard]
+let [] func-call
+
+[[eval] is called on the arguments of a function...]
+[I should give crafting interpreters another chance. The type system is a real pain in the bum.]
+
+[overloading]
+fn [arg1] [
+    string? arg1 ? [stuff] [
+        throw [Unsupported type: %] type arg1
+    ]
+] as [overload]
+fn [arg1] [
+    number? arg1 ? [stuff] [
+        overload arg1
+    ]
+] as [overload]
+
+[I don't even need [item-in]...]
+[type [Struct Vector]?]
+[objects and templates? or prototypes?]
+[but a prototype is just another object...]
+
+item [val] do [1 2] as [val2]
+item [val] do [1 2] next [val]
+
+[maybe every variable should have a padding, to allow for arbitrary sized values?]
+[you can call clone on any object?]
+
+[damn, i can do] var . proto . type
+value size [where [size] is just another overloaded function that check the type of the value in the stack?]
+
+[this just doesn't work]
+a == b || b == c
+
+sqrt 9 [returns special type? like an [Or] type that means the value can be any of the list]
+
+[has to be + a b for constexpr]
+let [VALUE] + + 1 2 + 3 4
+
+[interesting: using this model, there is no mutation from inner to out block...]
+[or not? how do I do globals?]
+[maybe I should let and set like other programming languages?]
+
+[oh shit i can do static methods...]
+Object [
+    [name] [test-object]
+    [func] fn [] [
+        print [This works!\n]
+    ]
+]
+
+[eveything is not a function, but everything behaves like one, syntaxically]
+[everything is a "function", including types]
+[I should do [functions.c]]
+
+[Maybe there shouldn't be a distinction between code and data... You're gonna have to call a
+function anyway, to push the data on the stack and stuff...]
+[memcpy and stuff.]
+[everything behaving like a function but not really being one could be the best way to implement
+lambda calculus on a computer...]
+
+[I may be giving up on [proc] too quickly. I feel typeless is pretty much dead now, tough.]
+[Still it is a fact that procedural made me agonize over a few things. – Honestly, I should be more
+open to experiment with shit, even if it's not going to bear any fruit.]
+
+let [ret] func-call
+ret match
+    [Some a] [print a]
+    [None  ] [throw [Failed to unwrap monad.]]
+
+length list
+clone vec
+
+[Initially, I wanted functional. I should try it. If it doesn't work, then too bad.]
+
+let [C] import [libc]
+let [main] fn [] [
+    let [a b] i32 3 i32 4
+    let [result] C.add a b
+    print [% + % = %\n] a b result
+]
+
+let [true ] fn [x y] [x]
+let [false] fn [x y] [y]
+
+[I should have a function that takes piece of code and debugs it step-by-step]
+debug [
+    print [Hello, World!\n]
+]
+[Similar to a GDB or LLDB breakpoint, it halt the execution of your code to enter a TUI debugger
+for the requested piece of code.]
+
+let [func] []
+do [
+    set [func] fn [] []
+    defer [munmap ptr-to [func]]
+
+    [fine]
+    func
+]
+[will segfault]
+func
+
+[do I really need fexpr?]
+[I mean, I just need to pass in a string to a normal function. No... Every function is an fexpr
+(or macro) by default; they just choose to always evaluate the arguments. And you can still use
+[macro], but it's like really deep in the language, and not idiomatic, I guess.]
+
+let [c] char [🤓]
+             [  ]
+
+let [a] 123
+let a = 123;
+
+let [a] i32 123
+let a: i32 = 123;
+
+let [io] import [System/IO]
+io.print [Hello, ]
+use import [System/IO]
+print [World!\n]
+use [
+    import [System/String]
+    import [System/Syscall]
+]
+import [System/String] as [text]
+print text.reverse [Hello, World!\n]
+
+[I should probably make it so that everything in the language follow this form:]
+let [symbol] [something]
+[like this]
+let [number] 4
+let [string] [Hello, World!\n]
+let [function] fn [] [
+    print string
+]
+let [person] Object [
+    [name] [John Smith]
+    [date-of-birth] Date [4-7-1969]
+]
+let [person2] clone person
+let [person2.name] [Jane Doe]
+
+[also, I just had a brilliant idea for objects:]
+let [sys] import [System]
+[is problematic because [import] returns an object, and how is [sys.something] defined then? Well,
+[let] manages that. It checks if the value of the assignement is some sort of object, and if yes,
+does seperate assignements for all the fields. Clever, right? Right??]
+
+[wait a second.]
+let [] import [System/IO]
+.print [Hello, World!\n]
+[right?]
+[no, it shouldn't work like that...]
+
+[Maybe take the zig route?]
+let [std] import [std]
+let [print] std.debug.print
+
+[Still, I wanted [import] to work a bit like [load]]
+let [lib] load [lib.txt]
+let [sys] import [System/]
+[or something like that]
+
+let [Vector3] fn [x y z] [
+    Object [
+        [x] x
+        [y] y
+        [z] z
+    ]
+]
+let [vector] Vector3 1 2 3
+println vector.x
+
+[I should try to implement dependent types, since this language already blurs the lines between
+compile-time and runtime. Also, it's a good way to learn.]
+
+[By the way, this language probably won't have any tuples, since those are basically just
+structures.]
+let [tpl] tuple [1 [Hello, World!\n] 1/3 Vector3 1 2 3]
+let [tpl] Object [
+    [0] 1
+    [1] [Hello, World!\n]
+    [2] 1/3
+    [3] Vector3 1 2 3
+]
+println tpl.1 [outputs [Hello, World!\n]]
+[then again... they are objects, but [tuple] could just be a shorthand (macro or function) to avoid
+naming things inside the object]
+
+[Also, enums]
+let [] enum [
+    [Monday]
+    [Tuesday]
+    [Wednesday]
+]
+println .Monday [outputs 0]
+[I guess this is similar to a tuple. That is to say that it's just some macro for shorter object
+initialization.]
+
+[People talking about arbitrary compile-time execution; I talk about arbitrary runtime compilation.]
+
+let [func] fn [] []
+let [func] ptr-to [func]
+let [func] val-of [func]
+func [works]
+
+print type-of Object [
+    [name] [John Smith]
+    [date-of-birth] Date [4-7-1969]
+]
+[will output:]
+[Object [
+    [name] [String 10]
+    [date-of-birth] [Date]
+]]
+[or something like that]
+
+[I should do Elm style, that also compile to html/css/javascript]
+
+let [n] 10
+let [test-fn] fn [n] [
+    while -- [n] [
+        println n
+        n
+    ]
+]
+let [factorial] fn [n] [
+    as [arg1 arg2]
+    while != arg1 n [
+        * arg1 arg2 as [arg1 arg2]
+    ]
+]
+test-fn n
+factorial n
+
+[hmm.]
+[maybe everything should be an S-expression...]
+let [test] ? condition [
+    do-something
+] [do-nothing]
+[yeah, this code is impossible with the old model.]
+
+let [condition] or = 1 2 ≠ 2 2
+
+[Maybe I should just use a VM. The only difference is that the vm is for arm64 assembly?]
+[Man, I wouldn't have this headache if the OS just allowed me to make things for writable and
+executable.]
+
+ls | sort-by [size] | reverse
+[is there a way to implement this?]
+[maybe I should reconsider the very first approach]
+reverse sort-by ls [size]
+ls push [size] sort-by reverse
+[no, if I wanted multiple return values, I can't]
+let [value1 value2]
+    reverse sort-by ls [size]
+    where ls [> size 1kb]
+
+[maybe it's just a macro?]
+ls | sort-by [size] | reverse
+[is equivalent to]
+ls ; sort-by _ [size] ; reverse _
+
+[Maybe there is a stack type and a heap type?]
+
+[Pattern matching?]
+if let [value] dup func-call [
+    debug value
+]
+[[dup] for duplicate... or should I overload [clone]?]
+
+[[mut] instead of [set]?]
+[because [set] was paired with [get] for array assignment and retrieval.]
+[or [set] could just be overloaded.]
+
+2.0
+let [number] print [number: ]
+println number [outputs [number: 2.0]]
+
+[I guess floats should have a precision field so it actually prints [2.0] and not [2.000000]]
+
+clone value
+length value
+
+[I forgot: modal programming!]
+ls | reverse
+[[ls] pushes an array of characters onto the stack. [|] changes the mode to [Piped]. [reverse]
+looks at the mode first before executing.]
+[Then again, maybe every type can become piped?]
+
+let [_] last-stack-item
+[special type?]
+
+[[=] vs [==]]
+[value vs reference]
+let [str1] [test]
+let [str2] [test]
+println =  str1 str2 [outputs [false]]
+println == str1 str2 [outputs [true]]
+
+printl [vs] println [?]
+
+[Oh mother fucking shit!]
+compile opt [
+    [filename] [Terminal]
+    [filetype] [ELF]
+] [main]
+[^ an [Options] type!]
+
+[I will probably still have a [return] function.]
+let [print-unsigned] fn [number] [
+    if < number 0 [
+        return Error [Number too small.]
+    ] []
+    printl number
+    return []
+]
+let [e] print-unsigned -1
+if != e [] [
+    throw e
+] []
+
+0 ~ print [%i\n] _
+0 ~ print [%\n] _
+print [%\n] ~ 0
+print ~ 0
+
+if condition [
+    func-call 1
+] [
+    func-call 2
+]
+
+print 1 \n
+let [\n] fn [] [
+    print [\n]
+]
+
+print [\%] [outputs [%]]
+
+[zig is great, yeah, but I feel like I want this language to take more after jai]
+let [items] Array [
+    ptr-to [print]
+    ptr-to [let]
+    ptr-to [\n]
+    ptr-to [ptr-to]
+    ptr-to [Object]
+]
+for items [print it \n]
+
+[hmmm, [[]] made sense before, when I had [item-in] for return values, but now, not so much.]
+let a 2
+let str [Hello]
+let [push-str] [[ world]]
+
+[become more lispy by the second. wait till I add this revolutionnary feature called
+((("parentheses")))]
+
+[lispy formatting]
+let [render] [
+    fill-rect proj-rect proj-x proj-y
+              unpack-color PROJ-COLOR
+    fill-rect bar-rect
+              unpack-color BAR-COLOR
+    for targets-pool [
+        if ! it.dead [
+           fill-rect target-rect it
+                     unpack-color TARGET-COLOR] []]
+]
+
+[this might be better; more consistent with the [for] loop's format]
+let [render] [
+    fill-rect proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool [
+        if ! it.dead [
+            fill-rect target-rect it
+                unpack-color TARGET-COLOR
+        ] []
+    ]
+]
+
+[or all in one line; but hard to read]
+let [render] [
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool [if ! it.dead [fill-rect target-rect it unpack-color TARGET-COLOR] []]
+]
+
+[I suppose lispy formatting will eventually grow on me, like vertical alignement, but right it's
+either the second format or all in one line. For all in one line, I could just assign to a variable
+if it gets too long. I believe this is the pythonic way of doing this.]
+
+[Also, I don't have to worry about readability like before, since with the new type system, syntax
+highlighting will be much better, probably.]
+
+let [func] [
+    func1 func2 func4
+                func5
+          func3 func6
+                func7
+]
+
+let [func] [
+    func1 func2 func4
+            func5
+        func3 func6
+            func7
+]
+[yeah... the second one is hella ambiguous.]
+[as ugly as it looks, the first one is objectively better.]
+
+[no, if I multi-line a function call, I do it the C way.]
+func-call
+    func-call
+    variable
+    func-call
+
+func-call(
+    func-call(),
+    variable,
+    func-call(),
+);
+
+[The formatting problems only occur when I push the first argument on the same as the function
+call. If I don't do that, then all is good.]
+
+[[dup] vs [clone]]
+[dup: pushes a copy of the value attached directly to the symbol; like numbers, floats, and
+pointers.]
+[clone: clone value being referenced by symbol; like Arrays, Objects, Strings, and things pointed
+to by pointers.]
+
+[another reason to do it like this]
+let a 2
+++ a
+
+[what about reassigning [let] and [++]?]
+[I suppose I just have to not use them for the reassignment? Like how [let] and [++] where
+initially assigned?]
+
+[It's basically recursion vs easy overloading...]
+[But the minmax algorithm is a pain in the ass without recursion...]
+
+[The same way a function gets called when [do] is called with it as an argument, should an [Object]
+expand to just the fields?]
+fn [x] [print x \n] [Hello, World!] [outputs [Hello, World!\n]]
+Object [func fn [] [print [Hello, Again!\n]]]
+func [outputs [Hello, Again!\n]]
+
+[Wait, this may be a way to do multiple assignment?]
+Object [
+    [var1] 1
+    [var2] 2
+    [var3] 3
+    [var4] 4
+]
+print var2 [outputs [2]]
+[Interesting. I should consider it seriously.]
+[Granted, you can no longer do this:]
+fn [] [] as [func]
+[But so what? You're not supposed to anyway.]
+
+import [System/IO]
+print [Hello, World!\n]
+let [io] import [System/IO]
+io.print [Hello, Again!\n]
+
+[holy fuck, I don't even have to use [use]!]
+let [func obj] [
+    print obj.var-within-obj
+    obj
+    print val-within-obj
+]
+
+[Damn, nevermind. There's a discrepancy between returning an object and exposing it's fields.]
+let [func obj] [
+    print obj.var-within-obj
+    use obj
+    print val-within-obj
+]
+let [Vector3 x y z] [
+    return Object [
+        [x] x
+        [y] y
+        [z] z
+    ]
+]
+
+[There also another problem...]
+let [arguments] [
+    1 2 3
+]
+Vector3 1 2 3
+[vs]
+Vector3 arguments
+[vs]
+Vector3 arguments [] []
+
+[that is to say, should a function know how many arguments an argument actually is?]
+
+[maybe it's not that bad? it's a question of [use] vs [return]...]
+
+[imports]
+use import [System/IO]
+import [System/IO]
+
+[Object initialization]
+let [Vector3 x y z] [
+    Object [
+        [x] x
+        [y] y
+        [z] z
+    ]
+]
+let [Vector3 x y z] [
+    return Object [
+        [x] x
+        [y] y
+        [z] z
+    ]
+]
+
+[multiple variable initialization]
+use Object [
+    value1 [Hello, World!\n]
+    [func x y] [
+        print x
+        return y
+    ]
+    value2 Vector3 1 2 3
+]
+Object [
+    value1 [Hello, World!\n]
+    [func x y] [
+        print x
+        return y
+    ]
+    value2 Vector3 1 2 3
+]
+
+[and functions]
+do fn [x] [print x] [hello]
+fn [x] [print x] [world]
+
+[I guess function returns are not exactly related to Objects returning...]
+
+[oh shit. suppose functions do have meta data concerning argument count.]
+let [func] print [Hello, World!\n]
+let func print [Hello, World!\n]
+[the first one is lazy, the second one is eager.]
+
+[maybe I can use that to mix in eager and lazy in a function?]
+let [func x] do [
+    print x
+
+    [this has to be function, since [x] is not known yet.]
+    let [value] + x y
+
+    [this is basically function composition.]
+    print value
+]
+[it returns a string if I don't put [do]?]
+
+[I should consider function metadata more seriously.]
+for items print it
+for: item items print item
+
+[I guess macros, which is what all functions are built off, would need to figure out the function
+metadata.]
+
+let [fib n]
+    if or = n 0 = n 1
+       n
+       + fib - n 1
+         fib - n 2
+
+let [fib]
+    : : 1 1 zip-with [+] fib tail fib
+
+[I guess I should do function overloading? But instead define types that are comprehensive enough?]
+
+[need [println] if I want single line functions]
+let [say-hello] println [Hello, World!]
+
+[I don't know; I've been implementing features to get syntax I want, not for consistency...]
+
 

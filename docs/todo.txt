@@ -40,5 +40,6 @@ todo:
 [ ] ""
 [ ] module, end-module (?)
 [ ] meta-circular evaluator
+[ ] shell
 
 
