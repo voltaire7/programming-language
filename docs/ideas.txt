@@ -1615,7 +1615,7 @@ runtime...]
 item [a] [test]
 item [b] [test]
 a == b
-[this works because the language knows the type and can decide weither to call it or push it on the
+[this works because the language knows the type and can decide whether to call it or push it on the
 stack.]
 
 [Also]
@@ -3337,5 +3337,281 @@ let [fib]
 let [say-hello] println [Hello, World!]
 
 [I don't know; I've been implementing features to get syntax I want, not for consistency...]
+
+let [say-hello] println [Hello, World!]
+let ptr ptr-to [func]
+val-of [ptr] [outputs [Hello, World!\n]]
+
+[Dude, haskell is insane: I looked up how to implement a [Vector3] object or similar in it, and was
+extremely shocked! Gasp!]
+
+data Vector3 = Vector3 { x :: Int, y :: Int, z :: Int }
+    deriving (Show, Eq)
+
+main = do
+    let v = Vector3 1 2 3
+    print $ x v
+
+[this is fucking insane. I can't believe haskell implemented the stupid idea I had! And weirdly too! Since you can't overload [x]...]
+
+[By the way, [import] opens a file, reads it, executes it... then what? how is it turned into an object?]
+[I guess, maybe, it somehow convert the [env] into one?]
+
+[Shockingly, typescript is the most similar to what I envision the final implementation could look
+like... Well, not syntaxically of course. You know, the prototypeness, structured types and stuff.]
+
+[Should the language require to specify mutable input?]
+let [func mutable-input constant-input] do [
+    set mutable-input constant-input
+]
+[something like that?]
+
+[Should an array be an object?]
+[I should have an [Object.Field] type]
+
+[how do I insert the fields of an object in the initialization of another object?]
+let Person Object [
+    name []
+    age  []
+]
+
+let Citizen Object [
+    Id  []
+    use Person
+]
+
+[but then, there is no way I could make the name field non quoted...]
+
+[typescript's way of combining types with [&] is really nice and elegant! I should take notes.]
+
+[Maybe I should make the stack have a variable length? Like, I [calloc] when pushing makes the
+stack too big? Or maybe not? I mean, when variables have a symbol associated with them, they are by
+default on the heap, in a hashmap... There limited cases where this is useful.]
+
+[Also, I should the functional implementation with a very simple version of [let]. None of that
+fancy syntaxic sugar please. Though I will implement it eventually, and see how good it is.]
+
+[I'm just gonna use [use] too, at the start at least. Again, I will try a lot of things.]
+
+[Is it possible to make the language fully functional in syntax, but it actually mutates a lot?]
+
+[I'm going too far down the functional rabit hole...]
+object [] as [Vector3]
+
+proc [x y z] [
+    object [
+        [x] x
+        [y] y
+        [z] z
+    ]
+] as [Vector3]
+
+[I'm feel like I should only symbolic programming, but quoted symbols are basically pointers...?]
+
+let [Vector3 x y z]
+    Object [
+        x x
+        y y
+        z z
+    ]
+
+[functions have arguments in type, macros do not]
+[function types is according to first use?]
+
+let test-macro macro [print next-token]
+[wait – no no no!]
+let [test-macro] print next-token
+[macros are just functions without arguments!]
+
+[maybe true and false are macros?]
+
+print type-of [Vector3] [Function 3]]
+[for 3 arguments]
+
+[wait]
+for 3 printl it
+[?]
+
+[hmm.]
+let [Vector3 x y z] todo
+let Vector3 x y z = todo
+
+[[Object] should be capitalized like [Vector3]]
+
+[complex numbers]
+let z + 3 4i
+[or]
+let z 3+4i
+
+[I talk about inconsistency, but what about [[]]? How do you return a string?]
+[I guess a string is basically an array?]
+
+let [ret-str] do [
+    String [Hello, World!\n]
+]
+
+let value Pattern [1 5 25 125 625]
+
+[[Alias] type?]
+
+[I should figure out how to infer function types without arguments. Like, you have macros, but the
+macro behave exactly like a normal function, except it's written like a macro just because. And I
+should still be able to infer the type (not the implementation though)]
+
+[oh shit]
+load-bin [/bin/]
+mv [path1 path2]
+type mv Function [String String []]
+mv path1 path2
+[maybe?]
+
+[I think I will still do [let-in], otherwise, some macros can me a pain in the ass.]
+[I could make it so the type of a function is infered from it's first use; that or pretyped.]
+let [func1 arg] arg
+func1 123
+[or]
+type func2 [Function String]
+let [func2 arg] arg
+print func2 [Hello, World!\n]
+
+[Then again, no. It should be infered from usage. Like duck typing.]
+
+[I was thinking that arrays could be objects, but why not the reverse?]
+let "vector3" [1 2 3]
+println get vector3
+
+let ["func" "arg1" "arg2"] func arg1 arg2
+[This is weird. I don't like it. Still, the Haskell way, of not really having object should be
+explored.]
+
+[maybe [+] is overloaded for objects?]
+let [Person name age] Object [
+    [name] name
+    [age ] age
+]
+let [User name age] + Object [
+    [id] random 0 ^ 2 64
+] Person name age
+print User [test-name] 123
+[outputs:
+    [
+        [id  ] 123857120581204
+        [name] [test-name]
+        [age ] 123
+    ]
+]
+
+* 100 - .5 random
+
+[It makes me gag, but every value should be an object. Well, a tagged union to be exact?]
+let [val] 123
+debug val
+[outputs
+    [
+        [type ] Integer 32
+        [value] 123
+    ]
+]
+print val.type [outputs [Integer 32]]
+print val [outputs [123]]
+
+let [obj] Object [
+    [name] [test]
+]
+extend [obj] [age] 43
+print obj
+[outputs
+    [
+        [name] [test]
+        [age ] 43
+    ]
+]
+
+[maybe special syntax?]
+:= variable field
+
+[I should add named arguments...]
+let [test] [
+    let token next-token
+    if == [-] * token
+        match token [
+            [-o] set output-name next-token
+        ]
+    let file next-token
+]
+test -o main main.txt
+
+let [func arg] print arg
+let [func] print eval next-token
+let [func] print next-arg
+
+[doc function]
+doc [print] [
+    prints formatted output to stdout.
+    automatically call [to-string] on non-string inputs,
+    and [format] on string inputs.
+]
+help [print]
+
+[functions are colored but only for the linter? like, a symbol will be orange is if it is unsafe?]
+
+[[;] for eval?]
+print [Hello, World!\n] [Hello again.\n] ;
+print [final hello\n]
+
+[no, remember. a function that an infinite number of arguments. only, it call the functions passed
+to it. and the next statement is just that, an argument passed to it, that never returns because it
+also calls another function.]
+
+[huh. so i guess you can just do this]
++ 1 2 3 4 5 6
+[no, it doesn't work.]
++ + + 1 2 3 4
+
+[LISP has parentheses, I have types.]
+
+[A big reason for function compilation to be lazy, is inter-recursion. I'm pretty sure I saw it in
+the 'C programming language book', but there are case where functions doing recursion one after
+another makes sense.]
+
+[maybe "" is pushed on the stack, [] is not? and that's the only difference?]
+
+[I should let go of the old object system, and instead have prototypes and instances, where the
+object itself is just a macro taking a symbol, and matching it with stuff.]
+let [test-obj] do [
+    let [token] next-token
+    match token [
+        value    5
+        function do [
+            printl [Hello, World!]
+            do next-token
+        ]
+    ]
+]
+print test-obj value
+test-obj function print [rest of the application]
+[vs]
+print test-obj.value
+test-obj.function print [rest of the application]
+
+[hmm]
+my-list iter filter fn [item] == item id 132 collect
+collect filter fn [item] == item id 132 iter my-list
+[btw, this can't be done with [my-list.iter]. you need () function calls and actual [.] syntax.]
+
+[while this is technically the same, it isn't. One requires function overloading, the other
+doesn't, and can be done using macros and functions.]
+
+[more importantly, the initial way I had planned to structures was to just take a slice of an array
+using [get-at], but it sucked. Still, if I just have the same behavior, but with pre-built
+functions attached to a macro object (yeah, just came up with this name). Still, doing mutation is
+now kind of hard...]
+
+[also, this model allows for prefix, postfix and infix functions in a more natural way.]
+
+[no. how does [my-list iter] know whether to call the next token, or to just return an iterable?]
+let my-iter-list my-list iter []
+print my-iter-list filter fn [item] == item id 132 collect
+[nah, prefix syntax is just simpler and better.]
 
 
