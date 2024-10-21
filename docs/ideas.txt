@@ -3614,4 +3614,78 @@ let my-iter-list my-list iter []
 print my-iter-list filter fn [item] == item id 132 collect
 [nah, prefix syntax is just simpler and better.]
 
+my-list iter [filter fn [item] == item id 132 collect]
+let my-list my-list iter []
+my-list [filter fn [item] == item id 132 collect]
+[maybe?]
+
+[it's not that difficult when compiled, but when prototyped...]
+let [test-func1] printl eval next-token
+let [test-func2] test-func [Hello, World!]
+[this should work, since macros and functions are equivalent... but it probably won't be that
+simple.]
+[I guess [test-func1] is a function taking no arguments, and that's it. But then, they aren't
+equivalent...]
+let [test-func text] printl text
+let [test-func] printl eval next-token
+[to make them equivalent, I need to check if [next-token] is called, or just use [] for nesting
+everywhere...]
+
+[Even if I don't actually compile, emulating the compile once, then execute every other time is not
+that hard.]
+[Or should I just start of with proper compilation?]
+
+for range 0 10 printl it
+for-in i range 0 10 printl i
+
+fill 255
+fill rgb 255 0 0
+fill rgba 255 0 0 255
+[since object are also functions/macros, this is possible]
+
+do-version file [./main.txt]
+do-version 2.5 code [
+    printl [Hello, World!]
+]
+[[file] and [code] both just change the type of a thing.]
+[or maybe it should be [cast File [./main.txt]]]
+[or just [
+    File [./main.txt]
+]? That is to say, capitalized.]
+[in any case, [do-version] is basically just a function that can execute any version of the
+interpreter. perfect for backwards compatibility.]
+
+let [test-func obj] printl obj.name
+test-func object [
+    name [John Smith]
+    age  34
+]
+[should age also be passed to test-func? or is this equivalent to this:]
+let [test-func name] printl name
+test-func [John Smith]
+[are objects just syntaxic sugar to avoid have 100 arguments to a function?]
+
+let [func n]
+    if == typeof n [Number]
+        printl n
+        overload func n
+[basically explicit overloading. the overload function basically just calls the initial version of
+the function (throws if it doesn't exist) and doesn't do recursion.]
+[I either do OOP/Prototypes with [this], or overloading. There isn't really any reason to do both.
+I guess I could, but prefix syntax for everything seems cleaner.]
+
+[I should avoid putting methods in structures.]
+
+let [f x] - 1 * 0.5 x
+
+let value do [
+    let val1 69
+    let val2 420
+    let val3 + << 69 3 420
+    val3
+]
+printl value [outputs "69420"]
+
+[i should have a function called [delete-computer]]
+
 
