@@ -3688,4 +3688,492 @@ printl value [outputs "69420"]
 
 [i should have a function called [delete-computer]]
 
+[then again, I guess I could try some form of implicit function overloading?]
+[i mean, there's no real reason redefine a function and remove the initial definition, right?]
+[and overloading will be everywhere, so I should make the syntax as simple as possible]
+[i should use the terminology [overloading] and [overriding] to make it easier to talk about.]
+
+[should I force the use of [return] inside a [do] block?]
+
+[[alias] vs [new-type] vs [ref]]
+
+[[loop] is the only thing you really need.]
+[I can't buil [for] and [while] loops using recursion unless I figure out the performance issue]
+let i 10
+loop [
+    print "Hello, World!\n"
+    if ! -- i break []
+]
+
+let [for] do [
+    let [init] get-arg
+    let [cond] get-arg
+    let [incr] get-arg
+    let [body] get-arg
+
+    init
+    loop if cond do [
+            body
+            incr
+    ] break
+]
+for let i 10 != i 0 -- i print "Hello, World!\n"
+[I might need some seperators...]
+[But anyway, [loop], or at least [goto] needs to be a built in construct]
+
+[I guess I could have a [optimize] function that copies all the function that where defined packed
+together, then unmaps the old memory, then continues running with the new memory? Then again, all
+the pointers will be wrong. And it will be a pain to change them all...]
+
+[macros will work if we first define the type before defining the function?]
+type add-macro Function [i32 i32] [i32]
+let add-macro fn [] [
+    return + next-arg next-arg
+]
+let [add-two n] add-macro 2 n
+[[return] is of course optionnal]
+
+[this language does have implicit return, but it's not for use all the time. only when it makes
+sense.]
+let value if condition 5 0
+[right, [return] also exits a function, so that should be kept in mind.]
+
+[I should just have () in case someone wants to be more explicit with their code?]
+[But I just don't ever want people to use it.]
+
+[[Quote] and [String] types should be different. A quote can become a string, but it can also
+become a array.]
+[Like [Number] can be either [Integer], [Float] or [Fraction].]
+
+[There should be multiple ways to construct a [String].]
+let my-str String 4
+set my-str "hello" [Error: Type mismatch, String 4 -> String 5]
+let my-str String "hello"
+print type? my-str [outputs "String 5"]
+let my-str "hello"
+print str-len my-str [outputs 4, because [str-len] is overloaded to take both [String] and [Quote]]
+
+[Just realized that I don't need to make [String] a struct/object because the length is stored in
+the type!]
+
+[Wait. So you can do this?]
+type my-str "String 5"
+set  my-str "Hello"
+
+[Also, characters]
+let my-char 'b
+[No need for two single quotes. It's probably just a shorthand for this:]
+let my-char Char [b]
+
+[I don't do this anymore, but I used to.]
+for [let i 0][< i 10][++ i] [
+    printl i
+]
+[If "][" was ";", I could do this]
+for [let i 0; < i 10; ++ i] [
+    printl i
+]
+
+[Hmm, maybe types are variables?]
+[Like enums, I mean. Everytime a types gets created, a number is assigned to the symbol.]
+let [MyNewType] String
+type my-str MyNewType
+if == type? my-str String then [
+    printl "They are the same type!"
+] else [
+    printl "They are not the same type!"
+]
+[where]
+let [then quote] do quote
+let [else quote] do quote
+
+[but then, I would need to...]
+let my-str new String 5
+let my-str new String "Hello, World!\n"
+[where new is overloaded... but then again, how?]
+[[String] is always of type [Type]!]
+[Maybe I need two namespaces for types and strings, but I don't like the idea of that.]
+[What if I want to pass a type to a function?]
+
+[But then again, if the value a type is a function pointer... I could make this work.]
+
+[[type?] vs [meta?]]
+[[type?] gets the first part of the type string, a symbol, then returns its value.]
+[[meta?] gets the latter part of the type string; basically the dependant/refined type metadata
+like the length of a string/array.]
+[don't know about the question mark]
+
+[What happens if...]
+let [String] Integer
+[I imagine the other types that depend on [String] change not, but about these?]
+if == MyNewType String
+    print "Yay!\n"
+    print "Nay!\n"
+[I imagine it shouldn't break older pieces of code like this.]
+[If it does, you call that dynamic scoping, and that's bad!]
+
+[actual, [println] is good! that way I won't feel any obligation to use it!]
+[Wait no. I just need [\n] as a function.]
+println 123
+print 123 \n
+print "%\n" 123
+[equivalent to this in scheme]
+(display 123) (newline)
+
+[I should give tail recursion a real try. If I can successfully implement it, it will make looping
+so much nicer.]
+
+[Casting from value to pointer should be done implicitly, or not?]
+let obj Object []
+let [test-func obj] do [
+    set obj "Hello, World!\n"
+]
+[Then again, no?]
+let obj ptr-to Object []
+let [test-func obj] do [
+    set obj "Hello, World!\n"
+]
+test-func obj
+print obj [outputs "Hello, World\n"]
+[^ now this works?]
+[is the pointer/value overload implicit?]
+
+[[type] to declare things is a little silly. [let] should always be used with default
+constructors.]
+let str String 10
+set str "Hi!\n"
+[but is it on the stack or on the heap?]
+[wait, [String] allocates space? It doesn't just change the type?? Damn, that change things...]
+[Or is it only being reserved? And only actually being allocated when being assigned... Then again,
+it's also probably just static memory. You can get the string in the source code, after all.]
+
+[[var] vs [let]]
+[Yeah, I need immutable data. Probably a type thing. Maybe every symbol has it?]
+
+[[Float] and [Integer]]
+[When you don't want to think about the size of a value, or it's just not important, there should
+be a way to not have to specify it.]
+[
+    Float
+    Float 32
+    Float 64
+    Integer
+    Integer 8
+    Integer 16
+    Integer 32
+    Integer 64
+]
+[[Float] and [Integer] just default to 64 bits. When you use them, you're telling other it doesn't
+matter.]
+let n Integer []
+[but you usually just use inference I guess.]
+[Hmm, it's faster to just assign it to zero.]
+[But what if you want it undefined?]
+let n []
+[can be used later.]
+[wait, should I use i64 and int and such?]
+
+[Maybe I should add syntax?]
+let a 2
+let a = 2;
+[The latter is more verbose, but it's clearer what's happening.]
+let [add a b] + a b
+let add a b = + a b;
+[The great thing about the latter, is that variables and functions do behave the exact same way.]
+add 1 2
+add 1 2;
+[I guess I don't really need the semi-colon.]
+
+[But if I add syntax, I would rather go the Jai route than the Ocaml route.]
+add a b :: + a b
+[Nevermind. It sucks. You can see why.]
+
+[By the way, how does Ocaml do inference?]
+[Holy fuck! ChatGPT tells me it look into the body to figure that out!! That's what I was trying to
+do!!!]
+[Damn, this is interesting. So I guess I could make the language look dynamic without actually
+making it so.]
+
+[I should dynamically load [printf] from libc just as a proof of concept.]
+let value = 123
+printf "My value is: %i\n" value
+
+[[symbol] could a be a function that returns the symbol of an argument before it was passed to a
+function?]
+let macro a = print symbol a
+macro hello [outputs "hello"]
+
+(define (reverse-list lst)
+    (let loop ((prev '()) (current lst))
+        (if (null? current)
+            prev
+            (loop (cons (car current) prev) (cdr current))
+        )
+    )
+)
+(display (reverse-list (list 1 2 3 4)))
+(newline)
+
+let [reverse-list lst] do [
+    let [loop prev current]
+        if null? current
+            prev
+            loop cons car current prev
+                cdr current
+    loop [] lst
+]
+println reverse-list [1 2 3 4]
+
+[I naturally took some liberties. My language having a rich type system, it doesn't actually need a
+[list] function (though it of course can be added). Also, [let] behave like [define], and could be
+more accurate if the original version of the code was written use it... Still, shockingly enough,
+the parentheses make it easier to read. I guess you need a pretty good LSP for this language. I
+guess I also don't really need [null?] – in either of the codes, too! Nevermind, just tried it and
+['()] is not falsy. Shame on you Scheme! So yeah, advantage for my C-like language.]
+
+let [reverse-list lst] do [
+    let [loop prev current]
+        if current do [
+            loop cons car current prev cdr current
+        ] else [ prev ]
+    loop [] lst
+]
+println reverse-list [1 2 3 4]
+
+[do/else is probably better than then/else.]
+
+let [reverse-list lst] do [
+    let prev []
+    let current lst
+    while current do [
+        set prev cons car current prev
+        set current cdr current
+    ]
+    return prev
+]
+println reverse-list [1 2 3 4]
+
+[As usual, imperative is so much easier to read.]
+
+let [add a b] Function [int int int]
+let [add a b] + a b
+
+let [greet] Function [void]
+let [greet] print "Hello, World!\n"
+
+[Not too bad, but it doesn't work. Because types are values, [greet] essentially just returns a
+type.]
+
+let [StringAlias] ptr-to [String]
+[vs]
+let [NewStringType init] String init
+
+if == ptr-to [StringAlias] ptr-to [String]
+    print "The types are the same!\n"
+else
+    print "The types are not the same, but they behave the same!\n"
+
+[The language doesn't have name arguments, of course.]
+[Instead, you do it like JavaScript, where you pass in an object with all the options as fields.]
+
+[For multiple return values...]
+let [test-func value] do [
+    if some-test value do [
+        return [value []]
+    ] else [
+        return [[] Error [Value is incorrect.]]
+    ]
+]
+let result test-func 123
+print get 0 result [outputs 123]
+[Hmm, the syntax is ambiguous. What if I want to return a string? Anyway, that's how – or at least,
+something like this – that I will use to do multiple return values.]
+
+[But then...]
+if tail result do [
+    let e tail result
+    eprint e.msg
+    exit 1
+]
+[I can of course shorten it...]
+if tail result throw tail result
+[Or just this?]
+throw-if tail result
+[It's probably safer since it check the type to see if it's actually an [Error].]
+
+[Still, should I have something like this?]
+print get-field [msg] e
+[equivalent to?]
+print e.msg
+[the former is more verbose, but probably better because...]
+let print get-field [print] import [System/IO]
+[but then...]
+let io import [System/IO]
+io.print "Hello, World!\n"
+[vs]
+do get-field [print] io "Hello, World!\n"
+[I guess I need both?]
+[Wait a second!]
+let print get [print] import [System/IO]
+[Because of course [get] is overloaded!]
+[I could even do this!]
+let-get [print] import [System/IO]
+[But what about this?]
+let-get [print read] import [System/IO]
+[I don't see why not?]
+let-get print import [System/IO]
+[This too?]
+[Hmm, isn't this basically destructuring?]
+let [test-func n] Result [n []]
+let-get [value error] test-func 123
+[I guess I could also overload [let-get] to work on arrays?]
+[Maybe I should call it match?]
+match [value error] test-func 123
+
+[What if [.] was a shorthand for [quote] like [']?]
+iterable .next
+[Nevermind. It's ugly.]
+[... Just like parentheses. But damn! Parentheses make so many things so much more simple.]
+
+[I should have overloading for things like sorted and unsorted lists.]
+let [element-of-set? x set] Procedure [Any Ordered[Any]] Boolean
+set [element-of-set? x set] cond [
+    null? set    #f
+    = x head set #t
+    < x head set #f
+    #t element-of-set? x tail set
+]
+[Damn, this is hard to read.]
+
+let numbers [42 17 93 8 56 27 91 35 74 3 88 65 12 39 81 53 18 99 47 23 77 6 50 28 96 84 31 62 11 4 90 48 66 14 19 87 45 78 25 70]
+
+let [quick-sort ls] do [
+    if null? ls [] else [
+        let pivot head ls
+        let rest  tail ls
+        let smaller filter lambda [x] <  x pivot rest
+        let larger  filter lambda [x] >= x pivot rest
+        append [quick-sort smaller pivot quick-sort larger]
+    ]
+]
+
+print quick-sort numbers \n
+
+[macro?]
+#type Procedure [Any List[Any]] Boolean
+let [element-of-set? x set] cond [
+    null? set   #f
+    = x car set #t
+    #t element-of-set? x cdr set
+]
+#type Procedure [Number Ordered[Number]] Boolean
+let [element-of-set? x set] cond [
+    null? set    #f
+    = x head set #t
+    < x head set #f
+    #t element-of-set? x tail set
+]
+[where]
+let [#type] do [
+    let type next-arg
+    if ! = next-token [let] error "Invalid syntax:\n\n%\n" next-expression
+    create-procedure type next-expression
+]
+[Honestly, I like it. I should mention that you can still do overloading without explicit types,
+but it will probably not be as smooth.]
+
+[I should postfix change changing procedures without [!] like in scheme.]
+let msg "Hello, World!\n"
+print msg [outputs "Hello, World!\n"]
+let [change-nothing] let msg "Goodbye, World!\n"
+print msg [outputs "Hello, World!\n"]
+let [mutate-state] set! msg "Goodbye, World!\n"
+mutate-state
+print msg [outputs "Goodbye, World!\n"]
+
+[By the way, [let] is an expression.]
+let val1 let val2 do [ 123 321 ]
+print [val1 val2] \n [outputs [123 321]]
+[[let] evaluates the expression then assigns the value at the end of the stack to itself.]
+
+[Also, [List] can be an [Array] or a [LinkedList] or a [Tree] or whatever like that.]
+[Though I guess it would need to flatten the tree?]
+[What about B-trees?]
+
+[Maybe I should add some syntax that isn't really syntax?]
+append [quick-sort smaller  pivot  quick-sort larger]
+append [quick-sort smaller, pivot, quick-sort larger]
+[These two things are equivalent. the commas are just syntaxic sugar to make it easier to read.]
+[Yeah, I'm pretty sure this is a step in the right direction. It's as simple as considering it
+whitespace. [;] would probably also make the list.]
+let a 2  let b 5
+let a 2; let b 5
+[I guess I'll call them "syntax" characters? Similar to whitespace, but added to give the language
+syntax to make it easier to read. It's of course optionnal, but was judged necessary still.]
+['(' and ')' will probably also make the list.]
+print (quick-sort numbers) \n
+[I don't know about [:] though... I wanted to use it in names and such...]
+for range 0 10 print it
+for: n range 0 10 print n
+for-in n range 0 10 print n
+[I guess I mostly wanted [:] for options and such, but I guess I dont really need it.]
+[I can always use the type [Option] as the first argument if I really need to.]
+let opt Option [with: "newline"]
+print opt "Hello, World!" [outputs "Hello, World!\n"]
+[Not the best example, but you get the gist of it.]
+[Anything else? Can't think of anything.]
+[I don't think I will do [=] though.]
+let a 20
+let a = 20
+let a: 20
+[Main reason: it just doesn't look that good.]
+
+[Basically: '(', ')', ',', ';', ':', '"' ]
+[Maybe ['] should be a short hand for ['a => Char [a]]]
+[What about [{] and [}]? Can't think of anything.]
+[What about...]
+let [a b] {1 2}
+let {a b} 1 2
+let {a: 1, b: 2}
+[... some sort of special destructuring syntax?]
+[What if it's still a quote, but there a way to tell what kind of quote it is?]
+print type? [] [outputs "Quote [Bracket]"]
+print type? "" [outputs "Quote [String]"]
+print type? {} [outputs "Quote [Curly]"]
+
+[I should use these things in moderation. And on second thought, I don't mind adding 'syntax', but
+it should remain fake, otherwise the language will become bloated very quickly. So I'm dropping the
+{}; I just don't need them.]
+
+[Should [Char] really be a type? Or just an [Integer]?]
+print Char [a]       [outputs 97]
+print type? Char [a] [outputs "Integer"]
+[I think this should be the case, at least for now.]
+
+[Holy shit.]
+let obj Object [
+    name: "John Smith",
+    age: 32, Tag [Ignore]
+]
+[What ever [Tag [Ignore]] means, I don't know. Anyway, because the [Object] procedure is smart, it
+will be able to see that there is an item of type [Tag] and not add it to the object as some field,
+as well as add it to the metadata, or where ever the fuck. I can even something like [Private]!]
+
+[Also, I guess it doesn't matter where the [Option] is passed?]
+let opt Option [with: "newline"]
+print opt "Hello, World!"
+[is equivalent to]
+print "Hello, World!" opt
+[Because if [print] is responsible for executing the rest of the application, then it will have to
+check the next argument regardless.]
+[And I can have an implicit field in [Context] or [Environment] where I can extract the options
+from.]
+
+[I know I said no syntax...]
+let a 2; let b 3
+print "a b" [outputs "a b"]
+print [a b] [outputs [2 3]]
+[I mean I should right? Otherwise, it will become insanely verbose. And Scheme's printing of lists
+is so nice to work with! I want some of that!]
+
 
