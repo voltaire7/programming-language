@@ -4153,7 +4153,7 @@ print type? Char [a] [outputs "Integer"]
 [Holy shit.]
 let obj Object [
     name: "John Smith",
-    age: 32, Tag [Ignore]
+    age: 32, #tag [Ignore]
 ]
 [What ever [Tag [Ignore]] means, I don't know. Anyway, because the [Object] procedure is smart, it
 will be able to see that there is an item of type [Tag] and not add it to the object as some field,
@@ -4175,5 +4175,437 @@ print "a b" [outputs "a b"]
 print [a b] [outputs [2 3]]
 [I mean I should right? Otherwise, it will become insanely verbose. And Scheme's printing of lists
 is so nice to work with! I want some of that!]
+
+[[xyz] is parsed as a string and matched to the symbols [x], [y] and [z]?]
+swizzle vec xyz
+
+[[=], [==] and [!]?]
+print ! =  1.0 1 [outputs #f]
+print ! == 1.0 1 [outputs #t]
+[I don't know. I guess [=] is a 'loose' equal, while [==] is a 'deep' equal.]
+
+[I guess it should be [#opt]?]
+let file open "./random-file.txt"
+print "Hello, World!"
+    #opt [with: "newline", without: "format", output: file]
+[I guess this is important also because a procedure can take a type of [Option] the normal way.
+This is just a way to make sure the [Context] captures the options.]
+
+[I should maybe go back to calling things [Word] and [List], because I'm struggling a little with
+[Expression] and [Statement] (which is which?).]
+
+[[import] returns a value of type [Module] which is overloaded with [do] to expand.]
+import [System/IO]
+print "Hello, World!\n"
+[or]
+let io import [System/IO]
+io.print "Hello, World!\n"
+[or]
+let io #import "System/IO"
+io.print "Hello, World!\n"
+[because [#import] is actually a macro that expands to]
+let io Module [
+    let [print fmt] do [
+        [INSERT PRINTING LOGIC HERE]
+    ]
+
+    [INSERT ALL THE OTHER IO PROCEDURES HERE]
+]
+[maybe?]
+[I certainly prefer the [#] and ["] syntax.]
+#import "System/Syscalls"
+
+[Also, I need an [Or] type. For polymorphism or whatever.]
+#type : Or [Number, String, Object[Any]]
+let item proc-call-that 123 "will return" Object [random: "value"]
+[Or should it be an [Inherit] type?]
+
+[[#] is a prefix for procedures that modify the usual execution of procedures.]
+[[#import] for example is a modification on [do].]
+[[#type] is a modification on [let].]
+[[#tag] is a modification on [Object].]
+[[#opt] is a modification on every procedure, and their implicit [Context].]
+
+["" (String) and [] (Quote) are both the same, in that they stop the normal execution of code, but
+they are different, and procedures may overload them accordingly.]
+[Or should I say [List] instead of [Quote]?]
+
+[I guess I could just do [inline].]
+let [square x] inline [
+    * x x
+]
+square 4
+* 4 4
+
+[Maybe I should put the [#type] modifier after the assignment?]
+#type Proc [Number, Number] Number
+let [add x y] + x y
+[vs]
+let [add x y] + x y
+    #type Proc [Number, Number] Number
+[Nevermind, it's ugly.]
+
+[Hmm.]
+let [say-hello] do [print "Hello, World!\n"]
+let [a b] [1 2]
+print a \n [outputs 1]
+print b \n [outputs 2]
+[Damn!]
+let list [1 2 3 4 5]
+let [x y] list
+[But no, it doesn't really work.]
+[But I can figure this out! It's doable.]
+
+[I guess this is better right?]
+let [element-of-set? x set] cond [
+    null? set : #f
+    = x head set : #t
+    < x head set : #f
+    #t : element-of-set? x tail set
+]
+
+for 0..10 as i print i
+[Damn, I just remembered why I decided to implement [println].]
+[Anyway, I thought that I could've a [..] special notation for numbers but...]
+let N 10
+for 0..N/2 println it
+[Yeah, that's illegal.]
+[Anyway, big idea! [as] macro that changes [it].]
+let [as] inline [
+    let next-token.......
+    next
+]
+[Fuck. I can't do it.]
+[No wait. I can't give up.]
+let [as] inline [
+    assign next-token it
+    delete it
+    next-arg
+]
+[Something like that?]
+for range 0 N as index println index
+
+[I should use [print\n] instead. Just for shits and giggles.]
+for range 0 N as index print\n index
+
+[But...]
+str1 :: "Hello, World!\n";
+str2 :: "Hello, World!\n";
+if str1 == str2 print true;
+else print false;
+[^ this will be true, because it's a strcmp, but...]
+if &str1 == &str2 print true;
+[this is the standard C [==], which frankly speaking makes sense... That being the case, do I
+really need a loose equal?]
+let str1 "Hello, World!\n"
+let str2 "Hello, World!\n"
+if == str1 str2: print "true"; print "false"                   [outputs "true" ]
+if == ptr-to [str1] ptr-to [str2]: print "true"; print "false" [outputs "false"]
+if = str1 str2: print "true"; print "false"                    [outputs "false"]
+
+let new-print [print]
+new-print "Hello, World!\n"
+[this should work because there is a difference between quoted and a string, probably.]
+
+[should be like this instead.]
+#type [Proc Number Number Number]
+let [add x y] + x y
+
+[I guess [] can turn a procedure into a value?]
+print add 1 2 [outputs 3]
+print [add]   [outputs [outputs 0x1aebeff453 something...]
+[no, it should print [add].]
+[you can still call it. I just need to not forget the value-symbol-pointer relation.]
+
+#type [Real Number]
+[^ if a function takes any number type, then it first check the first type, then it checks the
+second, until it either finds it or throw and error because this function does not this type.]
+[basically this]
+cons [Dog] cons [Mammal] [Animal]
+
+[By the way, I'm reading SICP, and the Scheme way of doing dynamic dispatch is so interesting.]
+[[#type] should be a macro for that.]
+let [#type] inline [
+    assign do [
+        let type next-token
+        if = next-token "let" do [
+            error "[#type] only works on [let] procedures."
+        ] []
+        let name next-token
+        let body next-datum
+        put global.overloads name type body
+        return [name (get global.overloads name type)]
+    ] do-nothing
+]
+[something like this?]
+
+[I guess I should be able to do something like this?]
+map [+ 1] [1 2 3 4 5]
+[and]
+let test [print "Hello, World!\n"]
+test
+[^ this works and so does this]
+return test
+[but this is delayed?]
+return [test]
+[I guess [] is more of a delay than a quote?]
+
+[Honestly, fuck it.]
+cp -i file.txt folder/file.txt
+[This should be valid code.]
+[Okay, no. Too much.]
+cp -i "file.txt" "folder/file.txt"
+[Now this should be valid code.]
+[But then again...]
+cp "file.txt" "folder/file.txt" #opt -i
+[I guess I change nothing.]
+
+[Wait a second...]
+let [add x y] + x y
+[this is mutliple assignment on one like...]
+add, x, y = () => x + y, 1, 2
+[it is just that the x and the y are delayed?]
+[but how do I use this knowledge? If I think of this a currying, then this could become extremely
+elegant.]
+
+[All strings are delayed evaluation.]
+[[extract]? [let-for]?]
+[[+] is both a symbol and a pointer until it is used?]
+
+[Moral dilemma: strings are procedures, at least on the surface.]
+let add [+]
+[vs]
+let [add] [+]
+[vs]
+let add lambda [] [+]
+[one should return a string/function, the other should be a function.]
+[equivalent to this:]
+(define add +)
+(add 1 2 3 4 5)
+(define (add) +)
+(add) => #<procedure +>
+[similarly]
+let add [+]
++ [1 2 3 4 5]
+let [add] [+]
+print add [outputs "add"]
+[since procedures are strings. strings need indirection to not be evaluated as strings.]
+
+[I need to sit down and figure out the essentials. The language is a mess right now.
+
+[List of things that will not change.]
+    print "Hello, World!\n"
+
+[List of things that may change.]
+    let say-hello [print "Hello, World!\n"]
+    say-hello [outputs "Hello, World!\n"]
+
+    let [hello-str] "Hello, World!\n"
+    print hello-str [outputs "Hello, World!\n"]
+
+[I have no need for [#type [Proc Int Int Int]], just put all the arg types and the final type is a
+procedure. For variables, just have the return type and nothing else.]
+#type [int int int]
+let [add a b] + a b
+
+[Maybe a [#mutates] which marks a procedure call that mutates the global state of a program? To
+help find bugs?]
+[I should name asm instructions [move-register], [move-immediate], and some such. It's longer, but
+clearer.]
+
+[It sucks, but I should explicitly overload functions like in Odin.]
+[Or not? What if procedures are either polymorphic or overloaded?]
+[If I don't put an explicit type, they become generic, not dynamic?]
+[So [sub n] and [sub x y] are overloaded without the need for a [#type]?]
+[Nevermind, I can't do that.]
+
+[What if [Text] is the most fundamental datatype?]
+[This always always returns a string or [Text], but the receiver can parse it however they want...
+but how does it capture variables?]
+return [something something-else]
+
+let val [print]
+[calls [do] on [print] which makes it return a procedure pointer, but]
+let [val] [print]
+[calls]
+let val lambda [] [print]
+[which calls [reduce] or something which doesn't return a procedure pointer.]
+
+[No, a procedure is always both a string and a pointer.]
+let say-hello [print "Hello, World!\n"]
+say-hello [outputs "Hello, World!\n"]
+print [say-hello] [outputs "say-hello"]
+print "say-hello" [outputs "say-hello"]
+print ptr-to [say-hello] [outputs 0x(random pointer)]
+print val-of [say-hello] [outputs "print "Hello, World!\n"]
+print say-hello [outputs 14 (or strlen "Hello, World!\n")]
+[I don't know. It's nice. I think I like it.]
+
+[When we import binaries...]
+load "a.out"
+a.out ["Hello, World!\n"] [outputs "Hello, World!\n"]
+
+#type [int]
+load "a.out"
+let n a.out []
+print\n n [outputs "Hello, World!\n14\n"]
+[or not. I think I had an idea, but I lost it.]
+
+[Maybe I shouldn't bother with special function declaration.]
+let add [
+    let [arg1 arg2] next-arg next-arg
+    + arg1 arg2
+]
+[no, even beyond that...]
+let add [
+    [[args] is the program code + offset for the current part of the program.]
+    let [x y] args
+    [which is equivalent to [let [x y] [1 2]]]
+    + x y
+]
+add 1 2
+[I actually really think I'm onto something here.]
+[In LISP, it's all about linked lists, in this languages, it's all about strings.]
+
+[Holy, fuck. [args] is a string, so it gets executed!!!]
+let [print-2-words] [
+    let [x y] next [args], next [args]
+    print "%, %\n" x, y
+]
+print-2-words Hello World! [outputs "Hello, World!\n"]
+[Also, [let] can go back to always being quoted... But isn't that a problem?]
+[By the way, does [let] consume when doing [let [x y] args]?]
+[No, it consumes when it's being run.]
+
+let two + 1 1
+let add [+]
+let [str num] "Hello, World!\n" 123
+[Whatever, I guess I'm keeping the non quoted [let].]
+[You shouldn't be doing mutliple function declarations any.]
+
+[Hmm.]
+let [str num] "Hello, World!\n" + 1 2
+[What if num equals [+] and not 3?]
+let [new-print] print
+let new-print [print]
+[equivalent?]
+[I know this:]
+let val + 1 2 [=> 3]
+let val [+ 1 2] [=> + 1 2 (lazy)]
+let [val] [+ 1 2] [=> "+ 1 2" (lazy)]
+
+[Wait, I know.]
+let [str num] "hello" 123 [str == "hello", num == 123]
+let vals ["hello" 123]
+let [str num] vals [str == "hello", num == 123]
+[Imagine [vals] getting evaluated, and it being replaced with the first example because the braces
+have gotten removed.]
+let [vals] ["hello" 123]
+let [str num] vals [str == "\"hello\" 123", num == [str == "\"hello\" 123", num == [str == "\"hello\" 123", num == [str == "\"hello\" 123", num == ...]]]] You get the gist of it.
+
+[Anyway don't think [+] should get evaluated. But I don't know.]
+let [str num] "Hello, World!\n" + 1 2
+
+let [read write] #import "System/IO"
+[Then again... It should otherwise this isn't possible.]
+[And honestly, there's not much point in it not executing...]
+let io #import "System/IO"
+#import "System/IO"
+[These 3 should be valid always.]
+
+[I guess I can't do this.]
+let [obj2 obj1] obj1 obj2
+[It will destructure obj1 otherwise.]
+
+let test-proc [
+    for args print it
+]
+[Honestly, wow. I really hope I can work this out, because fucking hell!]
+
+[but what does [#import] return specifically...?]
+[something like this?]
+[
+    read  [...]
+    write [...]
+]
+[Maybe I really should have something like a distinction between strings and lists... That would
+make it easier.]
+
+let #import [
+    let full-path (+ global.modules-path args)
+    let file (read-entire-file full-path)
+    return (reduce file)
+]
+[No, this is wrong.]
+[I think I got it!]
+[What does [#import]? Nothing, that's how I'll do it!]
+
+#import "System/IO"
+[is equivalent to]
+let read  [...]
+let write [...]
+[maybe [...] should be the [error Not-Implemented] call?]
+[anyway]
+let io #import "System/IO"
+[is equivalent to]
+let io [
+    let read  [...]
+    let write [...]
+]
+[but that means you should be able to do this for every assignment?]
+let val [
+    let a 123
+    let b 321
+    + a b
+]
+print\n val.a
+[Wait... Did I accidentally come up with a clever ass way to do objects?]
+[The problem is this.]
+let [read write] [
+    let read  [...]
+    let write [...]
+]
+[But I guess it's fine. Literals should not be destructurable.]
+let pkg [
+    let read  [...]
+    let write [...]
+]
+let [read write] pkg
+[this works!]
+
+[Now that I think about it, I already had this idea for objects a long time ago.]
+obj :: {
+    a :: 123;
+    b :: 321;
+}
+[Yeah, I didn't even use square brackets yet. It was that long ago. Before I even decided to
+conceive this language.]
+
+let obj1 [let name "John Smith"]
+let obj2 + obj1 [
+    let age 23
+]
+[and they even double as constructors.]
+let new-obj [
+    let field1 args
+    let field2 args
+]
+let obj (new-obj 1 2)
+
+[Wait!]
+let test [
+    return [1 2]
+]
+let result1 test
+print result1 [outputs "1 2"]
+let [result2] test
+print result2 [outputs 1]
+[That's how I do multiple return values.]
+
+[The equivalent in Jai:]
+result2 :: test();
+print("%", result2); // outputs 1
+[Actually, there's no real equivalent... You can return arrays in Jai, but I don't think you can
+casually destructure an array like I did.]
 
 
