@@ -1,0 +1,43 @@
+[List of things that will not change.]
+
+    [This is a comment.]
+
+    print "Hello, World!\n" [outputs "Hello, World!\n"]
+    print\n "Hello, World!" [outputs "Hello, World!\n"]
+
+    print [Hello, World!\n] [outputs "Hello, World!\n"]
+    print\n [Hello, World!] [outputs "Hello, World!\n"]
+
+    let say-hello [print "Hello, World!\n"]
+    say-hello [outputs "Hello, World!\n"]
+
+    let [hello-str] "Hello, World!\n"
+    print hello-str [outputs "Hello, World!\n"]
+
+    [syntax characters: "(),;:"]
+
+    #import "System/IO"
+    write stdout (read stdin)
+
+    let io #import "System/IO"
+    io.write io.stdout (io.read io.stdin)
+
+    let [read stdin write stdout] #import "System/IO"
+    write stdout (read stdin)
+
+    let obj [
+        let field1 123
+        let field2 321
+    ]
+    print "% %" obj.field1 obj.field2 [outputs "123 321"]
+
+    let [obj] [
+        let field1 123
+        let field2 321
+    ]
+    print "%" obj [outputs "\n        let field1 123\n        let field2 321\n    "]
+
+    let void-func [
+        let [a b] 1 2
+    ]
+    print void-func [outputs [] or "void" or "undefined"]

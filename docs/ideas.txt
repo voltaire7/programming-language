@@ -4608,4 +4608,233 @@ print("%", result2); // outputs 1
 [Actually, there's no real equivalent... You can return arrays in Jai, but I don't think you can
 casually destructure an array like I did.]
 
+let #import [
+    let [module-name] args
+    let file (read-entire-file (+ modules-path module-name))
+    inline file
+]
+[Should it really be that simple? Seriously?]
+[No, there's a bug somewhere.]
 
+[For one, this is scoped, so the top level full import is discarded.]
+let #import [
+    let [module-name] args
+    let file (read-entire-file (+ modules-path module-name))
+    return file
+]
+[Wait, I changed it to a return randomly, but that actually makes sense!]
+let io #import "System/IO"
+[Now [io] runs the file everytime it is called.]
+io
+[nothing happens, but if the module had top-level prints, or it returned something, then that
+would happen.]
+
+[But no... I need to think about this harder.]
+let f1 [
+    return [print\n "hello"]
+]
+f1 [what happens?]
+[I don't know. So I'm going to assume that it executes the text because that's what would make
+[#import] work easier.]
+let f2 [
+    let g [print\n "hello"]
+    return g
+]
+f2 [This also should evaluate.]
+let f3 [
+    let [str] "print\n \"hello\""
+    return str
+]
+f3 [and this]
+[When it becomes different is with [let].]
+let ret   f1 [== [print\n "hello"]]
+let [ret] f1 [== print\n]
+[Ahh... This is becoming a bit of a pain. But I really need to figure this out.]
+
+[Wait, [f2] returns [] or void. [g] is eager, so it gets evaluated.]
+[Okay, I know. The thing I said about [f2] still stands.]
+[[f1] also. For [f3], it's equivalent to this.]
+let ret f3
+ret [outputs "hello"]
+let [ret] f3
+print ret [outputs "print\n \"hello\""]
+[which is of course equivalent to]
+let ret   "print\n \"hello\""
+let [ret] "print\n \"hello\""
+[Wait, but how does the receiver know how the string was returned?]
+
+let [str1] [print "hello"]
+let str2 str1 [I guess this just doesn't get evaluated.]
+
+[There should just be 3 ways for strings to be parsed, then again. Otherwise, is this a procedure
+or a string?]
+return [print\n "hello"]
+return [1 2 3 4 5]
+[God, then return value things are so damn confusing!]
+[There are so many goddamn layers to it! It's never ending!]
+
+[I wonder if I should make it so it's impossible for the language to error?]
+[Probably not, but I could right?]
+[No, some things need to error.]
+tail []
+[for example.]
+
+[maybe?]
+let imports do [
+    #import "System/IO"
+    [...]
+]
+[I guess I could also do this if I had "" and [] as different types.]
+let imports #import [
+    "System/IO"
+    "..."
+]
+
+[Actually, I decided to create a file in which the list of things that will not change will go.]
+[It's like a very barebones spec.]
+
+[I've been thinking about it for a while, but fuck "procedure". It sound worse and looks worse then
+"function" in every way. I'm using "function" from now on.]
+
+[What about, if the function returns [], it matches on the fields, like an object. And if it
+returns something, it is multiple assignment.]
+
+[Destructuring]
+let obj [
+    let field1 123
+    let field1 321
+]
+let new-obj obj
+print new-obj [outputs []]
+print\n new-obj.field1 [outputs 123]
+let [field1 field2] obj
+print\n field1 [outputs 123]
+
+[Mutliple return]
+let obj [
+    let field1 123
+    let field1 321
+    return [field1 field2]
+]
+let ret obj
+print ret [outputs "field1 field2"]
+print\n ret.field1 [outputs 123]
+let [ret] obj
+print ret [outputs 123]
+
+[Wait but that means these are still the same!]
+let new-obj obj
+let ret obj
+[It's only destructuring that changes.]
+[If this was a boring/useful language, I would probably not allow this... but whatever.]
+
+[I guess there is no way to return a function with literals.]
+[or is there?]
+let obj [
+    let field1 123
+    let field1 321
+    return [print\n field1]
+]
+let ret obj
+print ret [outputs "print\n field1"]
+let [ret] obj
+print ret [outputs 123 and then [] for the second print.]
+
+[I did it. Finally. It's done.]
+[Damn.]
+
+[And it makes sense. Right?]
+[When we destructure something, we want the result to be evaluated.]
+let obj [
+    let field1 123
+    let field1 321
+    return [field1 field2]
+]
+let [ret] obj
+print ret [outputs 123]
+[This prints 123, not "field1". So it's eager.]
+[And because it's eager, and the first field gets evaluated, we can just put in a function with
+arguments. It will get evaluated, and so will it's arguments.]
+[I'm so happy, man.]
+[Finally.]
+
+[The only caveat is returning one string. But that's manageable, of course.]
+let obj [
+    let field1 123
+    let field1 321
+    return ["Hello, World!\n"]
+]
+let [str] obj
+print str [outputs "Hello, World!\n"]
+[Actually, it's not even a real caveat!]
+let obj [
+    let field1 123
+    let field1 321
+    return "Hello, World!\n"
+]
+let str obj
+print str [outputs "Hello, World!\n"]
+[I mean, yeah. Of course it would.]
+
+[bad]
+let obj [
+    let field1 123
+    let field1 321
+    return field1 field2
+]
+let ret obj [error "Not-Found" on symbol "field1" with call (field1 field2)]
+
+let f [f] [== infinite loop]
+
+let print-all [
+    for args print\n "% " it
+]
+print-all [1 2 3 4 5] [outputs "1 2 3 4 5 "]
+
+[I hope I don't find yet another headache about the language.]
+
+[What if after destructuring the return, you can still get the fields?]
+let obj [
+    let field1 123
+    let field1 321
+    return [field1]
+]
+let ret obj
+print ret [outputs "field1"]
+let [ret field2] obj 666
+print field2 [outputs 666]
+[On second thought. No, it would be better to keep multiple assignment for this.]
+
+[Then again! You should not destructure and mutliple assign at the same time!]
+[It's either one or the other.]
+[And as usual, I prefer to remove limitation rather than adding them, so...]
+let [ret field2] obj 666
+print field2 [outputs 321]
+
+[And if you want to do mutliple with a function that returns a string, well you're fucked.]
+[And anyway, it's impossible. Not with this model, at least.]
+
+[I should mention, that if a function returns a single value, not quoted, it defaults to mutliple
+assignment.]
+
+let [type-list] ["text" "[text]" "number"]
+[That's pretty much all I need right?]
+[Everything else can be built the scheme way.]
+[If object layout is like C structs, then that's a lot of problems out the window, just like that.]
+[And I already figured out that enums and tuples are glorified objects.]
+
+[Oh!]
+let func [
+    let arg1 int args
+    let arg2 float args
+]
+[Is this better than [#type]? Probably. But it needs working.]
+[And this doesn't work.]
+let func [
+    let [arg1 arg2] int float args
+]
+[but you can do this.]
+let func [
+    let [arg1 arg2] int args, float args
+]
+[I don't see any reason not to.]
