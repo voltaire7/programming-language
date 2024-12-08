@@ -40,4 +40,4 @@
     let void-func [
         let [a b] 1 2
     ]
-    print void-func [outputs [] or "void" or "undefined"]
+    print void-func [outputs [] or "void" or "null" or "undefined"]

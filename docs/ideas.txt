@@ -5041,3 +5041,144 @@ print\n real 3+4i [outputs 3]
 print\n imaginary 3+4i [outputs 4i]
 print\n + real 3+4i, imaginary 3+4i [outputs 3+4i]
 print\n complex 3 4 [outputs 3+4i]
+
+[I should have negative indexes like in python.]
+let [list] [1 2 3 4 5]
+print\n get -1 list [outputs 5]
+[but if I have negative indexes, I can't have one-based indexing... Oh well.]
+
+[Since I am to make it almost impossible for the program to crash without an explicit panic, should
+I do this?]
+let [list] []
+print\n tail list [outputs []]
+
+[No even haskell can do this. This is some insane APL shit.]
+let . [let n arg; return [n n]]
+let square [* .]
+print\n square 4 [outputs 16]
+
+[[??] and [!?]]
+let [nil] []
+let not-nil 123
+print\n ?? nil 321 [outputs 321]
+print\n ?? not-nil 321 [outputs 123]
+print\n !? nil 321 [outputs []]
+print\n !? not-nil 321 [outputs 321]
+
+let ?? [
+    let [x y] args
+    if x [
+        return x
+    ] [
+        return y
+    ]
+]
+let !? [
+    let [x y] args
+    if x [
+        return y
+    ] [
+        return x
+    ]
+]
+
+[By the way, this returns [].]
+let val []
+[It's still a function, but function without a body always return [].]
+
+[Maybe calling [tail] on the last item goes back to the start? That would make sense if [get -1] is
+the end.]
+[New piece of syntax. -symbol negates a symbol and -[] negates every item in an array. -arr also
+does it.]
+[Wait, I can't forget that]
+let [list-of-strings] ["dog" "cat" "elephant" "so on"]
+for list-of-strings [print\n it]
+[works for objects as well.]
+
+[Nevermind for 1 based indexing. And I think I'm going inclusive ranges as well.]
+[N has to be inclusive, otherwise [10..0] will be fucked.]
+
+[Oh my god!]
+let val [] [== 0]
+[So it's zero by default. Is it even possible to have true undefined?]
+[Wait no. They are equal but not equal at the same time.]
+[[] is closer to the "" and can be used as an actual undefined. Who cares if a single int is 0? It
+did not initialize the array it points to... But then again, how do I initialize it?]
+
+let nil []
+let zero 0
+print\n bool =  nil zero [outputs "true"]
+print\n bool == nil zero [outputs "false"]
+[[=] is true because they are equivalent.]
+[[==] is false because they are of different types.]
+
+for [0 10] as n [print\n n]
+[[as] attaches itself to the start of the code block so]
+[assign [n] it; print\n n]
+
+[These should do different things.]
+let x arg
+let x args
+
+[functions are objects right?]
+let.single [x] [print "hello\n"]
+x [outputs "hello\n"]
+
+[I can even do overloading like this.]
+print.overload "complex" [
+    let number arg
+    print "%+%i" real number, imaginary number
+]
+let number complex 3 4
+print\n number [outputs 3+4i]
+[[print\n]'s definition is of course based on [print].]
+let print\n [print args; print "\n"]
+
+[I suppose I should make it so every function is overloadable. They are just overloaded by default
+on basic text, [text] and number.]
+[Also, I just realized that the above code is maybe broken?]
+[I know what to do.]
+let x args
+print x [outputs [print "hello" 123 "arg3" ...]]
+let [x] args
+print x [outputs "hello"[]]
+[... This is a bit of a long shot, but what if the arguments aren't consumed until they are used?]
+[so this code would be valid.]
+let print + [
+    let [number] args
+    if = "complex" type? number [print "%+%i" real number, imaginary number] []
+] print
+let number complex 3 4
+print\n number [outputs 3+4i]
+[Isn't it beautiful? Function overloading is just string concatenation.]
+
+[By the way, args at the top-level takes the args from the terminal call.]
+
+[The [print\n] is wrong. Let me think about it more.]
+let print\n [print head args, tail args; print "\n"]
+
+[Should I do this?]
+let [x y z] args [tail y == z]
+[No. What if [y] is a list?]
+
+[I shouldn't about this.]
+let x nth 0 args
+[macros basically.]
+[then again.]
+let x nth.lazy 0 args
+[this is probably better.]
+
+[heh.]
+let x nth.number 0 args
+
+[wait]
+let print + [
+    let [number] args
+    if = number.type "complex" [print "%+%i" real number, imaginary number] []
+] print
+let number complex 3 4
+print\n number [outputs 3+4i]
+[then again...]
+= number.type "complex"
+= type number "complex"
+[I shouldn't hide fields like that.]
