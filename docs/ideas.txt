@@ -1168,7 +1168,7 @@ atom [func x y] fn [print [thing]]
 [Sometimes, it's just ugly. I don't think I should go to such lengths just to avoid
 [proc [] [] as [f]]]
 [Death to syntaxic sugar!]
-[Also, quoting non-evaulated strings is just better. No suprise there.]
+[Also, quoting non-evaluated strings is just better. No suprise there.]
 
 [I could do this, though it's ugly.]
 0 then 1 print x
@@ -5182,3 +5182,689 @@ print\n number [outputs 3+4i]
 = number.type "complex"
 = type number "complex"
 [I shouldn't hide fields like that.]
+
+[[+] vs [++]]
+print\n + 1 2 [outputs 3]
+print\n + [1 2 3] [outputs 6]
+print ++ "Hello, " "World!\n" [outputs "Hello, World!\n"]
+let val 5
+print\n val [outputs 6]
+print\n ++ val [outputs 6]
+print\n val [outputs 6]
+
+let val 5
++= val 2 [-> 7]
++= 2 val [-> 7]
++= [1 2 3] val [-> 11]
+
+let [val] "Hello, "
+++= "World!\n" val [val = "World!\nHello, "]
+++= val "World!\n"  [val = "Hello, World!\n"]
+let [ue] "World!\n"
+++= val ue [val = "Hello, World!\n"]
+++= ue val [ue  = "World!\nHello, "]
+
+let loop [loop args]
+loop [
+    print "THE END IS NEVER "
+    break
+]
+[But no. That would be the ideal because of how simple it is... But I don't know how to make it
+work. I'll have to think about it.]
+[I should try to warp the logic of the language to allow for that though. It's too sexy!]
+
+[I guess it should be this.]
+let loop [loop do head args]
+
+[A pointer to any type is [type].]
+[This works too: [number].]
+
+echo "print [Hello, World!\n]" | ./a.out
+
+[nested destructures]
+let [[field1 field2]] args
+
+[rust]
+#[function_component]
+fn Component() -> Html {
+    html! { 69 }
+}
+[vs]
+let Component [
+    html [69]
+]
+
+[val-of vs ptr-to vs do]
+let f [print "hello"]
+val-of [f] [-> [print "hello"]
+ptr-to [f] [-> (random pointer)]
+let [s] "print \"hello\""
+ptr-to s [-> (random pointer)]
+do s [outputs "hello"]
+
+let withdraw do [
+    let balance 100
+    return [
+        let [amount] args
+        if >= balance amount [
+            set balance - balance amount
+            return balance
+        ] [
+            return "Insufficient funds"
+        ]
+    ]
+]
+[I guess you can't multiple return a function and other things...]
+[But aren't variables functions?]
+[Or maybe you can, but the function has to be the last one...]
+[Or maybe [let] is secretly a tree argument function? And so is [if]?]
+
+[I should probably define the standard library before I actually implement the language... Then
+again? I don't know. If I do it before, I could get things that are mathematically elegant.
+
+[Maybe I should create a borrow check of sorts, just more implicit?]
+[Like instead of throwing an error because a variable no longer owns a value, it implicitly inserts
+a copy?]
+
+[My language should have the same energy as c89, at least for obfuscation.]
+
+[I should add single quotes as well.]
+let [my-str] 'Hello, World!\n'
+print 'Hello, World!\n'
+print "Hello, World!\n"
+[Then again, maybe not. Unlike ["], it doesn't look good enough for me to make an exception.]
+
+[I have three options right now:
+    - Do it like math, where I just write the overview of the language.
+    - Do it like emulated, where it's not truly compiled. I can test it though.
+    - Do it like a true interpreter/compiler.]
+[I don't know. I initially thought to just do the third one, because I'll just have to change it
+anyway, once it's done, if I do another model. But I don't know about that anymore. I saw how
+elegant some of the algorithms are and thought that I could try to first defined those elegant
+functions without worrying about performance, then workout the implementation details. The goal is
+something that is both elegant and performant...]
+
+[I should consider making order of assignment irrelevant. I already planned that out for the
+top-level, but I mean for inside functions as well. And it makes sense to have that, since
+[#import] basically just reads an entire file and evaluates the resulting string as a
+function.]
+[I suppose order of assignment should only matter for redeclaration or usage?]
+[There is compile-time and run-time right? So I could do it... Then again, I don't need to, since
+it's literally just a bunch of strings.]
+
+[Honestly, I'm starting to see the limits of this way of doing things. I should try to write a
+second interpreter again... But honestly, I should also finish reading SICP. There's a lot of
+knowledge I can steal from that.]
+
+[There are maybe two types of [set]s? One sets variables for dynamic scoping, the other for static.
+That way, there no need to create functions that create new scopes and functions that don't.]
+let test [
+    set.dyn var + var 123
+]
+[... or maybe if there isn't a global variable that matches, it simply continues searching using
+dynamic scoping?]
+[Or maybe I can just get away with not having it period. Yeah, I'll features as I need them.]
+
+[Even if I do the string model, I should include [#run].]
+
+[I guess a macro is just this.]
+let test-macro [
+    let val 22; do
+]
+let val 33
+test-macro
+print\n val [outputs 22]
+[That and you know, the non-evaluated args.]
+
+[I should define a map function.]
+(define (map f lst)
+    (if (null? lst)
+        '()
+        (cons (f (car lst))
+              (my-map f (cdr lst)))))
+
+let map [
+    let [f lst] args
+    if lst [pair do f lst, map f tail lst] []
+]
+map [* 2] [1 2 3 4 5]
+[It's nice, but I still don't know how [args] behaves.]
+
+[I should be able to do this.]
+map [+] [1 2 3] [4 5 6]
+[The number of arguments is determined by the function.]
+[Nevermind, should follow haskell and only partially apply the function.]
+[Then I'll use [zip-with] for stuff like that.]
+
+[Constants are uppercase, but there is nothing forcing you to not mutate.]
+[You can force it by making it so that [set] can't redefine uppercase (lol).]
+
+[[char] chars takes a [text], and converts it to list of chars:]
+chars "hello" [-> ["h" "e" "l" "l" "o"]]
+[Single character strings are synonymous with characters, and you can loose compare them to
+numbers.]
+[Maybe I should have a "text" type as well; not for any real reason, just to help with pretty
+printing. Though, nevermind. That would complicate things unnecessarily.]
+
+[There is a [type] and [true-type]. The true type is actually what's used to optimize things.]
+[Every type starts as [indeterminate].]
+
+[I shouldn't always need [#run]. If a function is pure, it should run at compile time
+automatically.]
+
+[Everything is copied by default]
+let say-hello [print "Hello, World!\n"]
+let ref [say-hello]
+[^ to create reference.]
+
+[Maybe [:] won't be a syntax char...]
+
+[One of the goals was array programming but...]
+[That's on hold for now, since there are no array programming languages without scheme/haskell like
+syntax that I can copy. This is telling me that the syntax is probably a big aspect of it. Anyway,
+array programming will be a second thought.]
+
+[[do] and [val-of] should work on pointers.]
+
+[If functions call themselves recursively, there no reason not to be able to do this.]
+let obj [
+    let name "John Smith"
+
+    let method [
+        print\n name
+    ]
+]
+obj.method [outputs "John Smith\n"]
+[or even]
+let obj [
+    let name "John Smith"
+]
+let obj.method [
+    print obj.name
+]
+[now I now this is weird, especially considering]
+let new-obj [obj]
+[but you should remember that [new-obj] is still [obj]. All the earlier aliases are still valid.]
+[Then again...]
+let new-obj val-of [obj]
+[This is broken.]
+
+[I don't want [.] to be a special character... but it would be so good if I could do this.]
+let obj []
+set [obj.name] "something"
+[I guess I should do this?]
+set-field obj [name] "something"
+[Honestly, there's no real reason not to.]
+[I should and I will.]
+[It's not a special character, of course.]
+[The [set] function simply choose to treat it specially.]
+
+[Passing a struct to a function should not copy the whole struct, that way I don't have to worry
+about adding fields to it.]
+[If the language follows a pattern, it will become something precise. otherwise, it's all just a
+list of [Any].]
+
+[What if...]
+* 3 [] -> malloc * 3 sizeof [indeterminate]
+
+[I hate it, but I really need to separate [let] destructuring and multiple assign. It's too
+confusing otherwise.]
+[Maybe I should consider {} again?]
+[Or... I just give up on destructuring? Is it really that needed? Right, destructuring was for
+multiple return.]
+[The biggest problem is the function call syntax. How about I use [:] as the syntax for calling a
+function?]
+main() [vs] (main) [vs] main:
+[The biggest gripe I had with () is that the argument count is forced.]
+[I think the trick to multiple return values might be implicit return?]
+[If I add [:], that means i won't need two text types anymore.]
+return: [1 2 3] [vs] return text "hello" [?]
+
+[Technically, there is still text and [text], it's just that [let] does automatic assignment for
+[var:], of type text.]
+==: [... [:] is a last resort.]
+[also]
+let: f complex [and] let: f [complex:] [are redundant]
+[[return text "hello"] returns a string, [return [print "hello"]] returns multiple values or a
+function, depending on the receiver.]
+
+[I'm having another crisis.]
+((func1) 1 2 3)
+(display (func1))
+[How do I do this is my language?]
+func1:: 1 2 3
+display: func1:
+[Nah, this sucks.]
+((func1 'field1) "hello")
+(display (func1 'field1))
+func1 [field1] "hello"
+print [func1 [field1]]
+[Or not? Maybe I can do this.]
+[The only difference is that scheme returns the pointer to the function, which can be called, or
+passed around, and I create lambdas.]
+
+print "Hello, World!\n"
+print: "Hello, World!\n"
+let f complex 3 4
+let: f complex: 3 4
+
+[Wait a second, I can do arrays!]
+let arr [
+    let [index] args
+    cond [
+        (= index [0]) 123
+        (= index [1]) 312
+    ]
+]
+print arr[0]
+[I mean right?]
+[Still, assignment...]
+
+[You know, why not?]
+set arr[0] 4312
+[Because you're setting [arr] to [0]. That's why.]
+[I think I should focus on first doing everything scheme can do. Otherwise, I'm going to get
+overwhelmed.]
+
+[I really need to figure this out...]
+let func [
+    return [text "hello"]
+]
+print func [outputs "hello"]
+let func [
+    return [text "Hello, %!\n", text "World"]
+]
+print func [outputs "Hello, World!\n"]
+let func [
+    return [+]
+]
+print\n func 1 2 [outputs 3]
+let func [
+    let val 0
+    return [
+        ++ val
+        print\n val
+    ]
+]
+print func 1 2 [outputs 3]
+[Uh...]
+
+let f [return [1 2 3]]
+let f [return "Hello, World!\n"]
+let f [return [+ 1 2]]
+
+print f [outputs "1 2 3"]
+print f [outputs "Hello, World!\n"]
+print f [outputs "+ 1 2"]
+[equivalent to]
+print [1 2 3] [outputs "1 2 3"]
+print "Hello, World!\n" [outputs "Hello, World!\n"]
+print [+ 1 2] [outputs "+ 1 2"]
+
+(print (f))
+print: f:
+print $f
+[Ahh... AHHHH. ARRRHHGGHGHAGS!!!!!!]
+
+[Multiple return, returning functions, returning strings...]
+
+let f [
+    return { print "Hello, World!\n" }
+]
+let f [
+    return [ 1 2 3 ]
+]
+let f [
+    return "Hello, World!\n"
+]
+
+let val0 (+ 1 2)
+let val1 {+ 1 2}
+let val2 [1 2 3]
+let val3 "Hello, World!\n"
+
+print\n val1 [outputs 3]
+print\n val2 [outputs [1 2 3]]
+print\n val3 [outputs "Hello, World!\n"]
+
+let f {
+    return [1 2 3]
+}
+let [a b c] f
+[equivalent to]
+let [a b c] [1 2 3]
+
+let f {
+    return { + arg 0, arg 1 }
+}
+print f [outputs { + arg 1, arg 1 }]
+[Functions that are returned are never executed.]
+[As opposed to this.]
+let f {
+    return + arg 0, arg 1
+}
+print f 1 2 [outputs 3]
+[I guess... You can only really really return numbers and strings?]
+print f "test " "123" [outputs "test 123"]
+
+set [arg 1] 69420
+[huh]
+
+let map [
+    if (arg 1) [pair do (arg 0) (arg 1), map (arg 0) tail (arg 1)] []
+]
+map [* 2] [1 2 3 4 5]
+let map [
+    let [f lst] arg 0, arg 1
+    if lst [pair do f lst, map f tail lst] []
+]
+map [* 2] [1 2 3 4 5]
+[Things are so much simpler when I don't do destructuring.]
+
+[Wait a second.]
+let map [
+    let [f lst] split args
+    if lst [pair do f lst, map f tail lst] []
+]
+map [* 2] [1 2 3 4 5]
+[I mean I could, right? Did I fix it? Just like that?]
+[And it just makes sense, right? Like with [as].]
+
+[Should I use [..] instead?]
+let map [
+    let [f lst] .. args
+    if lst [pair do f lst, map f tail lst] []
+]
+map [* 2] [1 2 3 4 5]
+[Yeah I should.]
+
+[If order of assignment doesn't matter, I can do forward [goto]!]
+
+[Technically, [..] has the same purpose as [do].]
+let map [
+    let [f lst] .. args
+    if lst [pair .. f lst, map f tail lst] []
+]
+map [* 2] [1 2 3 4 5]
+[It remove the [].]
+[Then again, no. [do] creates a new scope.]
+[But [..] doesn't? I don't know about that.]
+[There's no reason for it not to create a new scope.]
+[But it might be intersting for it not to.]
+[Better than [do-here], that's for sure.]
+
+[Also, this would break the [..] function.]
+map [
+    let [x y] 2, arg 0
+    * x y
+] [1 2 3 4 5]
+
+[Still, I ended up breaking [#import]. I don't know how to fix it while keeping the behavior the
+same.]
+#import "System/IO"
+let io #import "System/IO"
+[like this?]
+.. #import "System/IO"
+[You know, at this point, why not? Fuck it.]
+[It makes sense. It's not as nice, but it makes sense.]
+
+.. #import "Basic"
+.. #import "File"
+.. #import "String"
+[vs]
+#import "Basic";
+#import "File";
+#import "String";
+
+[Honestly, Jai's imports are nice, but they don't make that much sense. I prefer consistency.]
+
+[Though it's weird, I should be able to do this.]
+map [.. #import] [
+    "Basic"
+    "File"
+    "String"
+]
+[or rather like this]
+.. map [.. #import] [
+    "Basic"
+    "File"
+    "String"
+]
+
+[By the way, [...] is still the error not implemented function.]
+
+[[let] should return the value that's passed to it.]
+let x let y 0
+print\n [x y]  [outputs [0 0]]
+[This is clearly wrong...]
+[But something tells me this should be right.]
+[The weird usage of [print\n] I mean.]
+[No, there's a better way of doing this.]
+print\n reduce [x y]  [outputs [0 0]]
+[Having no need for new syntax is always a good thing.]
+
+[From now on, if variable is passed to function, it should always be equivalent to passing the
+literal directly. No need for surprises.]
+let [val] "hello"
+print val
+[equivalent to]
+print "hello"
+[and this for every function.]
+[that does mean I will have to change my for loop logic...]
+
+[Also, I just realized an interesting mnemonic.]
+[I thought of it as something ugly before, but now it's better.]
+let val [print]  [type = text]
+let [val] "print"  [type = [text]]
+[See the resemblance?]
+
+[How do define [arg]?]
+let arg [
+    let index (get 0 args)
+]
+[Damn, the one time I need a dynamic scope.]
+[Wait.]
+let arg [
+    let index (get 0 args)
+    return get index #args
+]
+[Two [args] variables. One static, the other dynamic.]
+
+[By the way, for trailing comment, two spaces beforehand.]
+
+atom [fib n]
+    ? | = n 0 = n 1
+        n
+        + fib - n 1 fib - n 2
+
+let fib [
+    let n arg 0
+    if or = n 0 = n 1
+        [n] [+ fib - n 1 fib - n 2]
+]
+
+let obj [
+    match word 0 [
+        [field1] 123
+        [field2] [print]
+    ]
+]
+print\n obj[field1]  [outputs 123]
+let set-field [
+    let field arg 0
+    let old arg 1
+    let value arg 2
+    let [new] [
+        if = arg 0 field [value] [old]
+    ]
+    set old new
+]
+set-field [field1] [obj] 321
+[And this would of course be optimized away.]
+
+[It should behave more like this.]
+set-field obj field1 321
+[or like this?]
+set [obj field1] 321
+[but it also breaks the [#import]s. But it's also more elegant in a way.]
+
+[The [obj field] also solve the chaining problem. I need to make it work.]
+
+[Holy fuck.]
+let fib [+ fib (- arg 0 1), fib (- arg 0 2)]
+set [fib 0]
+set [fib 1]
+[^ a Haskell.]
+[Also, [set] should not change the type.]
+
+[I shouldn't abuse of parentheses. One of the purposes of this language was to be rid of the
+accursed parentheses.]
+
+[The LSP can use the indentation of the code to check if the obj field calling is erronous.]
+
+[Initializer]
+let val int []
+let val int 123
+
+let [val] [for 30 int []]
+print\n get 0 val
+let val (array 30 int [])
+print\n val 0
+[I don't know how I'll do it.]
+
+[[#import] returns a [text] with an environment, right? Why not have a function that operates on
+that? And convert the environment into an object function?]
+
+let set-name [
+    set [obj name] arg 0
+]
+print\n set-name "John Smith" [outputs (function body)]
+
+[old] my-list iter filter fn [item] == item id 132 collect
+print\n (my-list iter filter [= (do (arg 0) id) 132] collect)
+let obj [my-list iter filter [= (do (arg 0) id) 132]]
+print\n obj collect
+[This works, though it's stupid.]
+[Well, when you don't have overloading, you gotta do what you gotta do.]
+
+[[iter] is only there to avoid name conflicts.]
+set [my-list iter filter] [
+    filter arg 0 my-list
+]
+[but how do I return a plain string?]
+
+[[arg []] returns the full list?]
+[but then [arg 0]...]
+[...]
+[one based indexing!?]
+
+[I should try implementing infinite lists.]
+for range [0 infinity] [print\n it]
+
+[Should [let] differenciate [] and ""?]
+[And no other function does it?]
+
+let number 123
+let func [print "hello"]
+let str "hello"
+[yeah, but...]
+let array [1 2 3]
+[... doing so introduces unnecessary complexity.]
+
+[Instead, [cond] should just be like [if], always evaluating a function body.]
+let condition true
+if condition [
+    print\n "It's true."
+] [
+    print\n "It's false."
+]
+cond [
+      condition [print\n "It's true." ],
+    ! condition [print\n "It's false."],
+]
+[Yeah, I'm doing this. Not to mention that's it's more consistent with [if] this way.]
+[And you know. The body of [if] just makes sense for lazy evaluation.]
+
+set [obj field] [text "Hello, World!\n"]
+print\n obj field
+[Because [set] does not change the type, any reassignment has to be the same type.]
+let [my-str] "hello"
+set my-str [hello]  [-> type [text]]
+let my-func [print "hello"]
+set my-func [print my-str]  [-> type text]
+[... Or not?]
+let [str] "hello"
+set [str print\n] [print\n str]
+print\n str
+str print\n
+[Every function can behave as a string, but not every string can behave as a function?]
+
+let arr [1 2 3]
+set [arr 1] [get 1 arr]
+print\n arr
+print\n arr 1
+
+[I got it.]
+set val [print "hello"]
+set [val] "hello"
+set [val say-hello] [print "hello"]
+val say-hello  [outputs "hello"]
+set [val [say-hello]] "hello"
+print\n val say-hello  [outputs "hello"]
+set [val [say-hello number]] "hello" 123
+print\n val number  [outputs 123]
+[Nevermind about [set] not changing the type.]
+
+for 1 .. 10 [print\n it]
+set [number ..] [range [number arg 0]]
+
+[If you have called [let] beforehand, it's alright. [set] it for you.]
+set [obj field] 123
+[is equivalent to]
+let obj []
+set [obj field] 123
+
+[Nevermind.]
+[Fields always call functions.]
+[That way, I can do this.]
+set [obj "John Smith"] [
+    return [
+        123
+        312
+        [other data]
+    ]
+]
+obj "John Smith"
+
+let file (#import "File" open-file "./file.txt")
+let file [#import "File"]
+let content (file open "./file.txt")
+context add (#import "File" context)
+[Zig style imports... I need to figure them out.]
+
+this context
+that context
+
+let open [#import "File" open]
+let File [#import "File"]
+let open [File open]
+[maybe I don't need to import everything?]
+
+[You know, if you program with discipline, you won't need to worry about name conflicts.]
+[Objects shouldn't have too many nested fields.]
+
+[The more I think about these Zig style imports, the more I like them.]
+let File [#import "File"]
+let file File open "file.txt"
+File fscanf [file] "%d %d " val1 val2
+[[val1] and [val2] should need to be explicitly declared. Though, these C-style mutations should be
+avoided.]
+
+[Ah damn.]
+let [val1 val2] [] []
+do [
+    set [val1 val2] .. File fscanf [file] "%d %d "
+]
+print\n val1
+print\n val2
+[This is awkward.]

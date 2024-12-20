@@ -1,6 +1,7 @@
 [List of things that will not change.]
 
     [This is a comment.]
+    "This is a comment."
 
     print "Hello, World!\n" [outputs "Hello, World!\n"]
     print\n "Hello, World!" [outputs "Hello, World!\n"]
