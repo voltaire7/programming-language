@@ -5868,3 +5868,226 @@ do [
 print\n val1
 print\n val2
 [This is awkward.]
+
+use [#import "File"]
+
+let-key val1 [field1] [
+    print "Hello, World!\n"
+]
+set-key [val1] [field2] [print "Hello, World!\n"]
+
+val1 field1        [outputs "Hello, World!\n"]
+print val1 field2  [outputs [print "Hello, World!\n"]]
+
+[no.]
+set [arr 0] 123
+set [arr 1] 321
+print\n arr 0
+print\n arr 1
+[it needs to match.]
+[but then the awkward scoping assignment...]
+
+[I guess this fixes it?]
+set-key [arr 0] 123
+set-key [arr 1] 321
+print\n arr 0
+print\n arr 1
+[or just]
+let arr []  [optional, but available for reset of all fields.]
+key [arr 0] 123
+key [arr 1] 321
+
+[I guess [key] is also like an upsert? Or should [set] just create a new variable if not bound?]
+[I guess [key] behave the same as [set] when there's only one variable?]
+[Or not? Maybe [key] always takes text as functions, while [let] takes as strings?]
+
+[No, [key] behaves the same as [let] when only one input, as [set] when more than one.]
+let [str] "Hello, World!\n"
+key [func] [print "Hello, World!\n"]
+
+let [str number] "Hello, World!\n" 123
+key [obj field] [print "Hello, World!\n"]
+
+[This is nice though.]
+let str "Hello, World!\n"
+key func [print "Hello, World!\n"]
+[or this?]
+var str "Hello, World!\n"
+let func [print "Hello, World!\n"]
+
+var [str num] "Hello, World!\n" 123
+let [obj field] [print "Hello, World!\n"]
+let [obj field] "Hello, World!\n"
+let [obj field] [text "Hello, World!\n"]
+let [obj field] [1 2 3 4 5]
+let [obj field] [text [1 2 3 4 5]]
+
+[You know, if I just drop multiple assignment, like Scheme, this would be much easier.]
+[If functions return multiple values, then just return a struct/array or something.]
+[But no. I need multiple return for args.]
+var [arg1 arg2] .. args
+
+[Honestly, I hate it, but using different functions for multiple assign and function assignement
+and object construction just makes more sense.]
+[The real question is whether [let] should have both function and object assignment.]
+[I'm guessing yes, otherwise there will be too many functions for every little thing.]
+[String and quotes are common enough to justify seperating assignment into two functions.]
+
+[The other question is should I make it more like scheme, and just omit objects?]
+[All you really need is a list in the end.]
+[And the whole obj model is kind of a pain with macros and stuff.]
+print obj field
+print Object.field obj
+[The latter is longer, but there is no ambiguity.]
+print Object.field obj
+print Object/field obj
+
+[But what about [#import]? It's broken again?]
+[Does it just return a table of key/value pairs? An environment?]
+[RIP, zig imports.]
+[Yeah, lists and selectors just make better objects.]
+
+[raku]
+my &func = {
+    my ($val1, $val2) = @_;
+    print "Hello, World!, $val1, $val2\n";
+}
+func 1, 2;
+
+[this]
+let func [
+    let [val1 val2] .. args
+    print "Hello, World!, %, %\n" val1 val2
+]
+func 1 2
+
+[Shockingly, as a whole, this language has fewer characters?]
+
+let [my-vector] [1 2 3]
+print "x = %, y = %, z = %\n" .. my-vector  [outputs "x = 1, y = 2, z = 3\n"]
+print "x = %, y = %, z = %\n" Vector.x my-vector, Vector.y my-vector, Vector.z my-vector
+let Vector.x [nth 0 arg 0]
+let Vector.y [nth 1 arg 0]
+let Vector.z [nth 2 arg 0]
+[I should keep [arg n].]
+
+[[#] for dynamic scope?]
+
+[This really, really sucks, but I might have to do imports, not the Jai way, not the zig way, but
+the odin way...]
+#import "File"
+open "my-file.txt"
+#import File "File"
+File.open "my-file.txt"
+[Well, not exactly like odin.]
+
+[Or different from anything else?]
+let open (get "open" #import "File")
+open "file.txt"
+
+let [File] #import "File"  [File -> a table of key/value pairs.]
+let open get "open" File
+open "file.txt"
+
+[[get] gets the nth element if the index is a number, or – scratch that. Tables should have numbers
+as valid keys as well.]
+
+[Should packages have [return env] at the end? Like in Lua?]
+
+let [File] #import "File"
+match [open close] File
+open "file.txt"
+
+[I guess the values should just maintain there type, which is why [match] works, but what about the
+earlier combination of [let] and [get]?]
+
+[I guess this is how a table would print.]
+[
+    [value1 123]
+    [value2 text "Hello, World!\n"]
+    [value3 print\n value1]
+    [value4 print value2]
+]
+match [value1 value3] #import "test-module"
+print\n value1
+value3
+
+[[match] actually extract a level of quotation.]
+let [test-module] #import "test-module"
+match [value1 value3] test-module
+[is equivalent to]
+let value1 get "value1" test-module
+let value3 get "value3" test-module
+[You can't do multiple assign, because the return is quoted.]
+
+let func [print "Hello, World!\n"]
+let [func] fn [print "Hello, World!\n"]
+[But how do I implement this?]
+[I guess it's similar to [..], but unlike it, does separate the return into different entries in
+the stack.]
+
+let [MyInterface] [
+    name
+    age
+    [value1 value2]
+]
+make "MyInterface" MyInterface
+
+let [value] ["hello" 123 [321 "something"]]
+print\n MyInterface.name value  [outputs "hello"]
+MyInterface.name! value "hello again"
+print\n MyInterface.name value  [outputs "hello again"]
+[I guess this is the best. It's so simple.]
+
+[If the input of a getter/setter is a number, it treats it as a pointer to a struct, otherwise as a
+value.]
+
+make "MyInterface" [
+    value1
+    value2
+    [value3 value4]
+]
+let [obj] ["hello" 123 [321 "something"]]
+print\n obj
+print\n MyInterface.value1 obj
+MyInterface.value1! obj "bye"
+print\n MyInterface.value1 obj
+
+print\n MyInterface  [outputs [value1 value2 [value3 value4]]]
+
+for MyInterface [
+    use MyInterface
+    print "% = %, " it, do it obj
+]
+
+struct "File" #import "File"
+[Nevermind, "struct". I don't like duplicates.]
+#import-as "File"
+[But then again, there's no choice. What if you want to rename it?]
+
+to-obj "File" #import "File"
+let [file] File.open "file.txt"
+use File.interface
+print\n File.name file  [outputs "file.txt"]
+
+to-obj "obj" MyInterface obj
+
+[Okay, far simpler.]
+#import "File"
+File.open "file.txt"
+use File
+open "file.txt"
+use #import "File"
+
+[Oh.]
+#import "File" as "F"
+[What's going on here?]
+[Well, [as] looks at the latest values added to the environment, and mutates the names.]
+
+[Nevermind. Too complicated to implement.]
+#import [File F]
+[This though...]
+[Hmm. It's better, because there is less noise/duplicates. There won't be fields named both
+[File.something] and [F.something] at the same time.]
+[Still, it would be interesting if it both has side-effects and return an environment at the same
+time.]
