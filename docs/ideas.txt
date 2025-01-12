@@ -6168,7 +6168,7 @@ let [str] "Hello, World!\n"
 print str
 # both are equivalent to
 print do ["Hello, World!\n"]
-# damn, this is actually looks really nice.
+# damn, this actually looks really nice.
 
 let func [
     let [arg1 arg2 arg3] .. args 3
