@@ -6091,3 +6091,89 @@ use #import "File"
 [File.something] and [F.something] at the same time.]
 [Still, it would be interesting if it both has side-effects and return an environment at the same
 time.]
+
+[Maybe strings should implicitly return?]
+let [val] if condition ["true"] ["false"]
+
+# Maybe strings should implicitly return?
+let [val] if condition ["true"] ["false"]
+
+# Yeah. That might be better, because otherwise you can't do this.]
+make "MyInterface" [
+    value1  # Only for value4
+    value2
+    [value3 value4]
+]
+
+table->obj "File" import "File"
+
+print\n MyInterface  [outputs [value1 value2 [value3 value4]]]
+print\n MyInterface  # outputs [value1 value2 [value3 value4]]
+
+# Still, if I do add [#], that means adding syntax, and abandonning [#args] or [#import].
+# But frankly, I never liked how numbers and functions implicitly returned, and text did not.
+# And what's up with [#import]? Why does it have a [#]?
+# Also, [#!/path/to/interpreter] is now possible.
+
+object "my-obj" [
+    [value1 123]
+    [value2 text "Hello, World!\n"]
+    [value3 print\n value1]
+    [value4 print value2]
+]
+my-obj.value1
+
+# There are two ways of doing objects:
+# - Tables
+# - Lists with getters/setters
+
+# I suppose this is still possible?
+let func [
+    object "obj" .. args
+    print\n obj.value1
+]
+func [
+    [value1 123]
+    [value2 text "Hello, World!\n"]
+    [value3 print\n value1]
+    [value4 print value2]
+]
+# But I guess, you can't just use [set] on it.
+
+# I'm really warming up to [#] for comments. It looks so nice.
+
+# I should probably not use tables as struct, since they very much have a runtime overhead.
+# Tables are more for dynamic stuff.
+# Structures as lists make more sense, since they actually match the implementation.
+
+# [rename] function
+let [val] "hello"
+rename "val" "value"
+print\n value  # outputs "hello"
+print\n val  # error: not bound
+
+# size (in bytes)
+# count (number of elements in list)
+# length (length of utf-8 string)
+
+for chars "Hello, World!\n" [print it]
+# equivalent to
+print "Hello, World!\n"
+
+for chars "Hello, World!\n" [print it]
+for chars "Hello, World!\n" as c [print c]
+
+let str ["Hello, World!\n"]
+let [str] "Hello, World!\n"
+print str
+# both are equivalent to
+print do ["Hello, World!\n"]
+# damn, this is actually looks really nice.
+
+let func [
+    let [arg1 arg2 arg3] .. args 3
+]
+# ^ this is the lazy way of doing things.
+# there's no way of consuming arguments otherwise.
+# hmm.
+let next-arg [top-args 1]
