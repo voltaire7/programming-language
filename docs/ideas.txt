@@ -6177,3 +6177,348 @@ let func [
 # there's no way of consuming arguments otherwise.
 # hmm.
 let next-arg [top-args 1]
+
+# the best.
+let func [
+    args [arg1 arg2 arg3]
+]
+# functions use arguments so often, it would be dumb not to do this.
+
+let square [* .]
+print\n square 5  # outputs 25
+# [*] and [.] should not exit the scope, even if the args are outside it.
+# that's why this works.
+let test [
+    let value 25
+    do
+]
+test print\n value  # outputs 25
+# although... it only works for once function call, which is good!
+test [
+    print\n value  # outputs 25
+    print\n square value  # outputs 625
+]
+
+# oh!
+args 3  # returns list of eager arguments
+args [arg1 arg2]  # returns nothing. sets symbols to [.. args 2]
+
+args 0   # returns all the args in a list.
+args []  # same here because 0 == [].
+
+# maybe [do] should only pop the scope when there is a quote?
+let test [let value 25; do]
+
+test [print\n value]  # outputs 25
+print\n square value  # error: "value" not bound
+
+test
+print\n value         # outputs 25
+print\n square value  # outputs 625
+
+# yeah, this is the best. I still have the behavior where the scope gets poped, and can still
+# include multiple function calls in it, but now I have a way to include the rest of upper scope
+# without putting it in [].
+
+# nevermind... what if a function returns a string?
+# in fact, every function either return [] or something else.
+
+let test [
+    pop  # or maybe [done]? you know, to pair with [do] which creates a scope?
+    let value 25
+]
+# yeah, but pop is called automatically at the end so...
+let test [
+    pop-scope
+    let value 25
+    push-scope
+]
+# ugly.
+let test [
+    done [let value 25]
+]
+# now that's better.
+
+# for popping multiple scopes?
+done 2 []
+# or I guess it doesn't really pop them, otherwise this wouldn't work:
+let test [
+    let value 5
+    done [let value 25]
+    print\n value  # outputs 5
+]
+# All it does is set the environment.
+
+# this only works if [let] returns nothing.
+if let value ! % 2 . 5 [
+    print\n value
+]
+
+let test1 [
+    print\n "hello"
+]
+let test2 [
+    print\n "hello"
+    return []
+]
+print\n test1  # error: no argument found.
+print\n test2  # outputs ""
+
+# but what about...
+let value if condition ["hello"] []
+# do I need to write it like this now?
+let value if condition ["hello"] [[]]
+# still, the fact is that you can do this.
+print\n * . 5  # outputs 25
+# you can have functions that return multiple values.
+# so why not functions that return nothing?
+# I should figure out how to define [.]
+
+let square [* .. .]
+# if [.] returned [val val].
+# but no, [..] also returns multiple values.
+
+# this is how it should work.
+let test1 [
+    print\n "hello"
+]
+let value test1 5
+print\n value  # outputs 5
+
+let multiple [
+    return .. [123 321]
+]
+let multiple [123 321]
+let [a b] multiple
+print\n "% %" a b  # outputs "123 321"
+
+let multiple [
+    123 321 return
+]
+# If I allow this way of doing multiple returns, then things will be more terse in some part, but
+# also more verbose in others. And I'll have to use discards everywhere now...
+
+# What's going on here?
+let [a b] .. [1 2 3]
+# Is 3 discarded?
+# But it's a good thing no? It's more explicit. I know people like explicit.
+
+# Should I call [] a set?
+
+# What about a function that only runs if a function that normally never returns suddenly does, and
+# therefore executes the code that's passed as a body? Like for an error?
+# I don't know.
+
+# [digits] function
+print\n digits 123  # outputs [1 2 3]
+# what about hex and bin?
+
+# damn, there's actually a use for true/false constants.
+let true  [u8 1]
+let false [u8 0]
+
+# it's only natural for a function that can take multiple inputs to be able to have multiple
+# outputs as well.
+
+let test [
+    print\n value
+    let [value]
+]
+test 5  # outputs 5
+# nevermind. this only works for functions because they are 'strings'.
+let test1 [test2]
+let test2 [test1]
+# this wouldn't work.
+let test1 test2  # error: "test2" not bound
+let test2 [test1]
+
+let multiple [123 321]
+let [a b] multiple
+let [a] multiple  # discards 321
+let a multiple    # discards 321 as well?
+# if feel like it should.
+# thing is, I really need use cases to make a decision.
+
+if let a multiple []
+# vs
+if let a . 5 []
+# [. 5] is a function like [multiple] that returns two things.
+let a multiple  # should not discard 321 then.
+
+# honestly, I'm not really liking this [if let] syntax.
+if let a swap % 2 . 5 [] # i have to do stupid shit like this.
+
+# maybe [let] returns the updated environment? so I don't have to do [return env]?
+
+print\n list multiple  # outputs [123 321]
+# takes any number of returns from function call and puts it in a list
+
+let test [1 2 3]
+print\n + - test  # outputs 2 -> (1 - 2) + 3
+let test [1 2]
+print\n + - test 3  # same as above
+
+fold-left [+] 0 [0 1 2 3 4 5]
+fold-left [+] 0 [0 1 2 3 4 5]
+
+let [] func-call  # needs to discard.
+# and I guess it's fine if it's the only thing that discards?
+# also, I guess if a function explects an input but gets nothing, then there will be hell to pay.
+let test []
+print\n test  # error: passed void as argument
+
+let multiple [1 2]
+let test [
+    args [a b c]
+]
+test multiple 3  # this should work.
+
+let multiple [1 2 3]
+let [] print\n - multiple  # outputs -1
+# or
+clean let [value] - multiple
+print\n value  # outputs -1
+# should I just not have the ability to discard?
+let [a b _] multiple
+print\n _  # outputs 3
+# it's just a convention. it could be any name.
+# [_] just keeps getting reassigned to 'discarded' values.
+# this is probably the best. [let] now behave like all the other functions.
+
+# but then what does this do?
+let [] multiple
+# it could throw, but I thinks it's better for it to just not do anything.
+# it's equivalent to
+multiple
+
+let [byte-arr] map [u8] [1 2 3 4 5 6]
+# then again...
+let [byte-arr] u8 [1 2 3 4 5 6]
+# all you need is an overload.
+
+# actually, nevermind for [list].
+let multiple [1 2 3]
+print\n [multiple]  # outputs [multiple]
+print\n reduce [multiple]  # outputs [1 2 3]
+
+# [<>] instead of [swap]?
+let multiple [1 2]
+let [a b] swap multiple
+let [a b] <> multiple
+# or even
+let [a b] >< multiple
+# nah. [swap] is better.
+
+let [quoted] [print "Hello, World!\n"]
+print\n quoted  # outputs [print "Hello, World!\n"]
+to-fn quoted
+quoted  # outputs "Hello, World!\n"
+
+let [arr] [1 2 3 4 5 6]
+
+print\n first 3 arr  # outputs [1 2 3]
+print\n first   arr  # outputs 1
+
+print\n last  5 arr  # outputs [2 3 4 5 6]
+print\n last -1 arr  # outputs [2 3 4 5 6]
+print\n last  0 arr  # outputs [1 2 3 4 5 6]
+
+print\n half   arr  # outputs [[1 2 3] [4 5 6]]
+print\n half 0 arr  # outputs [1 2 3]
+print\n half 1 arr  # outputs [4 5 6]
+# [first] and [last] work. I still need to think about [half].
+
+# constant just capitalized for the same reason that [_] is used as a discard variable.
+# it's all convention. no need to actually change the language to add these "features".
+# though again, you can add them; just not through the default channels.
+
+# I still can't get over this. so simple, yet so smart.
+let multiple [1 2 3]
+let [a b _] multiple
+let [a _ _] multiple
+let _ test
+let [val err] test
+let [val _] test
+let err drop test  # [drop] takes one argument, and returns nothing.
+let drop [args [_]]
+# nah, this is better.
+let [_ err] test
+# or this.
+let err let [_] test
+let drop [let [_]]
+
+# Go
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	// Try to open a file
+	file, err := os.Open("example.txt")
+	if err != nil {
+		// Handle the error
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	// Don't forget to close the file
+	defer file.Close()
+
+	fmt.Println("File opened successfully")
+}
+
+# this
+import "File"
+
+let main [
+    # Try to open a file
+    let [file err] File.open "example.txt"
+    if err [
+        # Handle the error
+        print\n "Error opening file: %" err
+        return
+    ]
+    # Don't forget to close the file
+    defer [File.close file]
+ 
+    print\n "File opened successfully"
+]
+
+# maybe I should seperate imports and uses?
+import "File"
+use [File]
+# but again, I don't like repetition for such common operations, so no.
+# the problem is what [import] returns.
+# if it returns something, thing will become pretty dirty, pretty quick.
+let [_] import "File"
+drop import "File"
+
+use [File System Graphics Core]
+# i think this is the best. it also encourages the use of [use].
+
+let [file err] File.open "example.txt"
+defer File.close file
+# vs
+let [file err] File/open "example.txt"
+defer File/close file
+
+# [.] looks kind of better with ["].
+
+# oh shit.
+let import [
+    args [file]
+
+    if ! between count file, 1, 2 [
+        error [usage = [import "module-name optional-rename"]]
+    ]
+
+    let [content] read-file get 0 file
+    module get 1 file
+    done [add env, get 0 file, content]
+    done content
+    module ""
+]
+# damn, this is actually so simple.
+# I think you can omit the ending [module] call.
+# unless it is in a [done] call. then you have to include it, unless you want the effect to be
+# included in the outer scope.
