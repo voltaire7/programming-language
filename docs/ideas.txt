@@ -6522,3 +6522,429 @@ let import [
 # I think you can omit the ending [module] call.
 # unless it is in a [done] call. then you have to include it, unless you want the effect to be
 # included in the outer scope.
+
+let use [
+    for args 1 [
+        done 2 [do it]
+    ]
+]
+# [for] should automatically call reduce on the array that's passed.
+# you can still iterate of symbols, but you have to quote them first.
+for quote args 1 [...]
+
+print\n quote [1 2 3]  # outputs ["1" "2" "3"]
+let arr [1 2 3]
+print\n quote arr  # outputs ["1" "2" "3"]
+print\n quote [print "hello"]  # outputs ["print" ["hello"]]
+print\n quote 123  # outputs "123"?
+# or should I do this?
+print\n quote 2 [1 2 3]  # outputs ["1" "2" 3]
+# I don't know. I don't see much use from this.
+
+let test [args 3]
+test 1 2 EOF  # error: invalid argument count. expected 3, got 2
+
+# I like the idea that because the functions are so general, you can get some "happy accidents"
+# from it. functionality you didn't expect, I mean.
+
+# does this throw?
+get 1 [1]
+# it should. so...
+get-or 1 [1] []
+get-or-nil 1 [1]
+
+# I guess [] and 0 should be equal to each other. otherwise...
++ [] 2
++  0 2
+# what should I do?
+
+let [arr] []  # null pointer?
+set 0 arr 5  # [5]
+set "val1" arr 6  # [5 [val1 6]]
+# cannot have numbers as keys then.
+
+print\n get "val1" arr  # outputs [val1 6]
+print\n key get "val1" arr  # outputs "val1 6"
+print\n value get "val1" arr  # outputs 6
+print\n get-key "val1" arr  # outputs "val1"
+print\n get-val "val1" arr  # outputs 6
+# [get-val] runs the function if it is one.
+
+set "val1" arr [print\n "hello"]  # to set functions
+set "val1" arr ["hello"]  # to set strings
+# or
+set "val1" arr fn ["hello"]
+set "val1" arr "hello"
+
+even? [1 2 3]  # false, because list count is not even
+
+add arr [val1 hello]  # though it doesn't check for duplicates...
+
+let [str] "hello"
+set 2 char str "x"
+print\n str  # outputs "hexlo"
+# but [char] should probably copy it.
+
+let [str] char "hello"
+set 2 str "x"
+print\n str  # outputs ["h" "e" "x" "l" "o"]
+print\n to-str str  # outputs "hexlo"
+
+# I just realized. I don't need [get-key] – because it's stupid – but also [get-val] because that
+# should just be [get].
+let arr []
+set "value" arr 123
+print\n get "value" arr  # outputs 123
+# fuck. I just realized. I can't use [set].
+
+let arr []
+set [arr] at 0 arr 123
+set [arr] at "test" arr 321
+print\n arr  # outputs [123 [test 321]]
+# or
+let-at 0 arr 123
+set-at "test" arr 321
+print\n arr  # outputs [[0 123] [test 321]]
+
+# I know.
+let arr [[] [] []]
+set 0 arr 123
+set 2 arr 321
+print\n arr  # outputs [123 [] 321]
+set [0 2] arr 4
+print\n arr  # outputs [4 4 4]
+# nevermind. I don't know.
+
+key 0 arr 123
+key "test" arr 321
+print\n arr  # outputs [[0 123] ["test" 321]]
+print\n get "test" arr  # outputs 321
+# the key cannot be a symbol
+let n 0
+print\n get n arr  # outputs 123
+
+set 2 123  # error: not bound [2]
+let 2 123
+print\n 2  # outputs 123
+# lol.
+
+let [arr] reduce [* 3 []]
+set-at 2 arr 123
+print\n arr  # outputs [[] [] 2]
+# if the array was empty, it would not check if the index was out of bounds, like C.
+print\n at 2 arr 123  # outputs [[] [] 2]
+# [at] return, doesn't mutate.
+
+set-at [1 0 2] arr 123 321 333
+print\n arr  # outputs [321 123 333]
+set-at [1 0 2] [arr1 arr2] 123 321 333
+set-at range [0 2], arr, .. range [10 12]
+# now I need to figure out arr vs [arr].
+
+let val 123
+let [val] 123
+
+let func [print "hello"]
+let [func] fn [print "hello"]
+
+let [str] "hello"
+let str "other hello"
+print\n hello  # outputs "other hello"
+# alright, from now I'm quoting the symbol passed to [let] as well.
+# I can always go back if I don't like it. still, I should try this consistency thing.
+
+let [import] fn [
+    args [file]
+
+    if ! between count file, 1, 2 [
+        error [usage = [import "module-name optional-rename"]]
+    ]
+
+    let [content] read-file get 0 file
+    module get 1 file
+    done [add env, get 0 file, content]
+    done content
+    module ""
+]
+# doesn't change that much, honestly.
+
+import "File"
+
+let [main] fn [
+    # Try to open a file
+    let [file err] File.open "example.txt"
+    if err [
+        # Handle the error
+        print\n "Error opening file: %" err
+        return
+    ]
+    # Don't forget to close the file
+    defer [File.close file]
+ 
+    print\n "File opened successfully"
+]
+# not much at all.
+
+let [arr] reduce [* 3 []]
+set-at 0 [arr] 123
+print\n arr  # outputs [123 [] []]
+let [index] 2
+set-at [0 index] [arr] 123 321
+print\n arr  # outputs [123 [] 321]
+
+let [arr] []
+set-key "hello" [arr] 123
+set-key "bye" [arr] 321
+print\n arr  # outputs [["hello" 123] ["bye" 321]]
+print\n get "bye" arr  # outputs 321
+print\n get 0 arr  # outputs ["hello" 123]
+set-key 0 [arr] 666
+print\n arr  # outputs [["hello" 123] ["bye" 321] [0 666]]
+print\n get 0 arr  # outputs ["hello" 123]
+
+# hmm.
+let [arr] []
+set-at "hello" [arr] 123
+set-at "bye" [arr] 321
+print\n arr  # outputs [["hello" 123] ["bye" 321]]
+set-at 0 [arr] 123
+print\n arr  # outputs [123 ["bye" 321]]
+# good. this fixes the [set-key 0] problem.
+
+# I shouldn't allow number assignment. if it's more code to add such a stupid feature, I'm not
+# doing it.
+
+let [test] fn [
+    print\n args 0
+]
+test 1 2 3 4  # a random comment.
+print\n "Hello, World!\n"  # another random comment.
+
+# this should print something like [1 2 3 4 print\n "Hello, World!\n"].
+# the comments are of course ignored. I guess that's how you do metaprogramming?
+let [meta] fn [
+    print\n first args []
+]
+meta hello world  # outputs "hello", then error because "world" not bound
+# or rather...
+let [meta] fn [
+    print\n first quote args 0
+]
+
+let [test] fn [
+    for args 0 [
+        if = "end" it [
+            break
+        ] [
+            print "%, " it
+        ]
+    ]
+    print \n
+]
+let [\n] "\n"
+test 1 2 3 4 5 6 [end]  # outputs 1 2 3 4 5 6
+
+let [break-list] ["for" "while" "loop"]
+let [break] fn [
+    pop-until [contains this break-list]
+]
+
+let [for] fn [
+    args [list body]
+    let [it] first list
+    do body
+    for last -1 list, body
+]
+
+let [it] 6
+for [1 2 3] [print\n it]  # I guess [it] shouldn't be 6?
+# does the static scope only work when [fn] is called then?
+
+let [func] fn [for [1 2 3] [it]]
+# equivalent to
+let [func] fn [1 2 3]
+let [func] fn [1 2 3]
+
+let [test] fn [
+    print\n this
+]
+test  # outputs "test"
+
+do [
+    print\n this
+]  # outputs ""
+
+let [test] fn [
+    let [here] this
+    if true [
+        goto here
+    ] []
+]
+
+# maybe [do] only takes strings as functions, numbers as the level.
+do [
+    let [x] 5
+]
+print\n x  # [error] not bound: x
+do [
+    do 1 [let [x] 5]
+]
+print\n x  # outputs 5
+
+do fn []  # [error] scope level too high
+# or not. [fn] should return a string. so...
+do fn []  # [error] argument not quoted
+# or something.
+
+# everything is a string.
+let [val] 123
+char *val = "123";
+let [val] [123]
+char *val = "[123]";
+let [val] [print "Hello, World!\n"]
+char *val = "[print \"Hello, World!\n\"]";
+let [val] fn [print "Hello, World!\n"]
+char *val = "print \"Hello, World!\n\"";
+
+do val  # will equally run a string as if it were a function
+
+let [_] [this is a comment, lol.]
+drop [this is a comment, lol.]
+
+# string manipulation needs to be hella good, because it's also code manipulation.
+
+do 0 [
+    let [x] 5
+]
+print\n x  # outputs 5
+# this is equivalent to the old [do-here].
+
+# [head]/[tail] vs [first]/[last]?
+# and [tail] defaults to -1 for the input.
+# I'm still torn on what to do for an input of 0.
+
+let [set-at] fn [
+    args [key var value]
+    do 1 [
+        set var, at key (do var) value
+    ]
+]
+set-at "hello" [arr] 123
+# so easy!
+
+let [at] fn [
+    args [key var value]
+    reduce [
+        for var [
+            if = head it, key [
+                [head it, value]
+            ] [it]
+        ]
+    ]
+]
+# wait, but how do I do [at (number)]?
+
+# comparing an array or a list is just a [strcmp], lol.
+
+print\n bool = 0 []   # outputs "false"
+print\n bool = 0 [0]  # outputs "false"
+
+print\n bool == 0 []   # outputs "true"
+print\n bool == 0 [0]  # outputs "false"
+
+let [null] u64 0
+let [value] []
+
+print\n bool == null value
+
+# actually...
+print\n bool == 0 []   # outputs "false"
+print\n bool == 0 [0]  # outputs "false"
+# because "0" and "[]" are seperately allocated strings.
+# I guess [==] is check for reference and reference only. so...
+print\n bool =  0, ptr []  # outputs "true"
+print\n bool == 0, ptr []  # outputs "false"
+# [=] is just strcmp. I can make better in the future, but not now.
+
+let [hello] fn [print\n "hello"]
+print\n reduce 1 [hello]  # outputs [print args 1; print \n]
+print\n reduce [hello]  # outputs [exec 1010101010101101]... something like that.
+# or not? because...
+let [vars] [a b c]
+let vars 1 2 3
+print\n vars  # outputs "a b c"
+print\n reduce vars  # outputs "a b c"
+print\n reduce vars  # outputs [1 2 3]
+# right, I see the problem. [reduce] actually execute the code! it just doesn't return.
+
+# honestly, a function passed arg that returns nothing should just take another argument.
+# then again... I just don't see a use case. most cases are bugs!
+
+# maybe I should write a [strcmp] that ignores syntax chars?
+
+# I don't know if I can do [goto] in this language. at least not the high level unoptimized version
+# of the interpreter. if I do implement it, it need to be as powerful as C's goto: can go up a
+# scope, backwards, forwards, down a scope – all the directions. if it can't do that, it's not
+# worth having in the language. and honestly, since everything is recursion now, I guess I don't
+# even need it? I don't know, I don't know.
+
+[-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
+[ ASSIGNMENT                                                                                      ]
+[-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-]
+
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
+# ASSIGNMENT                                                                                      #
+#-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-#
+
+# honestly, this time, the [] win. they somehow look nicer.
+
+let [table] [
+    "my-str" 123
+    "another value" "Hello, World!\n"
+    "do-something" fn [print\n "hello"]
+]
+print\n get "another value" table  # outputs "Hello, World!\n
+get "do-something" table  # ... how do I run this?
+do get "do-something" table  # not this, [do] only accepts strings.
+let [table] [
+    "my-str" 123
+    "another value" "Hello, World!\n"
+    "do-something" [print\n "hello"]
+]
+do get "do-something" table  # I guess?
+let [do-something] fn get "do-something" table
+# yeah, this is the best solution.
+
+let [file] import "File"
+let [open] get "open" file
+# oh! another reason why numbers can't be keys: variables can't either.
+let [my-file] open "example.txt"
+write my-file "Hello, World!\n"
+print\n get "filename" my-file  # outputs "example.txt"
+print\n my-file  # outputs [(insert file struct/table here)]
+
+let [open close] get [open close] file
+let-get [open close] file
+let-get [open close] import "File"
+
+use import "File"
+object "File" import "File"
+# I don't know how make these last two though...
+# How do you represent a function as a string?
+
+let [table] [
+    ["my-num" 123]
+    ["another value" "Hello, World!\n"]
+    ["do-something" print\n "hello"]
+    ["do-again", fn [print\n "hello"]]
+]
+# this is probably ideal.
+print\n get "my-num" table  # outputs 123
+
+let [get] fn [
+    # searching logic...
+    print\n found  # e.g. [123]
+    do tail found
+]
+let [do-again] get "do-again" table
+do-again  # outputs "hello"
