@@ -7068,3 +7068,5 @@ call [print\n "hello"]
 let [value] 123
 assert [= value 123]
 # it's funny how easy [assert] is to implement.
+
+# intrinsics.c vs functions.c

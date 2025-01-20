@@ -1,8 +1,15 @@
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
-int size;
+typedef struct Program {
+    char *code;
+    int size;
+    int position;
+} Program;
 
 void error(char *msg, ...) {
     va_list args;
@@ -11,24 +18,52 @@ void error(char *msg, ...) {
     exit(1);
 }
 
-char *read_file(char *filename) {
+Program read_file(char *filename) {
+    Program program = {};
+
     FILE *file = fopen(filename, "r");
     if (!file) error("File not found.\n");
 
     fseek(file, 0, SEEK_END);
-    size = ftell(file);
+    program.size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    char *code = malloc(size + 1);
-    fread(code, size, 1, file);
-    code[size] = 0;
+    program.code = malloc(program.size + 1);
+    fread(program.code, program.size, 1, file);
+    program.code[program.size] = 0;
 
-    return code;
+    return program;
+}
+
+char *get_token(Program *program) {
+    while (program->position < program->size && isspace(program->code[program->position])) program->position++;
+    int end = program->position;
+
+    while (end < program->size && !isspace(program->code[end])) end++;
+    int size = end - program->position;
+
+    if (size == 0) return NULL;
+
+    char *token = malloc(size + 1);
+    strncpy(token, program->code + program->position, size);
+    token[size] = 0;
+    program->position = end;
+
+    return token;
+}
+
+void interpret(Program program) {
+    for (int i = 0; program.position < program.size; i++) {
+        char *token = get_token(&program);
+        if (!token) return;
+        printf("[%s]\n", token);
+    }
 }
 
 int main(int argc, char** argv) {
     if (argc < 2) error("Repl not implemented yet.\n");
 
-    char *code = read_file(argv[1]);
-    printf("%s", code);
+    Program program = read_file(argv[1]);
+    // printf("%s", program.code);
+    interpret(program);
 }
