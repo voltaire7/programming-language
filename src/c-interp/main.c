@@ -5,11 +5,21 @@
 #include <stdbool.h>
 #include <string.h>
 
+typedef char * Token;
+
 typedef struct Program {
     char *code;
     int size;
     int position;
 } Program;
+
+typedef enum Type {
+    NUMBER,
+    STRING,
+    SYMBOL,
+} Type;
+
+const char *TYPES[] = { "NUMBER", "STRING", "SYMBOL" };
 
 void error(char *msg, ...) {
     va_list args;
@@ -35,21 +45,21 @@ Program read_file(char *filename) {
     return program;
 }
 
-char *get_token(Program *program) {
+Token get_token(Program *program) {
     while (program->position < program->size && isspace(program->code[program->position])) program->position++;
     int end = program->position + 1;
 
     if (program->code[program->position] == '[') {
         int layer = 1;
         for (;;) {
-            if (++end > program->size) error("Non terminating quote.");
-            if (program->code[end-1] == '[' && program->code[end-2] != '\\') layer++;
-            if (program->code[end-1] == ']' && program->code[end-2] != '\\') layer--;
-            if (layer <= 0) break;
+            if (++end > program->size) error("Non terminating quote.\n");
+            else if (program->code[end-1] == '[' && program->code[end-2] != '\\') layer++;
+            else if (program->code[end-1] == ']' && program->code[end-2] != '\\') layer--;
+            if (layer < 1) break;
         }
     } else if (program->code[program->position] == '"') {
         for (;;) {
-            if (++end > program->size) error("Non terminating quote.");
+            if (++end > program->size) error("Non terminating quote.\n");
             if (program->code[end-1] == '"' && program->code[end-2] != '\\') break;
         }
     } else {
@@ -60,7 +70,7 @@ char *get_token(Program *program) {
 
     if (size == 0) return NULL;
 
-    char *token = malloc(size + 1);
+    Token token = malloc(size + 1);
     strncpy(token, program->code + program->position, size);
     token[size] = 0;
     program->position = end + 1;
@@ -68,11 +78,28 @@ char *get_token(Program *program) {
     return token;
 }
 
+bool is_number(Token token) {
+    if (isdigit(*token)) {
+        while (isdigit(*token++));
+        if (*(token-1) == '.') while (isdigit(*token++));
+    } else if (*token == '.' && isdigit(*++token)) while (isdigit(*token++));
+    else return false;
+    if (*token == 0) return true;
+    return false;
+}
+
+Type get_type(Token token) {
+    if (*token == '[' || *token == '"') return STRING;
+    if (is_number(token)) return NUMBER;
+    return SYMBOL;
+}
+
 void interpret(Program program) {
     for (int i = 0; program.position < program.size; i++) {
-        char *token = get_token(&program);
+        Token token = get_token(&program);
         if (!token) return;
-        printf("[%s]\n", token);
+        printf("%s == %s\n", token, TYPES[get_type(token)]);
+        free(token);
     }
 }
 
