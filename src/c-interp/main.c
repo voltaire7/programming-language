@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define STACK_SIZE 1000
+
 typedef char * Token;
 
 typedef struct Program {
@@ -20,6 +22,9 @@ typedef enum Type {
 } Type;
 
 const char *TYPES[] = { "NUMBER", "STRING", "SYMBOL" };
+
+char *stack[STACK_SIZE] = {};
+int stack_index = 0;
 
 void error(char *msg, ...) {
     va_list args;
@@ -84,8 +89,7 @@ bool is_number(Token token) {
         if (*(token-1) == '.') while (isdigit(*token++));
     } else if (*token == '.' && isdigit(*++token)) while (isdigit(*token++));
     else return false;
-    if (*token == 0) return true;
-    return false;
+    return !*token;
 }
 
 Type get_type(Token token) {
@@ -94,13 +98,33 @@ Type get_type(Token token) {
     return SYMBOL;
 }
 
+void eval(Program program, Token token) {
+}
+
+void debug_stack() {
+    for (int i = 0; i < stack_index; i++) {
+        printf("%i = %s\n", i, stack[i]);
+    }
+}
+
 void interpret(Program program) {
     for (int i = 0; program.position < program.size; i++) {
         Token token = get_token(&program);
-        if (!token) return;
-        printf("%s == %s\n", token, TYPES[get_type(token)]);
-        free(token);
+        if (!token) break;
+        // printf("%s == %s\n", token, TYPES[get_type(token)]);
+
+        Type type = get_type(token);
+        switch (type) {
+            case NUMBER:
+            case STRING:
+                stack[stack_index++] = token;
+                break;
+            case SYMBOL:
+                free(token);
+                break;
+        }
     }
+    debug_stack();
 }
 
 int main(int argc, char** argv) {
