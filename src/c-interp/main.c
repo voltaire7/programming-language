@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "env.c"
+
 #define STACK_SIZE 1000
 
 typedef char * Token;
@@ -133,4 +135,8 @@ int main(int argc, char** argv) {
     Program program = read_file(argv[1]);
     // printf("%s", program.code);
     interpret(program);
+
+    upsert("test", "print [ehll]", true);
+    Variable *var = find("test");
+    printf("var = %s\n", var->value);
 }
