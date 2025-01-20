@@ -6915,16 +6915,16 @@ do get "do-something" table  # I guess?
 let [do-something] fn get "do-something" table
 # yeah, this is the best solution.
 
-let [file] import "File"
-let [open] get "open" file
+let [File] import "File"
+let [open] get "open" File
 # oh! another reason why numbers can't be keys: variables can't either.
 let [my-file] open "example.txt"
 write my-file "Hello, World!\n"
 print\n get "filename" my-file  # outputs "example.txt"
 print\n my-file  # outputs [(insert file struct/table here)]
 
-let [open close] get [open close] file
-let-get [open close] file
+let [open close] get [open close] File
+let-get [open close] File
 let-get [open close] import "File"
 
 use import "File"
@@ -6948,3 +6948,123 @@ let [get] fn [
 ]
 let [do-again] get "do-again" table
 do-again  # outputs "hello"
+
+make "File" table
+print\n File.my-num  # outputs 123
+# or it throws if the key is spaced.
+make "File" import "File"
+make-import "File"
+
+let [make-import] fn [
+    do 1 [make import .]
+]
+
+let [let-get] fn [
+    args [name]
+    do 1 [let name get name]
+]
+
+let square [* .]
+let [square] fn [* .]
+
+let ^ [* .]
+let [^] fn [* .]
+
+# honestly, a function that executes the moment you [get] it, doesn't make sense.
+let [table] [
+    "my-num" 123
+    "another value" "Hello, World!\n"
+    "do-something" [print\n "hello"]
+]
+print\n get "do-something" table  # outputs [print\n "hello"]
+do get "do-something" table  # outputs "hello"
+# ah, I remember now, why this was a problem.
+# how do we know if [do-something] is a function?
+let [do-something] get "do-something" table  # string
+let [do-something] fn get "do-something" table  # string
+let-get [do-something] table  # string
+
+# this instead.
+let [get] fn [
+    # searching logic...
+    print\n found  # e.g. [123]
+    fn tail found
+]
+
+let [table] [
+    ["my-num" 123]
+    ["another value" "Hello, World!\n"]
+    ["do-something" print\n "hello"]
+]
+let [do-something] get "do-something" table  # function
+do-something  # outputs "hello"
+
+let-get [do-something] table
+
+let [test] fn [
+    let 1 [x] "hello"
+]
+print\n x  # outputs "hello"
+
+let [make-import] fn [
+    make 1 import .
+]
+
+let [let-get] fn [
+    args [name]
+    let 1 name get name
+]
+
+print\n map    [+ 5] [1 2 3 4 5]  # outputs [6 7 8 9 10]
+# vs
+print\n map fn [+ 5] [1 2 3 4 5]  # outputs [6 7 8 9 10]
+# it's still just [[]] instead of [fn []] because it's basically typed.
+# it only expects a function. nothing else.
+
+# I need to figure out what this does.
+do fn []
+# before, it errored, but I don't know anymore.
+let [do-something] get "do-something" table  # function
+do-something  # outputs "hello"
+do get "do-something" table  # ???
+# logically, it should just run the function... but, that creates inconsistencies.
+# a function is a string without quotation characters at the start and end.
+# [do] needs to remove those characters, before running the code...
+# I know.
+call fn []
+call get "do-something" table  # ???
+# I guess I could call (lol) it something else, but it's clear that this only accepts functions.
+
+# it should be [get-at] to make it clear that it pairs with [set-at] and [let-at].
+# or not? since [at] is a standalone function, and [get] has nothing to do with it?
+# [set-at] is called so because it is a mix of the two functions.
+
+# I'll be using [let] a lot, and so if I made a mistake with the argument count a function, the
+# program will pick up on that by telling me that the argument returned nothing (it's an error).
+# The function will have take the [let] call as an argument and gotten a invalid input from that.
+
+call fn [print\n "hello"]
+# vs
+call [print\n "hello"]
+# what happens?
+# I guess it returns a string?
+# it's equivalent to
+let [test] fn [[print\n "hello"]]
+print\n test                    # outputs [print\n "hello"]
+print\n call [print\n "hello"]  # outputs [print\n "hello"]
+# because functions called with variables and literals should behave the same.
+let [test] fn [print\n "hello"]
+call fn [print\n "hello"]
+call test  # ...
+# maybe not.
+let [test] [print\n "hello"]
+call test
+call [print\n "hello"]
+# what now?
+# no, with the variable it still returns the string of code.
+# but doing the same for the literal is weird... but no matter.
+# even for the variable, you usually only return one string or number.
+
+let [value] 123
+assert [= value 123]
+# it's funny how easy [assert] is to implement.
