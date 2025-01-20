@@ -37,17 +37,33 @@ Program read_file(char *filename) {
 
 char *get_token(Program *program) {
     while (program->position < program->size && isspace(program->code[program->position])) program->position++;
-    int end = program->position;
+    int end = program->position + 1;
 
-    while (end < program->size && !isspace(program->code[end])) end++;
+    if (program->code[program->position] == '[') {
+        int layer = 1;
+        for (;;) {
+            if (++end > program->size) error("Non terminating quote.");
+            if (program->code[end-1] == '[' && program->code[end-2] != '\\') layer++;
+            if (program->code[end-1] == ']' && program->code[end-2] != '\\') layer--;
+            if (layer <= 0) break;
+        }
+    } else if (program->code[program->position] == '"') {
+        for (;;) {
+            if (++end > program->size) error("Non terminating quote.");
+            if (program->code[end-1] == '"' && program->code[end-2] != '\\') break;
+        }
+    } else {
+        while (end < program->size && !isspace(program->code[end])) end++;
+    }
     int size = end - program->position;
+    // printf("size: %i\n", size);
 
     if (size == 0) return NULL;
 
     char *token = malloc(size + 1);
     strncpy(token, program->code + program->position, size);
     token[size] = 0;
-    program->position = end;
+    program->position = end + 1;
 
     return token;
 }
