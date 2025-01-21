@@ -42,11 +42,17 @@ void interpret(Program *program) {
 void PRINT(Program *program) {
     if (!stack_index) error("Stack is empty.");
     eval(program);
-    int size = strlen(stack[stack_index-1]) - 2;
-    char unquoted[size];
-    strncpy(unquoted, stack[stack_index-1] + 1, size);
-    unquoted[size] = 0;
-    printf("token: %s\n", unquoted);
+
+    if (get_type(stack[stack_index-1]) == STRING) {
+        int size = strlen(stack[stack_index-1]) - 2;
+
+        char unquoted[size];
+        strncpy(unquoted, stack[stack_index-1] + 1, size);
+        unquoted[size] = 0;
+
+        printf("token: %s\n", unquoted);
+    } else printf("token: %s\n", stack[stack_index-1]);
+
     free(stack[stack_index--]);
 }
 
