@@ -1,5 +1,5 @@
-#ifndef ENV_H
-#define ENV_H
+#ifndef SHARED_H
+#define SHARED_H
 
 #define WHITE "\033[0m"
 #define RED   "\033[1;31m"
