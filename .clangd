@@ -1,2 +1,4 @@
 Diagnostics:
     Suppress: expected_unqualified_id
+InlayHints:
+    Enabled: No

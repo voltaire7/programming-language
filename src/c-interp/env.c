@@ -3,19 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define ENV_SIZE 100
-
-typedef struct Variable {
-    char *key;
-    char *value;
-    bool is_intrinsic;
-    struct Variable *next;
-} Variable;
-
-typedef struct Environment {
-    Variable *var[ENV_SIZE];
-    struct Environment *next;
-} Environment;
+#include "shared.h"
 
 Environment env = {};
 
@@ -37,7 +25,7 @@ Variable *find(char *key) {
     return NULL;
 }
 
-void upsert(char *key, char *value, bool is_intrinsic) {
+void upsert(char *key, void *value, bool is_intrinsic) {
     int index = hash(key);
     Variable *var = env.var[index], *prev;
 
