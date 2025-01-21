@@ -1,3 +1,4 @@
 print [hello\n]
 print "test: [%][%]\n\n" hello 321
 print format "test: [%][%]\n\n" hello 321
+format "test: [%][%]\n\n" hello 321

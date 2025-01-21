@@ -93,37 +93,6 @@ void FORMAT(Program *program) {
     }
     result[j] = 0;
     stack[stack_index++] = result;
-
-    // eval(program);
-    // if (!stack_index) error("Stack is empty.\n");
-    //
-    // char *fmt = stack[--stack_index];
-    // bool is_quote = *fmt == '[' || *fmt == '"';
-    // for (int i = is_quote; fmt[i + is_quote]; i++) {
-    //     if (fmt[i] == '\\') {
-    //         i++;
-    //         switch (fmt[i]) {
-    //             case 'n':
-    //                 putchar('\n');
-    //                 break;
-    //             case '"':
-    //                 printf("%s", fmt[0] == '"' ? "\"" : "\\\"");
-    //                 break;
-    //             case '[':
-    //                 printf("%s", fmt[0] == '[' ? "[" : "\\[");
-    //                 break;
-    //             case ']':
-    //                 printf("%s", fmt[0] == '[' ? "]" : "\\]");
-    //                 break;
-    //         }
-    //     } else if (fmt[i] == '%') {
-    //         eval(program);
-    //         if (!stack_index) error("Stack is empty.\n");
-    //         printf("%s", stack[--stack_index]);
-    //         free(stack[stack_index]);
-    //     } else putchar(fmt[i]);
-    // }
-    // free(fmt);
 }
 
 void PRINT(Program *program) {

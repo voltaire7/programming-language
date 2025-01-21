@@ -58,21 +58,23 @@ void debug_stack() {
 
 Token get_token(Program *program) {
     while (program->position < program->size && isspace(program->code[program->position])) program->position++;
-    int end = program->position + 1;
+    int end = program->position;
 
     if (program->code[program->position] == '[') {
         int layer = 1;
         for (;;) {
             if (++end > program->size) error("Non terminating quote.\n");
-            else if (program->code[end-1] == '[' && program->code[end-2] != '\\') layer++;
-            else if (program->code[end-1] == ']' && program->code[end-2] != '\\') layer--;
+            else if (program->code[end] == '[' && program->code[end-1] != '\\') layer++;
+            else if (program->code[end] == ']' && program->code[end-1] != '\\') layer--;
             if (layer < 1) break;
         }
+        end++;
     } else if (program->code[program->position] == '"') {
         for (;;) {
             if (++end > program->size) error("Non terminating quote.\n");
-            if (program->code[end-1] == '"' && program->code[end-2] != '\\') break;
+            if (program->code[end] == '"' && program->code[end-1] != '\\') break;
         }
+        end++;
     } else {
         while (end < program->size && !isspace(program->code[end])) end++;
     }
@@ -81,7 +83,7 @@ Token get_token(Program *program) {
     if (size == 0) return NULL;
 
     Token token = malloc(size + 1);
-    strncpy(token, program->code + program->position, size);
+    strncpy(token, program->code + program->position, size + 1);
     token[size] = 0;
     program->position = end + 1;
 
