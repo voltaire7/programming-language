@@ -1,6 +1,8 @@
 #ifndef SHARED_H
 #define SHARED_H
 
+#include <stdbool.h>
+
 #define WHITE "\033[0m"
 #define RED   "\033[1;31m"
 #define BLUE  "\033[1;34m"

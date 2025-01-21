@@ -1,8 +1,3 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "shared.h"
 #include "util.h"
 #include "env.h"
