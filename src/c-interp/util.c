@@ -77,7 +77,6 @@ Token get_token(Program *program) {
         while (end < program->size && !isspace(program->code[end])) end++;
     }
     int size = end - program->position;
-    // printf("size: %i\n", size);
 
     if (size == 0) return NULL;
 

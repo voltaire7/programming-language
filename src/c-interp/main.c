@@ -53,10 +53,24 @@ void PRINT(Program *program) {
                 case 'n':
                     putchar('\n');
                     break;
+                case '"':
+                    printf("%s", fmt[0] == '"' ? "\"" : "\\\"");
+                    break;
+                case '[':
+                    printf("%s", fmt[0] == '[' ? "[" : "\\[");
+                    break;
+                case ']':
+                    printf("%s", fmt[0] == '[' ? "]" : "\\]");
+                    break;
             }
+        } else if (fmt[i] == '%') {
+            eval(program);
+            if (!stack_index) error("Stack is empty.\n");
+            printf("%s", stack[--stack_index]);
+            free(stack[stack_index]);
         } else putchar(fmt[i]);
     }
-    free(stack[stack_index]);
+    free(fmt);
 }
 
 int main(int argc, char** argv) {
@@ -65,7 +79,7 @@ int main(int argc, char** argv) {
     Program program = read_file(argv[1]);
     
     upsert("print", PRINT, true);
-    upsert("hello", "[hello]", false);
+    upsert("hello", "[hello\\n]", false);
 
     interpret(&program);
     debug_stack();
