@@ -7,8 +7,8 @@
 
 Environment env = {};
 
-int hash(char *key) {
-    int value = 0, key_len = strlen(key);
+unsigned hash(char *key) {
+    unsigned value = 0, key_len = strlen(key);
     for (int i = 0; i < key_len; ++i) {
         value = value * 37 + key[i];
     }
@@ -16,7 +16,7 @@ int hash(char *key) {
 }
 
 Variable *find(char *key) {
-    int index = hash(key);
+    unsigned int index = hash(key);
     Variable *var = env.var[index];
     while (var) {
         if (!strcmp(key, var->key)) return var;
@@ -26,7 +26,7 @@ Variable *find(char *key) {
 }
 
 void upsert(char *key, void *value, bool is_intrinsic) {
-    int index = hash(key);
+    unsigned index = hash(key);
     Variable *var = env.var[index], *prev;
 
     if (!var) {

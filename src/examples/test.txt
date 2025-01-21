@@ -1,1 +1,3 @@
-print "test: %\n\n" hello
+print [hello\n]
+print "test: [%][%]\n\n" hello 321
+print format "test: [%][%]\n\n" hello 321

@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "shared.h"
 #include "env.c"
@@ -40,37 +41,96 @@ void interpret(Program *program) {
     }
 }
 
-void PRINT(Program *program) {
+void FORMAT(Program *program) {
     eval(program);
     if (!stack_index) error("Stack is empty.\n");
 
     char *fmt = stack[--stack_index];
+    int size = strlen(fmt);
+    char *result = malloc(size);
+
     bool is_quote = *fmt == '[' || *fmt == '"';
-    for (int i = is_quote; fmt[i + is_quote]; i++) {
+    int j = 0;
+    for (int i = is_quote; fmt[i + is_quote]; i++, j++) {
         if (fmt[i] == '\\') {
-            i++;
-            switch (fmt[i]) {
+            switch (fmt[++i]) {
+                case '\\':
+                    result[j] = '\\';
+                    break;
                 case 'n':
-                    putchar('\n');
+                    result[j] = '\n';
                     break;
                 case '"':
-                    printf("%s", fmt[0] == '"' ? "\"" : "\\\"");
+                    if (fmt[0] != '"') result[j++] = '\\';
+                    result[j] = '"';
                     break;
                 case '[':
-                    printf("%s", fmt[0] == '[' ? "[" : "\\[");
+                    if (fmt[0] != '[') result[j++] = '\\';
+                    result[j] = '[';
                     break;
                 case ']':
-                    printf("%s", fmt[0] == '[' ? "]" : "\\]");
+                    if (fmt[0] != '[') result[j++] = '\\';
+                    result[j] = ']';
                     break;
+                default: error("Invalid escape character: '\\%c'\n", fmt[i]);
             }
         } else if (fmt[i] == '%') {
             eval(program);
             if (!stack_index) error("Stack is empty.\n");
-            printf("%s", stack[--stack_index]);
-            free(stack[stack_index]);
-        } else putchar(fmt[i]);
+
+            char *value = stack[--stack_index];
+            int value_size = strlen(value);
+            bool is_quote = value[0] == '[' || value[0] == '"';
+            char *temp = realloc(result, size + value_size - is_quote * 2);
+
+            if (!temp) error("Failed to realloc memory.\n");
+            result = temp;
+            strncpy(result+j, value + is_quote, j + value_size - is_quote);
+            j += value_size - 1 - is_quote * 2;
+
+            free(value);
+        } else result[j] = fmt[i];
     }
-    free(fmt);
+    result[j] = 0;
+    stack[stack_index++] = result;
+
+    // eval(program);
+    // if (!stack_index) error("Stack is empty.\n");
+    //
+    // char *fmt = stack[--stack_index];
+    // bool is_quote = *fmt == '[' || *fmt == '"';
+    // for (int i = is_quote; fmt[i + is_quote]; i++) {
+    //     if (fmt[i] == '\\') {
+    //         i++;
+    //         switch (fmt[i]) {
+    //             case 'n':
+    //                 putchar('\n');
+    //                 break;
+    //             case '"':
+    //                 printf("%s", fmt[0] == '"' ? "\"" : "\\\"");
+    //                 break;
+    //             case '[':
+    //                 printf("%s", fmt[0] == '[' ? "[" : "\\[");
+    //                 break;
+    //             case ']':
+    //                 printf("%s", fmt[0] == '[' ? "]" : "\\]");
+    //                 break;
+    //         }
+    //     } else if (fmt[i] == '%') {
+    //         eval(program);
+    //         if (!stack_index) error("Stack is empty.\n");
+    //         printf("%s", stack[--stack_index]);
+    //         free(stack[stack_index]);
+    //     } else putchar(fmt[i]);
+    // }
+    // free(fmt);
+}
+
+void PRINT(Program *program) {
+    FORMAT(program);
+    if (!stack_index) error("Stack is empty.\n");
+    printf("%s", stack[--stack_index]);
+    free(stack[stack_index]);
 }
 
 int main(int argc, char** argv) {
@@ -79,6 +139,7 @@ int main(int argc, char** argv) {
     Program program = read_file(argv[1]);
     
     upsert("print", PRINT, true);
+    upsert("format", FORMAT, true);
     upsert("hello", "[hello\\n]", false);
 
     interpret(&program);
