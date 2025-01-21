@@ -13,7 +13,9 @@ extern int stack_index;
 void error(char *msg, ...) {
     va_list args;
     va_start(args, msg);
+    fprintf(stderr, "[" RED "ERROR" WHITE "] ");
     vfprintf(stderr, msg, args);
+    fprintf(stderr, "\n");
     exit(1);
 }
 
@@ -21,7 +23,7 @@ Program read_file(char *filename) {
     Program program = {};
 
     FILE *file = fopen(filename, "r");
-    if (!file) error("File not found.\n");
+    if (!file) error("File not found: '%s'\n", filename);
 
     fseek(file, 0, SEEK_END);
     program.size = ftell(file);

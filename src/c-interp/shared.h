@@ -1,6 +1,10 @@
 #ifndef ENV_H
 #define ENV_H
 
+#define WHITE "\033[0m"
+#define RED   "\033[1;31m"
+#define BLUE  "\033[1;34m"
+
 #define STACK_SIZE 1000
 #define ENV_SIZE 100
 

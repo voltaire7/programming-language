@@ -25,7 +25,7 @@ void eval(Program *program) {
             break;
         case SYMBOL: {
             Variable *var = find(token);
-            if (!var) error("Variable not bound '%s'\n", token);
+            if (!var) error("Variable not bound: '%s'\n", token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
             else interpret(&(Program){ .code = var->value, .size = strlen(var->value) });
@@ -103,7 +103,7 @@ void PRINT(Program *program) {
 }
 
 int main(int argc, char** argv) {
-    if (argc < 2) error("Repl not implemented yet.\n");
+    if (argc < 2) error("The interpreter currently only supports a single source file argument.");
 
     Program program = read_file(argv[1]);
     
