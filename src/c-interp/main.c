@@ -1,8 +1,5 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include "shared.h"
 #include "env.c"
@@ -11,14 +8,8 @@
 char *stack[STACK_SIZE] = {};
 int stack_index = 0;
 
-void interpret(Program *program);
 void eval(Program *program);
-
-void interpret(Program *program) {
-    for (int i = 0; program->position < program->size; i++) {
-        eval(program);
-    }
-}
+void interpret(Program *program);
 
 void eval(Program *program) {
     Token token = get_token(program);
@@ -42,10 +33,21 @@ void eval(Program *program) {
     }
 }
 
+void interpret(Program *program) {
+    for (int i = 0; program->position < program->size; i++) {
+        eval(program);
+    }
+}
+
 void PRINT(Program *program) {
     if (!stack_index) error("Stack is empty.");
     eval(program);
-    printf("token: %s\n", stack[--stack_index]);
+    int size = strlen(stack[stack_index-1]) - 2;
+    char unquoted[size];
+    strncpy(unquoted, stack[stack_index-1] + 1, size);
+    unquoted[size] = 0;
+    printf("token: %s\n", unquoted);
+    free(stack[stack_index--]);
 }
 
 int main(int argc, char** argv) {
@@ -54,7 +56,7 @@ int main(int argc, char** argv) {
     Program program = read_file(argv[1]);
     
     upsert("print", PRINT, true);
-    upsert("hello", "print [hello]", false);
+    upsert("hello", "[hello]", false);
 
     interpret(&program);
     debug_stack();
