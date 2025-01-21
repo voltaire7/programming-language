@@ -52,6 +52,7 @@ Type get_type(Token token) {
 void debug_stack() {
     for (int i = 0; i < stack_index; i++) {
         printf("%i = %s\n", i, stack[i]);
+        // printf("%s == %s\n", stack[i], TYPES[get_type(stack[i])]);
     }
 }
 
