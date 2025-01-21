@@ -91,3 +91,13 @@ Token get_token(Program *program) {
 
     return token;
 }
+
+char *pop() {
+    if (!stack_index) error("Stack is empty.\n");
+    return stack[--stack_index];
+}
+
+void push(char *value) {
+    if (stack_index >= STACK_SIZE) error("Stack has overflowed.\n");
+    stack[stack_index++] = value;
+}

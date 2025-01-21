@@ -21,7 +21,7 @@ void eval(Program *program) {
     switch (type) {
         case NUMBER:
         case STRING:
-            stack[stack_index++] = token;
+            push(token);
             break;
         case SYMBOL: {
             Variable *var = find(token);
@@ -43,9 +43,8 @@ void interpret(Program *program) {
 
 void FORMAT(Program *program) {
     eval(program);
-    if (!stack_index) error("Stack is empty.\n");
 
-    char *fmt = stack[--stack_index];
+    char *fmt = pop();
     int size = strlen(fmt);
     char *result = malloc(size);
 
@@ -76,9 +75,8 @@ void FORMAT(Program *program) {
             }
         } else if (fmt[i] == '%') {
             eval(program);
-            if (!stack_index) error("Stack is empty.\n");
 
-            char *value = stack[--stack_index];
+            char *value = pop();
             int value_size = strlen(value);
             bool is_quote = value[0] == '[' || value[0] == '"';
             char *temp = realloc(result, size + value_size - is_quote * 2);
@@ -92,13 +90,12 @@ void FORMAT(Program *program) {
         } else result[j] = fmt[i];
     }
     result[j] = 0;
-    stack[stack_index++] = result;
+    push(result);
 }
 
 void PRINT(Program *program) {
     FORMAT(program);
-    if (!stack_index) error("Stack is empty.\n");
-    printf("%s", stack[--stack_index]);
+    printf("%s", pop());
     free(stack[stack_index]);
 }
 
@@ -109,7 +106,8 @@ int main(int argc, char** argv) {
     
     upsert("print", PRINT, true);
     upsert("format", FORMAT, true);
-    upsert("hello", "[hello\\n]", false);
+    upsert("hello", "[test]", false);
+    // upsert("hello", "print \"test \n\" hello", false);
 
     interpret(&program);
     debug_stack();
