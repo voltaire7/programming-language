@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -5,6 +6,10 @@
 #include "util.h"
 #include "eval.h"
 #include "env.h"
+
+void args(Program *program, int count) {
+    while (count--) eval(program);
+}
 
 void eval(Program *program) {
     Token token = get_token(program);

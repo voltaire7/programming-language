@@ -66,3 +66,9 @@ void PRINT(Program *program) {
     printf("%s", pop());
     free(stack[stack_index]);
 }
+
+void LET(Program *program) {
+    FORMAT(program);
+    printf("%s", pop());
+    free(stack[stack_index]);
+}

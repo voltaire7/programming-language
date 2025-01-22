@@ -7070,3 +7070,6 @@ assert [= value 123]
 # it's funny how easy [assert] is to implement.
 
 # intrinsics.c vs functions.c
+
++ fn [123 321]  # what happens here?
+# I can't proceed until I figure this out.
