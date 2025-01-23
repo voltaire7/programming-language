@@ -7073,3 +7073,71 @@ assert [= value 123]
 
 + fn [123 321]  # what happens here?
 # I can't proceed until I figure this out.
+
+# let's think about it. the only function that really needs [fn] is [let].
+let [test] fn [123 321]
++ test
+let test [123 321]
++ test
+# or not?
+set-at "test" [table] fn [123 321]
+# or yea?
+set-at "test" table [123 321]    # function
+set-at "test" [table] [123 321]  # string
+# should 0 == [0]?
+# because I mean...
+print\n 0    # outputs 0
+print\n [0]  # outputs 0
+# okay, my intuition says that
++ fn [123 321]
+# should be treated like
++ [123 321]
+# so there should be a bool [is_executable].
+# the function and string representation are the same.
++ [123] [321]
++ 123 321
++ [123 321]
++ fn [123 321]
+# all equivalent?
+
+# necessary
++ 123 321
+
+# I should get rid of [fn] because of how much trouble it causes.
+# [do] vs [..] are the same.
+# the language is less consistent but cleaner without [fn].
+# the only reason I added [fn] was [set-at].
+# I should have [unquote] instead of [fn].
+# but [unquote] can break things, so it should be used conservatively.
+# the only time [fn] is used is during assignment.
+let [a b c] get-token, args 2
+
+import File, import "File", import [File FileImport]
+# I guess this makes more sense with [load]?
+load ./lib.txt, load "./lib.txt", load [./lib.txt lib]
+# though I need this...
+load ./my\ file.txt, load "./my\ file.txt", load [./my\ file.txt MyFile]
+# but what about
+print\n "hello"
+# ?
+# wait.
+import "File", import File "File", import FileImport [File]
+# maybe? but I really don't like repetition! I want to avoid it!!
+# this model is the best one. it's the cleanest, and shortest one.
+import File, import "File", import [File FileImport]
+load ./lib.txt, load "./lib.txt", load [./lib.txt lib]
+# I can't import only a specific few things, but who cares!
+# in other languages I always did things like this.
+from numpy import *
+# Jai also doesn't have the ability to extract specific functions.
+
+# it doesn't look like stack-oriented programming language, but it is.
+# or stack-based?
+
+use import-as "File"
+
+# I will probably have to do malloc to 'capture' variables.
+
+let str ["Hello, World!\n"]
+let [str] "Hello, World!\n"
+print str  # outputs "Hello, World!\n" for both.

@@ -67,8 +67,8 @@ void PRINT(Program *program) {
     free(stack[stack_index]);
 }
 
-void LET(Program *program) {
-    FORMAT(program);
-    printf("%s", pop());
-    free(stack[stack_index]);
+void LET(Program *program) {}
+
+void DEBUG_STACK(Program *program) {
+    debug_stack();
 }
