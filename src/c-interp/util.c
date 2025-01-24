@@ -57,8 +57,12 @@ void debug_stack() {
     }
 }
 
+bool issyntax(char c) {
+    return c == ',' || c == ';' || c == '(' || c == ')';
+}
+
 Token get_token(Program *program) {
-    while (program->position < program->size && isspace(program->code[program->position])) program->position++;
+    while (program->position < program->size && (isspace(program->code[program->position]) || issyntax(program->code[program->position]))) program->position++;
     if (program->code[program->position] == '#') {
         while (program->code[program->position] != '\n') program->position++;
     }
@@ -80,7 +84,7 @@ Token get_token(Program *program) {
         }
         end++;
     } else {
-        while (end < program->size && !isspace(program->code[end]) && program->code[end] != '#') end++;
+        while (end < program->size && !isspace(program->code[end]) && !issyntax(program->code[end]) && program->code[end] != '#') end++;
     }
     int size = end - program->position;
 

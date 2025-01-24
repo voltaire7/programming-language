@@ -67,7 +67,11 @@ void PRINT(Program *program) {
     free(stack[stack_index]);
 }
 
-void LET(Program *program) {}
+void LET(Program *program) {
+    Token token = get_token(program);
+    Type type = get_type(token);
+    printf("%s, %s\n", token, TYPES[type]);
+}
 
 void DEBUG_STACK(Program *program) {
     debug_stack();
