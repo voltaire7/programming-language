@@ -17,6 +17,8 @@ int main(int argc, char** argv) {
     upsert("format", FORMAT, true);
     upsert("let", LET, true);
     upsert("debug-stack", DEBUG_STACK, true);
+    upsert("unquote", UNQUOTE, true);
+    upsert("halt", HALT, true);
     upsert("hello", "[test\\n]", false);
 
     interpret(&program);

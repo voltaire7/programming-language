@@ -1,2 +1,9 @@
+unquote [test]
+unquote hello
+unquote 123
+
 # testing [let]
-let,;([hello hello])
+
+let 123
+let hello
+let [hello hello]

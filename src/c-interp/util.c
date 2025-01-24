@@ -22,7 +22,7 @@ Program read_file(char *filename) {
     Program program = {};
 
     FILE *file = fopen(filename, "r");
-    if (!file) error("File not found: '%s'\n", filename);
+    if (!file) error("File not found: '%s'", filename);
 
     fseek(file, 0, SEEK_END);
     program.size = ftell(file);
@@ -71,7 +71,7 @@ Token get_token(Program *program) {
     if (program->code[program->position] == '[') {
         int layer = 1;
         for (;;) {
-            if (++end > program->size) error("Non terminating quote.\n");
+            if (++end > program->size) error("Non terminating quote.");
             else if (program->code[end] == '[' && program->code[end-1] != '\\') layer++;
             else if (program->code[end] == ']' && program->code[end-1] != '\\') layer--;
             if (layer < 1) break;
@@ -79,7 +79,7 @@ Token get_token(Program *program) {
         end++;
     } else if (program->code[program->position] == '"') {
         for (;;) {
-            if (++end > program->size) error("Non terminating quote.\n");
+            if (++end > program->size) error("Non terminating quote.");
             if (program->code[end] == '"' && program->code[end-1] != '\\') break;
         }
         end++;
@@ -99,11 +99,11 @@ Token get_token(Program *program) {
 }
 
 char *pop() {
-    if (!stack_index) error("Stack is empty.\n");
+    if (!stack_index) error("Stack is empty.");
     return stack[--stack_index];
 }
 
 void push(char *value) {
-    if (stack_index >= STACK_SIZE) error("Stack has overflowed.\n");
+    if (stack_index >= STACK_SIZE) error("Stack has overflowed.");
     stack[stack_index++] = value;
 }

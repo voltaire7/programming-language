@@ -39,7 +39,7 @@ void FORMAT(Program *program) {
                     if (fmt[0] != '[') result[j++] = '\\';
                     result[j] = ']';
                     break;
-                default: error("Invalid escape character: '\\%c'\n", fmt[i]);
+                default: error("Invalid escape character: '\\%c'", fmt[i]);
             }
         } else if (fmt[i] == '%') {
             eval(program);
@@ -49,7 +49,7 @@ void FORMAT(Program *program) {
             bool is_quote = value[0] == '[' || value[0] == '"';
             char *temp = realloc(result, size + value_size - is_quote * 2);
 
-            if (!temp) error("Failed to realloc memory.\n");
+            if (!temp) error("Failed to realloc memory.");
             result = temp;
             strncpy(result+j, value + is_quote, j + value_size - is_quote);
             j += value_size - 1 - is_quote * 2;
@@ -67,12 +67,42 @@ void PRINT(Program *program) {
     free(stack[stack_index]);
 }
 
+void UNQUOTE(Program *program) {
+    eval(program);
+    Token token = pop();
+    Type type = get_type(token);
+    switch (type) {
+        case STRING: {
+            int size = strlen(token) - 2;
+            for (int i = 0; i < size; i++) token[i] = token[i+1];
+            token[size] = 0;
+        } break;
+        case NUMBER:
+        case SYMBOL:
+            error("Cannot [unquote] number or symbol: '%s'", token);
+            break;
+    }
+    push(token);
+}
+
 void LET(Program *program) {
     Token token = get_token(program);
     Type type = get_type(token);
-    printf("%s, %s\n", token, TYPES[type]);
+    switch (type) {
+        case NUMBER:
+            break;
+        case STRING:
+            break;
+        case SYMBOL:
+            break;
+    }
+    // printf("%s, %s\n", token, TYPES[type]);
 }
 
 void DEBUG_STACK(Program *program) {
     debug_stack();
+}
+
+void HALT(Program *program) {
+    exit(0);
 }
