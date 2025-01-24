@@ -107,3 +107,19 @@ void push(char *value) {
     if (stack_index >= STACK_SIZE) error("Stack has overflowed.");
     stack[stack_index++] = value;
 }
+
+Token unquote(Token token) {
+    Type type = get_type(token);
+    switch (type) {
+        case STRING: {
+            int size = strlen(token) - 2;
+            for (int i = 0; i < size; i++) token[i] = token[i+1];
+            token[size] = 0;
+        } break;
+        case NUMBER:
+        case SYMBOL:
+            error("Cannot [unquote] number or symbol: '%s'", token);
+            break;
+    }
+    return token;
+}

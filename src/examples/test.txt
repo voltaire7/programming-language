@@ -1,7 +1,3 @@
-unquote [test]
-unquote hello
-unquote 123
-
 # testing [let]
 
 let 123

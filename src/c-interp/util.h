@@ -11,5 +11,6 @@ void debug_stack();
 Token get_token(Program *program);
 char *pop();
 void push(char *value);
+Token unquote(Token token);
 
 #endif

@@ -69,20 +69,7 @@ void PRINT(Program *program) {
 
 void UNQUOTE(Program *program) {
     eval(program);
-    Token token = pop();
-    Type type = get_type(token);
-    switch (type) {
-        case STRING: {
-            int size = strlen(token) - 2;
-            for (int i = 0; i < size; i++) token[i] = token[i+1];
-            token[size] = 0;
-        } break;
-        case NUMBER:
-        case SYMBOL:
-            error("Cannot [unquote] number or symbol: '%s'", token);
-            break;
-    }
-    push(token);
+    push(unquote(pop()));
 }
 
 void LET(Program *program) {
