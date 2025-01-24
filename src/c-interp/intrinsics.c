@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "env.h"
 #include "eval.h"
 #include "shared.h"
 #include "util.h"
@@ -77,13 +78,21 @@ void LET(Program *program) {
     Type type = get_type(token);
     switch (type) {
         case NUMBER:
+            error("Invalid symbol: %s", token);
             break;
-        case STRING:
-            break;
+        case STRING: {
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token) };
+            while ((token = get_token(symbols))) {
+                eval(program);
+                upsert(token, pop(), false);
+            }
+            free(token);
+        } break;
         case SYMBOL:
+            UNQUOTE(program);
+            upsert(token, pop(), false);
             break;
     }
-    // printf("%s, %s\n", token, TYPES[type]);
 }
 
 void DEBUG_STACK(Program *program) {

@@ -23,7 +23,7 @@ void eval(Program *program) {
             break;
         case SYMBOL: {
             Variable *var = find(token);
-            if (!var) error("Variable not bound: '%s'\n", token);
+            if (!var) error("Variable not bound: '%s'", token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
             else interpret(&(Program){ .code = var->value, .size = strlen(var->value) });
