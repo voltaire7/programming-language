@@ -7141,3 +7141,84 @@ use import-as "File"
 let str ["Hello, World!\n"]
 let [str] "Hello, World!\n"
 print str  # outputs "Hello, World!\n" for both.
+
+print do ["%\n" 123]  # outputs "123\n" ?
+
+let my\ function [print\n "hello"]
+my\ function  # outputs "hello\n"
+# I can't have call or assign without '\'.
+my\        function  # maybe the amount of whitespace doesn't matter?
+
+let test [
+    let [var] new [hello]
+    ptr-to var
+]
+print\n test  # outputs "hello\n"
+
+load ./src/
+# honestly, I didn't expect this.
+# that was something I liked about the nix programming language. who would have thunk?
+
+# though I should this consider this.
+./src/print\n "hello"  # outputs "hello\n"
+# like a shell script.
+File  # is already in the PATH
+# so we just need to do
+use File
+# or
+File/open "file.txt"
+# but what is [/]? is [File] a directory? a file?
+let open [File/open]
+let close [File/close]
+# need to know how Jai does it.
+# what does this do?
+print\n File
+# I guess there is a file called "File.txt" and a directory called "File"
+# [File.txt] contains all the loads for the folder [File], though there's no real need for a
+# folder. it could all be contained within the file.
+
+# preload module?
+
+# I'm not doing the shell imports...
+# If I do, then [.] and [/] have to special characters.
+# I don't know if I want that.
+
+# then again... it would look nice.
+File/open "file.txt"
+let open [File/open]
+use File
+# where [File] is a directory.
+# but what is [open]? a single file? a function within a file?
+# or I guess more like zig?
+File/file.txt/open
+# both directories and file count in the path.
+
+append PATH "path/to/modules"
+include "path/to/modules"
+
+# hmm, I'm not liking how .txt is removed from the thing, but I'm not liking keeping it either.
+# honestly, the shell model only works if you have single file binaries.
+# don't now how I would actually do that though.
+
+# if I did make it, [/] would be like the interpolation character.
+File/open
+# instead of [$].
+$File/open
+
+File/my-file.open "file.txt"
+# so [/] for directories, [.] for files?
+# I know none of this is getting in, but whatever. still interesting.
+# yeah, giving up on it. too hard to implement.
+# guess this language can't really be used as shell then?
+
+# maybe?
+import "File [open close]"
+# well, if I really need this feature.
+
+# eh.
+import "File" as "FileImport"
+import "File" as ""
+import "File" as "File"
+# I will take the shortest.
+
+for 0 []  # should probably not execute.

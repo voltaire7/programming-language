@@ -1,3 +1,4 @@
 print [test\n]
+print "test\n"
 print hello
 print "%" format "[Hello, %!\n]" "World"

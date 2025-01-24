@@ -59,6 +59,9 @@ void debug_stack() {
 
 Token get_token(Program *program) {
     while (program->position < program->size && isspace(program->code[program->position])) program->position++;
+    if (program->code[program->position] == '#') {
+        while (program->code[program->position] != '\n') program->position++;
+    }
     int end = program->position;
 
     if (program->code[program->position] == '[') {
@@ -77,7 +80,7 @@ Token get_token(Program *program) {
         }
         end++;
     } else {
-        while (end < program->size && !isspace(program->code[end])) end++;
+        while (end < program->size && !isspace(program->code[end]) && program->code[end] != '#') end++;
     }
     int size = end - program->position;
 
@@ -86,7 +89,7 @@ Token get_token(Program *program) {
     Token token = malloc(size + 1);
     strncpy(token, program->code + program->position, size + 1);
     token[size] = 0;
-    program->position = end + 1;
+    program->position = end;
 
     return token;
 }
