@@ -14,6 +14,7 @@ int main(int argc, char** argv) {
     Program program = read_file(argv[1]);
     
     upsert("print", PRINT, true);
+    upsert("print\\n", PRINTLN, true);
     upsert("format", FORMAT, true);
     upsert("let", LET, true);
     upsert("debug-stack", DEBUG_STACK, true);

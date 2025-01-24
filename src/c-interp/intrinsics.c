@@ -68,6 +68,11 @@ void PRINT(Program *program) {
     free(stack[stack_index]);
 }
 
+void PRINTLN(Program *program) {
+    PRINT(program);
+    putchar('\n');
+}
+
 void UNQUOTE(Program *program) {
     eval(program);
     push(unquote(pop()));
