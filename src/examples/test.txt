@@ -11,3 +11,6 @@ print\n var2
 let test [666]
 let [test-again] test
 print\n test-again
+
+let val 123
+val

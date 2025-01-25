@@ -7222,3 +7222,12 @@ import "File" as "File"
 # I will take the shortest.
 
 for 0 []  # should probably not execute.
+
+# I guess if a function returns a non quoted string, it should just run it? but all number are non
+# quoted strings... or i guess [do] just work for everything.
+
+object [Vector3] [x y z]
+print\n Vector3.x [1 2 3]
+
+# function for strings passed by copy, strings for pass by reference?
+# but strings are just functions that return strings.
