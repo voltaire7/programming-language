@@ -1,9 +1,7 @@
-let [str] [123]
-print\n do str
-let str str
-print\n do [str]
+let number 123
+print\n number
 
-format ["%"] "Hello, World!"
+do unquote [print\n "hello"]
 
-do format [let [%] 123 321] [a b]
-a b
+let func unquote [print\n "hello"]
+func
