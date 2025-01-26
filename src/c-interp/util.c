@@ -119,8 +119,7 @@ Token unquote(Token token) {
             token[size] = 0;
         } break;
         case SYMBOL:
-            error("Cannot [unquote] number or symbol: '%s'", token);
-            break;
+            error("Cannot [unquote] symbol: '%s'", token);
     }
     return token;
 }

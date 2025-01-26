@@ -7231,3 +7231,14 @@ print\n Vector3.x [1 2 3]
 
 # function for strings passed by copy, strings for pass by reference?
 # but strings are just functions that return strings.
+
+let [value] if condition [function1] [function2] input
+# pass [input] to [function1] or [function2]?
+# I can and I will. I just need to evaluate the [then]/[else] bodies of the if statement.
+# not [do] them!, just put the string in the stack.
+
+let [value] if condition [
+    function1
+] [
+    function2
+] input

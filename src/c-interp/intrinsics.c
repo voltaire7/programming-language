@@ -83,8 +83,7 @@ void LET(Program *program) {
     Type type = get_type(token);
     switch (type) {
         case NUMBER:
-            error("Invalid symbol: %s", token);
-            break;
+            error("Cannot accept numbers for assignment: %s", token);
         case STRING: {
             Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token) };
             while ((token = get_token(symbols))) {
@@ -106,4 +105,10 @@ void DEBUG_STACK(Program *program) {
 
 void HALT(Program *program) {
     exit(0);
+}
+
+void EXIT(Program *program) {
+    eval(program);
+    int exit_code = atoi(pop());
+    exit(exit_code);
 }

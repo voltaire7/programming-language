@@ -1,6 +1,5 @@
 # testing [let]
 
-#let 123
 let test [print "Hello, World!\n"]
 test
 let [\n] "\n"
@@ -13,4 +12,6 @@ let [test-again] test
 print\n test-again
 
 let val 123
-val
+print\n val
+
+# let 123  # should error
