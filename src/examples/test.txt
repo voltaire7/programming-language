@@ -1,4 +1,9 @@
 let [str] [123]
 print\n do str
 let str str
-[str]
+print\n do [str]
+
+format ["%"] "Hello, World!"
+
+do format [let [%] 123 321] [a b]
+a b

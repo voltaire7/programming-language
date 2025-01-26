@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "eval.h"
 #include "shared.h"
 
 extern char *stack[STACK_SIZE];
@@ -119,7 +120,8 @@ Token unquote(Token token) {
             token[size] = 0;
         } break;
         case SYMBOL:
-            error("Cannot [unquote] symbol: '%s'", token);
+            interpret(&(Program){ .code = token, .size = strlen(token) });
+            break;
     }
     return token;
 }

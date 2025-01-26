@@ -7245,3 +7245,25 @@ let [value] if condition [
 
 let func1 [print "printing func1!"]
 do format [func%] 1  # outputs "printing func1!"
+# [format] may be more useful than I thought. especially for macros.
+
+# a static scope might be easier than expected?
+# same process as the old language implementation, but the recursive lookup will search another
+# linked list?
+
+do format [let 1 % 123] "value"
+
+let let-get [
+    args [symbols table]
+    do format [let 2 [%] get symbols table] symbols
+]
+let-get [open close] import "File"
+# I guess this is the best way of doing this?
+# but anyway, while we can, I should avoid doing this.
+# it's ugly, and impossible if you consider recursive function calls (i.e. for/while loops)
+
+# [Volatile] If you change these, the bytecode has to change!
+enum [
+    SOMETHING
+    SOMETHING-ELSE
+]
