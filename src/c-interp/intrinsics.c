@@ -111,3 +111,9 @@ void EXIT(Program *program) {
     eval(program);
     exit(atoi(pop()));
 }
+
+void DO(Program *program) {
+    eval(program);
+    char *value = unquote(pop());
+    interpret(&(Program){ .code = value, .size = strlen(value) });
+}

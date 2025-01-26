@@ -1,1 +1,4 @@
-unquote unquote [0.]
+let [str] [123]
+print\n do str
+let str str
+[str]

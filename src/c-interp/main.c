@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     upsert("unquote", UNQUOTE, true);
     upsert("halt", HALT, true);
     upsert("exit", EXIT, true);
-    upsert("hello", "[test\\n]", false);
+    upsert("do", DO, true);
 
     interpret(&program);
     debug_stack();

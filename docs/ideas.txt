@@ -7242,3 +7242,6 @@ let [value] if condition [
 ] [
     function2
 ] input
+
+let func1 [print "printing func1!"]
+do format [func%] 1  # outputs "printing func1!"
