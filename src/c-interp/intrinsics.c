@@ -109,6 +109,5 @@ void HALT(Program *program) {
 
 void EXIT(Program *program) {
     eval(program);
-    int exit_code = atoi(pop());
-    exit(exit_code);
+    exit(atoi(pop()));
 }

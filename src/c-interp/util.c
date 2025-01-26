@@ -41,7 +41,7 @@ bool is_number(Token token) {
         if (*(token-1) == '.') while (isdigit(*token++));
     } else if (*token == '.' && isdigit(*++token)) while (isdigit(*token++));
     else return false;
-    return !*token;
+    return !*(token-1);
 }
 
 Type get_type(Token token) {
