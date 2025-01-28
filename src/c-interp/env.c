@@ -34,6 +34,7 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
         program->env[index]->key = key;
         program->env[index]->value = value;
         program->env[index]->is_intrinsic = is_intrinsic;
+        program->env[index]->program = program;
     } else {
         while (var) {
             if (!strcmp(key, var->key)) {
@@ -47,6 +48,7 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
         var->key = key;
         var->value = value;
         var->is_intrinsic = is_intrinsic;
+        var->program = program;
         prev->next = var;
     }
 }

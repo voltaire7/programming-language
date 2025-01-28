@@ -14,20 +14,23 @@
 
 typedef char * Token;
 
+typedef struct Program Program;
+
 typedef struct Variable {
     char *key;
     void *value;
     bool is_intrinsic;
     struct Variable *next;
+    Program *program;
 } Variable;
 
-typedef struct Program {
+struct Program {
     char *code;
     int size;
     int position;
     Variable *env[ENV_SIZE];
     struct Program *next;
-} Program;
+};
 
 typedef enum Type {
     NUMBER,

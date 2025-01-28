@@ -26,7 +26,7 @@ void eval(Program *program) {
             if (!var) error("Variable not bound: '%s'", token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
-            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .next = program });
+            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .next = var->program });
 
             free(token);
         } break;

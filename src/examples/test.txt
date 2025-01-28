@@ -1,11 +1,25 @@
-# testing dynamic scope.
+# testing static/dynamic scope.
 
 let global 123
 
-let test-func [
-    print\n global
+let test-func1 [
+    let [global] "nil"
+    test-func2
+    print "expected: nil, actual: %\n" global
+]
+
+# huh, I find test-func2 in [program] where it's assigned? no need to attach it then.
+let test-func2 [
     set global 321
 ]
-test-func
 
-print\n global
+print "expected: 123, actual: %\n" global
+test-func1
+print "expected: 321, actual: %\n" global
+
+halt
+let recursive-func [
+    print "THE END IS NEVER "
+    recursive-func
+]
+recursive-func
