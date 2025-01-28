@@ -1,5 +1,1 @@
-let [a b c] 1 2 3
-debug reduce [a b c]
-
-let test [123 321 312]
-debug reduce [test]
+print\n + 1 2

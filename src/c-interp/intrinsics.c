@@ -172,3 +172,12 @@ void DEBUG(Program *program) {
     eval(program);
     printf("%s\n", pop());
 }
+
+void ADD(Program *program) {
+    args(program, 2);
+    Token token2 = pop(), token1 = pop();
+    double arg1 = atof(token1), arg2 = atof(token2);
+    free(token1), free(token2);
+    printf("%g %g\n", arg1, arg2);
+    push(ftoa(arg1 + arg2));
+}

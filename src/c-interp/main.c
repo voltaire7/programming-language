@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     upsert(&program, "do", DO, true);
     upsert(&program, "reduce", REDUCE, true);
     upsert(&program, "debug", DEBUG, true);
+    upsert(&program, "+", ADD, true);
 
     interpret(&program);
     debug_stack();

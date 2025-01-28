@@ -122,3 +122,15 @@ Token unquote(Token token) {
     }
     return token;
 }
+
+char *ftoa(float num) {
+    char temp[50];
+
+    snprintf(temp, sizeof(temp), "%g", num);
+    size_t len = strlen(temp) + 1;
+    char *result = malloc(len);
+    snprintf(result, len, "%s", temp);
+
+    return result;
+}
+
