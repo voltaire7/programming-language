@@ -112,7 +112,7 @@ void SET(Program *program) {
             while ((token = get_token(symbols))) {
                 eval(program);
                 Variable *var = find(program, token);
-                if (!var) error("Not bound: '%s'\n", token);
+                if (!var) error("Varible not bound: '%s'\n", token);
                 var->value = pop();
             }
             free(token);
@@ -120,7 +120,7 @@ void SET(Program *program) {
         case SYMBOL:
             UNQUOTE(program);
             Variable *var = find(program, token);
-            if (!var) error("Not bound: '%s'\n", token);
+            if (!var) error("Varible not bound: '%s'\n", token);
             var->value = pop();
             break;
     }
@@ -143,4 +143,32 @@ void DO(Program *program) {
     eval(program);
     char *value = unquote(pop());
     interpret(&(Program){ .code = value, .size = strlen(value), .next = program });
+}
+
+void REDUCE(Program *program) {
+    int old = stack_index;
+    DO(program);
+    int size = 2;
+    Token acc = malloc(size);
+    while (old != stack_index) {
+        Token token = pop();
+        int token_size = strlen(token);
+        size += token_size + 1;
+        Token new = malloc(size);
+        new[0] = ' ';
+        strncpy(new + 1, token, token_size);
+        strncpy(new + 1 + token_size, acc, size - token_size - 3);
+        free(token), free(acc);
+        acc = new;
+    }
+    if (size == 2) acc = realloc(acc, ++size);
+    acc[0] = '[';
+    acc[size-2] = ']';
+    acc[size-1] = 0;
+    push(acc);
+}
+
+void DEBUG(Program *program) {
+    eval(program);
+    printf("%s\n", pop());
 }

@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
     upsert(&program, "halt", HALT, true);
     upsert(&program, "exit", EXIT, true);
     upsert(&program, "do", DO, true);
+    upsert(&program, "reduce", REDUCE, true);
+    upsert(&program, "debug", DEBUG, true);
 
     interpret(&program);
     debug_stack();

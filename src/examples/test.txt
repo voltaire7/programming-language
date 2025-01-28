@@ -1,34 +1,5 @@
-# testing static/dynamic scope.
+let [a b c] 1 2 3
+debug reduce [a b c]
 
-let get-obj [
-    let inner 123
-    let [obj] [print\n inner]
-    obj
-]
-let obj get-obj
-obj
-# this is probably fine for now right?
-
-halt
-let global 123
-
-let test-func1 [
-    let [global] "nil"
-    test-func2
-    print "expected: nil, actual: %\n" global
-]
-
-let test-func2 [
-    set global 321
-]
-
-print "expected: 123, actual: %\n" global
-test-func1
-print "expected: 321, actual: %\n" global
-
-halt
-let recursive-func [
-    print "THE END IS NEVER "
-    recursive-func
-]
-recursive-func
+let test [123 321 312]
+debug reduce [test]

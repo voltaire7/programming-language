@@ -7296,3 +7296,24 @@ do [
 
 # maybe I should always [debug-stack]? just as a implicit way of telling you not to fuck up.
 # it prints to stdout, all the values of the stack at the end, always.
+
+let get-obj [
+    let inner 123
+    let [obj] [print\n inner]
+    obj
+]
+let obj get-obj
+obj  # Variable not bound: 'inner'
+# this is probably fine for now right?
+
+let get-obj [
+    let [obj] [print\n inner]
+    obj
+]
+let inner 123
+let obj get-obj
+obj  # outputs 123
+
+# do I really need to capture variables?
+# the best use for it is encapsulation.
+# ... wait, but can I do encapsulation without captures?
