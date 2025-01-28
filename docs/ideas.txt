@@ -7267,3 +7267,29 @@ enum [
     SOMETHING
     SOMETHING-ELSE
 ]
+
+# I really need to make it so [get_type] properly identifies quotes, like with the scan and layers.
+# just to make sure that the first and last brackets are actually pairs.
+
+object [Node] [
+    value
+    next
+]
+let [node] [123 [321 []]]
+print\n Node.value node  # outputs 123
+print\n Node.next  node  # outputs [321 []]
+print\n Node.value Node.next node  # outputs 321
+print\n Node.next  Node.next node  # outputs []
+
+Node.value! node 124
+print\n node  # outputs [124 [321 []]]
+Node.value! Node.next node 322
+print\n node  # outputs [124 [322 []]]
+# I guess?
+
+do [
+    use Node
+    print\n value node  # outputs 124
+    # it's not that different from something like a typed function.
+    print\n Node  # outputs [value next]
+]

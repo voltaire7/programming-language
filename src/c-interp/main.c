@@ -13,15 +13,15 @@ int main(int argc, char** argv) {
 
     Program program = read_file(argv[1]);
 
-    upsert("print", PRINT, true);
-    upsert("print\\n", PRINTLN, true);
-    upsert("format", FORMAT, true);
-    upsert("let", LET, true);
-    upsert("debug-stack", DEBUG_STACK, true);
-    upsert("unquote", UNQUOTE, true);
-    upsert("halt", HALT, true);
-    upsert("exit", EXIT, true);
-    upsert("do", DO, true);
+    upsert(&program, "print", PRINT, true);
+    upsert(&program, "print\\n", PRINTLN, true);
+    upsert(&program, "format", FORMAT, true);
+    upsert(&program, "let", LET, true);
+    upsert(&program, "debug-stack", DEBUG_STACK, true);
+    upsert(&program, "unquote", UNQUOTE, true);
+    upsert(&program, "halt", HALT, true);
+    upsert(&program, "exit", EXIT, true);
+    upsert(&program, "do", DO, true);
 
     interpret(&program);
     debug_stack();

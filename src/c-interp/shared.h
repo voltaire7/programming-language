@@ -14,18 +14,6 @@
 
 typedef char * Token;
 
-typedef struct Program {
-    char *code;
-    int size;
-    int position;
-} Program;
-
-typedef enum Type {
-    NUMBER,
-    STRING,
-    SYMBOL,
-} Type;
-
 typedef struct Variable {
     char *key;
     void *value;
@@ -33,9 +21,18 @@ typedef struct Variable {
     struct Variable *next;
 } Variable;
 
-typedef struct Environment {
-    Variable *var[ENV_SIZE];
-    struct Environment *next;
-} Environment;
+typedef struct Program {
+    char *code;
+    int size;
+    int position;
+    Variable *env[ENV_SIZE];
+    struct Program *next;
+} Program;
+
+typedef enum Type {
+    NUMBER,
+    STRING,
+    SYMBOL,
+} Type;
 
 #endif

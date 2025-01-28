@@ -85,16 +85,16 @@ void LET(Program *program) {
         case NUMBER:
             error("Cannot accept numbers for assignment: %s", token);
         case STRING: {
-            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token) };
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
             while ((token = get_token(symbols))) {
                 eval(program);
-                upsert(token, pop(), false);
+                upsert(program, token, pop(), false);
             }
             free(token);
         } break;
         case SYMBOL:
             UNQUOTE(program);
-            upsert(token, pop(), false);
+            upsert(program, token, pop(), false);
             break;
     }
 }
@@ -115,5 +115,5 @@ void EXIT(Program *program) {
 void DO(Program *program) {
     eval(program);
     char *value = unquote(pop());
-    interpret(&(Program){ .code = value, .size = strlen(value) });
+    interpret(&(Program){ .code = value, .size = strlen(value), .next = program });
 }

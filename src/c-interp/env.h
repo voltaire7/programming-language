@@ -4,7 +4,7 @@
 #include "shared.h"
 
 unsigned hash(char *key);
-Variable *find(char *key);
-void upsert(char *key, void *value, bool is_intrinsic);
+Variable *find(Program *program, char *key);
+void upsert(Program *program, char *key, void *value, bool is_intrinsic);
 
 #endif
