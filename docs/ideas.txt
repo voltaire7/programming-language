@@ -7293,3 +7293,6 @@ do [
     # it's not that different from something like a typed function.
     print\n Node  # outputs [value next]
 ]
+
+# maybe I should always [debug-stack]? just as a implicit way of telling you not to fuck up.
+# it prints to stdout, all the values of the stack at the end, always.

@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     upsert(&program, "print\\n", PRINTLN, true);
     upsert(&program, "format", FORMAT, true);
     upsert(&program, "let", LET, true);
+    upsert(&program, "set", SET, true);
     upsert(&program, "debug-stack", DEBUG_STACK, true);
     upsert(&program, "unquote", UNQUOTE, true);
     upsert(&program, "halt", HALT, true);

@@ -81,6 +81,7 @@ void UNQUOTE(Program *program) {
 void LET(Program *program) {
     Token token = get_token(program);
     Type type = get_type(token);
+
     switch (type) {
         case NUMBER:
             error("Cannot accept numbers for assignment: %s", token);
@@ -95,6 +96,32 @@ void LET(Program *program) {
         case SYMBOL:
             UNQUOTE(program);
             upsert(program, token, pop(), false);
+            break;
+    }
+}
+
+void SET(Program *program) {
+    Token token = get_token(program);
+    Type type = get_type(token);
+
+    switch (type) {
+        case NUMBER:
+            error("Cannot accept numbers for assignment: %s", token);
+        case STRING: {
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
+            while ((token = get_token(symbols))) {
+                eval(program);
+                Variable *var = find(program, token);
+                if (!var) error("Not bound: '%s'\n", token);
+                var->value = pop();
+            }
+            free(token);
+        } break;
+        case SYMBOL:
+            UNQUOTE(program);
+            Variable *var = find(program, token);
+            if (!var) error("Not bound: '%s'\n", token);
+            var->value = pop();
             break;
     }
 }

@@ -1,7 +1,11 @@
-let number 123
-print\n number
+# testing dynamic scope.
 
-do unquote [print\n "hello"]
+let global 123
 
-let func unquote [print\n "hello"]
-func
+let test-func [
+    print\n global
+    set global 321
+]
+test-func
+
+print\n global
