@@ -1,9 +1,2 @@
 let args [1 2 3]
-let [a b c] args 4 5
-set [a b c] args 4 5
-
-print "a = %\n" a
-print "b = %\n" b
-print "c = %\n" c
-
-print \n
+args

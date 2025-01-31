@@ -11,7 +11,7 @@ extern char *stack[STACK_SIZE];
 extern int stack_index;
 
 void FORMAT(Program *program) {
-    eval(program);
+    args(program, 1);
 
     char *fmt = pop();
     int size = strlen(fmt);
@@ -43,7 +43,7 @@ void FORMAT(Program *program) {
                 default: error("Invalid escape character: '\\%c'", fmt[i]);
             }
         } else if (fmt[i] == '%') {
-            eval(program);
+            args(program, 1);
 
             char *value = pop();
             int value_size = strlen(value);
@@ -74,7 +74,7 @@ void PRINTLN(Program *program) {
 }
 
 void UNQUOTE(Program *program) {
-    eval(program);
+    args(program, 1);
     push(unquote(pop()));
 }
 
@@ -136,12 +136,12 @@ void HALT(Program *program) {
 }
 
 void EXIT(Program *program) {
-    eval(program);
+    args(program, 1);
     exit(atoi(pop()));
 }
 
 void DO(Program *program) {
-    eval(program);
+    args(program, 1);
     char *value = unquote(pop());
     interpret(&(Program){ .code = value, .size = strlen(value), .next = program });
 }
@@ -170,7 +170,7 @@ void REDUCE(Program *program) {
 }
 
 void DEBUG(Program *program) {
-    eval(program);
+    args(program, 1);
     printf("%s\n", pop());
 }
 
