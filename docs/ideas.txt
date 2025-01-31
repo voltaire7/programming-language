@@ -7353,3 +7353,7 @@ print\n get 0 ptr  # outputs 321 ?
 # a global stack for everything, then a queue individual scopes.
 # what is left in a queue after a function returns, is pushed to the stack.
 # ... no, the simpler solution is to just reverse n amount of arguments in the stack.
+
+# maybe the special thing about [for] and [while], is that [->next] for [Program] pointers skip a
+# scope? and you know, giving the illusion that the scope is special, while still retaining the
+# variable are are popped after the stack gets deleted.

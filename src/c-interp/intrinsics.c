@@ -181,7 +181,6 @@ void ADD(Program *program) {
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
-    // printf("%g %g\n", arg1, arg2);
     push(ftoa(arg1 + arg2));
 }
 
@@ -193,6 +192,33 @@ void SUB(Program *program) {
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
-    // printf("%g %g\n", arg1, arg2);
     push(ftoa(arg1 - arg2));
+}
+
+void MUL(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+    }
+    double arg1 = atof(token1), arg2 = atof(token2);
+    free(token1), free(token2);
+    push(ftoa(arg1 * arg2));
+}
+
+void DIV(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+    }
+    double arg1 = atof(token1), arg2 = atof(token2);
+    free(token1), free(token2);
+    push(ftoa(arg1 / arg2));
+}
+
+void DUP(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    push(token), push(strdup(token));
 }

@@ -16,8 +16,12 @@ void args(Program *program, int count) {
 }
 
 void eval(Program *program) {
+    if (!program) return;
     Token token = get_token(program);
-    if (!token) return;
+    if (!token) {
+        eval(program->next);
+        return;
+    }
 
     Type type = get_type(token);
     switch (type) {
