@@ -108,16 +108,16 @@ void SET(Program *program) {
     switch (type) {
         case NUMBER:
             error("Cannot accept numbers for assignment: %s", token);
-        case STRING: {
+        case STRING:
+            args(program, length(token));
             Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
             while ((token = get_token(symbols))) {
-                eval(program);
                 Variable *var = find(program, token);
                 if (!var) error("Varible not bound: '%s'\n", token);
                 var->value = pop();
             }
             free(token);
-        } break;
+            break;
         case SYMBOL:
             UNQUOTE(program);
             Variable *var = find(program, token);
