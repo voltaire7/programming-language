@@ -223,3 +223,19 @@ void DUP(Program *program) {
     Token token = pop();
     push(token), push(strdup(token));
 }
+
+void ARGS(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    switch (get_type(token)) {
+        case NUMBER: {
+            int goal = stack_index + atof(token);
+            while (stack_index < goal) eval(program->next);
+        } break;
+        case STRING:
+            error("Not implemented yet.");
+        case SYMBOL:
+            error("Invalid argument: '%s'\n", token);
+    }
+    free(token);
+}

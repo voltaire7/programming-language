@@ -1,2 +1,10 @@
-let args [1 2 3]
-args
+let func [
+    let [_ _ _]
+]
+func 1 2 3
+
+let func [
+    let [a b c] args 3
+    print\n reduce [a b c]
+]
+func 1 2 3
