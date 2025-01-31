@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
     upsert(&program, "*", MUL, true);
     upsert(&program, "/", DIV, true);
     upsert(&program, ".", DUP, true);
+    upsert(&program, "\\n", "[\\n]", false);
 
     interpret(&program);
     debug_stack();

@@ -141,3 +141,12 @@ void reverse_stack(int count) {
         stack[stack_index - j] = temp;
     }
 }
+
+int length(Token token) {
+    token++;
+    while (*token && isspace(*token)) token++;
+    if (!*token || *token == ']') return 0;
+    while (*token && !isspace(*token)) token++;
+    if (!*token && *(token-1) != ']') return 0;
+    return 1 + length(token);
+}

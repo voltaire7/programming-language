@@ -14,5 +14,6 @@ void push(char *);
 Token unquote(Token);
 char *ftoa(float);
 void reverse_stack(int);
+int length(Token);
 
 #endif

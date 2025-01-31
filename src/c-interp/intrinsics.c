@@ -85,14 +85,15 @@ void LET(Program *program) {
     switch (type) {
         case NUMBER:
             error("Cannot accept numbers for assignment: %s", token);
-        case STRING: {
+        case STRING:
+            args(program, length(token));
             Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
-            while ((token = get_token(symbols))) {
-                eval(program);
-                upsert(program, token, pop(), false);
+            Token symbol;
+            while ((symbol = get_token(symbols))) {
+                upsert(program, symbol, pop(), false);
             }
             free(token);
-        } break;
+            break;
         case SYMBOL:
             UNQUOTE(program);
             upsert(program, token, pop(), false);
