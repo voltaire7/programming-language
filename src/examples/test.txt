@@ -8,3 +8,8 @@ let func [
     print\n reduce [a b c]
 ]
 func 1 2 3
+
+let func [
+    args 3
+]
+func 1 2 3
