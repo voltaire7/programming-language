@@ -7,8 +7,12 @@
 #include "eval.h"
 #include "env.h"
 
+extern int stack_index;
+
 void args(Program *program, int count) {
-    while (count--) eval(program);
+    int goal = stack_index + count;
+    while (stack_index < goal) eval(program);
+    reverse_stack(count - goal + stack_index);
 }
 
 void eval(Program *program) {

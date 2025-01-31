@@ -7317,3 +7317,39 @@ obj  # outputs 123
 # do I really need to capture variables?
 # the best use for it is encapsulation.
 # ... wait, but can I do encapsulation without captures?
+
+let empty []
+let args [1 2]
+print\n - empty args
+# I'm going to allow this, I think.
+# it require more code to prevent it.
+
+# I think pointers will really be key to pass by pointer.
+
+let ptr to [1 2 3]
+set-at 0 ptr 5
+print\n ptr  # outputs (random pointer)
+print\n of ptr  # outputs [5 2 3]
+print\n get 1 ptr  # outputs 2
+
+let ptr new [1 2 3]
+free ptr
+let test [
+    let ptr new [1 2 3]
+    ptr
+]
+# I guess it makes sense? in scheme, references are also just lists.
+
+# oh! okay, so the pointer is stored in the stack, or environment, and the actually value is
+# somewhere in memory.
+
+# hmm.
+let ptr new 123
+set-at 0 ptr 321
+print\n get 0 ptr  # outputs 321 ?
+# I don't know. it feels awkward.
+
+# I feel like I need a mixture of a stack and a queue.
+# a global stack for everything, then a queue individual scopes.
+# what is left in a queue after a function returns, is pushed to the stack.
+# ... no, the simpler solution is to just reverse n amount of arguments in the stack.

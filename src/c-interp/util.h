@@ -3,15 +3,16 @@
 
 #include "shared.h"
 
-void error(char *msg, ...);
-Program read_file(char *filename);
-bool is_number(Token token);
-Type get_type(Token token);
+void error(char *, ...);
+Program read_file(char *);
+bool is_number(Token);
+Type get_type(Token);
 void debug_stack();
-Token get_token(Program *program);
+Token get_token(Program *);
 char *pop();
-void push(char *value);
-Token unquote(Token token);
-char *ftoa(float num);
+void push(char *);
+Token unquote(Token);
+char *ftoa(float);
+void reverse_stack(int);
 
 #endif

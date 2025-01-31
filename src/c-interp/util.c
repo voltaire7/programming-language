@@ -134,3 +134,10 @@ char *ftoa(float num) {
     return result;
 }
 
+void reverse_stack(int count) {
+    for (int i = 1, j = count; i <= count / 2; i++, j--) {
+        char *temp = stack[stack_index - i];
+        stack[stack_index - i] = stack[stack_index - j];
+        stack[stack_index - j] = temp;
+    }
+}
