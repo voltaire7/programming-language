@@ -14,7 +14,6 @@ void args(Program *program, int count) {
     while (stack_index < goal) {
         int sp = stack_index;
         eval(program, true);
-        printf("[debug: %p]\n\n", program);
         if (sp == stack_index) error("Operand returned nothing.");
     }
     reverse_stack(count - goal + stack_index);

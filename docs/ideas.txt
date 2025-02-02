@@ -7447,3 +7447,92 @@ new [print\n "hello"]
 let [var] new [print\n "hello"]
 var
 # ??
+
+# wait a second! that's good!
+let [macro] [set [x] - x 1]
+let test [
+    let [x] 6
+    do macro
+    print\n x
+]
+test  # outputs 5
+# then again... is there that much use for it?
+# honestly, [do] running statically vs ...
+# oh.
+let test [
+    let [x] 6
+    do [set [x] - x 1]
+    print\n x
+]
+# it needs to be dynamic, otherwise the above code is impossible.
+# ... then again.
+let function [set [x] - x 1]
+let test [
+    let [x] 6
+    function
+    print\n x
+]
+# is equivalent to
+let test [
+    let [x] 6
+    set [x] - x 1
+    print\n x
+]
+# right?
+# or should [set] always work one scope lower?
+# it kind of works the same as [let] when inside the same scope.
+
+# nah
+let func [1 2 3]
+func
+# is equivalent to
+do [1 2 3]
+# so [do] should be statically scoped.
+let [func] [1 2 3]
+do func
+do [1 2 3]
+
+let [number] 123
+map [+ number] [1 2 3 4 5]
+# how do I do this?
+map reduce [+ number] [1 2 3 4 5]
+# this is an option...
+
+map [print\n] my-list
+# this works regardless.
+# whatever. I'll only add features as I need them.
+
+# ... I just realized, but my reduce is kinda scuffed.
+# when I first had the idea for reduce, it was for reducing everything that did not have
+# side-effects, or something like that.
+
+# in scheme:
+(define x 123)
+(define func '(begin (set! x (+ x 5)) (display x)))
+(define other-func (lambda () (let ((x 5)) (eval func) (display x))))
+(other-func)  ; outputs 1285
+# or
+(define x 123)
+(define func (lambda () (set! x (+ x 5)) (display x)))
+(define other-func (lambda () (let ((x 5)) (func) (display x))))
+(other-func)  ; outputs 1285
+
+# hmm
+mkdir 'test
+'
+# is equivalent to
+mkdir test\n
+# and [ls] prints
+test\n
+# regardless.
+# also,
+mkdir 'test  test'
+# and
+mkdir test\ \ test
+# are equivalent
+# (you need the double blackslashes for consecutive spaces in tokens).
+
+let bool [
+    if args 1 ["true"] ["false"]
+]
+print\n bool false
