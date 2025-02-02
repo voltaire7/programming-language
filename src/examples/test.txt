@@ -9,4 +9,5 @@ print val
 let test [
     args 3
 ]
-do [test 1 2 3]
+let [_ _ _] do [test 1 2 3] 4 5 6
+print\n _

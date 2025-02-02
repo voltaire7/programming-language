@@ -20,7 +20,7 @@ Variable *find(Program *program, char *key) {
             if (!strcmp(key, var->key)) return var;
             var = var->next;
         }
-        program = program->next;
+        program = program->scope_static;
     }
     return NULL;
 }

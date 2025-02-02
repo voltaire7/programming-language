@@ -29,7 +29,8 @@ struct Program {
     int size;
     int position;
     Variable *env[ENV_SIZE];
-    struct Program *next;
+    struct Program *scope_static;
+    struct Program *scope_dynamic;
 };
 
 typedef enum Type {

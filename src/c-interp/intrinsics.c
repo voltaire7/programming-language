@@ -87,7 +87,7 @@ void LET(Program *program) {
             error("Cannot accept numbers for assignment: %s", token);
         case STRING:
             args(program, length(token));
-            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program };
             Token symbol;
             while ((symbol = get_token(symbols))) {
                 upsert(program, symbol, pop(), false);
@@ -110,7 +110,7 @@ void SET(Program *program) {
             error("Cannot accept numbers for assignment: %s", token);
         case STRING:
             args(program, length(token));
-            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .next = program };
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program };
             while ((token = get_token(symbols))) {
                 Variable *var = find(program, token);
                 if (!var) error("Varible not bound: '%s'\n", token);
@@ -143,7 +143,7 @@ void EXIT(Program *program) {
 void DO(Program *program) {
     args(program, 1);
     char *value = unquote(pop());
-    interpret(&(Program){ .code = value, .size = strlen(value), .next = program });
+    interpret(&(Program){ .code = value, .size = strlen(value), .scope_static = program });
 }
 
 void REDUCE(Program *program) {
@@ -255,7 +255,11 @@ void ARGS(Program *program) {
     switch (get_type(token)) {
         case NUMBER: {
             int goal = stack_index + atof(token);
-            while (stack_index < goal) eval(program->next, true);
+            while (stack_index < goal) {
+                int sp = stack_index;
+                eval(program->scope_dynamic, true);
+                if (sp == stack_index) error("Operand returned nothing.");
+            }
         } break;
         case STRING:
             error("Not implemented yet.");
@@ -285,6 +289,6 @@ void IF(Program *program) {
     args(program, 3);
     Token condition = pop(), if_ = pop(), else_ = pop();
     Token body = strcmp(condition, "[]") && strcmp(condition, "0") && strcmp(condition, "\"\"") ? if_ : else_;
-    interpret(&(Program){ .code = unquote(body), .size = strlen(body), .next = program });
+    interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
     free(condition), free(if_), free(else_);
 }

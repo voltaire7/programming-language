@@ -22,9 +22,8 @@ void args(Program *program, int count) {
 void eval(Program *program, bool should_continue) {
     if (!program) return;
     Token token = get_token(program);
-    if (!strcmp(program->code, "\n    \"is true\\n\"\n")) printf("debug: %i, %i, %p\n", program->position, program->size, token);
     if (!token) {
-        if (should_continue) eval(program->next, true);
+        if (should_continue) eval(program->scope_static, true);
         return;
     }
 
@@ -39,7 +38,7 @@ void eval(Program *program, bool should_continue) {
             if (!var) error("Variable not bound: '%s'", token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
-            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .next = var->program });
+            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .scope_static = var->program, .scope_dynamic = program });
 
             free(token);
         } break;
