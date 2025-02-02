@@ -11,7 +11,11 @@ extern int stack_index;
 
 void args(Program *program, int count) {
     int goal = stack_index + count;
-    while (stack_index < goal) eval(program);
+    while (stack_index < goal) {
+        int sp = stack_index;
+        eval(program);
+        if (sp == stack_index) error("Operand returned nothing.");
+    }
     reverse_stack(count - goal + stack_index);
 }
 

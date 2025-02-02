@@ -7357,3 +7357,40 @@ print\n get 0 ptr  # outputs 321 ?
 # maybe the special thing about [for] and [while], is that [->next] for [Program] pointers skip a
 # scope? and you know, giving the illusion that the scope is special, while still retaining the
 # variable are are popped after the stack gets deleted.
+
+let func [
+    let [_ _ _]
+]
+func 1 2 3
+
+let func [
+    let [a b c] args 3
+    print\n reduce [a b c]
+]
+func 1 2 3
+
+let func [
+    args 3
+]
+func 1 2 3  # outputs 
+
+# don't forget: free all variables at the end of the scope.
+
+# wait, shit.
+# how do I define [print\n] using the language?
+let print\n [
+    print args 1
+    print \n
+]
+# ...
+
+# oh!
+let print\n [
+    defer [print \n]
+    print
+]
+
+# or simpler...
+let print\n [
+    print "%\n" format
+]
