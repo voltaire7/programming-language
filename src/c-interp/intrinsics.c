@@ -245,3 +245,9 @@ void LENGTH(Program *program) {
     Token token = pop();
     push(ftoa(length(token)));
 }
+
+void SWAP(Program *program) {
+    args(program, 2);
+    Token t1 = pop(), t2 = pop();
+    push(t2), push(t1);
+}

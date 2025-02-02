@@ -7394,3 +7394,34 @@ let print\n [
 let print\n [
     print "%\n" format
 ]
+
+# still, I'm curious. is there a way I could make this work with just [args]?
+let test ["% %\n" 1 2 3]
+print test
+# what happens here?
+# honestly, I think this should just work.
+print test  # outputs "1 2 3\n"
+# and also
+let test ["% %\n" 1 2 3]
+print test
+# should... maybe...... (not) return 3?
+print\n print test # outputs "1 2\n", then 3
+# because
+let test [
+    print\n args 0
+]
+# ...
+# this would be much easier if this language was lazy.
+let print [
+    let [buf nbytes] format args 0, size buf
+    write stdout buf nbytes
+]
+# or
+let print [
+    defer [write stdout, buf, size buf]
+    let [buf] format args 0, size buf
+]
+# or
+let print [
+    write stdout swap size . format
+]
