@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
     upsert(&program, "exit", EXIT, true);
     upsert(&program, "do", DO, true);
     upsert(&program, "reduce", REDUCE, true);
+    upsert(&program, "reverse", REVERSE, true);
     upsert(&program, "debug", DEBUG, true);
     upsert(&program, "+", ADD, true);
     upsert(&program, "-", SUB, true);
@@ -35,7 +36,6 @@ int main(int argc, char** argv) {
     upsert(&program, "args", ARGS, true);
     upsert(&program, "length", LENGTH, true);
     upsert(&program, "swap", SWAP, true);
-    upsert(&program, "reverse", REVERSE, true);
 
     interpret(&program);
     debug_stack();
