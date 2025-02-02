@@ -169,9 +169,34 @@ void REDUCE(Program *program) {
     push(acc);
 }
 
+void REVERSE(Program *program) {
+    int old = stack_index;
+    DO(program);
+    int size = 1;
+    Token acc = malloc(size+1);
+    while (old != stack_index) {
+        Token token = pop();
+        int token_size = strlen(token);
+        size += token_size + 1;
+        Token new = malloc(size+1);
+        new[size - token_size - 2] = ' ';
+        strncpy(new, acc, size - token_size - 2);
+        strncpy(new + 1 + size - token_size - 2, token, token_size);
+        free(token), free(acc);
+        acc = new;
+    }
+    if (size == 1) acc = realloc(acc, ++size + 1);
+    acc[0] = '[';
+    acc[size-1] = ']';
+    acc[size] = 0;
+    push(acc);
+}
+
 void DEBUG(Program *program) {
     args(program, 1);
-    printf("%s\n", pop());
+    Token token = pop();
+    printf("%s\n", token);
+    free(token);
 }
 
 void ADD(Program *program) {

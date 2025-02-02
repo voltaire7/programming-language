@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
     upsert(&program, "args", ARGS, true);
     upsert(&program, "length", LENGTH, true);
     upsert(&program, "swap", SWAP, true);
+    upsert(&program, "reverse", REVERSE, true);
 
     interpret(&program);
     debug_stack();

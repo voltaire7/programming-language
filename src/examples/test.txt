@@ -1,2 +1,9 @@
-print\n + .1 .2
-print\n / 1 3
+let [x] [+ 1 2 - 3 4 * 5 6]
+reduce  x
+reverse x
+
+# reduce 1
+
+# for [1 2 3] [print\n it]
+# for 3 [print\n it]
+# do [1 2 3]

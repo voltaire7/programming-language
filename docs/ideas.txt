@@ -7429,3 +7429,7 @@ let print [
 # the fuck?
 print\n + .1 .2  # outputs 0.3??
 # how does %g figure that out?
+
+# maybe I should [reduce] the first argument of [for]?
+for [1 2 3] [print\n it]
+for 3 [print\n it]
