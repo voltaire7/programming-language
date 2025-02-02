@@ -6,8 +6,24 @@ let [val] if true [
 ]
 print val
 
-let test [
-    args 3
+# let test [args 3]
+# let [_ _ _] do [test 1 2 3] 4 5 6
+
+let [test] [args 3, set [x] 5]
+let [_ _ _] do [
+    let [x] 2
+    do test 1 2 3
+    print "x = %\n" x
 ]
-let [_ _ _] do [test 1 2 3] 4 5 6
-print\n _
+
+let [x a] 6 77
+let test [
+    set [x] 5
+]
+let test2 [
+    let [x] 1
+    test
+    print "test2 = %\n" x
+]
+test2
+print "global = %\n" a

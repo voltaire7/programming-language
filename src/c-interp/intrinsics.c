@@ -143,7 +143,7 @@ void EXIT(Program *program) {
 void DO(Program *program) {
     args(program, 1);
     char *value = unquote(pop());
-    interpret(&(Program){ .code = value, .size = strlen(value), .scope_static = program });
+    interpret(&(Program){ .code = value, .size = strlen(value), .scope_static = program, .scope_dynamic = program });
 }
 
 void REDUCE(Program *program) {

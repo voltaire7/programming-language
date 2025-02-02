@@ -14,6 +14,7 @@ void args(Program *program, int count) {
     while (stack_index < goal) {
         int sp = stack_index;
         eval(program, true);
+        printf("[debug: %p]\n\n", program);
         if (sp == stack_index) error("Operand returned nothing.");
     }
     reverse_stack(count - goal + stack_index);
@@ -36,11 +37,10 @@ void eval(Program *program, bool should_continue) {
         case SYMBOL: {
             Variable *var = find(program, token);
             if (!var) error("Variable not bound: '%s'", token);
+            free(token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
             else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .scope_static = var->program, .scope_dynamic = program });
-
-            free(token);
         } break;
     }
 }

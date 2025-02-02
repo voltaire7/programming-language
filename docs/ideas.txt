@@ -7433,3 +7433,17 @@ print\n + .1 .2  # outputs 0.3??
 # maybe I should [reduce] the first argument of [for]?
 for [1 2 3] [print\n it]
 for 3 [print\n it]
+
+# maybe [new] is nothing special? it's just a bool field called [should_free] or something.
+# when calling [free_scope] automatically, at the end of [interpret], ...
+# no, [free_scope] is only called if...
+# wait. ok. [free_scope] frees all the variables that should be freed with [should_free].
+# but the scope itself does not get freed unless all variables are freed.
+# so, using the variable will still be like anything else in the language.
+# or not, because when you return from a function, it copies...
+# wait!
+new [print\n "hello"]
+# vs
+let [var] new [print\n "hello"]
+var
+# ??
