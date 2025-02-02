@@ -36,6 +36,7 @@ Program read_file(char *filename) {
 }
 
 bool is_number(Token token) {
+    if (*token == '-') token++;
     if (isdigit(*token)) {
         while (isdigit(*token++));
         if (*(token-1) == '.') while (isdigit(*token++));
