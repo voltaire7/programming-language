@@ -166,7 +166,6 @@ void REDUCE(Program *program) {
     acc[0] = '[';
     acc[size-1] = ']';
     acc[size] = 0;
-    printf("strlen = %lu, size = %i\n", strlen(acc), size);
     push(acc);
 }
 
