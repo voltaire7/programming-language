@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
     upsert(&program, "length", LENGTH, true);
     upsert(&program, "swap", SWAP, true);
     upsert(&program, "...", NOT_IMPLEMENTED, true);
+    upsert(&program, "if", IF, true);
 
     interpret(&program);
     debug_stack();

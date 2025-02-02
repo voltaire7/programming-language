@@ -1,12 +1,12 @@
-let test [...]
-test
+let [true false] 1 0
+let [val] if true [
+    "is true\n"
+] [
+    "is false\n"
+]
+print val
 
-let [x] [+ 1 2, - 3 4, * 5 6]
-reduce  x
-reverse x
-
-# reduce 1
-
-# for [1 2 3] [print\n it]
-# for 3 [print\n it]
-# do [1 2 3]
+let test [
+    args 3
+]
+do [test 1 2 3]

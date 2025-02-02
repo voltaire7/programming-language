@@ -13,17 +13,18 @@ void args(Program *program, int count) {
     int goal = stack_index + count;
     while (stack_index < goal) {
         int sp = stack_index;
-        eval(program);
+        eval(program, true);
         if (sp == stack_index) error("Operand returned nothing.");
     }
     reverse_stack(count - goal + stack_index);
 }
 
-void eval(Program *program) {
+void eval(Program *program, bool should_continue) {
     if (!program) return;
     Token token = get_token(program);
+    if (!strcmp(program->code, "\n    \"is true\\n\"\n")) printf("debug: %i, %i, %p\n", program->position, program->size, token);
     if (!token) {
-        eval(program->next);
+        if (should_continue) eval(program->next, true);
         return;
     }
 
@@ -47,6 +48,6 @@ void eval(Program *program) {
 
 void interpret(Program *program) {
     for (int i = 0; program->position < program->size; i++) {
-        eval(program);
+        eval(program, false);
     }
 }

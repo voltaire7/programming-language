@@ -255,7 +255,7 @@ void ARGS(Program *program) {
     switch (get_type(token)) {
         case NUMBER: {
             int goal = stack_index + atof(token);
-            while (stack_index < goal) eval(program->next);
+            while (stack_index < goal) eval(program->next, true);
         } break;
         case STRING:
             error("Not implemented yet.");
@@ -279,4 +279,12 @@ void SWAP(Program *program) {
 
 void NOT_IMPLEMENTED(Program *program) {
     error("Function not implemented yet.");
+}
+
+void IF(Program *program) {
+    args(program, 3);
+    Token condition = pop(), if_ = pop(), else_ = pop();
+    Token body = strcmp(condition, "[]") && strcmp(condition, "0") && strcmp(condition, "\"\"") ? if_ : else_;
+    interpret(&(Program){ .code = unquote(body), .size = strlen(body), .next = program });
+    free(condition), free(if_), free(else_);
 }
