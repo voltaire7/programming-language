@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
     upsert(&program, ".", DUP, true);
     upsert(&program, "\\n", "[\\n]", false);
     upsert(&program, "args", ARGS, true);
+    upsert(&program, "length", LENGTH, true);
 
     interpret(&program);
     debug_stack();

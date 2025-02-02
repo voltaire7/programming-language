@@ -239,3 +239,9 @@ void ARGS(Program *program) {
     }
     free(token);
 }
+
+void LENGTH(Program *program) {
+    REDUCE(program);
+    Token token = pop();
+    push(ftoa(length(token)));
+}
