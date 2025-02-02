@@ -276,3 +276,7 @@ void SWAP(Program *program) {
     Token t1 = pop(), t2 = pop();
     push(t2), push(t1);
 }
+
+void NOT_IMPLEMENTED(Program *program) {
+    error("Function not implemented yet.");
+}
