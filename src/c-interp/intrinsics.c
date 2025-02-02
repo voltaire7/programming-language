@@ -149,23 +149,24 @@ void DO(Program *program) {
 void REDUCE(Program *program) {
     int old = stack_index;
     DO(program);
-    int size = 2;
-    Token acc = malloc(size);
+    int size = 1;
+    Token acc = malloc(size+1);
     while (old != stack_index) {
         Token token = pop();
         int token_size = strlen(token);
         size += token_size + 1;
-        Token new = malloc(size);
+        Token new = malloc(size+1);
         new[0] = ' ';
         strncpy(new + 1, token, token_size);
-        strncpy(new + 1 + token_size, acc, size - token_size - 3);
+        strncpy(new + 1 + token_size, acc, size - token_size - 2);
         free(token), free(acc);
         acc = new;
     }
-    if (size == 2) acc = realloc(acc, ++size);
+    if (size == 1) acc = realloc(acc, ++size + 1);
     acc[0] = '[';
-    acc[size-2] = ']';
-    acc[size-1] = 0;
+    acc[size-1] = ']';
+    acc[size] = 0;
+    printf("strlen = %lu, size = %i\n", strlen(acc), size);
     push(acc);
 }
 
