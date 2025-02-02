@@ -7425,3 +7425,7 @@ let print [
 let print [
     write stdout swap size . format
 ]
+
+# the fuck?
+print\n + .1 .2  # outputs 0.3??
+# how does %g figure that out?

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "shared.h"
 #include "util.h"
 #include "env.h"

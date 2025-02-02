@@ -124,7 +124,7 @@ Token unquote(Token token) {
     return token;
 }
 
-char *ftoa(float num) {
+char *ftoa(double num) {
     char temp[50];
 
     snprintf(temp, sizeof(temp), "%g", num);

@@ -12,7 +12,7 @@ Token get_token(Program *);
 char *pop();
 void push(char *);
 Token unquote(Token);
-char *ftoa(float);
+char *ftoa(double);
 void reverse_stack(int);
 int length(Token);
 
