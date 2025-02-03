@@ -19,6 +19,13 @@ void args(Program *program, int count) {
     reverse_stack(count - goal + stack_index);
 }
 
+bool next(Program *program) {
+    int sp = stack_index;
+    eval(program, false);
+    if (sp == stack_index) return false;
+    return true;
+}
+
 void eval(Program *program, bool should_continue) {
     if (!program) return;
     Token token = get_token(program);

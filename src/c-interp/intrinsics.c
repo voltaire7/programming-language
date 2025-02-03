@@ -320,15 +320,17 @@ void FOR(Program *program) {
             list = temp;
         }
         case STRING: {
-            unquote(list);
             Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .scope_static = program };
-            args(program_list, 1);
-            printf("debug: %s\n", append("", ""));
-            // interpret(&(Program){ .code = unquote(body), .size = strlen(body) });
-            // printf("debug: %s\n", list);
+
+            while (next(program_list)) {
+                Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program };
+                Token it = pop();
+                upsert(program_body, "it", it, false);
+                interpret(program_body);
+                free(it);
+            }
         } break;
         case SYMBOL:
             error("Symbol not supported as list for loop.");
     }
-    printf("%s, %s\n", list, body);
 }

@@ -176,12 +176,14 @@ Token range(double min, double max) {
 Token append(Token left, Token right) {
     int size_left = strlen(left), size_right = strlen(right);
     Token new = malloc(size_left + size_right + 4);
+
     strncpy(new + 1, left, size_left);
     strncpy(new + 2 + size_left, right, size_right);
 
     new[0] = '[';
     new[size_left + 1] = ' ';
-    new[size_left + 1 + size_right] = ']';
-    new[size_left + 2 + size_right] = 0;
+    new[size_left + 2 + size_right] = ']';
+    new[size_left + 3 + size_right] = 0;
+
     return new;
 }

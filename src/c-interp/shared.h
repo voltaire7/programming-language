@@ -13,7 +13,6 @@
 #define TYPES (char *[]){ "NUMBER", "STRING", "SYMBOL" }
 
 typedef char * Token;
-
 typedef struct Program Program;
 
 typedef struct Variable {
@@ -24,11 +23,13 @@ typedef struct Variable {
     Program *program;
 } Variable;
 
+typedef Variable *Environment[ENV_SIZE];
+
 struct Program {
     char *code;
     int size;
     int position;
-    Variable *env[ENV_SIZE];
+    Environment env;
     struct Program *scope_static;
     struct Program *scope_dynamic;
 };
