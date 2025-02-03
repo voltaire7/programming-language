@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "shared.h"
+#include "util.h"
 
 unsigned hash(char *key) {
     unsigned value = 0, key_len = strlen(key);
@@ -52,4 +53,22 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
         var->program = program;
         prev->next = var;
     }
+}
+
+void delete(Program *program, char *key) {
+    unsigned index = hash(key);
+    Variable *var  = program->env[index], *prev = NULL;
+
+    while (var != NULL) {
+        if (strcmp(var->key, key) == 0) {
+            if (prev == NULL) program->env[index] = var->next;
+            else prev->next = var->next;
+            free(var->key);
+            free(var);
+            return;
+        }
+        prev  = var;
+        var = var->next;
+    }
+    error("Cannot delete, entry not found: '%s'", key);
 }

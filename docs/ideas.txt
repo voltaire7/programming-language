@@ -7538,3 +7538,9 @@ let bool [
 print\n bool false
 
 # for [for], first a reduce, then while not end of scope, [args 1], [args 1] and [args 1].
+
+rename x y
+# vs
+rename "x" "y"
+# I think the former is better, since I need to write a [is_valid_symbol] function otherwise.
+# and it doesn't really make sense to have "" or [], if I don't do multiple renames.

@@ -350,3 +350,14 @@ void WHILE(Program *program) {
         program->position = position;
     }
 }
+
+void AS(Program *program) {
+    Token new_name = get_token(program);
+    args(program, 1);
+    Token new = append("rename it", new_name);
+}
+
+void RENAME(Program *program) {
+    Token old = get_token(program), new = get_token(program);
+    rename_var(program, old, new);
+}

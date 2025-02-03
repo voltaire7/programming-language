@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "env.h"
 #include "shared.h"
 
 extern char *stack[STACK_SIZE];
@@ -186,4 +187,12 @@ Token append(Token left, Token right) {
     new[size_left + 3 + size_right] = 0;
 
     return new;
+}
+
+
+void rename_var(Program *program, Token old, Token new) {
+    Variable *var = find(program, old);
+    if (!var) error("Variable not bound: '%s'", old);
+    upsert(program, new, var->value, false);
+    delete(program, old);
 }

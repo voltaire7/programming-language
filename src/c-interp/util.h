@@ -17,5 +17,6 @@ void reverse_stack(int);
 int length(Token);
 Token range(double, double);
 Token append(Token, Token);
+void rename_var(Program *, Token, Token);
 
 #endif
