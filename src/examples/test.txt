@@ -1,14 +1,6 @@
-# reduce  [+ 1 2, - 3 4, * 5 6]
-# reverse [+ 1 2, - 3 4, * 5 6]
-
-reduce [for 5 [
-    it
-]]
-
-for 5 [
-    it
+let [i] 10
+while i [
+    set [i] - i 1
+    print "i = %\n" i
 ]
-
-for [+ 1 2, - 3 4, * 5 6] [
-    print "success: %\n"  it
-]
+halt

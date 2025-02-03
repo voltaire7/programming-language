@@ -334,3 +334,19 @@ void FOR(Program *program) {
             error("Symbol not supported as list for loop.");
     }
 }
+
+void WHILE(Program *program) {
+    int position = program->position;
+    for (;;) {
+        args(program, 2);
+        Token cond = pop(), body = unquote(pop());
+        if (strcmp(cond, "[]") && strcmp(cond, "0") && strcmp(cond, "\"\"")) {
+            interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
+            free(cond), free(body);
+        } else {
+            free(cond), free(body);
+            break;
+        }
+        program->position = position;
+    }
+}
