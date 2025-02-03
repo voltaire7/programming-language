@@ -15,5 +15,7 @@ Token unquote(Token);
 char *ftoa(double);
 void reverse_stack(int);
 int length(Token);
+Token range(double, double);
+Token append(Token, Token);
 
 #endif

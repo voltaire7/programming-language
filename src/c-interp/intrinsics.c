@@ -310,15 +310,25 @@ void IF(Program *program) {
 }
 
 void FOR(Program *program) {
-    args(program, 2);
-    Token list = pop(), body = unquote(pop());
+    REDUCE(program);
+    args(program, 1);
+    Token body = unquote(pop()), list = pop();
     switch (get_type(list)) {
-        case NUMBER:
-            break;
-        case STRING:
-            break;
+        case NUMBER: {
+            Token temp = range(0, atof(list));
+            free(list);
+            list = temp;
+        }
+        case STRING: {
+            unquote(list);
+            Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .scope_static = program };
+            args(program_list, 1);
+            printf("debug: %s\n", append("", ""));
+            // interpret(&(Program){ .code = unquote(body), .size = strlen(body) });
+            // printf("debug: %s\n", list);
+        } break;
         case SYMBOL:
-            break;
+            error("Symbol not supported as list for loop.");
     }
     printf("%s, %s\n", list, body);
 }

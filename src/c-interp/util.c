@@ -151,3 +151,37 @@ int length(Token token) {
     if (!*token && *(token-1) != ']') return 0;
     return 1 + length(token);
 }
+
+Token range(double min, double max) {
+    int size = 1;
+    Token acc = malloc(size+1);
+    for (; min <= max; min++) {
+        Token token = ftoa(min);
+        int token_size = strlen(token);
+        size += token_size + 1;
+        Token new = malloc(size+1);
+        new[size - token_size - 2] = ' ';
+        strncpy(new, acc, size - token_size - 2);
+        strncpy(new + 1 + size - token_size - 2, token, token_size);
+        free(token), free(acc);
+        acc = new;
+    }
+    if (size == 1) acc = realloc(acc, ++size + 1);
+    acc[0] = '[';
+    acc[size-1] = ']';
+    acc[size] = 0;
+    return acc;
+}
+
+Token append(Token left, Token right) {
+    int size_left = strlen(left), size_right = strlen(right);
+    Token new = malloc(size_left + size_right + 4);
+    strncpy(new + 1, left, size_left);
+    strncpy(new + 2 + size_left, right, size_right);
+
+    new[0] = '[';
+    new[size_left + 1] = ' ';
+    new[size_left + 1 + size_right] = ']';
+    new[size_left + 2 + size_right] = 0;
+    return new;
+}
