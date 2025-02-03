@@ -7535,7 +7535,6 @@ mkdir test\ \ test
 let bool [
     if args 1 ["true"] ["false"]
 ]
-let bool [if args 1 ["true"] ["false"]]
 print\n bool false
 
 # for [for], first a reduce, then while not end of scope, [args 1], [args 1] and [args 1].

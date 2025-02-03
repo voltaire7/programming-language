@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
     upsert(&program, "true", "1", false);
     upsert(&program, "false", "0", false);
     upsert(&program, "bool", "if args 1 [\"true\"] [\"false\"]", false);
+    upsert(&program, "for", FOR, true);
 
     interpret(&program);
     debug_stack();

@@ -148,7 +148,15 @@ void DO(Program *program) {
 
 void REDUCE(Program *program) {
     int old = stack_index;
-    DO(program);
+
+    args(program, 1);
+    Token token = pop();
+    if (get_type(token) != STRING) {
+        push(token);
+        return;
+    }
+    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program, .scope_dynamic = program });
+
     int size = 1;
     Token acc = malloc(size+1);
     while (old != stack_index) {
@@ -171,7 +179,15 @@ void REDUCE(Program *program) {
 
 void REVERSE(Program *program) {
     int old = stack_index;
-    DO(program);
+
+    args(program, 1);
+    Token token = pop();
+    if (get_type(token) != STRING) {
+        push(token);
+        return;
+    }
+    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program, .scope_dynamic = program });
+
     int size = 1;
     Token acc = malloc(size+1);
     while (old != stack_index) {
@@ -291,4 +307,18 @@ void IF(Program *program) {
     Token body = strcmp(condition, "[]") && strcmp(condition, "0") && strcmp(condition, "\"\"") ? if_ : else_;
     interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
     free(condition), free(if_), free(else_);
+}
+
+void FOR(Program *program) {
+    args(program, 2);
+    Token list = pop(), body = unquote(pop());
+    switch (get_type(list)) {
+        case NUMBER:
+            break;
+        case STRING:
+            break;
+        case SYMBOL:
+            break;
+    }
+    printf("%s, %s\n", list, body);
 }
