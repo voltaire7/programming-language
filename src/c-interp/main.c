@@ -38,6 +38,9 @@ int main(int argc, char** argv) {
     upsert(&program, "swap", SWAP, true);
     upsert(&program, "...", NOT_IMPLEMENTED, true);
     upsert(&program, "if", IF, true);
+    upsert(&program, "true", "1", false);
+    upsert(&program, "false", "0", false);
+    upsert(&program, "bool", "if args 1 [\"true\"] [\"false\"]", false);
 
     interpret(&program);
     debug_stack();

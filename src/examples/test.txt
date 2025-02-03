@@ -1,12 +1,4 @@
-let [true false] 1 0
-let [val] if false [
-    "is true\n"
-] [
-    "is false\n"
-]
-print val
-
-let bool [
-    if args 1 ["true"] ["false"]
-]
-print\n bool false
+let str ["Hello, World!\n"]
+let [str] "Hello, World!\n"
+print str
+print\n bool true
