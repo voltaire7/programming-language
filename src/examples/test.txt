@@ -1,3 +1,1 @@
-let [x] 132
-rename x y
-y
+for 10 as a [print\n a]

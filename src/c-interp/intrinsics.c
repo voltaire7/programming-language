@@ -325,7 +325,7 @@ void FOR(Program *program) {
             while (next(program_list)) {
                 Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program };
                 Token it = pop();
-                upsert(program_body, "it", it, false);
+                upsert(program_body, strdup("it"), it, false);
                 interpret(program_body);
                 free(it);
             }
@@ -354,7 +354,11 @@ void WHILE(Program *program) {
 void AS(Program *program) {
     Token new_name = get_token(program);
     args(program, 1);
-    Token new = append("rename it", new_name);
+    Token temp = append("rename it", new_name);
+    free(new_name);
+    Token body = pop();
+    push(append(unquote(temp), unquote(body)));
+    free(temp), free(body);
 }
 
 void RENAME(Program *program) {

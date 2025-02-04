@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
     upsert(&program, "bool", "if args 1 [\"true\"] [\"false\"]", false);
     upsert(&program, "for", FOR, true);
     upsert(&program, "while", WHILE, true);
+    upsert(&program, "as", AS, true);
     upsert(&program, "rename", RENAME, true);
 
     interpret(&program);
