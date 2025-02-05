@@ -13,6 +13,7 @@ char *pop();
 void push(char *);
 Token unquote(Token);
 char *ftoa(double);
+char *itoa(long);
 void reverse_stack(int);
 int length(Token);
 Token range(double, double);

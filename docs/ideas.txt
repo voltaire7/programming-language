@@ -7608,10 +7608,6 @@ let [str] new    "Hello, World!\n"  # in the heap
 
 let fib [
     let [n] args 1
-    if < n 2 [
-        n
-    ] [
-        + fib - n 1 fib - n 2
-    ]
+    if < n 2 [n] [+ fib - n 1 fib - n 2]
 ]
 print\n fib 10  # outputs 55

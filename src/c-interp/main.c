@@ -48,6 +48,9 @@ int main(int argc, char** argv) {
     upsert(&program, "=", EQUAL, true);
     upsert(&program, "<", LESS, true);
     upsert(&program, ">", MORE, true);
+    upsert(&program, "drop", DROP, true);
+    upsert(&program, "to", TO, true);
+    upsert(&program, "of", OF, true);
 
     interpret(&program);
     debug_stack();

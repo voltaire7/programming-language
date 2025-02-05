@@ -136,6 +136,17 @@ char *ftoa(double num) {
     return result;
 }
 
+char *itoa(long num) {
+    char temp[50];
+
+    snprintf(temp, sizeof(temp), "%li", num);
+    size_t len = strlen(temp) + 1;
+    char *result = malloc(len);
+    snprintf(result, len, "%s", temp);
+
+    return result;
+}
+
 void reverse_stack(int count) {
     for (int i = 1, j = count; i <= count / 2; i++, j--) {
         char *temp = stack[stack_index - i];

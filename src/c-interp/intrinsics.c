@@ -219,7 +219,7 @@ void ADD(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -230,7 +230,7 @@ void SUB(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -241,7 +241,7 @@ void MUL(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -252,7 +252,7 @@ void DIV(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -394,4 +394,21 @@ void MORE(Program *program) {
     if (atof(token1) > atof(token2)) push(strdup("1"));
     else push(strdup("0"));
     free(token1), free(token2);
+}
+
+void DROP(Program *program) {
+    args(program, 1);
+    pop();
+}
+
+void TO(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    push(itoa((long) token));
+}
+
+void OF(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    push((char *) atol(token));
 }
