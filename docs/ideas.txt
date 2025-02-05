@@ -7605,3 +7605,13 @@ let [str] new    "Hello, World!\n"  # in the heap
 # but then again, if the assembly implementation is done first, it will be easier with strings.
 # I should still try to make the "looks and behaves high-level, but has a lot of shenanigans
 # underneath" thing work.
+
+let fib [
+    let [n] args 1
+    if < n 2 [
+        n
+    ] [
+        + fib - n 1 fib - n 2
+    ]
+]
+print\n fib 10  # outputs 55
