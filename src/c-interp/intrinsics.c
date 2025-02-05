@@ -303,10 +303,10 @@ void NOT_IMPLEMENTED(Program *program) {
 
 void IF(Program *program) {
     args(program, 3);
-    Token condition = pop(), if_ = pop(), else_ = pop();
-    Token body = strcmp(condition, "[]") && strcmp(condition, "0") && strcmp(condition, "\"\"") ? if_ : else_;
+    Token cond = pop(), if_ = pop(), else_ = pop();
+    Token body = strcmp(cond, "[]") && strcmp(cond, "0") && strcmp(cond, "\"\"") ? if_ : else_;
     interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
-    free(condition), free(if_), free(else_);
+    free(cond), free(if_), free(else_);
 }
 
 void FOR(Program *program) {
@@ -398,7 +398,7 @@ void MORE(Program *program) {
 
 void DROP(Program *program) {
     args(program, 1);
-    pop();
+    free(pop());
 }
 
 void TO(Program *program) {
@@ -411,4 +411,22 @@ void OF(Program *program) {
     args(program, 1);
     Token token = pop();
     push((char *) atol(token));
+}
+
+void AND(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (strcmp(token1, "[]") && strcmp(token1, "0") && strcmp(token1, "\"\"") && strcmp(token2, "[]") && strcmp(token2, "0") && strcmp(token2, "\"\"")) {
+        push(strdup("1"));
+    } else push(strdup("0"));
+    free(token1), free(token2);
+}
+
+void OR(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if ((strcmp(token1, "[]") && strcmp(token1, "0") && strcmp(token1, "\"\"")) || (strcmp(token2, "[]") && strcmp(token2, "0") && strcmp(token2, "\"\""))) {
+        push(strdup("1"));
+    } else push(strdup("0"));
+    free(token1), free(token2);
 }

@@ -7611,3 +7611,51 @@ let fib [
     if < n 2 [n] [+ fib - n 1 fib - n 2]
 ]
 print\n fib 10  # outputs 55
+
+let ptr to    "Hello, World!\n"          # in readonly memory
+let [str ptr] "Hello, World!\n", to str  # in the stack?
+
+let recursive [
+    let [n] args 1
+    print\n n
+    recursive + 1 n
+]
+recursive 0
+
+# actually, [debug] should be smarter.
+
+# the following rust code outputs something much nicer.
+fn main() {
+    let str = "Hello, World!\n";
+    dbg!(str);
+}
+
+[src/main.rs:3:5] str = "Hello, World!\n"
+
+# hell!
+fn main() {
+    dbg!(1 + 1);
+}
+
+[src/main.rs:2:5] 1 + 1 = 2
+# now this is nice!
+
+debug [+ 1 2]  # outputs [test.txt:1:1] + 1 2 = 3
+# the position in the file is actually the start of the debug call.
+
+# [set-ref] sets the values of a pointer
+# equivalent to C's
+*ptr = (something);
+# wait.
+# I thought of adding a [set-char]... but I don't need it right?
+let ptr to "hello"
+print\n ptr     # outputs (random pointer)
+print\n of ptr  # outputs "hello\n"
+set-ref ptr "hello\n"
+print   of ptr  # outputs "hello\n"
+mut + 2 ptr "x"
+print   of ptr  # outputs "hexlo\n"
+
+# shit, I can't short-circuit the [and] function.
+and cond, func-call
+# the arguments are both eager.

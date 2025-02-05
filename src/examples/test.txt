@@ -4,7 +4,17 @@ let fib [
 ]
 # print\n fib 10  # outputs 55
 
-let ptr [to "Hello, World!\n"]
-print of ptr
+# let ptr [to "Hello, World!\n"]
+# print of ptr
+
+let recursive [
+    let [n] args 1
+    print\n n
+    recursive + 1 n
+]
+# recursive 0
+
+print\n bool && 1 0
+print\n bool || 1 0
 
 
