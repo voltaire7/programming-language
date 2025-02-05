@@ -72,3 +72,17 @@ void delete(Program *program, char *key) {
     }
     error("Cannot delete, entry not found: '%s'", key);
 }
+
+void free_env(Program program) {
+    for (int i = 0; i < ENV_SIZE; i++) {
+        Variable *var = program.env[i];
+        while (var != NULL) {
+            Variable *temp = var;
+            var = var->next;
+            if (temp->is_intrinsic) continue;
+            free(temp->key);
+            free(temp->value);
+            free(temp);
+        }
+    }
+}

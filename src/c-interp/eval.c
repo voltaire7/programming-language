@@ -55,4 +55,5 @@ void interpret(Program *program) {
     for (int i = 0; program->position < program->size; i++) {
         eval(program, false);
     }
+    free_env(program);
 }

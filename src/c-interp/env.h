@@ -3,9 +3,10 @@
 
 #include "shared.h"
 
-unsigned hash(char *key);
-Variable *find(Program *program, char *key);
-void upsert(Program *program, char *key, void *value, bool is_intrinsic);
-void delete(Program *program, char *key);
+unsigned hash(char *);
+Variable *find(Program *, char *);
+void upsert(Program *, char *, void *, bool);
+void delete(Program *, char *);
+void free_env(Program *);
 
 #endif
