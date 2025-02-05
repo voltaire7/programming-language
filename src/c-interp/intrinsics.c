@@ -277,8 +277,14 @@ void ARGS(Program *program) {
                 if (sp == stack_index) error("Operand returned nothing.");
             }
         } break;
-        case STRING:
-            error("Not implemented yet.");
+        case STRING: {
+            args(program->scope_dynamic, length(token));
+            Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program };
+            Token symbol;
+            while ((symbol = get_token(symbols))) {
+                upsert(program, symbol, pop(), false);
+            }
+        } break;
         case SYMBOL:
             error("Invalid argument: '%s'\n", token);
     }

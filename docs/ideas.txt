@@ -7662,3 +7662,37 @@ and cond, func-call
 
 # bitwise operators don't accept decimals. that's fine.
 # but instead of throwing an error, it should just truncate the thing.
+
+let test [
+    let [str] "hello\n"
+    to str
+]
+print\n of test
+# interesting. because everything is copied when passed to something else, there is no way to
+# reference something on the stack if it wasn't already a pointer.
+# that is unless [to] does not evaluate its argument?
+
+# maybe go back to the original model?
+let [str] "Hello, World!\n"
+let ptr ptr-to [str]          # [ptr-to] takes a quoted symbol.
+let [another-str] val-of ptr  # [val-of] takes a number/pointer.
+print another-str
+
+let test [
+    let [str] "hello\n"
+    ptr-to [str]
+]
+print\n val-of test
+
+let [str ptr] "hello\n", ptr-to [str]  # [str] and [ptr] are static.
+set-ptr ptr "hello"  # still static, but now points to another readonly string.
+print\n val-of ptr  # outputs "hello"
+set-char ptr "x"  # now in the stack.
+print\n val-of ptr  # outputs "xello"
+add-char ptr "lsjn"  # now in the heap. dynamic arrays automatically go in the heap.
+print\n val-of ptr  # outputs "xellolsjn"
+
+# btw, [mut-char] has an overload over numbers and strings?
+mut-char ptr "ljlf"  # unsafe like C, can override other parts of the memory.
+mut-char str "ljlf"  # returns a mutated copy of the string.
+# ... I guess [mut-char] is like [strcpy]?
