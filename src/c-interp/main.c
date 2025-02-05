@@ -53,6 +53,13 @@ int main(int argc, char** argv) {
     upsert(&program, "of", OF, true);
     upsert(&program, "&&", AND, true);
     upsert(&program, "||", OR, true);
+    upsert(&program, "!", NOT, true);
+    upsert(&program, "&", BIT_AND, true);
+    upsert(&program, "|", BIT_OR, true);
+    upsert(&program, "^", BIT_XOR, true);
+    upsert(&program, "~", BIT_NOT, true);
+    upsert(&program, "<<", BIT_SHIFT_LEFT, true);
+    upsert(&program, ">>", BIT_SHIFT_RIGHT, true);
 
     interpret(&program);
     debug_stack();

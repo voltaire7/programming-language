@@ -7659,3 +7659,6 @@ print   of ptr  # outputs "hexlo\n"
 # shit, I can't short-circuit the [and] function.
 and cond, func-call
 # the arguments are both eager.
+
+# bitwise operators don't accept decimals. that's fine.
+# but instead of throwing an error, it should just truncate the thing.

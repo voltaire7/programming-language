@@ -14,7 +14,6 @@ let recursive [
 ]
 # recursive 0
 
-print\n bool && 1 0
-print\n bool || 1 0
+print\n bool ! false
 
 

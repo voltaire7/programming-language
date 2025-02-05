@@ -219,7 +219,7 @@ void ADD(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -230,7 +230,7 @@ void SUB(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -241,7 +241,7 @@ void MUL(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -252,7 +252,7 @@ void DIV(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support strings: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     double arg1 = atof(token1), arg2 = atof(token2);
     free(token1), free(token2);
@@ -378,7 +378,7 @@ void LESS(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     if (atof(token1) < atof(token2)) push(strdup("1"));
     else push(strdup("0"));
@@ -389,7 +389,7 @@ void MORE(Program *program) {
     args(program, 2);
     Token token1 = pop(), token2 = pop();
     if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
-        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
     }
     if (atof(token1) > atof(token2)) push(strdup("1"));
     else push(strdup("0"));
@@ -428,5 +428,74 @@ void OR(Program *program) {
     if ((strcmp(token1, "[]") && strcmp(token1, "0") && strcmp(token1, "\"\"")) || (strcmp(token2, "[]") && strcmp(token2, "0") && strcmp(token2, "\"\""))) {
         push(strdup("1"));
     } else push(strdup("0"));
+    free(token1), free(token2);
+}
+
+void NOT(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    if (strcmp(token, "[]") && strcmp(token, "0") && strcmp(token, "\"\"")) {
+        push(strdup("0"));
+    } else push(strdup("1"));
+    free(token);
+}
+
+void BIT_AND(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Bitwise operators do not support strings: %s or %s", token1, token2);
+    }
+    push(itoa(atol(token1) & atol(token2)));
+    free(token1), free(token2);
+}
+
+void BIT_OR(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Bitwise operators do not support strings: %s or %s", token1, token2);
+    }
+    push(itoa(atol(token1) | atol(token2)));
+    free(token1), free(token2);
+}
+
+void BIT_XOR(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Bitwise operators do not support strings: %s or %s", token1, token2);
+    }
+    push(itoa(atol(token1) ^ atol(token2)));
+    free(token1), free(token2);
+}
+
+void BIT_NOT(Program *program) {
+    args(program, 1);
+    Token token = pop();
+    if (get_type(token) != NUMBER) {
+        error("Bitwise operators do not support strings: %s", token);
+    }
+    push(itoa(~atol(token)));
+    free(token);
+}
+
+void BIT_SHIFT_LEFT(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Bitwise operators do not support strings: %s or %s", token1, token2);
+    }
+    push(itoa(atol(token1) << atol(token2)));
+    free(token1), free(token2);
+}
+
+void BIT_SHIFT_RIGHT(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Bitwise operators do not support strings: %s or %s", token1, token2);
+    }
+    push(itoa(atol(token1) >> atol(token2)));
     free(token1), free(token2);
 }
