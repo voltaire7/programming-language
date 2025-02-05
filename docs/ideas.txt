@@ -7372,7 +7372,7 @@ func 1 2 3
 let func [
     args 3
 ]
-func 1 2 3  # outputs 
+func 1 2 3
 
 # don't forget: free all variables at the end of the scope.
 
@@ -7544,3 +7544,64 @@ rename x y
 rename "x" "y"
 # I think the former is better, since I need to write a [is_valid_symbol] function otherwise.
 # and it doesn't really make sense to have "" or [], if I don't do multiple renames.
+
+let ptr to "hello\n"
+print\n ptr  # outputs (random pointer)
+let val "hello\n"
+let ptr to val
+print\n ptr  # outputs (random pointer)
+# the difference between the two, is that the former is on the heap, the latter on the stack,
+# essentially because it will be freed afterwards.
+print\n of ptr  # outputs (random pointer)
+# huh, just realized I can't use [to] indefinitely.
+
+let [my-list] ["1" "2" "3" "4" "5"]
+map [to] my-list
+print\n my-list  # outputs [(list of pointers)]
+
+# oh! I just realized! I do have a stack!
+
+# OH. MY. FUCKING. GOD!!!!!!
+# I just found out that I can have both writable AND executable memory on macos!
+# I just need MAP_JIT as a flag!! That's all!
+
+# ... or not? I played around with, but while it tells me it's readable, executable, I get a SIGBUS.
+
+# you know. I guess I should only really compile when creating a file.
+# the performance gain is shadowed by the JIT compilation.
+# the interpreter should be slow, the compiled code should be fast.
+# ... but then, some things become impossible.
+# how do I define assembly instructions as function calls using [exec]?
+
+# damn, another problem: I'm using the stack to return things, but I can't do that when compiled.
+# variables will also be on the stack.
+# so I would need to pop all the variables, then push all the returns.
+# it's easier when everything except the args are on the heap...
+
+# how do I both use the stack to store the values of variables and function returns?
+# then again, it's impossible to return a string as a value...
+# so I can reserve space for pointer returns. the question is about returns of variable length.
+
+# while I create this stuff, I should try to make it as faithful to the future implementation as
+# possible.
+# it would be so much simpler if I didn't have to worry about compiling...
+
+# let's think about the final implementation:
+# honestly, I should be able to return from function, arrays as copies. I think.
+# man, I really wish I could see how Jai does, if it does it.
+
+let [str]        "Hello, World!\n"  # in the stack
+let [str] static "Hello, World!\n"  # in readonly memory
+let [str] new    "Hello, World!\n"  # in the heap
+# maybe?
+# but this sort of thing should be determined by the compiler.
+
+# I could also have two stacks?
+
+# for now, I should continue with the current model. try some advent of code problems and stuff.
+# I'm getting ahead of myself.
+
+# still, it might be easier to do the C low level implementation first.
+# but then again, if the assembly implementation is done first, it will be easier with strings.
+# I should still try to make the "looks and behaves high-level, but has a lot of shenanigans
+# underneath" thing work.

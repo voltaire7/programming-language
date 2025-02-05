@@ -1,1 +1,8 @@
-for 10 as a [print\n a]
+for 9 as index [
+    for 9 as index [
+        print "% " index
+    ]
+    print \n
+]
+
+
