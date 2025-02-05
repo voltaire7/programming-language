@@ -365,3 +365,33 @@ void RENAME(Program *program) {
     Token old = get_token(program), new = get_token(program);
     rename_var(program, old, new);
 }
+
+void EQUAL(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (strcmp(token1, token2) == 0) push(strdup("1"));
+    else push(strdup("0"));
+    free(token1), free(token2);
+}
+
+void LESS(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+    }
+    if (atof(token1) < atof(token2)) push(strdup("1"));
+    else push(strdup("0"));
+    free(token1), free(token2);
+}
+
+void MORE(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operator do not support string: %s or %s", token1, token2);
+    }
+    if (atof(token1) > atof(token2)) push(strdup("1"));
+    else push(strdup("0"));
+    free(token1), free(token2);
+}

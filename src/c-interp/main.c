@@ -45,6 +45,9 @@ int main(int argc, char** argv) {
     upsert(&program, "while", WHILE, true);
     upsert(&program, "as", AS, true);
     upsert(&program, "rename", RENAME, true);
+    upsert(&program, "=", EQUAL, true);
+    upsert(&program, "<", LESS, true);
+    upsert(&program, ">", MORE, true);
 
     interpret(&program);
     debug_stack();

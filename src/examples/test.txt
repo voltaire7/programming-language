@@ -1,8 +1,14 @@
-for 9 as index [
-    for 9 as index [
-        print "% " index
-    ]
-    print \n
+# (define (fib n)
+  # (if (< n 2)
+      # n
+      # (+ (fib (- n 1)) (fib (- n 2)))))
+
+# ;; Example usage
+# (fib 10)  ;; => 55
+
+let fib [
 ]
+< 2 10
+> 2 10
 
 
