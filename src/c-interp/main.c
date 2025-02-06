@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
     upsert(&program, strdup("-"), SUB, true);
     upsert(&program, strdup("*"), MUL, true);
     upsert(&program, strdup("/"), DIV, true);
+    upsert(&program, strdup("%"), MOD, true);
     upsert(&program, strdup("."), DUP, true);
     upsert(&program, strdup("\\n"), strdup("[\\n]"), false);
     upsert(&program, strdup("args"), ARGS, true);

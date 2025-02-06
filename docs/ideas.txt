@@ -7696,3 +7696,24 @@ print\n val-of ptr  # outputs "xellolsjn"
 mut-char ptr "ljlf"  # unsafe like C, can override other parts of the memory.
 mut-char str "ljlf"  # returns a mutated copy of the string.
 # ... I guess [mut-char] is like [strcpy]?
+
+# in C.
+int x = &0;
+# this is not valid, so this should not be valid either.
+let [x] ptr-to 0
+
+let [macro] [let [x] 5]
+inline macro
+
+let test [
+    if ! = [end] args 1 [
+        + 1 test
+    ] [print\n "end"; 0]
+]
+test 1 2 3 4 5 [end]
+
+let [a d] 50 10
+let [q r] / a d, % a d
+print "a = %\n" + r * q d
+# this works, but when you switch 50 and 10, there's a bug, because [/] returns a decimal.
+# btw, can't forget that it's supposed to return a fraction... yeah, I'll have to do it.

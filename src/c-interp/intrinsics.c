@@ -259,6 +259,17 @@ void DIV(Program *program) {
     push(ftoa(arg1 / arg2));
 }
 
+void MOD(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
+    }
+    long arg1 = atol(token1), arg2 = atol(token2);
+    free(token1), free(token2);
+    push(itoa(arg1 % arg2));
+}
+
 void DUP(Program *program) {
     args(program, 1);
     Token token = pop();

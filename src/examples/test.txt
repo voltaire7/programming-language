@@ -1,9 +1,5 @@
-let three [1 2 3]
+let [a d] 10 50
+let [q r] / a d, % a d
+print "a = %\n" + r * q d
 
-let test [
-    args [arg1 arg2 arg3]
-    print\n "%, %, %" arg1, arg2, arg3
-]
 
-test 1 2 3
-test three
