@@ -39,6 +39,7 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
     } else {
         while (var) {
             if (!strcmp(key, var->key)) {
+                free(var->value);
                 var->value = value;
                 var->is_intrinsic = is_intrinsic;
                 return;
