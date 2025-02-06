@@ -1,4 +1,9 @@
-let scope-offset 1
+# set scope-offset 0
 let str ["Hello, World!\n"]
 set [str] "hello\n"
 print str
+
+do [
+    let [x] 123
+]
+    print\n x

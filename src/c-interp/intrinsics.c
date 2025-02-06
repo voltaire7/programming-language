@@ -566,6 +566,7 @@ void LOAD(Program *program) {
             loaded.code = malloc(loaded.size + 1);
             fread(loaded.code, loaded.size, 1, file);
             loaded.code[loaded.size] = 0;
+            upsert(&loaded, strdup("scope-offset"), strdup("1"), false);
 
             interpret(&loaded);
         } break;
