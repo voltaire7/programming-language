@@ -82,6 +82,12 @@ void LET(Program *program) {
     Token token = get_token(program);
     Type type = get_type(token);
 
+    Variable *scope_offset = find(program, "scope-offset");
+    Program *scope = program;
+    if (scope_offset) for (int i = atoi(scope_offset->value); i > 0; i--) {
+        scope = scope->scope_static;
+    }
+
     switch (type) {
         case NUMBER:
             error("Cannot accept numbers for assignment: %s", token);
@@ -90,13 +96,13 @@ void LET(Program *program) {
             Program *symbols = &(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program };
             Token symbol;
             while ((symbol = get_token(symbols))) {
-                upsert(program, symbol, pop(), false);
+                upsert(scope, symbol, pop(), false);
             }
             free(token);
             break;
         case SYMBOL:
             UNQUOTE(program);
-            upsert(program, token, pop(), false);
+            upsert(scope, token, pop(), false);
             break;
     }
 }
@@ -114,6 +120,7 @@ void SET(Program *program) {
             while ((token = get_token(symbols))) {
                 Variable *var = find(program, token);
                 if (!var) error("Varible not bound: '%s'\n", token);
+                free(var->value);
                 var->value = pop();
             }
             free(token);
@@ -122,6 +129,7 @@ void SET(Program *program) {
             UNQUOTE(program);
             Variable *var = find(program, token);
             if (!var) error("Varible not bound: '%s'\n", token);
+            free(var->value);
             var->value = pop();
             break;
     }
@@ -413,6 +421,28 @@ void MORE(Program *program) {
     free(token1), free(token2);
 }
 
+void LESS_OR_EQUAL(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
+    }
+    if (atof(token1) <= atof(token2)) push(strdup("1"));
+    else push(strdup("0"));
+    free(token1), free(token2);
+}
+
+void MORE_OR_EQUAL(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
+    }
+    if (atof(token1) >= atof(token2)) push(strdup("1"));
+    else push(strdup("0"));
+    free(token1), free(token2);
+}
+
 void DROP(Program *program) {
     args(program, 1);
     free(pop());
@@ -515,4 +545,29 @@ void BIT_SHIFT_RIGHT(Program *program) {
     }
     push(itoa(atol(token1) >> atol(token2)));
     free(token1), free(token2);
+}
+
+void LOAD(Program *program) {
+    Token token = get_token(program);
+    switch (get_type(token)) {
+        case STRING:
+            break;
+        case NUMBER:
+        case SYMBOL: {
+            Program loaded = { .scope_static = program };
+
+            FILE *file = fopen(token, "r");
+            if (!file) error("File not found: '%s'", token);
+
+            fseek(file, 0, SEEK_END);
+            loaded.size = ftell(file);
+            fseek(file, 0, SEEK_SET);
+
+            loaded.code = malloc(loaded.size + 1);
+            fread(loaded.code, loaded.size, 1, file);
+            loaded.code[loaded.size] = 0;
+
+            interpret(&loaded);
+        } break;
+    }
 }

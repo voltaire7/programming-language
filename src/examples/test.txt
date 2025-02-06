@@ -1,5 +1,2 @@
-let [a d] 10 50
-let [q r] / a d, % a d
-print "a = %\n" + r * q d
-
-
+load src/examples/lib.txt
+print str

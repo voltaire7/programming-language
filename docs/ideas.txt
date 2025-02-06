@@ -7717,3 +7717,11 @@ let [q r] / a d, % a d
 print "a = %\n" + r * q d
 # this works, but when you switch 50 and 10, there's a bug, because [/] returns a decimal.
 # btw, can't forget that it's supposed to return a fraction... yeah, I'll have to do it.
+
+# [+>] should be something. it looks cool. so should [>>=].
+[1,2,3,4] >>= \ x -> [x - 1, x + 1]
+[0,2,1,3,2,4,3,5]
+# ^ in haskell
+
+# the repl is line disciplined. you need to use [do] for multiline in...puts.
+# no, [inline].

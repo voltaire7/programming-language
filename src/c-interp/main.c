@@ -61,6 +61,8 @@ int main(int argc, char** argv) {
     upsert(&program, strdup("~"), BIT_NOT, true);
     upsert(&program, strdup("<<"), BIT_SHIFT_LEFT, true);
     upsert(&program, strdup(">>"), BIT_SHIFT_RIGHT, true);
+    upsert(&program, strdup("load"), LOAD, true);
+    upsert(&program, strdup("scope-offset"), strdup("0"), false);
 
     interpret(&program);
     debug_stack();
