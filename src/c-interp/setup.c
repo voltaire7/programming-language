@@ -34,6 +34,7 @@ void setup(Program *program) {
     // upsert(program, strdup("bool"), strdup("if args 1 [\"true\"] [\"false\"]"), false);
     upsert(program, strdup("for"), FOR, true);
     upsert(program, strdup("while"), WHILE, true);
+    upsert(program, strdup("loop"), LOOP, true);
     upsert(program, strdup("as"), AS, true);
     upsert(program, strdup("rename"), RENAME, true);
     upsert(program, strdup("="), EQUAL, true);
@@ -54,4 +55,5 @@ void setup(Program *program) {
     upsert(program, strdup("<<"), BIT_SHIFT_LEFT, true);
     upsert(program, strdup(">>"), BIT_SHIFT_RIGHT, true);
     upsert(program, strdup("load"), LOAD, true);
+    upsert(program, strdup("range"), RANGE, true);
 }

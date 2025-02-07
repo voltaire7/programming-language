@@ -386,31 +386,7 @@ void WHILE(Program *program) {
     }
 }
 
-void LOOP(Program *program) {
-    REDUCE(program);
-    args(program, 1);
-    Token body = unquote(pop()), list = pop();
-    switch (get_type(list)) {
-        case NUMBER: {
-            Token temp = range(0, atof(list));
-            free(list);
-            list = temp;
-        }
-        case STRING: {
-            Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .dir = program->dir, .scope_static = program };
-
-            while (next(program_list)) {
-                Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program };
-                Token it = pop();
-                upsert(program_body, strdup("it"), it, false);
-                interpret(program_body);
-                free(it);
-            }
-        } break;
-        case SYMBOL:
-            error("Symbol not supported as list for loop.");
-    }
-}
+void LOOP(Program *program) {}
 
 void AS(Program *program) {
     Token new_name = get_token(program);
@@ -611,4 +587,15 @@ void LOAD(Program *program) {
             interpret(&loaded);
         } break;
     }
+}
+
+void RANGE(Program *program) {
+    args(program, 2);
+    Token token1 = pop(), token2 = pop();
+    if (get_type(token1) != NUMBER || get_type(token1) != NUMBER) {
+        error("Arithmetic operators do not support strings: %s or %s", token1, token2);
+    }
+    double arg1 = atof(token1), arg2 = atof(token2);
+    free(token1), free(token2);
+    push(range(arg1, arg2));
 }

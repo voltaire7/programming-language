@@ -7815,3 +7815,100 @@ loop as continue [
         continue
     ] []
 ]  # for loop basically.
+
+# you know, the more I use it, the more I like it.
+# it's really just recursion, but you don't have to define the function, then called it.
+
+let i 0
+let it [
+    if < 10 i [
+        print\n x
+        set i + i 1
+        continue
+    ] []
+] it
+
+loop [
+    print "THE END IS NEVER "; it
+]  # should loop forever.
+
+# wait, if a loop calls itself automatically, then what happens when you return?
+let i 0
+loop [
+    if < 10 i [
+        print\n x
+        set i + i 1
+    ] [return]
+]
+# the loop needs to reach the end to call itself again, but it didn't.
+# and since the outer scopes are already at the end, they will simply return.
+
+loop [
+    print "THE END IS NEVER "
+]  # should loop forever.
+
+loop [
+    args [x]
+    print\n x
+    if < x 10 [it - x 1] []
+] 10  # no longer possible
+
+# or is it?
+
+loop [
+    args [x]
+    print\n x
+    if < x 10 [it - x 1] []
+    return
+] 10  # because what is actually being called here?
+
+# but at this point, it might be better to just do recursive functions.
+
+let it [
+    args [x]
+    print\n x
+    if < x 10 [it - x 1] []
+] it 10
+
+# they where a little redundant with the earlier model, so I guess this is better?
+
+for list [
+    print\n it
+]
+
+let it [
+    args [x]
+    print\n car x
+    if cdr x [it cdr x] []
+] it list  # yeah... I'll just call them [car], [cdr].
+
+let [x] list
+loop [
+    print\n car x
+    set [x] cdr x
+    if x [] [return]
+]
+
+# ah, I just remembered why I didn't do [return].
+if x [] [return]
+# this returns from the [if] function.
+# right.
+let [x] list
+loop [
+    print\n car x
+    set [x] cdr x
+    if x [it] []
+]
+# so this is it. [it] remains the same, so it doesn't matter what scope you're in.
+loop [
+    args [x]
+    print\n car x
+    if cdr x [it cdr x] []
+] list
+# and it matches with [for] and [while], what with the [as].
+# you know, I think it will be good, because unlike the mundane recursion, it doesn't dirty the
+# environment with define and use once functions.
+
+while true [
+    print "THE END IS NEVER "
+]

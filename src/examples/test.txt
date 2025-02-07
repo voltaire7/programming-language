@@ -1,7 +1,3 @@
 load lib.txt
 
-print \n
-print\n 123
-print\n bool true
-
-bool <= 1 1
+range 1 10
