@@ -1,12 +1,11 @@
 load lib.txt
 
-# fac: func [
-#     "Factorize number"
-#     n "Number to factorize"
-# ][
-#     if n = 0 [return 1]
-#     n * fac n - 1
-# ]
+fac: func [
+    "Factorize number"
+    n "Number to factorize"
+][
+    if n = 0 [return 1] n * fac n - 1
+]
 
 let fac [
     args [n]

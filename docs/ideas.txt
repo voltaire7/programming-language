@@ -7984,3 +7984,6 @@ let fac [
 ]
 print\n fac 3  # outputs 6
 print\n fac 3  # outputs 24
+
+# oh. no wonder it was a fucked up factorial. in my mind, I thought of it as fib...
+# I'm dumb. oops.
