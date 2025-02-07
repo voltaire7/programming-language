@@ -42,7 +42,7 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
 
     if (!var) {
         program->env[index] = malloc(sizeof(Variable));
-        program->env[index]->key = key;
+        program->env[index]->key = strdup(key);
         program->env[index]->value = value;
         program->env[index]->is_intrinsic = is_intrinsic;
         program->env[index]->program = program;
@@ -58,7 +58,7 @@ void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
             var = var->next;
         }
         var = malloc(sizeof(Variable));
-        var->key = key;
+        var->key = strdup(key);
         var->value = value;
         var->is_intrinsic = is_intrinsic;
         var->program = program;

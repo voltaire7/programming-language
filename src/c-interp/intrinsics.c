@@ -360,9 +360,8 @@ void FOR(Program *program) {
             while (next(program_list)) {
                 Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program };
                 Token it = pop();
-                upsert(program_body, strdup("it"), it, false);
+                upsert(program_body, "it", it, false);
                 interpret(program_body);
-                free(it);
             }
         } break;
         case SYMBOL:

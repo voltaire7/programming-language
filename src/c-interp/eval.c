@@ -30,7 +30,7 @@ void eval(Program *program, bool should_continue) {
     if (!program) return;
     Token token = get_token(program);
     if (!token) {
-        if (should_continue) eval(program->scope_static, true);
+        if (should_continue) eval(program->scope_dynamic, true);
         return;
     }
 
