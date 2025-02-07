@@ -89,16 +89,10 @@ void LET(Program *program) {
         Variable *scope_offset = find_here(scope, "scope-offset");
         if (!scope_offset) break;
         int i = atoi(scope_offset->value);
-        // printf("###### debug: %p, %p\n", program, scope_offset);
-        if (!i) break;
-        for (; i > 0; i--) {
+        if (i) while (i-- > 0) {
             scope = scope->scope_static;
-        }
+        } else break;
     }
-    // Variable *scope_offset = find_here(scope, "scope-offset");
-    // if (scope_offset) for (int i = atoi(scope_offset->value); i > 0; i--) {
-    //     scope = scope->scope_static;
-    // }
 
     switch (type) {
         case NUMBER:
