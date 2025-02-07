@@ -5,5 +5,5 @@ print str
 
 do [
     let [x] 123
-]
     print\n x
+]

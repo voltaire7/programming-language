@@ -26,6 +26,16 @@ Variable *find(Program *program, char *key) {
     return NULL;
 }
 
+Variable *find_here(Program *program, char *key) {
+    unsigned int index = hash(key);
+    Variable *var = program->env[index];
+    while (var) {
+        if (!strcmp(key, var->key)) return var;
+        var = var->next;
+    }
+    return NULL;
+}
+
 void upsert(Program *program, char *key, void *value, bool is_intrinsic) {
     unsigned index = hash(key);
     Variable *var = program->env[index], *prev;
