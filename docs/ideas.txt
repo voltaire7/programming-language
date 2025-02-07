@@ -7964,3 +7964,23 @@ request-file/file %test.red
 request-file/file/save %test.red
 # right, if I want it to be high level, I should have to open or close files.
 write %r.html read/binary http://redprogramming.com/Home.html
+
+# I guess [delete] will only delete things in the scope it is called in?
+
+# this is one fucked up way of writing factorial...
+fac: func [
+    "Factorize number"
+    n "Number to factorize"
+][
+    if n = 0 [return 1]
+    n * fac n - 1
+]
+# and it fucking works!
+let fac [
+    args [n]
+    if = n 0 [1] [
+        * n fac - n 1
+    ]
+]
+print\n fac 3  # outputs 6
+print\n fac 3  # outputs 24

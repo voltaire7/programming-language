@@ -1,6 +1,18 @@
 load lib.txt
 
-let [x] 123
-print\n x
-delete [x]
-delete [print]
+# fac: func [
+#     "Factorize number"
+#     n "Number to factorize"
+# ][
+#     if n = 0 [return 1]
+#     n * fac n - 1
+# ]
+
+let fac [
+    args [n]
+    if = n 0 [1] [
+        * n fac - n 1
+    ]
+]
+print\n fac 3
+print\n fac 4
