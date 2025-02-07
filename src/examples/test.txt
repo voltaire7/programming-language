@@ -1,2 +1,4 @@
 load inner/inner.txt
-print str
+# print str
+
+test-func

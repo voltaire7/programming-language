@@ -558,11 +558,9 @@ void LOAD(Program *program) {
         case SYMBOL: {
             char *relative = realloc(strdup(program->dir), strlen(program->dir) + strlen(token) + 1);
             strcat(relative, token);
-            printf("relative = %s\n", relative);
 
             Program loaded = read_file(relative);
             loaded.scope_static = program;
-            printf("loaded.dir = %s\n", loaded.dir);
 
             FILE *file = fopen(relative, "r");
             if (!file) error("File not found: '%s'", token);

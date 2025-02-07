@@ -41,8 +41,6 @@ Program read_file(char *filename) {
     program.dir = realloc(program.dir, dir_size + 2);
     program.dir[dir_size] = '/';
     program.dir[dir_size + 1] = 0;
-    printf("debug: %s, %p\n", filename, filename);
-    printf("debug: %s, %p\n", program.dir, program.dir);
 
     return program;
 }

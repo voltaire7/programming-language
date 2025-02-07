@@ -1,3 +1,4 @@
+print "# in lib.txt\n"
 # set scope-offset 0
 let str ["Hello, World!\n"]
 set [str] "hello\n"
@@ -7,3 +8,4 @@ do [
     let [x] 123
     print\n x
 ]
+print "# out of lib.txt\n"
