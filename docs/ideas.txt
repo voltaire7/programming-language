@@ -7727,3 +7727,6 @@ print "a = %\n" + r * q d
 # no, [inline].
 
 # I think you should have only the need for one [import] call in an entire project.
+
+# I am increasingly more tempted to use a reference counter.
+# that's the only way for me to make [load] work.

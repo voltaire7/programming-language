@@ -53,5 +53,4 @@ void setup(Program *program) {
     upsert(program, strdup(">>"), BIT_SHIFT_RIGHT, true);
     upsert(program, strdup("load"), LOAD, true);
     upsert(program, strdup("scope-offset"), strdup("0"), false);
-
 }

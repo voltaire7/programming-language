@@ -2,5 +2,6 @@ print "# in inner.txt\n"
 load ../lib.txt
 print str
 
+# let [str] "Hello, World!\n"
 let test-func [print "test-func: " print str]
 print "# out of inner.txt\n"

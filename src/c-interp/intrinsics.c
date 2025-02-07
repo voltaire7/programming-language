@@ -84,11 +84,21 @@ void LET(Program *program) {
     Token token = get_token(program);
     Type type = get_type(token);
 
-    Variable *scope_offset = find_here(program, "scope-offset");
     Program *scope = program;
-    if (scope_offset) for (int i = atoi(scope_offset->value); i > 0; i--) {
-        scope = scope->scope_static;
+    for (;;) {
+        Variable *scope_offset = find_here(scope, "scope-offset");
+        if (!scope_offset) break;
+        int i = atoi(scope_offset->value);
+        // printf("###### debug: %p, %p\n", program, scope_offset);
+        if (!i) break;
+        for (; i > 0; i--) {
+            scope = scope->scope_static;
+        }
     }
+    // Variable *scope_offset = find_here(scope, "scope-offset");
+    // if (scope_offset) for (int i = atoi(scope_offset->value); i > 0; i--) {
+    //     scope = scope->scope_static;
+    // }
 
     switch (type) {
         case NUMBER:
