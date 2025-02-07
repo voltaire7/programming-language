@@ -599,3 +599,9 @@ void RANGE(Program *program) {
     free(token1), free(token2);
     push(range(arg1, arg2));
 }
+
+void DELETE(Program *program) {
+    UNQUOTE(program);
+    Token token = pop();
+    delete(program, token);
+}

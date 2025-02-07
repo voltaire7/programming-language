@@ -7912,3 +7912,55 @@ loop [
 while true [
     print "THE END IS NEVER "
 ]
+
+# I'm thinking that I maybe don't need the no repetition thingy?
+import [File File]
+File.open "file.txt"
+import "File"
+open "file.txt"
+
+File.open "file.txt"
+File/open "file.txt"
+
+Vector.x vec
+Vector/x vec
+
+# hmm... anyway, it is useful to have, but becomes weird with [load].
+load "lib.txt"
+lib.txt.open
+lib.txt/open
+# or should it automatically remove the file extension?
+load "lib.txt"
+lib.open
+lib/open
+# it is a little, just a little scuffed. still, if I ever find a better way of doing it, I will.
+# and you can do this.
+load "file1.txt"
+load "file2.txt"
+load "file3.txt"
+load "file4.txt"
+# which just looks cleaner.
+
+# I should still try to memoize these things eventually.
+# also, in general, the shorter solution is often the better one.
+
+# should [args] return the actual arguments passed by the command line?
+# probably not, since it will break something, but also because the command line passes arguments
+# more like lisp. it's a list. demanding a specific number of args from the cli is weird. forcing
+# the language and the cli to use the same interface is also just weird.
+
+# maybe I should have a global defer? it would make implementing a reference counter easier.
+# anyway, defer. I will probably use an extra field in [Program].
+
+# a good thing about the red programming language is how you could just pass a url or filename to a
+# function and it would figure out what it is just like that.
+read https://example.com
+# thought I imagine you had to pass it the full path or whatever.
+# and underneath, it calls the appropriate function accordingly.
+
+# seems like red has some "refinements".
+request-file
+request-file/file %test.red
+request-file/file/save %test.red
+# right, if I want it to be high level, I should have to open or close files.
+write %r.html read/binary http://redprogramming.com/Home.html

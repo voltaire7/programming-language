@@ -75,13 +75,14 @@ void delete(Program *program, char *key) {
             if (prev == NULL) program->env[index] = var->next;
             else prev->next = var->next;
             free(var->key);
+            if (!var->is_intrinsic) free(var->value);
             free(var);
             return;
         }
         prev  = var;
         var = var->next;
     }
-    error("Cannot delete, entry not found: '%s'", key);
+    error("Cannot delete, variable not found: '%s'", key);
 }
 
 void free_env(Program program) {
@@ -90,9 +91,8 @@ void free_env(Program program) {
         while (var != NULL) {
             Variable *temp = var;
             var = var->next;
-            if (temp->is_intrinsic) continue;
             free(temp->key);
-            free(temp->value);
+            if (!temp->is_intrinsic) free(temp->value);
             free(temp);
         }
     }

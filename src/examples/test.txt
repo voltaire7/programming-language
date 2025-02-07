@@ -1,8 +1,6 @@
 load lib.txt
 
-for .. 1 10 [
-    print\n it
-]
-
-let scope-offset 2142
-let x 2
+let [x] 123
+print\n x
+delete [x]
+delete [print]
