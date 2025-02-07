@@ -5,7 +5,7 @@
 
 void setup(Program *program) {
     upsert(program, strdup("print"), PRINT, true);
-    upsert(program, strdup("print\\n"), PRINTLN, true);
+    // upsert(program, strdup("print\\n"), PRINTLN, true);
     upsert(program, strdup("format"), FORMAT, true);
     upsert(program, strdup("let"), LET, true);
     upsert(program, strdup("set"), SET, true);
@@ -39,6 +39,8 @@ void setup(Program *program) {
     upsert(program, strdup("="), EQUAL, true);
     upsert(program, strdup("<"), LESS, true);
     upsert(program, strdup(">"), MORE, true);
+    upsert(program, strdup("<="), LESS_OR_EQUAL, true);
+    upsert(program, strdup(">="), MORE_OR_EQUAL, true);
     upsert(program, strdup("drop"), DROP, true);
     upsert(program, strdup("to"), TO, true);
     upsert(program, strdup("of"), OF, true);

@@ -7743,3 +7743,75 @@ let macro [
 ]
 macro
 print "% % %\n" x y z
+
+let [vec] [1 2 3]
+print\n Vector3.x vec
+# or
+use Vector3 vec
+print\n vec.x
+set vec.x 4
+# but [set] breaks it.
+# ... what if [vec.x] is a pointer?
+set-ptr vec.x
+get-ptr vec.x
+# or
+use Vector3 vec
+print\n vec.x
+vec.x! 4
+# this is the shorted one.
+# or not?
+use Vector3
+print\n x vec
+x! vec 4
+# nevermind. the model I had already planned is the shortest, and cleanest.
+x! vec 4
+x: vec 4
+
+table vec [x y z] [1 2 3]
+print\n get "x" vec
+table [vec] [
+    x 1
+    y 2
+    z 3
+]
+# but what is
+print\n vec
+# pointer to the list? the list?
+
+# ...
+let [vec] [
+    x 1
+    y 2
+    z 3
+]
+# same thing right?
+# so table just convert a list into a table.
+
+# I should consider the scheme style loop. the other loop are not impossible, but [continue] or
+# [break] make things ugly. especially with loops implemented as recursion.
+
+loop [
+    print "THE END IS NEVER "
+]  # should loop forever.
+
+loop [
+    args [x]
+    print\n x
+    if < x 10 [it - x 1] []
+] 10  # or more like this.
+
+let i 0
+loop [
+    print\n x
+    set i + i 1
+    if < 10 i [it] []
+]  # for loop basically.
+
+let i 0
+loop as continue [
+    if < 10 i [
+        print\n x
+        set i + i 1
+        continue
+    ] []
+]  # for loop basically.
