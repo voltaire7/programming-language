@@ -1,4 +1,5 @@
-load inner/inner.txt
-# print str
+load lib.txt
 
-test-func
+print \n
+print\n 123
+print\n bool true

@@ -7730,3 +7730,16 @@ print "a = %\n" + r * q d
 
 # I am increasingly more tempted to use a reference counter.
 # that's the only way for me to make [load] work.
+
+do [
+    let [scope-offset] 1
+    let [x] 123
+]
+print\n x
+
+let macro [
+    let [scope-offset] 0
+    let [x y z] 1 2 3
+]
+macro
+print "% % %\n" x y z

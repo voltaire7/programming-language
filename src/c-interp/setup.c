@@ -23,15 +23,15 @@ void setup(Program *program) {
     upsert(program, strdup("/"), DIV, true);
     upsert(program, strdup("%"), MOD, true);
     upsert(program, strdup("."), DUP, true);
-    upsert(program, strdup("\\n"), strdup("[\\n]"), false);
+    // upsert(program, strdup("\\n"), strdup("[\\n]"), false);
     upsert(program, strdup("args"), ARGS, true);
     upsert(program, strdup("length"), LENGTH, true);
     upsert(program, strdup("swap"), SWAP, true);
     upsert(program, strdup("..."), NOT_IMPLEMENTED, true);
     upsert(program, strdup("if"), IF, true);
-    upsert(program, strdup("true"), strdup("1"), false);
-    upsert(program, strdup("false"), strdup("0"), false);
-    upsert(program, strdup("bool"), strdup("if args 1 [\"true\"] [\"false\"]"), false);
+    // upsert(program, strdup("true"), strdup("1"), false);
+    // upsert(program, strdup("false"), strdup("0"), false);
+    // upsert(program, strdup("bool"), strdup("if args 1 [\"true\"] [\"false\"]"), false);
     upsert(program, strdup("for"), FOR, true);
     upsert(program, strdup("while"), WHILE, true);
     upsert(program, strdup("as"), AS, true);
@@ -52,5 +52,4 @@ void setup(Program *program) {
     upsert(program, strdup("<<"), BIT_SHIFT_LEFT, true);
     upsert(program, strdup(">>"), BIT_SHIFT_RIGHT, true);
     upsert(program, strdup("load"), LOAD, true);
-    upsert(program, strdup("scope-offset"), strdup("0"), false);
 }

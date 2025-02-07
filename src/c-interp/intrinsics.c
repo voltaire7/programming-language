@@ -88,10 +88,14 @@ void LET(Program *program) {
     for (;;) {
         Variable *scope_offset = find_here(scope, "scope-offset");
         if (!scope_offset) break;
+
         int i = atoi(scope_offset->value);
-        if (i) while (i-- > 0) {
+        if (!i) break;
+        else if (i < 0) error("Negative scope offset.");
+
+        while (i--) {
             scope = scope->scope_static;
-        } else break;
+        }
     }
 
     switch (type) {
