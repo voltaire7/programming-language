@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #include "env.h"
 #include "eval.h"
@@ -151,7 +153,7 @@ void EXIT(Program *program) {
 void DO(Program *program) {
     args(program, 1);
     char *value = unquote(pop());
-    interpret(&(Program){ .code = value, .size = strlen(value), .scope_static = program, .scope_dynamic = program });
+    interpret(&(Program){ .code = value, .size = strlen(value), .dir = program->dir, .scope_static = program, .scope_dynamic = program });
 }
 
 void REDUCE(Program *program) {
@@ -163,7 +165,7 @@ void REDUCE(Program *program) {
         push(token);
         return;
     }
-    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program, .scope_dynamic = program });
+    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .dir = program->dir, .scope_static = program, .scope_dynamic = program });
 
     int size = 1;
     Token acc = malloc(size+1);
@@ -194,7 +196,7 @@ void REVERSE(Program *program) {
         push(token);
         return;
     }
-    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .scope_static = program, .scope_dynamic = program });
+    interpret(&(Program){ .code = unquote(token), .size = strlen(token), .dir = program->dir, .scope_static = program, .scope_dynamic = program });
 
     int size = 1;
     Token acc = malloc(size+1);
@@ -330,7 +332,7 @@ void IF(Program *program) {
     args(program, 3);
     Token cond = pop(), if_ = pop(), else_ = pop();
     Token body = strcmp(cond, "[]") && strcmp(cond, "0") && strcmp(cond, "\"\"") ? if_ : else_;
-    interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
+    interpret(&(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program });
     free(cond), free(if_), free(else_);
 }
 
@@ -345,10 +347,10 @@ void FOR(Program *program) {
             list = temp;
         }
         case STRING: {
-            Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .scope_static = program };
+            Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .dir = program->dir, .scope_static = program };
 
             while (next(program_list)) {
-                Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program };
+                Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program };
                 Token it = pop();
                 upsert(program_body, strdup("it"), it, false);
                 interpret(program_body);
@@ -366,7 +368,7 @@ void WHILE(Program *program) {
         args(program, 2);
         Token cond = pop(), body = unquote(pop());
         if (strcmp(cond, "[]") && strcmp(cond, "0") && strcmp(cond, "\"\"")) {
-            interpret(&(Program){ .code = unquote(body), .size = strlen(body), .scope_static = program });
+            interpret(&(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program });
             free(cond), free(body);
         } else {
             free(cond), free(body);
@@ -554,9 +556,15 @@ void LOAD(Program *program) {
             break;
         case NUMBER:
         case SYMBOL: {
-            Program loaded = { .scope_static = program };
+            char *relative = realloc(strdup(program->dir), strlen(program->dir) + strlen(token) + 1);
+            strcat(relative, token);
+            printf("relative = %s\n", relative);
 
-            FILE *file = fopen(token, "r");
+            Program loaded = read_file(relative);
+            loaded.scope_static = program;
+            printf("loaded.dir = %s\n", loaded.dir);
+
+            FILE *file = fopen(relative, "r");
             if (!file) error("File not found: '%s'", token);
 
             fseek(file, 0, SEEK_END);

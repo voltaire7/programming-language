@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #include "env.h"
 #include "shared.h"
@@ -32,6 +35,14 @@ Program read_file(char *filename) {
     program.code = malloc(program.size + 1);
     fread(program.code, program.size, 1, file);
     program.code[program.size] = 0;
+
+    program.dir = strdup(dirname(filename));
+    int dir_size = strlen(program.dir);
+    program.dir = realloc(program.dir, dir_size + 2);
+    program.dir[dir_size] = '/';
+    program.dir[dir_size + 1] = 0;
+    printf("debug: %s, %p\n", filename, filename);
+    printf("debug: %s, %p\n", program.dir, program.dir);
 
     return program;
 }

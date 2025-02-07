@@ -29,6 +29,7 @@ struct Program {
     char *code;
     int size;
     int position;
+    char *dir;
     Environment env;
     struct Program *scope_static;
     struct Program *scope_dynamic;

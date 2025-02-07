@@ -46,7 +46,7 @@ void eval(Program *program, bool should_continue) {
             free(token);
 
             if (var->is_intrinsic) ((void (*)(Program *)) var->value)(program);
-            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .scope_static = var->program, .scope_dynamic = program });
+            else interpret(&(Program){ .code = var->value, .size = strlen(var->value), .dir = program->dir, .scope_static = var->program, .scope_dynamic = program });
         } break;
     }
 }

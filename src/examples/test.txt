@@ -1,2 +1,2 @@
-load src/examples/lib.txt
+load inner/inner.txt
 print str

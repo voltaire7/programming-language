@@ -7725,3 +7725,5 @@ print "a = %\n" + r * q d
 
 # the repl is line disciplined. you need to use [do] for multiline in...puts.
 # no, [inline].
+
+# I think you should have only the need for one [import] call in an entire project.
