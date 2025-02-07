@@ -1,5 +1,8 @@
 load lib.txt
 
-for range 1 10 [
+for .. 1 10 [
     print\n it
 ]
+
+let scope-offset 2142
+let x 2

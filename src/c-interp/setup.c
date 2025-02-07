@@ -55,5 +55,5 @@ void setup(Program *program) {
     upsert(program, strdup("<<"), BIT_SHIFT_LEFT, true);
     upsert(program, strdup(">>"), BIT_SHIFT_RIGHT, true);
     upsert(program, strdup("load"), LOAD, true);
-    upsert(program, strdup("range"), RANGE, true);
+    upsert(program, strdup(".."), RANGE, true);
 }

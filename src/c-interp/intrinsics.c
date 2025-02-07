@@ -95,6 +95,7 @@ void LET(Program *program) {
 
         while (i--) {
             scope = scope->scope_static;
+            if (!scope) error("Scope offset is too high.");
         }
     }
 
