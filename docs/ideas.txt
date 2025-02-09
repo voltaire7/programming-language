@@ -7987,3 +7987,22 @@ print\n fac 3  # outputs 24
 
 # oh. no wonder it was a fucked up factorial. in my mind, I thought of it as fib...
 # I'm dumb. oops.
+
+let test [
+    - args 2
+]
+test 1 2  # yes! YES! YES!! I thought this would break things, but it didn't!
+
+let ++ [+ 1]
+++ 10
+
+reduce [1, next 1] -> reduce [1, 2, next 3]
+# so like a list that grows everytime you call reduce on it.
+# though 'consuming' the first value may be a better idea.
+# can forget just having numbers with internal states.
+let next [
+    args [n]
+    unquote format [% next %] n, + n 1
+]
+reduce reduce reduce [next 1]
+# just tried it. lol, it actually works.

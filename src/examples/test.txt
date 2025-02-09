@@ -1,17 +1,13 @@
 load lib.txt
 
-fac: func [
-    "Factorize number"
-    n "Number to factorize"
-][
-    if n = 0 [return 1] n * fac n - 1
-]
-
-let fac [
+let next [
     args [n]
-    if = n 0 [1] [
-        * n fac - n 1
-    ]
+    unquote format [% next %] n, + n 1
 ]
-print\n fac 3
-print\n fac 4
+reduce reduce reduce [next 1]
+
+let [list] [next 1]
+for 10 [
+    set [list] reduce list
+    debug list
+]

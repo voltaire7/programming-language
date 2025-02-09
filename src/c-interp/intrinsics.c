@@ -358,8 +358,9 @@ void FOR(Program *program) {
         case STRING: {
             Program *program_list = &(Program){ .code = unquote(list), .size = strlen(list), .dir = program->dir, .scope_static = program };
 
+            int i = 0;
             while (next(program_list)) {
-                Program *program_body = &(Program){ .code = unquote(body), .size = strlen(body), .dir = program->dir, .scope_static = program };
+                Program *program_body = &(Program){ .code = body, .size = strlen(body), .dir = program->dir, .scope_static = program };
                 Token it = pop();
                 upsert(program_body, "it", it, false);
                 interpret(program_body);
