@@ -1,13 +1,5 @@
 load lib.txt
 
-let next [
-    args [n]
-    unquote format [% next %] n, + n 1
-]
-reduce reduce reduce [next 1]
-
-let [list] [next 1]
-for 10 [
-    set [list] reduce list
-    debug list
-]
+.. 0 0
+.. -100 100
+.. 100 -100

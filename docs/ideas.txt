@@ -8006,3 +8006,452 @@ let next [
 ]
 reduce reduce reduce [next 1]
 # just tried it. lol, it actually works.
+
+# this somehow breaks if the [free] call in [eval] is placed higher??
+let [list] [next 1]
+for 10 [
+    set [list] reduce list
+    debug list
+]
+
+let inline [
+    append [let [scope-offset] 1]
+]
+
+let test inline [
+    let [x] 123
+]
+print\n x
+# but what about
+inline test-func
+# it needs to be like jai, where every function has it's opposite.
+do inline reduce [test-func]
+# is ugly.
+
+# oh! so like a macro?
+# [inline] gets token, then if it's a quote, appends, if it's a symbol, gets the values, appends,
+# then runs? but I think I should avoid this sort of thing...
+
+do here [test-func]  # probably the best.
+
+a: 1 b: 2 c: 3
+str: "hello"
+
+inline: [
+    append [let [scope-offset] 1]
+]
+# I looks nice, but I'm not feeling it.
+
+let macro [
+    let [token1 token2] tokens 2
+    print\n "token1 = '%', token2 = '%'\n" token1, token2
+]
+macro something something-else
+
+macro: fn [
+    token1: token2: tokens 2
+    print\n "token1 = '%', token2 = '%'\n" token1, token2
+]
+macro something something-else
+
+a: b: c: 1 2 3
+let [a b c] 1 2 3
+# it's interesting, but you can reassign [:] right?
+# and how do you [set] something!? damn, it's the python problem.
+
+object Vector3 [x y z]
+use Vector3
+let [vec] [1 2 3]
+print\n get x vec  # outputs 1
+set-at x vec 123
+print\n vec        # outputs [123 2 3]
+# vs
+object Vector3 [x y z]
+use Vector3
+let [vec] [1 2 3]
+print\n x vec  # outputs 1
+x: vec 123
+print\n vec    # outputs [123 2 3]
+# considering just how often I'll be using this, model 2 is better.
+# I keep swinging with this shit. when will I decide? when!?
+
+if condition []
+if-else condition [] []
+if condition [] []
+
+view [
+    title "Tip Calculator"
+    below
+    let [f] field "9"
+    let [t] field ".2"
+    button "Calculate" []
+    let [x] field "tip"
+]
+# basically, [view] first calls [reduce] on the string, then iterates over the list to determine
+# how to display stuff.
+
+cond: true
+value: if cond ["true"] ["false"]
+print\n value
+
+a: b: c: 1 2 3
+print\n a  # outputs 3
+# because that's how the precedence works.
+a: 1 b: 2 c: 3
+# hmm.
+three: fn [1 2 3]
+a: b: c: three
+# oh?
+three: fn [[print] [loop] [error "Not found"]]
+a: fn b: fn c: fn three
+
+let square [* .]
+square: fn [* .]
+# shocking!
+
+object Vector2 [x y]
+object Vector3 format [% z] Vector2
+debug Vector2  # outputs [x y]
+debug Vector3  # outputs [x y z]
+
+table vec [x y z] [1 2 3]
+print\n get "x" vec
+table [vec] [
+    x 1
+    y 2
+    z 3
+]
+# but what is
+print\n vec
+# pointer to the list? the list?
+
+# ...
+let [vec] [
+    x 1
+    y 2
+    z 3
+]
+# same thing right?
+# so table just convert a list into a table.
+
+# I should consider the scheme style loop. the other loop are not impossible, but [continue] or
+# [break] make things ugly. especially with loops implemented as recursion.
+
+let [vec] [1 2 3]
+object Vector3 [x y z]
+print\n Vector3.x vec  # outputs 1
+print\n Vector3        # outputs [1 2 3]
+
+object [vec] [x 1; y 2; z 3]
+print\n get x vec  # outputs 1
+print\n get/symbol "z" vec  # outputs 1
+let [i] 2
+print\n get/index i vec  # outputs 2
+
+let [vec] [1 2 3]
+object Vector3 [x y z]
+let [vec] to-obj Vector3 [1 2 3]
+# or
+object [vec] [x y z] 1 2 3
+# so
+object [vec] [x y z] do vec
+# that way, [to-obj] doesn't need to be.
+print\n get/fields vec  # outputs [x y z]
+print\n get/values vec  # outputs [1 2 3]
+print\n vec             # outputs [x 1 y 2 z 3]
+set/at vec x 4          # outputs [x 4 y 2 z 3]
+# I kind of like this refinements model.
+# it allows this representation, which is so clean! [x 4 y 2 z 3]
+# but with less weirdness? no, there's still some. I need to "refine" it.
+
+object [vec] [x y z] [1 2 3]
+# perhaps this is better? since
+object [vec] [x y z] vec
+# is shorter?
+# ...
+object [vec] [x y z] [1] [2] [3]
+# vs
+object [vec] [x y z] ["1" "2" "3"]
+# then again.
+
+# anyway, I'm keeping [get/fields] and [get/values].
+# also, I think I have a solution for the symbol/string dilemma.
+let [v] reduce/symbols [x 1; y 2; z 3]
+print\n v  # outputs [x 1 y 2 z 3]
+# or just don't use [;].
+set/at "x" vec 123
+print\n v  # outputs [x 123 y 2 z 3]
+set/at "x something" vec 123
+print\n v  # outputs [x 123 y 2 z 3 "x something" 123]
+# I think this is the best.
+# also,
+let [x y z] 1 2 3
+let [v] reduce/values [x x y y z z]
+print\n v  # outputs [x 1 y 2 z 3]
+let [v] reduce/pairs [x y z]
+print\n v  # outputs [x 1 y 2 z 3]
+# or [reduce/match]?
+
+# wait, [set/at] vs [set/field]...
+# [set/at] for indices.
+# [set/field] for... um, what was it again?.
+
+# omg.
+# [.] is like [[]], but for valid symbols.
+print\n .my-symbol   # outputs [my-symbol]
+print\n [my-symbol]  # outputs [my-symbol]
+obj [field1]
+obj .field1
+# but also
+obj[field1]
+obj.field1
+
+# like ['] in scheme, I guess.
+obj .field1/set 123
+obj .field1/get
+
+set/field .x v 123
+
+Vector3.x
+Vector3/x
+# I can't have [Vector3.x] with [Vector3[x]]
+# well, whatever. [set/field] is better than [set.field].
+
+# I need to be clear though.
+print\n get/type .something  # outputs .String
+
+let [v] [x 1 y 2 z 3]
+object Vector3 get/fields v
+let [v] get/values v
+
+# but what if it was just an enum?
+let [v] [1 2 3]
+object Vector3 [x y z]
+print\n Vector3          # outputs [x y z]
+print\n Vector3/x        # outputs 0
+print\n get Vector3/x v  # outputs 1
+
+use Vector3
+print\n get x v  # outputs 1
+print\n get 0 v  # outputs 1
+set/at x v 123
+let [v] map [.] v
+print\n v        # outputs [123 123 2 2 3 3]
+
+print\n x v  # outputs 123
+x: v 321
+print\n v    # outputs [321 123 2 2 3 3]
+# ^ still the best model.
+
+let .v [1 2 3]
+
+let func1 []
+let func2 .func1
+
+get/ptr
+get/val
+
+# ?
+set/ptr
+set/val
+
+# no.
+let [str] "hello\n"
+let ptr to [str]
+print\n ptr      # outputs (random pointer)
+print\n get/ptr  # outputs "hello\n"
+set/ptr ptr "Hello, World!\n"
+print\n ptr      # outputs (random pointer)
+print\n get/ptr  # outputs "Hello, World!\n"
+
+let [pointer-list] reduce [for 100 [u64 0]]
+# vs
+let [pointer-list] list for 100 [u64 0]
+
+let [v] f64 [1 2 3]
+use Vector3
+x: v     69  # 69 will not be another type than f64.
+x: v f64 69  # you don't have to do this.
+
+let [str] "Hello, World!\n"
+set [str] 123  # throws an error?
+# it really shouldn't.
+# I guess it's just for numbers?
+
+let func1 []
+let func2 .func1
+let func2 'func1
+let func2 [func1]
+
+get .x v
+get 'x v
+
+let func [
+    .done
+]
+let func [
+    'done
+]
+
+set/field "a string" obj 123
+print\n obj  # outputs ["a string" 123]
+set/field .a\ string obj 321
+print\n obj  # outputs ["a string" 321]
+
+let [value] 123
+print\n get [value]  # outputs 123
+# [get] is like [get/field], but with the environment, which is also a hashmap!
+
+let get [
+    get/field args 1, env
+]
+# or
+let get [
+    args [field]
+    if env [
+        get/field field, car env
+    ] [get/field field, cdr env]
+]
+# I don't know how to do it.
+# no, I know, but it's ugly.
+let get [
+    let inner [
+        args [field env]
+        if env [
+            let [value] get/field field, car env
+            if value [value] [inner field, cdr env]
+        ] [inner field, cdr env]
+    ]
+    inner
+]
+# or
+let get [
+    let inner [
+        args [field env]
+        if && env, exists/field field, car env [
+            get/field field, car env
+        ] [inner field, cdr env]
+    ]
+    inner
+]
+# or~
+let get [
+    loop [
+        args [field env]
+        if && env, exists/field field, car env [
+            get/field field, car env
+        ] [loop field, cdr env]
+    ]
+]
+# wait.
+let get [
+    loop [
+        args [field env]
+        if env [
+            if exists/field field, car env [
+                get/field field, car env
+            ] [
+                loop field, cdr env
+            ]
+        ] [error "Symbol not bound: '%'" field]
+    ] args 1, env
+]
+# this is probably the best implementation.
+let get [
+    args [field]
+
+    loop [
+        args [env]
+
+        if env [
+            if exists/field field, car env [
+                get/field field, car env
+            ] [
+                loop field, cdr env
+            ]
+        ] [error "Symbol not bound: '%'" field]
+    ] env
+]
+
+let [v] [.x 1 .y 2 .z 3]
+# vs
+let [v] [ x 1  y 2  z 3]
+
+car/2
+cdr/2
+
+set/ptr
+set/char
+
+let [x y z] 1 2 3
+let [my-list] [x y z]
+print\n my-list  # outputs [x y z]
+reduce/set .my-list
+print\n my-list  # outputs [1 2 3]
+
+let get-thing [
+    let add1 [+ 1]
+    [add1]
+]
+print\n do get-thing 5  # outputs 6
+
+let [x y z] 1 2 3
+let [my-list] [x y z]
+print\n my-list           # outputs [x y z]
+print\n get/at 0 my-list  # outputs 1
+print\n my-list           # outputs [x y z]
+# and [my-list] should continue returning 3 when using [get/at 0], no matter the environment.
+# and so, strings should have static scopes attached to them, or something.
+
+get/x
+set/x
+
+while < 1 0 []
+while [< 1 0] []
+# the second one makes more sense... and can easily be implemented.
+
+let loop [
+    let it args 1
+    it
+]
+
+loop [
+    print "THE END IS NEVER " it
+]
+# this works, but it breaks [rename]...
+let while [
+    args [cond body]
+    if do cond [
+        do body
+    ] []
+]
+# another reason of strings have a scope attached to them.
+# it can't be done otherwise.
+# still, I just realized the problem. If the scope is static, [loop] won't know what [it] is.
+# or I guess the scope is static when using [do], but becomes static when assigning as a function?
+
+map [my-function] [1 2 3]
+# ^ here, [my-function], the string is dynamic, the function inside the string is static?
+# this feels somewhat natural? maybe? but also a little arbitrary...
+
+let "print\n" fn [print "%\n" format]
+let .print\n fn [print "%\n" format]
+let print\n [print "%\n" format]
+
+let "value" 123
+let .value 123
+let value 123
+
+let "square" fn [* .]
+let 'square fn [* .]
+let .square fn [* .]
+let square [* .]
+
+let "str" "Hello, World!\n"
+let "str" fn ["Hello, World!\n"]
+
+# Like seriously, there's not reason not to have macros in the language.
+# except consistency. whatever. it's shorter, it's better.
+let print\n [print "%\n" format]
+let value 123
+let square [* .]
