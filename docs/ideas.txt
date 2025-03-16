@@ -8455,3 +8455,713 @@ let "str" fn ["Hello, World!\n"]
 let print\n [print "%\n" format]
 let value 123
 let square [* .]
+
+# I think I should use ['] instead of [.]. otherwise, [..] and [...] are not possible.
+# and they're too nice not to have.
+load '.my-file
+# is better than
+load ..my-file
+# which is confusing.
+# and ['] matches with ["], and is nice for characters.
+let 'my-char 'x
+print\n my-char
+
+let new-print 'print
+# like
+int (*new_print)(const char *fmt, ...) = printf;
+# in C.
+let new-print [print]
+
+let [table] ['x 1 'y 2 'z 3]
+set/at 'x table 321
+print\n table  # outputs ['x 321 'y 2 'z 3]
+# or
+let [table] [.x 1 .y 2 .z 3]
+set/at .x table 321
+print\n table  # outputs [.x 321 .y 2 .z 3]
+
+# ... but it's ugly.
+let [table] ["x" 1 "y" 2 "z" 3]
+set/at "x" table 321
+print\n table  # outputs ["x" 321 "y" 2 "z" 3]
+
+let [obj] [
+    name "John Smith"
+    age  23
+]
+let [obj] [
+    .name "John Smith"
+    .age  23
+]
+let [obj] [
+    'name "John Smith"
+    'age  23
+]
+let [obj] [
+    "name" "John Smith"
+    "age"  23
+]
+
+# okay, usual logic: take the shortest one.
+let [table] [x 1 y 2 z 3]  # shortest initializer.
+get/at .x table            # shortest getter
+set/at .x table 321        # shortest setter
+print\n table              # shortest output: [x 1 y 2 z 3]
+# I didn't think of that! no need to keep the actual fields in the map quoted, just while getting
+# and setting!
+
+# [type] could return different things depending on whether it is comptime or runtime.
+
+object Vector2 [.x .y]
+object Vector3 [do Vector2, .z]
+print\n Vector3  # outputs [.x .y .z]
+
+object [vec] [.x .y] 1 2
+# or
+object Vector2 [.x .y]
+zip-with Vector2 [1 2]
+# or whatever the function is called that matches two values.
+(define (interleave lst1 lst2)
+    (apply append (map list lst1 lst2)))
+(interleave '(1 2 3) '(4 5 6))  ; => '(1 4 2 5 3 6)
+
+atom [fib n] cond [
+    = n 0 0
+    = n 1 1
+    true + fib - n 1 fib - n 2
+]
+let fib [
+    args [n]
+    cond [
+        = n 0 0
+        = n 1 1
+        true + fib - n 1 fib - n 2
+    ]
+]
+let fib [
+    match args 1 [
+        0 0
+        1 1
+        _ + fib - n 1 fib - n 2
+    ]
+]
+
+# it should really be like this.
+object Vector2 [x y]
+
+get/at [0 0] # -> [caar]
+
+get/at [0 0] list
+# is equivalent to
+caar list
+
+# I should do [get/index] first (was it called that?).
+
+let File [import "File"]
+let [file] File open "file.txt"
+print\n file id
+# I already decided not to do this. the current object model is simpler.
+# still, zig style imports are just nice.
+object File [
+    id
+    ...
+]
+import "File"
+let [file] File.open "file.txt"
+print\n File.id file
+# but zig style is shorter?
+# then again, how do you initialize a struct?
+let [vec] [1 2 3]
+print\n vec  # outputs [1 2 3]
+# zig style could not do this. it's so insanely simple.
+for vec [print\n it]  # outputs "1\n2\n3\n"
+
+# what does this do?
+let [file] import "File" open "file.txt"
+print\n file  # outputs... [id 1 ... ...]
+# no, I just can't make it work.
+
+let obj [
+    field [field1] "Hello, World!\n"
+    field [field2] 123
+    field field3 [print\n get [obj]]
+]
+print   obj field1  # outputs "Hello, World!\n"
+print\n obj field2  # outputs 123
+obj field3  # outputs (the content of [obj])
+# anyway, [field] is a function that basically works like [tokens], but only consuming a token if
+# there is a match.
+# maybe I should call it [part]?
+
+let/field obj [x y z] 1 2 3
+print\n obj x  # outputs 1
+let/field obj func [print\n "hello"]
+obj func  # outputs "hello\n"
+
+let [vec] [1 2 3]
+
+object Vector3 [x y z]
+print\n Vector3/x vec  # outputs 1
+print\n           vec  # outputs [1 2 3]
+
+use Vector3
+print\n x vec  # outputs 1
+print\n   vec  # outputs [1 2 3]
+
+let [vec] [y vec, x vec, z vec]
+print\n x vec  # outputs 2
+print\n   vec  # outputs [2 1 3]
+# mutation like this? it's very functional right?
+# but how do I implement this?
+
+let/quote
+let/unquote
+# or
+let/var
+let/fn
+
+let [vec] [1 2 3]
+set [vec] [3 2 1 0]  # error: cannot reallocate stack space
+let [vec] [3 2 1 0]  # valid
+# so
+use Vector3
+set [vec] [z vec, y vec, x vec]
+print\n vec  # outputs [1 2 3 0]
+# [set] only mutates. this actually makes it so much more useful!
+
+set [vec] [z vec, y vec, x vec]
+# is equivalent to
+set/at 0, vec, z vec
+set/at 1, vec, x vec
+set/at 2, vec, z vec
+
+use/all [Vector3 Matrix]
+# or
+use/for [Vector3 Matrix]
+
+# passing vec to function is awkward if vec is used as [vec x], because you need to use [do].
+let my-func [
+    args [vec]
+    do vec x
+]
+print\n my-func [vec]  # outputs 1, or whatever x is
+
+# [let] and [set] don't allocate? only [get/at] or [get/char]?
+# [set] should be safe. no reason for it no to be so.
+
+let ptr ptr-to "Hello, World\n"
+print get ptr  # outputs "Hello, World!\n"
+
+# [set] throws if not typed?
+let [str] "hello"
+set [str] "bye"  # error: unknown type for [str]
+# or not?
+let [str] [1 2 3]
+set [str] [1 2 3 4]  # error: reallocation too large.
+# whether it's a string or a list, it still makes sense!
+
+set/char str "hey\0"
+
+# hehe, just thought of something stupid.
+let [arr] [1 2 3]
+set [arr] [1 20 3]  # error: reallocation is too large.
+let [arr] [1 02 3]
+set [arr] [1 20 3]  # valid.
+# I mean... right?
+let [arr] u64 [1 2 3]  # [00..001 00..002 00..003]
+set [arr] [1 20 3]  # valid.
+# ... but like, binding the alocation to the string size? am I sure of this?
+# this may come to bite me in the ass, but it's so interesting! doubt anyone has done this!
+# still, it does make some sense, I guess?
+
+let number 123
+set number 1234  # error: reallocation is too large
+let number u64 123
+let number 1234  # valid
+# should I? the whole point of this is that it's located on the stack.
+# you're mutating a stack location, so it's impossible to increase the size without using [let].
+set number 12345  # error: mutation is too large
+# ^ better?
+
+# still, that mean that...
+let [arr] "hello"
+set [arr] "hey"  # puts the null terminator automatically.
+print\n arr  # outputs "hey\n"
+# that said, I really need to move away from null terminators.
+# and so, I need a allocated size, and a used size.
+# or real size and used size.
+
+# wait, I need to move away from null terminators...
+let [str] "hello"
+set/char str "hey\0"
+print\n str  # ?
+# I suppose there is no wait to do this then. "\0" is there for compatibility.
+
+# maybe individual functions should allocate their own stack?
+# then again, nah. simpler to have one stack pointer for everything. just change it after a while.
+# need to add a field for the old stack pointer in each program...
+
+let test [
+    print\n this/name
+]
+test  # outputs [test]
+
+# I'm giving up on [.] for quoting, that said, I might consider [']. I will see.
+
+# I should probably giving this sort of thing.
+let [arr] [1 2 3]
+set/at 1 arr 4
+print\n arr  # outputs [1 4 3]
+# for
+let [arr] [1 2 3]
+set [arr] set/at 1 arr 4
+print\n arr  # outputs [1 4 3]
+# otherwise, every function need to essentially double.
+# but... the shortest way to write it is usually better?
+let [arr] [1 2 3]
+print\n set/at 1 arr 4  # outputs [1 4 3]
+# this is sorter? it is, so I can consider it. it won't be good to have too many functions.
+
+let number stack/push 64 1
+print\n number  # outputs 1
+set number 1000
+print\n number  # outputs 1000
+let number 1
+print\n number  # outputs 1
+set number 1000
+print\n number  # error: mutation is too large.
+
+# honestly, it's probably better to just not have unsigned numbers.
+# how is [+] or [-] supposed to tell if they are signed or unsigned?
+# if you want it to wrap around, or error, do it yourself.
+
+to/object [x 1 y 2 z 3]  # nevermind, no useful way of doing this.
+object Vector3 [x y z]
+to/table Vector3 [1 2 3]
+# or just
+object [Vector3] [x y z] [1 2 3]
+# ^ passing the values as an array instead of
+object [Vector3] [x y z] 1 2 3
+# is better for errors because it's possible that the value count and name count are not the same.
+# anyway, hashmaps should really not be used so casually... or rather, it's not really a hashmap,
+# is it? this is a hashmap:
+let [hashmap] reduce [for 99 [alloc 64]]
+# a preallocated array of nodes.
+
+# if I know what a function returns, I can put the returns in the stack as well...
+# but the language is not typed... if I can figure it out, it would be good.
+# I suppose I should make it so a function has to return the same size values, no matter the
+# control flow? ... but then, a function like [new] that returns arbitrary memory... it could
+# return a pointer, that's easy, but I don't know if I want that. I should create a seperate stack
+# for returns. then see how it goes, then maybe consider having only one stack. the end product
+# should be like that anyway. I really need a comptime and a runtime...
+
+# I should have a function that takes a heap value, copies it to the stack, returns it, then frees
+# the original. that's something I've been doing a lot in C. or is [defer] enough for this?
+
+# but I guess I do need a seperate stack anyway? how do I [pop] and [push] otherwise?
+# like, I also need a seperate place to put the for symbol/value pairs.
+
+# I guess [Token] has a size (used), and [Variable] too (real)?
+
+# aaargh! [get/token] should push a value in the stack, then [let] should bind the pointer to that
+# value to a symbol... but then, adding a stack for returns requires extra steps...
+
+# okay, since this will require making massive changes, I will have to save c-interp in archive
+# again.
+# well, admittedly, the behavior of the language won't change that much.
+# it's important though, to be able to return both a string and a pointer, because that's how pass
+# by value and pass by reference is done.
+
+let test [
+    let [value] "Hello, World!\n"
+    value
+]
+test  # the stack space should ideally only be allocated once for performance.
+# this needs to be determined when calling [test], not when defining, because after defining, the
+# function can still be mutated.
+
+let [value] "hello"
+let test [
+    args [value]
+    set [value] "hey"
+    print\n value
+]
+test value  # what happens?
+# it should be copied. but then, that changes things.
+let test [
+    let [value] "Hello, World!\n"
+    value
+]
+test  # this is copied, in a different stack?
+
+# no matter how i think about it, it's just impossible! you need to run a function to determine how
+# large its return is.
+# wait a second, what about returning to registers?
+
+# [set/char] should be [mut/char].
+# recursion can also return an arbitrary precision value... numbers in general.
+
+get/chars str  # returns ["h" "e" "l" "l" "o"]
+get/chars str  # returns ['h 'e 'l 'l 'o]
+get/chars str  # returns ['h' 'e' 'l' 'l' 'o']
+# honestly, [' '] looks better then [' ]... also, just realized: ['\ ] for space (ugly).
+# or [to/chars]?
+
+let [Vector3] [x y z]
+let [vec] [1 2 3]
+use Vector3
+x vec  # returns 1
+# no need for [Vector3/x]?
+# but then import is weird.
+
+# or when I define a package, should I just use prefixes for everything?
+let File/open [...]
+let open [File/open]
+open "file.txt"  # returns (file object)
+
+import "File"
+File/open "file.txt"  # returns (file object)
+let open [File/open]
+open "file.txt"  # returns (file object)
+let/fn [open close] [File/open] [File/close]
+
+# the reason a hashmap is important is because that's what the environment is.
+
+let memcpy [...] @unsafe
+# [memcpy] should show itself in red when called.
+
+let [File] import "File"
+let/get [open close] File
+
+let File [import "File"]
+let open  [File open]
+let close [File close]
+# this is the only way to return a struct, basically.
+
+# well... you can still do this?
+let [File] import "File"
+use File
+# nah, I still can't do it. the implementation is such a pain in the ass.
+
+# You know? I don't need anything complicated.
+import "File"
+open "file.txt"  # that's all I need. that's all.
+# that's how scheme does it, that's how C does it.
+# if worst comes to worst
+do [
+    import "File"
+    open "file.txt"  # that's all I need. that's all.
+]
+# I guess it would be nice if [import] did not polute any subsequent imports.
+
+# oh!
+let [table] [
+    function [...]
+    [str] "hello"
+]
+let/get [function str] table
+function  # error: not implemented yet.
+print\n str  # outputs "hello\n"
+# um... I think I figured out hashmaps?
+
+# though, it's better to use [this]... or not, just call the functions from the import environment.
+
+do/tokens [x y z]  # returns "x", "y", and "z"
+
+# hmm, [let] and [object are both valid?
+let    [Vector3] [x y z]
+use Vector3
+x vec
+# or
+object [Vector3] [x y z]
+Vector3/x vec
+use Vector3
+x vec
+# you know... I'll keep having headaches on how to implement this for the rest of my life, won't I?
+
+# *sigh*
+
+# Maybe I should still have options for this object type?
+let vec [field [x y z] 1 2 3]
+print\n vec x  # outputs 1
+let vec [field [x y z] vec z, vec y, vec z]
+print\n vec x  # outputs 3
+
+# three models for objects:
+
+    # from least to most verbose initialization.
+    let [vec] [1 2 3]              # array type
+    let [vec] [x 1 y 2 z 3]        # table type
+    let vec [field [x y z] 1 2 3]  # function type
+
+    # from least to most verbose getter.
+    print\n vec x          # function type
+    print\n get 'x' vec    # table type
+    print\n Vector3/x vec  # array type
+
+    # from least to most verbose setter.
+    set/key 'x' vec 4                        # table type
+    use Vector3 set [vec] [4, y vec, z vec]  # array type
+    set vec [field [x y z] 4, vec y, vec z]  # function type
+
+# it seems there is no way to tell that something is a function in an array. you have to use [do].
+set/key 'x'  vec  4  # as function
+set/key 'x' [vec] 4  # as variable
+
+# the thing is, the reason I'm so reticent about the table type, is because I don't like
+# [Vector3/x]. not the naming scheme or whatever, but the idea that a function does a bunch of
+# side-effects, and names a bunch of things this and that, polluting the environment...
+
+# AAAAAAAAAAAAAAAAAAAAAAAAAARRRRGHH!!!!!11!1!1!!!
+
+# I guess if there's a way to switch between the three types, that would help?
+# If I use [load] as a script, it returning a environment would complicate things?
+
+get/meta [value]  # returns (metadata object)
+# but what type is the object!?!
+
+let map [
+    args [func list], set/unquote [func]
+    func 5  # returns 7
+    ...
+]
+map [+ 2] [1 2 3]
+
+let Module [
+    field [var1 var2 var3] 1 2 3
+
+    field func1 [...]
+    field func2 [...]
+    field func3 [...]
+    field func4 [...]
+]
+
+# (another file)
+import "Module"
+Module func3
+let func3 [Module func3]
+delete [Module]  # and it's gone!
+func3  # but this should still work?
+
+# one thing is certain, I should make the three object systems work before anything.
+# well, also change the way the stack works as well.
+
+# how the fuck do I make it so a variable is still available after it was deleted??
+# to make it so, it needs to be pointerified (?) and stuff... though, I guess it's fine if that is
+# done explicitly by the programmer?
+let func3 append/for ["call ", ptr-to Module, " func3"]
+delete [Module]  # and it's gone!
+func3  # but this still works
+# NOT! because when deleting something, that thing is also deallocated.
+
+# the whole memory managing thingimagig is so annoying!
+# I'm going crazy! I fucking am!!
+
+struct Module [
+    [var1 var2 var3] 1 2 3
+
+    func1 [...]
+    func2 [...]
+    func3 [...]
+    func4 [...]
+]
+Module func2
+# basically taking a hashmap as input.
+# but then how is it implemented? it needs to be a function, so we're back to square one?
+
+# object: function object
+# struct: array object
+# table : hashmap
+
+# object allows for cleaner nesting?
+
+enum [x y z]
+get/at x [1 2 3]  # returns 1
+
+let [Vector3] [x y z]
+enum Vector3
+get/at x [1 2 3]  # returns 1
+use Vector3
+x [1 2 3]  # returns 1
+
+struct Vector3 [x y z]
+Vector3/x [1 2 3]  # returns 1
+
+# oh. my. god! the more I think about it, the more frustrated I become! I cannot fucking decide!
+# I need to do something else... get my mind off of this.
+
+let test [
+    let [x y z] 1 2 3
+    [x y z]
+]
+let [vec] test
+x vec  # should return 1? or error?
+
+let test [
+    let [x y z] 1 2 3
+    reduce [x y z]
+]
+let [vec] test
+x vec  # better?
+# well, I suppose the implementation is certainly easier.
+
+# but that also means that...
+let test [
+    let [x y z] 1 2 3
+    reduce [field [x y z] x y z]
+]
+let vec test
+vec x  # is impossible
+# I should probably give up on the function object, it's not very practical.
+# the internal are ugly too. it's lacking in performance.
+
+# then again...
+let test [
+    let [x y z] 1 2 3
+    reduce ['x' x 'y' y 'z' z]
+    # or
+    reduce/table [x x y y z z]
+]
+struct vec test
+vec x  # is possible
+
+# is anyone reading this? this is the notebook of someone going insane.
+
+# anyway, do I even want the function object? unlike the hashmap, which is useful for environments,
+# it has no real purpose.
+# if anything it's a little dangerous.
+let obj [
+    field [x y z] 1 2 3
+]
+obj w  # error?
+let test [
+    args [obj]
+    do obj x
+]
+test [field [x y z] 1 2 3]  # return 1
+# I guess the advantage over structs, is that it can actually store functions as well?
+
+# I really need a reference counter, or compile time memory management, that checks whether
+# something should be freed from usage.
+# [new] and [static] are ugly. I don't want them.
+
+# wait a second? then things shouldn't be added to the stack... an environment should be open until
+# all references to it are removed... if I put things in the stack, it becomes impossible to do.
+
+let Object [
+    args [value]
+    [
+        field [
+            func1 [print\n value]
+            func2 [set value]
+        ]
+    ]
+]
+let obj Object 123
+obj func1  # outputs 123
+obj func2 321
+obj func1  # outputs 321
+# this should work, it other words. the memory manager should be able to tell that [obj] is a
+# string returned from [Object], and that having been returned from there, the environment from
+# [Object] should persist. this is impossible with the current model, but even less with the stack
+# model I was about to implement.
+
+let Object [
+    args [value]
+    [value] [set value]
+]
+let [getter setter] Object 123
+do getter  # outputs 123
+do setter 321
+do getter  # outputs 321
+# but you know, doing this... means putting everything in the heap, like it python and stuff.
+# that's not very good for performance.
+
+let test [
+    [] "error message"
+]
+let [value] unwrap test
+
+let unwrap [
+    args [result error]
+    if error [throw error] [result]
+]
+
+let make/obj [
+    let [a b c] 1 2 3
+    env
+]
+let [obj] make/obj
+get 'a' obj  # returns 1
+
+do/env value  # returns (environment)
+
+let Module [
+    let [var1 var2 var3] 1 2 3
+
+    let func1 [...]
+    let func2 [...]
+    let func3 [...]
+    let func4 [...]
+
+    call get tokens 1 env
+    # or
+    get/call tokens 1 env
+    # nvm, same length
+]
+Module func1
+# [call] does not unquote if the input is a quote.
+
+let Module [
+    let [var1 var2 var3] 1 2 3
+
+    let func1 [...]
+    let func2 [...]
+    let func3 [...]
+    let func4 [...]
+
+    match/field env
+]
+Module func1
+
+let Module [
+    field [
+        [var1 var2 var3] 1 2 3
+
+        func1 [...]
+        func2 [...]
+        func3 [...]
+        func4 [...]
+    ]
+]
+# ^ the best one.
+
+# oh!
+field [
+    [var1 var2 var3] 1 2 3
+
+    func1 [...]
+    func2 [...]
+    func3 [...]
+    func4 [...]
+]
+let file [import "File"]
+
+# setting public/private things in the module is just dumb.
+# the user of the module should have control of what they import.
+let/get [open close] import "File"
+# this is probably the ideal. it isn't short, but it is clean.
+# having all the global the import is not something I care to have.
+
+# btw, importing "File" again, would instead increment the reference count instead of running the
+# thing again. it will still return the environment, of course.
+
+# I should probably use gmp for arbitrary precision arithmetic.
+
++ [1 2] [3 4]  # returns [4 6]
+# so like vector addition?
+
+# okay, doing reference counter like swift, with maybe weak references and manual breaking of
+# cycles, and whatever else. I'll change it back when the language is more advanced.
+# well actually, the implicit borrow-checker is probably the best option.
