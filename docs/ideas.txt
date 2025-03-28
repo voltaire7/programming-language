@@ -9165,3 +9165,376 @@ let/get [open close] import "File"
 # okay, doing reference counter like swift, with maybe weak references and manual breaking of
 # cycles, and whatever else. I'll change it back when the language is more advanced.
 # well actually, the implicit borrow-checker is probably the best option.
+
+# this should be a linked list, as in they are references to references...
+let [list] [1 [2 [3]]]
+# ... or should I really just use pointers?
+# it has to be a pointer, otherwise we can do recursive linked lists.
+# unless...
+let [list] [1 [2 [3 [list]]]]
+# and be it's quoted, it's fine to reduce for every [get/at] call?
+
+# Numbers have a "maximum" field which is by degault 0.
+# or is it char size? since that would work with strings too.
+
+format/code [
+    print "hello\n"
+    print "bye\n"
+]  # return [print "hello\n" print "bye\n"]
+# nevermind, if there's nesting, it become pretty weird.
+let [fib] [
+    args [n]
+    if <= n 1 [n] [
+        + fib - n 1 fib - n 2
+    ]
+]
+debug fib  # outputs [args [n] if <= n 1 [n] [
+        + fib - n 1 fib - n 2
+]]
+# instead of just
+debug fib
+# outputting
+[
+    args [n]
+    if <= n 1 [n] [
+        + fib - n 1 fib - n 2
+    ]
+]
+
+# kind of clever? reason you can't assign numbers as keys is because [get/at] and [set/at]?
+
+# I should make it so the prefix [-] or [:] can but should never be used for symbol names.
+# or maybe, make it so [args] looks out for it?
+let cc [
+    args [filename]
+    let [output-file] "a.out"
+    opts [
+        -o [set [output-file] args 1]
+        --output [set [output-file] args 1]
+    ]
+    compile filename output-file
+]
+cc "main.txt" -o "main"
+# the only thing is, the options cannot be placed randomly...
+# wait a motherfucking second... these are named parameters, basically!
+cc "main.txt" :o "main"
+cc "main.txt" --output "main"
+cc "main.txt" -output "main"
+cc "main.txt" .output "main"
+# I just realized... but isn't this just [field] all over again?
+# ok, I looked it up: python make named arguments go last when there are positionnal arguments as well.
+
+# maybe [..] should be the spread operator? like with do?
+let [a b c] .. [1 2 3]
+let [a b c] do [1 2 3]
+let [list] [1 2 3]
+let [a b c] .. list
+let [a b c] do list
+
+# I think I just found a bug? [format] unquotes its input... that's great and all for [print], but
+# what if you want to reassign the formatted text?
+
+# this is the reason why it should be placed at the end.
+cc "main.txt" -o "main" -o "app-name"
+
+let test-func [
+    static [value] 123
+    print "% " value
+    set [value] + 1 value
+]
+for 10 [test-func]  # outputs [123 124 125 126 127 128 129 130 131 132]
+# I guess [static] is a useful way to do objects?
+
+# convert this code in this language.
+    (define (make-bank-account balance)
+        (lambda (message . amount)
+            (cond ((eq? message 'deposit)
+                      (set! balance (+ balance (car amount)))
+                      balance)
+                  ((eq? message 'withdraw)
+                      (if (>= balance (car amount))
+                          (begin (set! balance (- balance (car amount)))
+                                 balance)
+                          "Insufficient funds"))
+                  ((eq? message 'balance) balance)
+                  (else "Unknown message"))))
+
+    ;; Create an account with an initial balance of 100
+    (define my-account (make-bank-account 100))
+
+    ;; Example usage
+    (display (my-account 'deposit  50))  (newline)  ; => 150
+    (display (my-account 'withdraw 30))  (newline)  ; => 120
+    (display (my-account 'withdraw 200)) (newline)  ; => "Insufficient funds"
+    (display (my-account 'balance))      (newline)  ; => 120
+
+# converted:
+    let make-bank-account [
+        args [balance]
+        [
+            args [message]
+            cond [
+                = message "deposit" [
+                      set balance + balance args 1
+                      balance
+                ]
+                = message "withdraw" [
+                    if >= balance args 1 [
+                        set balance - balance args 1
+                        balance
+                    ][
+                        "Insufficient funds"
+                    ]
+                ]
+                = message "balance" [balance]
+                _ ["Unknown message"]
+            ]
+        ]
+    ]
+
+    # Create an account with an initial balance of 100
+    let my-account make-bank-account 100
+
+    # Example usage
+    print\n my-account "deposit"  50  # => 150
+    print\n my-account "withdraw" 30  # => 120
+    print\n my-account "withdraw" 200 # => "Insufficient funds"
+    print\n my-account "balance"      # => 120
+
+# or...
+    let [make-bank-account] [
+        static [balance] 0
+        match args 1 [
+            "deposit" [
+                set balance + balance args 1
+                balance
+            ]
+            "withdraw" [
+                if >= balance args 1 [
+                    set balance - balance args 1
+                    balance
+                ] ["Insufficient funds"]
+            ]
+            "balance" [balance]
+            _ ["Unknown message"]
+        ]
+    ]
+
+    # Create an account with an initial balance of 0
+    let my-account make-bank-account
+
+    # Example usage
+    print\n my-account "deposit"  50  # => 50
+    print\n my-account "withdraw" 30  # => 20
+    print\n my-account "withdraw" 200 # => "Insufficient funds"
+    print\n my-account "balance"      # => 20
+
+# damn, this is actually so terse!
+# though, I suppose it's no longer terse if you want to specify the initial amount...
+
+for [let i 0][< i 10][set i + 1 i] [
+    print\n i
+]
+let i 0
+while [< i 10] [
+    print\n i
+    set i + 1 i
+]
+# I mean, it's not like I can't do it?
+# in fact, I will probably do [while], but [for], or at least this one, is too ugly.
+
+# I guess I could also do this?
+for [let i 0; < i 10; set i + 1 i] [
+    print "%\n" i
+]
+# you run the first 2 items of the list, then the body, then the last item...
+# since you run the first too items once, you can determine the size of the function call.
+# and once you determine that, you can very simply seperate them.
+# it's impossible without calling though.
+for (int i = 0; i < 10; i = 1 + i) {
+    printf("%i\n", i);
+}
+# huh, somehow it's the exact same length... well, no. I could do [+=] or [++].
+for [let i 0; < i 10; ++ i] [
+    print "%\n" i
+]
+for (int i = 0; i < 10; ++i) {
+    printf("%i\n", i);
+}
+# damn! suprising even!
+
+# when I'll do the reference counter, and maybe eventually a automatic borrow-checker, I'll need to
+# make a way to check if the things do actually get freed.
+
+# in python, range can take a step, but it's better to do it this way.
+range 1 10        # [1 2 3 4 ...]
+range [1 10 100]  # ... I guess this would be [1 10 100 1000]
+# wait no, that's a lazy list...
+# but I guess I could do it, if I figure out how.
+let [list] [next [* 10] 0]
+for take 10 list [print "% "]  # outputs [0 10 20 30 ...]
+
+# anyway.
+let [list] take 10 range [1 2 3]
+for list [print "% "]  # outputs [1 2 3 4 5 6 7 8 9 10 ]
+# so [range] can return a normal list, or a lazy list...
+
+use Vector3
+use [Vector3]
+use [Vector3 Error]
+# I think passing in a list by default is just better.
+# I condidered making [use] a macro, but you can't do this otherwise.
+let [Vector3 vec] [x y z] [1 2 3]
+let test [
+    args [Obj list]
+    use Obj
+    # or equivalent
+    use [Obj]
+    for quote Obj [print "% " .. it list]  # outputs [1 2 3 ]
+]
+test Vector3 vec
+# actually... I can use it as a macro?
+
+use Error, use Vector3
+use [Code Message], use [x y z]
+
+use [Error Vector3]
+use [[Code Message] [x y z]]
+
+# I feel like [use] will be... used often enough for it to deserve a default list input.
+
+let [Vector3 vec] [x y z] [1 2 3]
+use [Vector3]
+print\n x vec  # outputs 1
+x! vec 4
+debug vec      # outputs [4 2 3]
+# I honestly don't want the [!] postfix, but it's too long otherwise.
+let [vec] [x vec, 5, z vec]
+# vs
+y! vec 5
+let x  [get/at 0]
+let x: [set/at 0]
+
+# hmm, I know what happens when you do this.
+let [vec] [x 1, y 2, z 3]
+set/at "x"  vec  4
+debug vec  # outputs [x 4, y 2, z 3]
+set/at "x" [vec] 4
+debug vec  # outputs ["x" 4, y 2, z 3]
+# but what happens when you do this?
+let [vec] [1 2 3]
+set/at 0  vec  4
+debug vec  # outputs [1 2 3] ?
+set/at 0 [vec] 4
+debug vec  # outputs [1 2 3] ?
+# heck!
+set/at "0"  vec  4
+set/at "0" [vec] 4
+# so like, my earlier conclusion that numbers cannot be bound to as symbols because of [set/at] is
+# wrong... or not?
+let ["a" b c] 1 2 3  # this is not valid, and will throw and error.
+# the symbol that is passed to the assignment has to be a symbol or a number, but the number will
+# also be rejected be it will basically destroy the list.
+# then again, I will probably use a hashmap... but maybe I can still interface with it using
+# something like [get/at] and [set/at]?
+# or not? I mean, [debug env] will probably show something a little fucked up, like a list of pointers or something.
+
+# [!] postfix should be used for "can error" like [u64!].
+
+debug stack  # outputs (stack list)
+# [stack] is a variable.
+
+let x 123
+let func [print\n x]
+let x 321
+func  # outputs 321
+# I don't see a use case where this doesn't output 321.
+let func1 [func2]
+let func2 [print\n 123]
+func1  # outputs 321
+# it makes sense. and it's less complicated to implement.
+
+# okay, let's consider [.] as a special syntax character.
+let [File] import "File"
+File.open "file.txt"
+# ARGH!! but how does it consider it a special char? how do you initialize it...
+# fuck it, never mind.
+# it's simply amazing how much I struggle at this.
+
+# this model is better than [.] syntax, since I don't have to change the interpreter at all.
+let File [import "File"]
+File open "file.txt"
+# it also just looks better.
+# that said...
+let [File] import "File"
+.. get/at [open] File "file.txt"
+# is longer, but...
+let/get [open] import "File"
+open "file.txt"
+# is the exact same length as the [File open] model. huh.
+let/get [open close] import "File"
+let [file] open "file.txt"
+close file
+# vs
+let File [import "File"]
+let [file] File open "file.txt"
+File close file
+# the former is in fact shorter.
+# that said...
+let/get [open close] [import "File"]
+let [file] open "file.txt"
+close file
+# where [let/get] expands to
+let/unquoted [open close] [import "File" open] [import "File" close]
+# but never mind. it's really ugly.
+
+let load [
+    let [env] get-env read-file/memo args 1
+    do/get args 1, env
+]
+let App [load "app.txt"]
+# this is actually... so elegant!
+# though I might need to change all the [/] for [-]...
+# vs
+let load [
+    get-env read-file/memo args 1
+]
+let [App] load "app.txt"
+
+let App [load "app.txt"]
+# vs
+let [App] load "app.txt"
+
+let run [App run]
+# vs
+let/get [run] App
+
+let run [App run]
+let shut-down [App shut-down]
+# or
+let/get [run shut-down] [App]
+# vs
+let/get [run shut-down] App
+
+let run [load "app.txt" run]
+# vs
+let/get [run] load "app.txt"
+
+let read-file/memo [
+    static [files] []
+    args [filename]
+    if contains filename files
+        [get/at filename files]
+        [set/at filename, [files], . read-file filename]
+]
+# and then maybe a function that automatically memoizes this?
+memoizes [read-file filename]  # is all you need to do!
+
+private [
+    let func1 [...]
+    let func2 [...]
+    let func3 [...]
+    let func4 [...]
+]
+# ^ I might want to do this just to shut up the OOP people.
+# ... but how is it implemented? do I create a new hashmap?
