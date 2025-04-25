@@ -9530,6 +9530,9 @@ let read-file/memo [
 # and then maybe a function that automatically memoizes this?
 memoizes [read-file filename]  # is all you need to do!
 
+# I think [read-file/memo] is a good example of how to use [-] and [/] when naming things.
+# [/] is for refinements that use the original, or composition?
+
 private [
     let func1 [...]
     let func2 [...]
@@ -9538,3 +9541,52 @@ private [
 ]
 # ^ I might want to do this just to shut up the OOP people.
 # ... but how is it implemented? do I create a new hashmap?
+# maybe the implementation is related to how [static] is implemented?
+
+# scheme but with currying?
+(let (func-call arg1 curried-arg2)
+    (print\n arg1)
+    (print\n curried-arg2))
+((func-call arg1) curried-arg2)
+# ...
+(let func-call
+    (args [arg1 curried-arg2])
+    (print\n arg1)
+    (print\n curried-arg2))
+# nah, parentheses are not where it's at. it's intersting to think about scheme with more
+# functional properties, but my language just works without really needing to think about these
+# things.
+
+# I just realized, but this is extremely unsafe!
+let test [
+    + args 2
+]
+test [1 2 3] 4
+# if [+] takes variable arguments depending on type, it can break things.
+
+let/typed [a int, b int, c int] 1 2 3
+args/typed [x int, y int, z int]
+
+let/type [x number] 123
+let/type [x string] 123
+let/type [x symbol] 123
+
+# maybe type checking is just some functions run before [compile]?
+# I mean, as opposed to the earlier model when every function is 'compiled' per se.
+# though I suppose it should still be compiled... and honestly, it's better if every function is
+# forced to handle all the type cases. that will help keep the list of names shorter and stuff.
+
+# maybe standard recursive functions add a new stack frame by default, but [loop] is always in the
+# same stack frame?
+
+# load and image.
+let [img] read-bytes "img.png"
+debug img  # outputs [0x43 0x55 0xAB ...]
+# an array of bytes.
+
+# basically typing.
+let variable value    # function type
+let [variable] value  # variable type
+# of course, "variable" is just a function that returns a string.
+
+# I'm probably repeating myself because of how long it took for me to get back here...
