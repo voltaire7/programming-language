@@ -9590,3 +9590,257 @@ let [variable] value  # variable type
 # of course, "variable" is just a function that returns a string.
 
 # I'm probably repeating myself because of how long it took for me to get back here...
+
+typst watch "file.typ"
+# where [typst] is an object?
+
+let func [
+    args [a b c]
+    print "% % %" a b c
+]
+func 1 2 3 4
+# ^ the linter should throw a warning here, to tell you the argument count is invalid.
+# and the linter should be a file, used to enumerate the rules for linting.
+# maybe the linter can also tell invalid type changes? basically adding type checking without
+# changing the language itself?
+let [num] 123
+set [num] "hello"
+# first off, invalid size error. but if it wasn't there, invalid type conversion.
+
+# lol: format is typing
+
+print quote Hello,\ World!\n  # outputs "Hello, World!\n"
+
+auto value 123  # i32
+int  value 123  # i32
+
+# maybe I should really do this? I mean, I've been struggling so much because of how there's no
+# function overloading... and I can't copy Jai here.
+
+auto square [* .]
+func square [* .]
+
+# but there should still be a value like dynamic. not to be confused with auto.
+# [dyn] accepts all values, but not all values accept [dyn].
+
+# and of course it can be used to optimize the compiler.
+
+# now, for objects. the thing that brought this up. the pain in the ass.
+# nevermind, not in the mood to think. I'll have to reread everything too.
+
+# or not! paused for a few hours...
+Car car [something something...]
+# ^ no need for this.
+Person person1 ["John Smith" 23]
+print name person1
+print age  person1
+# no... this doesn't fix the problem of mutable values.
+# and the earlier model was better.
+let [vec] [1 2 3]
+use Vector3
+print x vec
+
+# in other words...
+set person1.name "Jane Doe"
+# I need a function like this.
+# wait a second... it's typed, and therefore overloaded, and THEREFORE!
+set person1 name "Jane Doe"
+# and for multiple...
+set person1 [
+    name "Jane Doe"
+    age 24
+]
+# wait, no.
+person1 name
+name person1
+# which is it?
+
+# you know? it's been a real pain in the ass with [name person1].
+# either I don't do it, and we have classic imperative mutation; or we have Haskell objects, with
+# basic variable mutation.
+
+# this language is about elegance and minimalism. if I didn't want that, I'd use Jai or something.
+# my goal is to create the LISP that never was, so I will.
+# there are only functions and literals. variable are functions. there can be reassigned.
+# that is the restriction I will work with. and of course, no types; so no overloading.
+
+let [vec] [1 2 3]
+let func [
+    use Vector
+    set [vec] [x vec, * . y vec, z vec]
+]
+# ... that's just such a pain in the ass.
+let [vec] [1 2 3]
+let func [
+    use Vector
+    set [vec] [x vec, * . y vec, z vec]  # THIS is the problem! too long!!
+]
+
+# I need a coding project that I can convert into this language.
+
+# haskell records:
+data Vector3 = Vector3 { x :: Double, y :: Double, z :: Double }
+
+vec :: Vector3
+vec = Vector3 { x = 1.0, y = 2.0, z = 3.0 }
+
+x vec   -- 1.0
+y vec   -- 2.0
+z vec   -- 3.0
+
+x :: Vector3 -> Double
+
+vec2 = vec { y = 10 }  -- new vector: Vector3 { x = 1.0, y = 10.0, z = 3.0 }
+
+# I think this might be something...
+let [Vector3] [x y z]
+
+let [vec] [x 1.0, y 2.0, z 3.0]
+
+use Vector3
+x vec   # 1.0
+y vec   # 2.0
+z vec   # 3.0
+
+let vec2 mut y 10 vec  # [x 1.0, y 10.0, z 3.0]
+# yeah, this looks like "something", but it's not polished.
+
+# the lesson that can be learned: maybe objects shouldn't be arrays. or rather, it is trivially
+# easy to convert from array to object and vice-versa; so no need for an object that looks like an
+# array.
+
+# three types of "objects": arrays, interfaces and hashmaps.
+let [array]     [1 2 3]
+let [interface] [x y z]
+let [hashmap]   [x 1, y 2, z 3]
+# now I just need way to convert between those three.
+
+vec2 = vec { y = 10 }  -- new vector: Vector3 { x = 1.0, y = 10.0, z = 3.0 }
+let vec2 mut vec [y 10]  # [x 1.0, y 10.0, z 3.0]
+# so like
+let vec2 mut vec [y 10, z 100]  # [x 1.0, y 10.0, z 100.0]
+
+# or maybe...
+let vec [Object x 1, y 2, z 3]
+vec x  # 1
+mut [vec] [y 10, z 100]
+# though, honestly, function objects are just not it. they're such a pain to pass through a
+# function parameters. objects should be lists, end of story.
+# that or...
+let func [
+    args [val [obj]]
+    print\n val
+    print\n obj x
+]
+func 123 [vec]
+
+# maybe it's just a better model?
+let func [
+    args [val obj]
+    print\n val
+    use Vector3
+    print\n x obj
+]
+func 123 [x 1, y 2, z 3]
+func 123 [y 2, z 3]  # error: field x not found
+# right? the problem with the language is that there are too many ways for an error to go unnoticed
+# and now that I think about it, this is closer to how javascript do annonymous objects.
+let obj = {
+    name: "John Smith"
+    age: 23
+}
+let [obj] [
+    [name] "John Smith"
+    age 23
+]
+let func-with-optional-args [
+    args [input opt]
+    match opt [
+        trim 
+    ]
+]
+func-with-optional-args "John Smith" [trim 5]
+# ... well, something like that.
+
+# wait a second.
+let [vec] [x 1, y 2, z 3]
+use vec
+x vec
+# the object is its own template?
+# maybe I should just get rid of templates?
+# at most, templates should be there to convert lists into tables, nothing more.
+let [vec] [x 1, y 2, z 3]
+get "x y" vec
+use vec x vec y vec
+# hmm...
+take 2 to/list vec  # 1 2
+# I really don't know anymore...
+let/get [x y] vec
+debug [% %] x y  # outputs [1 2]
+
+# btw, I very much realize this is old news. shut up.
+
+export [func1 func2]  # at the end of library files?
+# returns table?
+# nah, I prefer being able to import everything... then again, it's clever encapsulation.
+
+use import "File"
+# so...
+use [x 1, y 2, z 3]
+print\n reduce [x y z]  # outputs [1 2 3]
+# wait, that's actually kinda good!
+let [vec] [x 1, y 2, z 3]
++ get [x y] vec  # 3
+use vec
++ x y  # 3
+# WAIT! Isn't that Jai's [using]? literally?!
+
+# you know what would be nice?
+let [vec] [x 1, y 2, z 3]
+use vec
+print\n x
+set x 10
+debug vec  # [x 10, y 2, z 3]
+# right? but how though...
+debug get/val x  # [get "x" vec]
+
+esu vec  # the opposite of [use]?
+
+# nevermind. I'll just use
+set [vec] mut vec [x x]
+# ... which is very long. ugh.
+set/mut vec [x x]
+
+# Jai example
+#import "Basic";
+
+Point3D :: struct {
+  x, y, z: float;
+}
+
+main :: () {
+    pnt := Point3D.{1,2,3};
+    using pnt;
+    print("The coordinates of pnt are % % %\n", x, y, z);
+}
+
+# in my language
+let/get [print] import "Basic"
+
+let main [
+    let [pnt] [x 1, y 2, z 3]
+    use pnt
+    print "The coordinates of pnt are % % %\n" x y z
+]
+
+# of course, this is easier.
+print "The coordinates of pnt are % % %\n" .. pnt
+
+# nested structs are a bit of a pain in the ass.
+let [obj] [x [y 2, z 3]]
+get "x" obj  # returns [y 2, z 3]
+get "y" get "x" obj  # returns 2
+# if I do this...
+get "x y" obj  # returns 2
+# then I can't do this:
+get [read write] env
