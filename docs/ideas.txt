@@ -9844,3 +9844,53 @@ get "y" get "x" obj  # returns 2
 get "x y" obj  # returns 2
 # then I can't do this:
 get [read write] env
+
+# oh, man! I. Just. Keep. On. Finding. NEW! PROBLEMS!!
+
+# hmm, maybe...
+let [obj] [x [y 2, z 3]]
+obj.x.y
+# a special operator?
+set obj.x.y 123
+set obj.x [y 3]  # doesn't delete z?
+let obj.x [y 3]  # this does?
+# also, it's not an operator. eval just looks out for it like with [].
+# and maybe I'll have to change the internal representations.
+# if it's pointer? [.] should also deref?
+
+# huh.
+let [File] import "File"
+File.open "file.txt"  # I can do this?
+# honestly, I decided this on a whim, but damn, it's nice.
+
+# well, the reason I didn't come up with this idea earlier, is because I insisted on objects with
+# no metadata, and templates. it became simpler when I limited complex types to two.
+# we'll see if this holds up.
+
+import "File"
+File.open "file.txt"
+let open [File.open]
+open "file.txt"
+# or
+let/get [open close] File
+# "the limit is your imagination."
+
+# anyway, this should be avoided.
+use import "File"
+# 1. it's ugly (never liked it), 2. it's bad practice.
+import "Math m"
+m.sin 1
+
+unquote [x 1, y 2, z 3]
+# what if... that's equivalent to [use]? (although only at the top level)
+# so like
+import "File"             # env gets used
+let [File] import "File"  # env bound to File
+# I mean... I can do it the Jai way, but should I?
+# then again, he probably did it for a reason.
+
+let/get [open close print] import [File Basic]
+
+let [arr] [1 2 3]
+arr.1  # return 2
+# wait, that's a little confusing!
