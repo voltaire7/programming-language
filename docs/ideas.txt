@@ -9892,5 +9892,222 @@ let [File] import "File"  # env bound to File
 let/get [open close print] import [File Basic]
 
 let [arr] [1 2 3]
-arr.1  # return 2
+arr.1  # returns 2
 # wait, that's a little confusing!
+
+let [person] [
+    [name] "John Smith"
+    greet [print "Hello, %\n" this.name]
+]
+print\n name  # outputs "John Smith\n"
+person.greet  # outputs "Hello, John Smith\n"
+
+set person.bid-farewell [
+    print "Goodbye, %\n" this.name
+]
+person.bid-farewell  # outputs "Goodbye, John Smith\n"
+
+# the equivalent in javascript.
+let person = {
+    name: "John Smith",
+    greet() {
+        console.log(`Hello, ${this.name}!`)
+    }
+}
+
+console.log(person)
+person.greet()
+
+person.bid_farewell = function() {
+    console.log(`Goodbye, ${this.name}!`)
+}
+person.bid_farewell()
+
+# of course, you can't do rust style function chaining.
+let nums = vec![1, 2, 3, 4, 5];
+let result: Vec<_> = nums.iter()
+    .map(|x| x * 2)
+    .filter(|x| x % 3 == 0)
+    .collect();
+# but that's fine. we're doing it haskell style (or scheme)
+nums :: [Int]
+nums = [1, 2, 3, 4, 5]
+
+result :: [Int]
+result = filter (\x -> x `mod` 3 == 0) (map (*2) nums)
+# so...
+let [nums] [1 2 3 4 5]
+let [result] filter [= 0 % args 1 3] map [* 2] nums
+# my language can get unreadable, but whatever.
+# that's why I added optional parentheses.
+
+# anyway, I think I figured out objects, for the most part.
+# unlike the earlier models, this one is far cleaner, although I have to change the evaluator...
+# best of all, it works like javascript prototypes!
+# I know it's a controversial opinion, but I love them!
+
+# I'm starting to think the Jai way is better.
+import "Basic"
+print "Hello, World!\n"
+# vs
+import "Basic"
+Basic.print "Hello, World!\n"
+# vs
+let/get [print] import "Basic"
+print "Hello, World!\n"
+# vs
+use import "Basic"
+print "Hello, World!\n"
+
+# the problem is this
+.. [
+    import "Basic"
+    print "Hello, World!\n"
+]
+
+# you know what? for now, the Jai way. I'll try to implement it, and see what happens.
+# maybe I should rename [unquote] to [use]? no need to have 2 functions that do the same thing.
+
+print\n name   # outputs "John Smith\n"
+person .greet  # still outputs "Hello, John Smith\n" ?
+
+person person person person
+.greet .greet .greet .greet
+# outputs "Hello, John Smith\n" x 4?
+
+# but how does
+set person .bid-farewell [print "Goodbye, %\n" this.name]
+# work?
+# maybe [set] parses all the arguments first?
+
+# I mean, you can do this.
+import "std" .print "Hello, World!\n"
+# and this
+let std [import "std"]
+std.print "Hello, World!\n"
+# and even this!
+import "std"
+print "Hello, World!\n"
+# because it's not a goddamn function!!
+# hell, even this!
+let [std] import "std"
+# or this
+let print [import "std" print]
+# or this
+let/get [print] import "std"
+# well, ^ is shorter, so I guess I should keep it?
+# anyway, you get my drift.
+
+# I should make it so
+person.greet
+# and
+person .greet
+# are equivalent. things become too interesting no to.
+# like, the insane flexibility of this language, bro.
+
+# there should be a way to enable multiline comments.
+# of course, if it's a library, it only affect the library. not the program that imports it.
+
+set Config.multiline-comments true
+#[
+    Hello, World!
+]#
+
+# ... the implementation will be such a pain in the ass.
+
+# ah shit, I forgot.
+internal value .type
+# does [internal] get called first, or [.type]?
+
+internal value .type
+# is not the same as
+internal value.type
+# ?
+
+internal .. [value .type]
+
+let [value] .. [
+    let [func] use [print "Hello, World!\n"]
+    func
+    123
+]
+print\n value  # outputs 123 ?
+let [value] .. [
+    import "File"
+    123
+]
+# maybe [import can detect if it's been used?
+
+[ func [print "hello\n"] ]
+func  # outputs "hello\n"
+
+# I guess it makes sense?
+let [Module] [ func [print "hello\n"] ]
+Module.func  # binds to "Module"
+
+[ func [print "hello\n"] ]
+func  # binds to the top level
+
+# hoh.
+[ func [print "hello\n"] ] .func  # outputs "hello\n"
+
+# maybe I should make it so () is not whitespace?
+# it's only equivalent to .. []
+
+internal .. [value .type]
+internal(value .type)
+internal value.type
+
+let [arr] [1 2 3 4 5]
+value.2        # returns 3
+value.(+ 1 1)  # returns 3
+
+let [Module] [ func [print "hello\n"] ]
+func    # error: symbol [func] not found
+Module  # returns [ func [print "hello\n"] ]
+func    # outputs "hello\n"
+func    # outputs "hello\n"
+func    # outputs "hello\n"
+
+# I guess this only gets added to the environment if a normal function is called afterwards?
+[ func [print "hello\n"] ] .func  # one use, can't call [func] again. any other function deleted.
+[ func [print "hello\n"] ]  func  # [func] and other function added to environment.
+# this works, but again, inside a function it doesn't.
+
+let func [
+    let [vec] [x 1, y 2, z 3]
+    use vec
+    print "% % %\n" x y z
+]
+let func [
+    use import "File"
+    open "file.txt"
+]
+
+use import "File"
+use import "Math"
+use import "Http"
+use import "OS"
+
+import "File"
+import "Math"
+import "Http"
+import "OS"
+
+use import [File Math HTTP OS]
+# I really think consistency and shortness is a good thing.
+# I already have everything else. No need to be greedy.
+
+let/get
+extract
+# yeah. it's fate.
+
+extract [open close] import "File"
+
+# () usually behave as whitespace. but sometimes it doesn't.
+
+_ _ _ [1 2 3]  # discard?
+# no
+let [_ y _] [1 2 3]
+
+# ah... remember when I thought the language shouldn't have objects? lol.
