@@ -10111,3 +10111,62 @@ _ _ _ [1 2 3]  # discard?
 let [_ y _] [1 2 3]
 
 # ah... remember when I thought the language shouldn't have objects? lol.
+
+let [value] if false [123] []
+print\n value  # outputs [] ?
+# maybe?
+
+# or...
+321
+let [value] if false [123] []
+print\n value  # outputs 321 ?
+# but I don't know. feels very erroneous (whatever that means).
+# *error prone was the term I wanted to use.
+
+print .. []  # should probably crash.
+
+let [value] "vec"
+let (value) [x 1, y 2, z 3]
+print\n vec  # outputs [x 1, y 2, z 3]
+# so like [#run] in Jai? no, I don't think so. I'll think about it later.
+
+let run [App run]
+extract [run] App
+
+let arg [args 1]
+
+let [nums] [1 2 3 4 5]
+let [result] filter [= 0 % arg 3] map [* 2] nums
+
+123 .x
+ptr .x
+# ?
+
+# nah, I don't need () being actual syntax. just use .. [] if you really need to.
+# or better: bind to a variable.
+
+
+let greet [
+    print "hello\n"
+]
+let bid-farewell [print "bye\n"]
+use [
+    greet [
+        print "hello\n"
+    ]
+    bid-farewell [print "bye\n"]
+]
+greet
+bid-farewell
+
+# I just realized.
+let ModuleName [
+    greet [print "hello\n"]
+    bid-farewell [print "bye\n"]
+]
+
+use import "ModuleName"
+ModuleName.greet
+ModuleName.bid-farewell
+# of course, I prefer to be able to bind my own name, but it's an option.
+# I'm just showing we have C++ namespaces.
