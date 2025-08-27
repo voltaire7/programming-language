@@ -10170,3 +10170,37 @@ ModuleName.greet
 ModuleName.bid-farewell
 # of course, I prefer to be able to bind my own name, but it's an option.
 # I'm just showing we have C++ namespaces.
+
+let PI 3.14
+set Settings.constant-modification ALLOW  # default
+set Settings.constant-modification WARN
+set Settings.constant-modification ERROR
+set PI 4.13  # error: tried to modify constant symbol "PI"
+
+# maybe [Settings] is by default empty?
+let [Settings] []
+set Settings.constant-modification ERROR
+
+# honestly, I think it might be better to just have a constant type.
+let value 123
+set value 312  # error: tried to modify immutable symbol "value"
+
+var value 123
+set value 312
+# so I guess constant objects should be declared fully ahead of time? maybe.
+let obj [
+    [name] "John Smith"
+    age 23
+]
+set obj.age 24  # error: tried to modify immutable symbol "obj.age"
+
+# I need to look at Jai, so I don't add features for the sake of adding them.
+# btw, I guess I'm doing duck typing now...
+let func [
+    args [obj]
+    obj.greet
+]
+func [ greet [print "hello\n"] ]  # outputs "hello\n"
+func [ bid-farewell [print "bye\n"] ]  # error: object field ".greet" not found.
+# ^ caught at compile time.
+# although it should also allow runtime. no reason not to. do everything, is what I say.
