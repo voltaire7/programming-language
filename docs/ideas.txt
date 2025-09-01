@@ -10204,3 +10204,835 @@ func [ greet [print "hello\n"] ]  # outputs "hello\n"
 func [ bid-farewell [print "bye\n"] ]  # error: object field ".greet" not found.
 # ^ caught at compile time.
 # although it should also allow runtime. no reason not to. do everything, is what I say.
+
+# I guess objects should be stored compact, but printed pretty?
+# () should be considered for #run, because I don't know how to [use] inside object.
+# [Context] should be empty because there's a new one for every env.
+
+let [private] [
+    greet [print "hello\n"
+]
+let func [
+    use private
+    greet  # outputs "hello\n"
+]
+
+use Math.PI
+print\n PI  # [use] on single values?
+
+# also, what happens here? (if [let] is constant)
+let greet [print "hi\n"]
+use [
+    greet [print "hello\n"]
+]
+# error? I guess not? I mean, use is equivalent to [let], so we shadow it?
+
+let x "John Smith"
+call/set upper x
+set x upper x
+print\n x  # outputs "JOHN SMITH\n" for both
+# though I probably won't do that. I'm not liking [call/set], [let/get] anymore.
+
+# ++ vs use
+let obj ++ obj1 ++ obj2 []
+let obj [
+    use obj1  # ignore that [use] doesn't work here.
+    use obj2
+]
+# you know, this is basically Jai's using, but it take advantage of the fact that everything is a
+# string. yeah, I think I'm team [++].
+
+# there should be a function that finds [let] calls and modifies them.
+let func [
+    let [str] "hello\n"
+    print str
+    Metaprogram.replace-let [func] [str] "bye\n"  # [str] being or not being quoted is significant
+]
+func  # outputs "hello\n"
+func  # outputs "bye\n"
+func  # outputs "bye\n"
+func  # outputs "bye\n"
+# equivalent to C's static.
+
+# in C
+#include <stdio.h>
+
+void counter() {
+    static int count = 0;  // initialized only once.
+    count++;
+    printf("count = %d\n", count);
+}
+
+int main() {
+    counter(); // prints: count = 1
+    counter(); // prints: count = 2
+    counter(); // prints: count = 3
+    return 0;
+}
+
+# in my language
+let counter [
+    let count 0;  # initialized everytime, but the literal changes.
+    Metaprogram.replace-let [counter] [count] + 1 count  # [str] being or not being quoted is significant
+    print "count = %\n" count
+]
+
+let main [
+    counter  # outputs "count = 1\n"
+    counter  # outputs "count = 2\n"
+    counter  # outputs "count = 3\n"
+]
+
+# it's only after every thing is defined that the program runs.
+let main [fun2]
+let fun2 [fun3]
+let fun3 [fun4]
+let fun4 [print "hello\n"]
+compile [
+    main  # after everything is defined.
+]
+
+let [value] mut []
+mut [value] []
+
+# maybe everything is dynamic by default, but you can add types afterwards?
+# also, maybe constant by default.
+# I've probably said this before, but variables should be colored according to internal type.
+# the problem is numbers, right? like, i32, u64, BigInt, etc. how do you decide what is what from
+# usage.
+# I should look into "tainted analysis".
+# even with dynamic to added types, functions should remain typeless, a new instance of the
+# function should be created from usage. static dispatch?
+
+# maybe I should follow python and do "convention over restriction".
+
+# type system - model 1 (ideal)
+
+    let value 123  # no types.
+    let value 123u32  # or maybe just this?
+    let func [
+        + . arg  # because [+] is called on [value], it's now a [Number] type.
+    ]
+    func value  # returns whatever type was passed in...
+
+    [for 10 [u32 0]]  # array of 32 bits, unsigned integers?
+
+    set value 321  # automatically makes [value] mutable, and removes it from readonly memory.
+
+# type system - model 2
+
+    let value     123  # type dynamic, basically the current implementation, everything is a string
+    let value i32 123  # type i32, better optimized. actual numbers, not text of numbers
+
+    let func [
+        + . arg
+    ]
+    func value  # returns 246, functions still don't have types, but they have static dispatch.
+    # works for both dynamic values, and static values. still has duck typing.
+
+# honestly, model 2 is just really easy to understand, and probably easier to understand.
+# if I can't make heads or tails of the concept, the implementation will even more impossible.
+# but what if it's just numbers? there is no way to infer them, so what if I added them for now?
+# let's try model 1 with number types for starters.
+
+let [arr] [for 10 u32 0]  # this thing is just so nice!
+let [arr] u32 [for 10 0]  # valid as well?
+# I should try making them equivalent.
+
+let [arr] u32 []
+set [arr] add 5 arr
+set [arr] add arr 10
+debug arr  # outputs [5 10]
+
+# again, if you don't specify [u32] or whatever, the type is dynamic (string).
+# wait, no. that's model 2. for model 1, the type is Number, or BigDecimal in other languages.
+
+# à la scheme.
+number
+ └─ complex
+     └─ real
+         └─ rational
+             └─ integer
+
+let [arr] [1 2 3 4 5]
+set arr.0 10
+set arr:0 10
+print arr  # outputs [10 2 3 4 5]
+set arr:+ 2 2 50
+print arr  # outputs [10 2 3 4 50]
+let i 2
+set arr:i 30
+print arr  # outputs [10 2 30 4 50]
+
+# I mean, if I did it for objects, I should do it for arrays too.
+
+# should [print] look at the true types so it prints properly?
+# I think so. no need for [debug] in it's current form, too.
+
+# it goes without saying, but if [.greet] is called, the type it's called on is automatically a
+# struct. although...
+let func [print]
+let [obj] [
+    func [print "hello\n"]
+]
+obj.greet  # outputs "hello\n"
+.. obj  # outputs [print "hello\n"]
+# so what's the type of object?
+
+# I guess every object has a source? but that source can have children depending on usage?
+
+let [arr] [0 1 2 3 4 5]
+let func [
+    args [arr]
+    set arr:5 50
+]
+func arr
+print arr  # outputs [0 1 2 3 4 5]
+func ptr-to arr
+print arr  # outputs [0 1 2 3 4 50]
+func [arr]
+print arr  # error: array out of bounds [arr].
+func [0 1 2 3 4 5]
+print arr  # outputs [0 1 2 3 4 50]
+
+# so like, [arr] is equivalent to [[0 1 2 3 4 5]]? it is redondant, and still cloned.
+# plus, it can't be overloaded. when [:] is used on a pointer, it's pass-by-reference.
+
+let [arr] [1 2 3 4 5]
+set arr:0 arr
+print arr  # outputs [1 2 3 4 5 2 3 4 5]
+let [arr] [1 2 3 4 5]
+set [arr:0] arr
+print arr  # outputs [[1 2 3 4 5] 2 3 4 5]
+
+let [arr] [1 2 3 4 5]
+let ptr to arr
+let val of ptr
+# or
+let ptr >> arr
+let val << ptr
+# but that's bitshift...
+
+# is this overloaded?
+let [arr] u64 [1 2 3 4 5]
+<< + 1 ptr  # returns 2?
+# probably. I guess [+] looks at the true type.
+
+# GOD! SO MANY DECISIONS!!
+
+# it would be nice if functions had options.
++ .wrap 1 u32 .max  # returns 0
+
+set [obj .field1 .field2] [1 2]
+# hmm, no. [.field2] should be a subfield.
+set [obj .field1.subfield1 .field2.subfield2] [1 2]
+print obj  # outputs [[field1] [subfield1 1], [field2] [subfield2 2]]
+# I think that's good. very powerful and terse.
+
+# I think this should be a macro.
+set [obj.field] 0
+# becomes
+set [obj] mut obj [field 0]
+
+let Vector3 [
+    [x arg, y arg, z arg]
+]
+# wait, does that even work?
+let [vec] Vector3 1 2 3
+print vec    # outputs [x arg, y arg, z arg]
+print vec.x  # ... wtf happens here?!
+# maybe [.x] returns the function body for [arg]? so [args 1]?
+
+let Vector3 [
+    new [x y z]
+]
+let [vec] Vector3 [1 2 3]
+let [vec] Vector3 1 2 3
+
+let [Vector3] [x y z]
+let [vec] new Vector3 [1 2 3]  # oddly enough, this feels like the best one.
+let [vec] new Vector3 1 2 3
+print vec
+
+let Person [
+    new [
+        id
+        [name]
+        age
+    ]
+]
+let [person1] Person random, "John Smith", 23
+let [person1] Person [random, "John Smith", 23]
+
+let [Person] [
+    id
+    [name]
+    age
+]
+let [person1] new Person [random, "John Smith", 23]  # it's just so much better with brackets.
+
+# I think the second model is better since you can do this:
+for quote Vector3 [
+    print\n get it vec
+]
+
+# trying out different syntax: what if {}, [] and "" where different?
+let arr [1 2 3 4 5 6]
+arr.1  # objects are still arrays.
+arr:1  # two ways to access them.
+
+let func {
+    print "Hello, World!\n"
+}
+func  # outputs "Hello, World!\n"
+let [value func] 1 {print\n}
+func value  # outputs "1\n"
+
+let obj [
+    value 1
+    func {print}
+]
+let {value func} obj
+
+let [open close] import "File"
+extract [open close] import "File"
+# yeah... honestly, I don't really feel it.
+
+# making these the same doesn't feel right.
+let  something  [print]
+let [something] [print]
+
+let "something" [print]
+let ["something" "otherthing"] [print] [debug]
+
+obj :: {
+    value 1
+    func {print}
+};
+obj.func obj.value
+
+# if I allow [obj .field], I should be able to add infix operators?
+# I think I'm going to stop this line of thought. it's becoming too complicated.
+# the only reason I added field syntax and primitive number types, is because of how much of a pain
+# it was. and they're really just macros, or necessities.
+
+# although, I could remove the Scheme-style numbers and only have C-style, with i32 as default, idk
+# all numbers should be wrapping by default. with maybe [+!] for short error checking.
+# although... is this language, you can mix multiple type in an array. that's not very static of it
+let [arr] [1 "hello" "A" [print "hello\n"] 321.55]
+# it should be opt-in to system programming. so things should be easy to beginners.
+
+let value 50
+print *- value  # outputs -50
+
+Pointer.+
+Pointer.-
+
+let [vec] [x 1, y 2, z 3]  # still a string.
+print vec  # outputs with no formatting.
+
+let [vec] [x 1, y 2, z 3]  # the linter show [vec] is a object because of later usage.
+print vec  # outputs with struct formatting.
+set vec.x *- vec.x
+
+# and function really need to detect argument count. it will cause problems.
++ 1 2
++ [1 2 3 4]
+
+- [1]  # returns -1?
+
+# since I'm already overloading on true types, I don't need [Pointer.+] and [Pointer.-].
+
+let [arr] [for 100 u64 0]  # array of null pointers.
+
+# wait a second.
+let ptr ^$ [1 2 3]
+print $^ ptr  # output [1 2 3]
+# full list right? but I can't do this!
+set *ptr 10
+# only
+set ptr:0 10
+print $^ ptr  # output [10 2 3]
+
+# mnemonic?? [$] the value, [^] the pointer.
+
+# also, because of this,
+let ptr ^$ [1 2 3]
+# you can't do this.
+let [arr] [1 2 3]
+let ptr ^$ [arr]
+# it has to be
+let ptr ^$ arr
+
+# scheme to this, equivalents
+    # pointers
+    arr
+    ^$ arr
+
+    # function calls
+    (my-func 1 2 3)
+    my-func [1 2 3]
+
+    # symbols
+    'symbol
+    [symbol]
+
+# I don't know...
+let 'arr [1 2 3]
+let ptr ^arr
+print ptr^  # output [1 2 3]
+# nah, I'm keeping [$^] and [^$]. too much syntax, too quickly.
+# I should also note, I can always remove it.
+
+let arr [1 2 3 4 5]
+arr:1  # returns 2
+let func [print "hello\n"]
+func  # outputs "hello\n"
+# yeah, I can't do this.
+
+let [arr] [1 2 3 4 5]
+# vs
+let 'arr [1 2 3 4 5]
+
+# maybe I should actually edit the copy of the program as I run it?
+# no, the error messages will get very confusing.
+
+let [obj] [field 123]
+set field: obj 321
+print field: obj  # outputs 321
+
+let [str] "Hello, World!\n"
+set chars str :5 "hhh"
+# I don't know about that. it's read as [set chars str] only.
+
+let [vec] [x 1, y 2, z 3]
+x.vec
+
+set 5:chars str "hhh"
+set + 1 2:chars str "hhh"
+# no. just no.
+
+let [arr] [1 2 3 4 5]
+set-at 1 arr 20
+set arr:1 20
+
+set-at 2 arr "hello"
+print arr  # outputs [1 20 hello 4 5]
+# I mean, you need it for objects!
+set-at 2 [arr] "hello"
+print arr  # outputs [1 20 "hello" 4 5]
+set [arr:2] "hello"
+print arr:2  # outputs "hello"
+print get-at 2 arr  # outputs "hello"
+# it's not even funny how bad it is without [:].
+
+# the problem is [set-char]. I can't use [:].
+let [str] "Hello, World!\n"
+set-char str 3 "hello"
+print str  # outputs "Helhelloorld!\n"
+
+let [c] to-char "Hello, World!\n"
+set c:3 to-char "hello"
+print to-str c  # outputs "Helhelloorld!\n"
+# honestly, I don't like the need for conversion.
+
+let [str] "Hello, World!\n"
+set str.chars:3 "hello"
+set-char str:3 "hello"
+print str  # outputs "Helhelloorld!\n"
+
+# there's no [let-char], so... do I need the [set-] part?
+char str:3 "hello"
+
+let [File] import "File"
+open.File "file.txt"
+# so ugly. but I don't know.
+open.import "File" "file.txt"
+# it does fix my earlier problem
+
+let [File] import "File"
+File.open "file.txt"
+get "open" File "file.txt"
+get open File "file.txt"
+open: File "file.txt"
+
+import "File" .open "file.txt"
+# I'll just go with the most aesthetically pleasing one.
+
+let [arr] [1 2 3 4 5]
+
+arr[1]  # returns 2
+arr: 1  # returns 2
+
+set arr[1] 20
+set arr: 1 20
+
+set arr[1 2 3] 20 30 40
+set arr :1 :2 :3 20 30 40
+
+set arr[.. range 1 4] 20 30 40
+set arr: range 1 4 [20 30 40]
+# oh!
+set arr[1 2 3] 20 30 40
+set arr:[1 2 3] [20 30 40]
+
+# how about [:] is for internal objects?
+let [str] "Hello, World!\n"
+print str  # outputs "Hello, World!\n"
+print str:type  # outputs "String"
+print str:char  # outputs ["H" "e" "l" "l" "o" "," " " "W" "o" "r" "l" "d" "!" "\n"]
+# basically, this is what [+] accesses to overload on type.
+# or [print] to determine how to format the thing. etc.
+
+# I can also use this.
+print str::char  # outputs "String"
+#
+
+let [vec] [x 1, y 2, z 3]
+let [field-name] "x"
+print vec.x  # outputs 1
+print vec.[field-name]  # outputs 1
+# clever right?
+
+add Syntax.rules []
+add [1 2] [3 4]  # returns [1 2 3 4]
+# or
++ [1 2] [3 4]  # returns [1 2 3 4]
++ 12 [3 4]  # returns [12 3 4]
+
+# I like the relation between [.], [:] and [::].
+
+let obj3 + obj1 + obj2 []
+let str3 + "Hello,"::chars + " "::chars "World!"::chars
+let str3 ++ "Hello," ++ " " "World!"
+
+# maybe I don't need [::].
+
+let [str] "Hello, World!\n"
+print str  # outputs "Hello, World!\n"
+print internal str .type  # outputs "String"
+print chars str  # outputs ["H" "e" "l" "l" "o" "," " " "W" "o" "r" "l" "d" "!" "\n"]
+chars str :[1 2 3]  # outputs ["E" "L" "L"]
+
+let [arr] [1 2 3 4 5]
+set arr:1 20
+print arr  # outputs [1 20 3 4 5]
+set [arr:1] "XX"
+print arr  # outputs [1XX0 3 4 5]
+
+let [vec] [.x 1, .y 2, .z 3]
+for vec [print "%, " it]  # outputs "x, 1, y, 2, z, 3, "
+# okay. but the reason it didn't work before was...
+print\n .x  # outputs "x"
+print\n [.x 1, .y 2, .z 3] .x  # outputs 1
+# how will I make this work?
+
+# nevermind. I don't need it.
+for quote vec [print "%, " it]  # outputs "x, 1, y, 2, z, 3, "
+
+# shit! [let] and [import] are both functions! how does [.open] know when to call?!
+let [file] import "File" .open "file.txt"
+
+let [file] :open import "File" "file.txt"
+
+let [File] import "File"
+File.open "file.txt"
+.open File "file.txt"
+
+let [arr] [1 2 3 4 5]
+:+ 1 2 arr
+arr:+ 1 2 
+
+let [file] (import "File" .open "file.txt")  # ugly...
+# man, I really thought I had it too.
+
+let [file] import "File".open "file.txt"  # not good, because it's on it's on the string.
+let [file] import "File" .open "file.txt"  # better because [import] get's called.
+let [file] identity import "File" .open "file.txt"  # still gets called after [import]...
+let [file] identity import "File" ..open "file.txt"  # gets called after [identity]...
+# or
+let [file] identity .open import "File" "file.txt"  # gets called after [identity]...
+# nah. [.open] should before it's arguments.
+
+# I guess I fixed the problem quickly?
+
+# btw, the reason why this work is really clever.
+obj .field .sub-field
+# [.field] returns a object! so [.sub-field] is really just a seperate function!!
+
+# I guess I should be careful about this...
+print-and-return obj.field .sub-field  # gets [.field], prints it, then gets [.sub-field].
+# if you think about it, in any other language you have to use parentheses to determine this.
+# this is actually a shorter way of doing things. far more homoiconic too.
+
+# or maybe I do?
+let [vec] [x "1", y "2", z "3"]
+for quote vec [print "%, " it]  # outputs [x, "1", y, "2", z, "3", ]
+
+# maybe I should do this instead.
+let [obj] [field1 123]
+let obj.field2 456
+print obj  # outputs [field1 123, field2 456]
+set obj.field3 789  # error: could not assign 789 to field [.field3], it does not exist.
+# I think this makes more sense.
+
+let [list] [1 [2 [3]]]
+list:1:1  # returns [3]
+list:1:1:0  # returns 3
+
+let value u64 123
+set value 321  # still a u64. you shouldn't have to say u64 everytime.
+# but what are the implications of that? does it throw if you change the type?
+
+# a comment [
+
+] still a comment?
+
+print loop as next [
+    static [value] 123
+    print "% " value
+    set [value] + 1 value
+
+    if < value 100 [next] [value]
+]
+# outputs [123 124 125 126 127 128 129 130 131 132]
+
+# I forgot how clever this renaming was. I feel like I've been using 'clever' a lot... I should
+# stop. sounds pretentious.
+
+# btw, I can totally do [return].
+
+print loop [
+    static [value] 123
+    print "% " value
+    set [value] + 1 value
+
+    if < value 100 [] [value  return it]
+]
+
+# maybe instead of [;], I should use [  ] for multiline statements on a single line?
+# [;] has always felt weird.
+
+print "Hello, "; print "World!\n"
+print "Hello, "  print "World!\n"
+
++ 1 2; + 4 5; + 6 7
++ 1 2  + 4 5  + 6 7
+
+# well, I'll keep [;] around. I just won't use it. I think it's a matter of preference.
+# in the first place, avoid unreadable code.
+
+# also, I'll say it before I forget, but I've looked at my old code, and the [/] seperator for word
+# names is no longer aesthetically pleasing to me. I don't know what happened, but whatever.
+vec/x
+vec.x
+# ^ obvious which one is better.
+set/at
+set-at
+# same.
+
+# a convention of the language should be that a function should always take the same number of
+# arguments. I just see this become a horrible pain in the rear if not. the language is already too
+# lax with duck typing and such, no need to cause more chaos.
+
+# then again, that's why I added this
+print let x 1  # error: [print] did not receive any value.
+# no... it should be added in spite of that. you can do stupid shit, but you shouldn't.
+# big codebases should be easy to debug. python is dynamic, but it doesn't have javascript's
+# nonsense, right?
+
+# "This language is not for the faint of heart."
+
+compile [
+    entry-point [main]
+    output-file "app"
+]
+# nevermind. [main]'s body should be inside [compile].
+# I can change the settings for the compilation elsewhere.
+set Settings.output-file "app"
+set Settings .output-file "app" .compile-target Platforms.x86_64
+# damn! it's better than
+set Settings.[
+    output-file "app"
+    compile-target Platforms.x86_64
+]
+
+set Settings
+    .output-file "app"
+    .compile-target Platforms.x86_64
+# okay... I know I said that, but I'm starting to like .[]
+# the problem is that it's already set for evaluating things...
+# and it just makes sense that you can chain assignments like that...
+
+# then again, no.
+print reduce [Settings .output-file .compile-target]  # error: field [.compile-target] not found in [Settings].
+print reduce [ Settings.[output-file compile-target] ]  # outputs ["App" 4]
+
+# wait a second.
+set Settings.[
+    [output-file] "app"
+    compile-target Platforms.x86_64
+]
+set [Settings
+    .output-file "app"
+    .compile-target Platforms.x86_64
+]  # yeah, I'm definitely NOT doing this.
+
+set [Settings.output-file] "app"
+set [Settings.compile-target] Platforms.x86_64
+
+set [Settings.output-file Settings.compile-target] "app" Platforms.x86_64
+set [Settings .output-file .compile-target] "app" Platforms.x86_64  # essential should "app" be data.appname
+
+set [Settings .output-file "app" .compile-target Platforms.x86_64]  # wait, that doesn't fucking work!
+# then again, I guess it could work. like you can't combine different models?
+# or you can, but [.compile-target] has to get it's input first.
+# I guess you can't combine different models for each object?
+set [Settings .output-file "app" .compile-target] Platforms.x86_64 # then again...
+# whatever. I guess you can, it will just be weird, and you'll have to figure things out.
+# just don't do weird shit. seriously.
+set [Settings .output-file "app" .compile-target Platforms.x86_64 MyObject.x] 5  # valid.
+set [Settings .output-file .compile-target Platforms.x86_64 MyObject.x] "app" 5  # bugged, waiting 4 values.
+
+set Settings.[[output-file] "app" compile-target Platforms.x86_64]  # can be shorter, can be longer
+set Settings .[output-file] "app" .compile-target Platforms.x86_64
+set Settings .[[output-file] "app"] .compile-target Platforms.x86_64
+# wait, but it is 'quoted' already, if you think about it!
+set Settings .[output-file "app"] .compile-target Platforms.x86_64
+set Settings.[
+    output-file "app"
+    compile-target Platforms.x86_64
+]  # this is valid!
+
+# I don't see why I can't make them all valid.
+# I thinks it's nicer if .[] just doesn't accept functions. but maybe it should. like some lambdas.
+# and it's good to keep object definitions the same. no need to cause confusion.
+
+print reduce [ Settings.output-file Settings.compile-target] ]  # outputs ["App" 4]
+print reduce [ Settings.[output-file compile-target] ]  # outputs ["App" 4]
+print reduce [ . Settings .output-file .compile-target] ]  # outputs ["App" 4]
+# I really think there are only 3 ways to access multiple fields...
+
+# maybe...
+let [arr compile-target] [1 2 3 4 5] 2
+arr:"compile-target"  # returns 3
+# non numbers and decimals don't make sense.
+# but what if...
+set [field] "compile-target"
+Settings:field  # returns 4
+# so I don't need [Settings.[field]]!
+# but I guess I really can't have numbers as keys. at least, they have to be quoted.
+
+# wait.
+let [obj] [1 2 3 4 5 6]
+obj.3  # so, what happens?
+
+# oh. my. god. I just realized. it gets even more fucked when I combine [.] and [:]... God save me.
+
+# alright. I'll just do this.
+let [[func] value] [print] 123
+func value  # outputs 123
+# or not?
+let [symbol] "hello"
+let [[symbol] value] unquote [print] 123
+hello value
+.. symbol value
+# but honestly, there's not much point to it.
+# better to do
+let [symbol value] "hello" 123
+set env:symbol 123
+print\n hello  # outputs 123
+
+env.NEXT-LAYER.NEXT-LAYER.NEXT-LAYER.NEXT-LAYER  # linked list?
+# btw, [env] is totally a pointer. isn't [.] just so convenient.
+# no need for dumb [->]. heh, stupid tool for cavemen!
+
+# [->] :(
+
+for 100 [
+    print\n arr:[quote it]
+]
+# I guess I can have numbers. Just have to be careful about switching them around.
+
+# you know? why not make many of them valid? like with [import].
+# just add many options and call it a day.
+
+set set []
+delete set
+set  # returns []
+
+let x 1
+.. [
+    rename x y
+    set y 2
+]
+print\n x  # outputs 2 ?
+
+# I feel like this language is becoming rakuish, in that it's closer to a maximilist language,
+# while still being constrained by a very few basic rules.
+
+set 5 str "---"  # it something, but nothing.
+# should be like this.
+set 5 []
+set env.5 []
+# ^ equivalent. and useless, although possible.
+
+let [str] chars "Hello, World!\n"
+set str:3 chars "---"
+print string str  # outputs "Hel---lo, World!\n"
+# I think that's the key. I literally have [set-char] as two different functions!
+# and it makes sense, like in rust, it's utf-8! so internally, you convert from [u8] to [u64].
+
+let [arr] [1 2 3 4 5]
+set arr:0 10                    # [10 2 3 4 5]
+set arr:0 [100]                 # [100 2 3 4 5]
+set arr:0 [10 20]               # [10 20 2 3 4 5]
+set arr:-1 [-10 0]              # [-10 0 10 20 2 3 4 5]
+set arr:-0 [-30 -20 -10]        # [-30 -20 -10 0 10 20 2 3 4 5]
+set [arr:0] -3                  # [-3 -20 -10 0 10 20 2 3 4 5]
+set [arr:0] [-3]                # [[-3] -20 -10 0 10 20 2 3 4 5]
+set arr:[1] [-2]                # [[-3] [-2] -10 0 10 20 2 3 4 5]
+set arr:[1 2 3] 111 222 333     # [[-3] 111 222 333 10 20 2 3 4 5]
+set arr: offset 3 ['x' 'y' 'z']  # [[-3] 111 222 'x' 'y' 'z' 2 3 4 5]
+set arr: range 1 4 111 222 333 # [[-3] 111 222 333 10 20 2 3 4 5]
+
+offset 3 ['x' 'y' 'z']  # returns [3 4 5] .. ['x' 'y' 'z']
+offset   ['x' 'y' 'z']  # returns [0 1 2] .. ['x' 'y' 'z']
+# I know what I said. but damn, this should be.
+
+set str:3 chars "---"
+set arr: offset 3 chars "xyz"
+
+for range 0 100 [print\n it]
+for offset 0 range 0 100 [print\n it]
+
+regex [insert regex here]  # returns C-style compiled regex function?
+regex [insert regex here]  # returns C-style compiled regex function?
+
+(define (interleave lst1 lst2)
+    (apply append (map list lst1 lst2)))
+(interleave '(1 2 3) '(4 5 6))  ; => '(1 4 2 5 3 6)
+
+let interleave [
+    args [lst1 lst2]
+    let [lst3] []
+    for enumerate lst1 [set lst3:(quote it.value) lst2:it.index
+    lst3
+]
+# I thought it would be simpler, but maybe not.
+# also... how do I do this?
+arr[indexes[i]] = ...;
+set arr:indexes:i ...
+# I guess you can index with a list, right?
+# except you can, because of multiple assignment. that you still accept strings...
+
+# these two are different? that's the only thing I can think right now.
+set arr:indexes:i ...
+set arr: indexes:i ...
+
+let interleave [
+    args [lst1 lst2]
+    let lst3: quote lst1 lst2
+    lst3
+]
+# this works??
