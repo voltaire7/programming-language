@@ -935,7 +935,7 @@ atom [else x] if _ [] x
 
 [it should be lazy, but then I can't do [lambda]...]
 
-[optionnal []?]
+[optional []?]
 define name 3
 atom [define x y] do [
     quoted? x atom x y
@@ -1873,7 +1873,7 @@ it.]
 version. Instead of using the actually stack, though, I will create my own. If I don't do that...
 My progress may lag too hard...]
 
-[A lot of procedure have optionnal arguments?]
+[A lot of procedure have optional arguments?]
 compile main
 compile: [executable-type mach-o] main
 [or]
@@ -3731,7 +3731,7 @@ let add-macro fn [] [
     return + next-arg next-arg
 ]
 let [add-two n] add-macro 2 n
-[[return] is of course optionnal]
+[[return] is of course optional]
 
 [this language does have implicit return, but it's not for use all the time. only when it makes
 sense.]
@@ -4109,7 +4109,7 @@ whitespace. [;] would probably also make the list.]
 let a 2  let b 5
 let a 2; let b 5
 [I guess I'll call them "syntax" characters? Similar to whitespace, but added to give the language
-syntax to make it easier to read. It's of course optionnal, but was judged necessary still.]
+syntax to make it easier to read. It's of course optional, but was judged necessary still.]
 ['(' and ')' will probably also make the list.]
 print (quick-sort numbers) \n
 [I don't know about [:] though... I wanted to use it in names and such...]
@@ -11036,3 +11036,658 @@ let interleave [
     lst3
 ]
 # this works??
+let interleave [
+    let lst3: quote args 2
+    lst3
+]
+# but is there no way to one-line it?
+let [ls] interleave [1 2 3] [4 5 6]
+let ls: quote [1 2 3] [4 5 6]
+
+let ls: [1 2 3]
+# vs
+let [ls: 1 2 3]
+# should they be different?
+
+# swap
+let [ls] [1 2]
+set [ls] [ls:[1 0]]
+
+# css, basically.
+[h1] [
+    color BLUE
+    background-color BLACK
+]
+let [main] [
+    [h1] "Hello, World!\n"
+    [div] []
+]
+
+print view [
+    h1 style [color BLACK] "Hello, World!\n"
+]
+# outputs [
+    [element] [h1]
+    [style] [color BLACK]
+    [content] "Hello, World!\n"
+]
+# I have to say: the whole [h1 style [] class [] []] type of chain is just so nice.
+# one of the best parts of the language.
+# like with [for list as value []].
+
+let thing view [
+    div [
+        h1 style [color BLACK] "Hello, World!\n"
+        h2 style [color BLACK] "Goodbye, World!\n"
+    ]
+]
+print thing
+# outputs [
+    [element] [div]
+    [style] []
+    [content] [
+        [element] [h1]
+        [style] [color BLACK]
+        [content] "Hello, World!\n"
+    ] [
+        [element] [h2]
+        [style] [color BLACK]
+        [content] "Goodbye, World!\n"
+    ]
+]
+# something like this?
+
+print thing.div.h1.style
+# that's how it should work, but that doesn't follow the current model.
+
+# outputs [
+    [div] [
+        [h1] [
+            [style] [color BLACK]
+            [content] "Hello, World!\n"
+        ]
+        [h2] [
+            [style] [color BLACK]
+            [content] "Goodbye, World!\n"
+        ]
+    ]
+]
+# then again, no. there are multiple divs, so there will be confusion.
+
+make-step v [dt .5]
+make-step v -dt .5
+
+make-step v []
+make-step v
+# ^ is better.
+
+# also, like python, required comes first (by convention).
+let make-step [
+    args [v]
+    opts [dt 1]  # [-] is added by the function.
+    print\n dt
+]
+# it's best this way because [print\n] may also have optional arguments.
+# then again... if you put [-dt] in a required spot, there's no ambiguity, right?
+
+make-step v dt .5
+make-step v
+dt other-thing
+# yeah, not good. [-] should be a convention. only used when expected as symbol.
+# no need for redundancy. the earlier [make-step] definition is correct.
+
+let make-step [
+    args [v]  opts [dt 1]
+    print\n dt
+]
+
+# by the way, when passing a number when expecting a string, should it be treated as a reference?
+# no overload, basically. – well, there is, but it's on references/values acting the same.
+# like with [ptr .field].
+
+let cc [
+    args [filename]
+    opts [o "a.out"]
+    compile filename o
+]
+cc "main.txt" -o "main"
+
+let cc [
+    args [filename]
+    opts [o "a.out" -output "a.out"]
+    compile filename -output
+]
+cc "main.txt" --output "main"
+# now, though...
+
+# should I add this?
+opts [o -output "a.out"]
+# I mean, I guess I could, but I also think it's rare enough that I don't need it.
+# it also doesn't fix this problem:
+compile filename o  compile filename -output
+# I don't think python does this, so I don't see why I should.
+
+# destructuring with defaults
+function createUser({ name, age = 18 } = {}) {
+    console.log(name, age);
+}
+
+createUser({ name: "Alice" });  // "Alice 18"
+createUser();                   // undefined 18
+
+# in my language
+let create-user [
+    extract [name [age 18]] arg
+    print "% %\n" name age
+]
+
+create-user [[name] "Alice"]  # "Alice 18"
+create-user []                # error
+
+args [value1 value2 [func1 func2 func3]]
+# ^ [func1-3] are unquoted.
+
+# anyway, I don't know about treating any number as functions when expecting a string.
+for [0 1 2] [print\n it]  # good.
+for 3       [print\n it]  # also good.
+# and anyway, what benefit do you get by passing it by reference? for loops work by value.
+let [list] [0 1 2]
+for index list [print\n list:it]
+
+fn main() {
+    let fruits = vec!["apple", "banana", "cherry"];
+
+    for (i, fruit) in fruits.iter().enumerate() {
+        println!("{}: {}", i, fruit);
+    }
+}
+
+let main [
+    let [fruits] ["apple" "banana" "cherry"]
+
+    for enumerate fruits [
+        extract [index value] it
+        print\n "%: %" index value
+    ]
+]
+
+let main [
+    let [fruits] ["apple" "banana" "cherry"]
+
+    for enumerate fruits [
+        print\n "%: %" it.index it.value
+    ]
+]
+
+fn main() {
+    let fruits = vec!["apple", "banana", "cherry"];
+
+    for it in fruits.iter().enumerate() {
+        println!("{}: {}", it.0, it.1);
+    }
+}
+# well... being shorter than rust isn't much of an accomplishment.
+
+# I think it's maybe not idiomatic, but in keeping with the spirit of the language, you should be
+# able to explicitly type everything if you really want to.
+
+let [list] [1 2 3 4]
+[0]list
+0:list
+:+ 1 1 list
+
+x.vec
+.vec x
+
+obj.func "hello"
+.func obj "hello"
+func.obj "hello"
+func:obj "hello"
+func: obj "hello"
+
+let [list2] [5 6 7 8]
+:list :list2 0
+list: 5
+list: list2:0
+# what a pain in the ass.
+
+let ptr to [true]
+print\n ptr:0  # outputs true
+let func [
+    args [ptr]
+    set ptr:0 false
+]
+print\n ptr:0   # outputs false
+print\n ptr     # outputs 0xFFFFF...
+print\n of ptr  # outputs [false]
+
+print\n $^ ptr  # outputs [false]
+print\n ptr^  # outputs [false]
+
+let ptr ^[true]
+
+let ptr to [true]
+let val of ptr
+
+let ptr &[true]
+let val *ptr
+
+# this should probably be syntax, because of how often it's done.
+# then again, it's impossible. not with the way function calls work (no parentheses).
+
+print\n ptr-list:0^   # now that's fucked.
+print\n *ptr-list:0   # maybe?
+print\n *ptr-list :0  # different?
+
+# maybe [debug] works like rust? it prints, then returns? also, maybe it just takes all multiple
+# return values, but also does multiple return after printing? that sounds useful.
+
+# I think [$^] and [^$] might just be the way to go.
+
+let ptr to [true]
+let val ot ptr
+# no...
+
+print\n $^ ptr
+print\n *ptr
+print\n ptr
+
+list:1
+list.[1]
+
+obj.i
+obj:i
+# it's more powerful if we do both [.] and [:].
+
+map [pair] quote import "File"  # returns [["open" []] ["close" []] ...]
+for map [pair] quote import "File" [
+    print "%: %\n" it:0 it:1
+]
+# outputs open: []\nclose: []\n...
+
+map [+] [1 2 3 4 5 6]  # returns [3 7 11]
+map [+] [1 2 3 4 5  ]  # error: insufficient arguments for [+].
+# that's interesting.
+
+map [group 3] [1 2 3 4 5 6]  # returns [[1 2 3] [4 5 6]]
+let pair  [group 2]
+let quote [group 1]  # maybe? but maybe not. we need it not to evaluate things.
+
+let then [
+    let cond pop
+    if cond [arg] [cond]
+]
+let else [
+    if pop [arg] []
+]
+# nevermind. faster to just do this.
+let then [
+    if args 2 []
+]
+then cond [print\n "yes"]
+
+# oh my god!
+if cond [print "yes"] []
+if cond then [print "yes"]
+if cond else [print "no"]
+
+let then [ arg [] ]
+let else [ [] arg ]
+
+# well, it's intersting. but interesting is not shorter.
+if cond [print "yes"] []
+then cond [print "yes"]
+guard cond [print "yes"]
+# I could maybe do [guard], but for once, I think it's better to just use [if], always.
+
+# right, I can't forget about this:
+let else [arg]
+if cond [] else []
+if cond [] []
+# really optional, but may help readability.
+
+if true [
+    print "the value is 'truthy'."
+    halt
+] else [
+    print "the value is 'falsey'."
+    continue
+]
+
+# I guess there's no way to do [else if]? unless...
+if true [
+    print "the value is 'truthy'."
+    halt
+] else-if false [
+    print "the value is 'falsey'."
+    continue
+] else [
+    print "that's not possible... how?"
+]
+# yeah... but the input is not lazy.
+# I guess if you avoid giving the condition side-effects, it's good?
+
+cond [
+    true [
+        print "the value is 'truthy'."
+        halt
+    ]
+    false [
+        print "the value is 'falsey'."
+        continue
+    ]
+    _ [
+        print "that's not possible... how?"
+    ]
+]
+# this makes more sense, since the list is evaluated from the top, it can stop evaluating anytime.
+# also, I suppose [_] is just assigned to [true] at the start.
+# I guess it breaks if it finds a match?
+# though, I suppose it's not hard to create a fallthrough function? it's basically identity, but it
+# overflows from the function block and execute the next condition. nice and elegant.
+
+.. [
+    print "Hello, World!\n"
+]
+
+print match value [
+    0 "the value is 0\n"
+    1 "the value is 1\n"
+    _ format "the value is %\n" _
+]
+
+print match value [
+    for 2 [ it, format "the value is %\n" it ]
+    _ format "the value is %\n" _
+]
+# god... this is nice.
+
+import "Debug" .step-into [print "Hello, World!\n"]
+import "Debug" .step-into 2 [print "Hello, World!\n"]
+
+let T 1
+let F 0
+
+if T [
+    print "it's true."
+] else-if F [
+    print "it's false."
+] else [
+    print "stop."
+]
+
+let is-open true
+let is-open T
+
+print bool true  # outputs "true"
+print bool T     # outputs "T"
+
+# I think there is merit to [T] and [F], but I don't know.
+# the values being capitalized makes sense, since they are constants, though. like python.
+
+# oh. my. god.
+for ! T [ print "is true." ]
+if ! T [ print "is true." ] []
+guard ! T [ print "is true." ]
+# okay, that's how I'll do single if statements. it's too clever not to.
+
+while true [ print "is true." ]
+while T [ print "is true." ]
+while 1 [ print "is true." ]
+loop [ print "is true." it ]
+
+# wait, no.
+for 0 [print "forever "]
+# there's probably a benefit to having [it] increment infinitely...
+# and the fact that [it] is assigned, it'll cause problems if the "[if]" statement is inside
+# another [for] loop.
+# let's just use [if]. it's the best for short code, and for refactoring.
+
+[field1 123] get "field1" pop
+
+# maybe I don't need a string append?
+let [IObject] + IOther + IThing [
+    field1
+    field2
+]
+let [obj] new IObject [...]
+# I mean, there's a \n right there ^
+
+# (old thing from there)
+.. map [.. #import] [
+    "Basic"
+    "File"
+    "String"
+]
+# hmm...
+use map [use import] [
+    "Basic"
+    "File"
+    "String"
+]
+# of course, this is redundant now.
+use import [Basic File String]
+
+let obj [
+    let [name] "John Smith"
+
+    let method [
+        print\n name
+    ]
+]
+obj.method  # outputs "John Smith\n"
+# or even
+let obj [
+    let [name] "John Smith"
+]
+let obj.method [
+    print obj.name
+]
+
+# [let obj.method] feels so wrong, but it makes so much sense for initializing a field...
+# anyway, I think I should have this. function objects sound really nice.
+u32 123
+u32.max
+# also, they make sense for this:
+import "File" .open "file.txt"
+# okay, nvm. I thought I was unto something with [import], but no.
+# still think [u32.max] is good though. and I want a way to change [let] statements inside
+# functions. like optional arguments, but more definite. I mean, might as well overload on whether
+# or not it's function or a string. it's right there.
+
+# also, [static] becomes easy.
+let func [
+    let i 0
+
+    if < i 10 [
+        set func.i + 1 i
+    ] [
+        print "the value has reached it's maximum.\n"
+    ]
+]
+func func func func func func func func func func
+func  # outputs "the value has reached it's maximum.\n"
+func  # outputs "the value has reached it's maximum.\n" again
+print\n func.i  # outputs 10
+
+# right, this is what I want to do with [import] and function objects.
+python -m http.server 8000
+# but it's better to do it like this
+import "HTTP" .serve 8000
+
+let Server [
+    format [
+        [server-address RequestHandlerClass] % %
+        serve-forever [
+            let [host port] .. server-address
+            ...
+        ]
+    ]
+]
+let [server] Server ["localhost" 8000] SimpleHTTPRequestHandler
+server.serve-forever
+# not very ideal, is it? I can't do this for example.
+let [server] new Server [["localhost" 8000], SimpleHTTPRequestHandler]
+# maybe...
+let [Server] [
+    new [
+        args [this.[server-address RequestHandlerClass]]
+        this
+    ]
+
+    serve-forever [
+        let [host port] .. this.server-address
+        ...
+    ]
+]
+let [server] Server.new ["localhost" 8000], SimpleHTTPRequestHandler
+server.serve-forever
+# then again, this is more scuffed.
+let [Server] [
+    [server-address RequestHandlerClass] % %
+    serve-forever [
+        let [host port] .. server-address
+        ...
+    ]
+]
+let [server] format Server ["localhost" 8000], SimpleHTTPRequestHandler
+# why is this the most elegant...
+# a little dangerous, though.
+let [Server] [
+    [server-address RequestHandlerClass] % %
+    serve-forever [
+        let [host port] .. server-address
+        ...
+        print "% % %"
+    ]
+]
+
+let [Server] [
+    [constructor] [server-address RequestHandlerClass]
+    [fields] [
+        [field1] 123
+        [field2] 123
+
+        serve-forever [
+            let [host port] .. server-address
+            ...
+        ]
+    ]
+]
+# or maybe [new] assigns depending on the type?
+let [Server] [
+    [server-address RequestHandlerClass]  # initialized by constructor
+
+    serve-forever [  # during definition.
+        let [host port] .. server-address
+        ...
+    ]
+]
+let [server] new Server [["localhost" 8000], SimpleHTTPRequestHandler]
+server.serve-forever
+
+let [Server] struct [
+    [server-address]
+    [RequestHandlerClass]
+] [
+    serve-forever [
+        let [host port] .. server-address
+        ...
+    ]
+]
+# interesting, but I don't feel it.
+
+let [Server] [
+    new init [server-address RequestHandlerClass] []
+
+    serve-forever [
+        let [host port] .. this.server-address
+        ...
+    ]
+]
+let [server] Server.new [["localhost" 8000], SimpleHTTPRequestHandler]
+# now that I think about it, if I have [Server.new] I also have [server.new], which is useless...
+
+let [Vector3] [x y z]
+let [vec] new Vector3 [1 2 3]
+# ^ I should go with the assuption that this works, and work around that.
+
+# huh.
+let [Object] [
+    field1 field2 field3      # to be bound
+    method [print "hello\n"]  # already bound
+]
+let [obj] new Object [1 2 3]  # only binds to [field1 field2 field3]
+# but
+let [obj] new Object [1 2 3 4]  # causes problems, because [method] is bound to 4
+# this is extremely unsafe, but also very short... and it works with the old model!
+# I think I'm unto something. [new] is even handling all the shit!
+
+# I think the best solution is the easiest one.
+let [obj] new Object [1 2 3 4]  # error: [print "hello\n"] is not a field.
+# or more simply, the fields have to be unquoted. it's prevention incorrect argument count.
+# also
+let [obj] new Object [1 2]  # this is valid.
+print obj  # outputs [field1 1, field2 2, method [print "hello\n"]]
+# it can even be useful!
+
+# hmm, I think I'm unto something, but I really need to flesh it out.
+
+let [Object] [
+    field1 field2 field3
+    method [print "hello\n"]
+
+    random-value random 0 100  # function call...
+]
+# that's tough. fields should be assignable to eagerly computed values.
+let [obj] new Object [1 2]  # in other words, I can't do this.
+
+# in that case, I can also do this, since the argument count is fixed.
+let [Object] [
+    [field1 field2 field3]
+    random-value random 0 100
+    method [print "hello\n"]
+]
+
+# huh.
+new [1 2 3] [4 5 6]  # returns [1 4 2 5 3 6]
+# I guess it's not exactly interleave, since the left most value is quoted, but it's close.
+# should interleave behave the same then? (minus the quoting part, of course.)
+interleave [1 2 3] [4 5 6 7 8 9]  # returns [1 4 2 5 3 6 7 8 9]
+# maybe.
+
+# honestly, so much brainstorming... and I finally found a very simply yet dangerous solution.
+# I think I'm going to stick with it, for now.
+
+# what does this do?
+new 3 Vector3 [1 2 3]
+
+new [x] [1]  # returns [x 1]
+new [1] [1]  # returns [1 1]
+new  1  [1]  # returns ?
+
+# huh.
+let Vector3 [2 [x y z 3]]
+new Vector3 [1 2]    # returns [x 1 y 2 z 3] ?
+new Vector3 [1 2 3]  # error: Vector3 expected 3 arguments.
+# no, I don't think so. new throws an error anyway, and [Vector3]'s definition is ugly. but I may
+# be unto something.
+
+let [Vector3] [x y z]
+new T Vector3 [1 2 3]
+new F Vector3 [1 2 3]
+
+maybe it's simpler to just take a pointer.
+new Vector3 list-ptr  # this makes sense, so [Vector3] should also accept pointers for symmetry.
+
+# I just realized: the [] in [new 3 Vector3 [1 2 3]] is now mandatory, since [new] itself doesn't
+# know how many argument to have.
+
+# I think no two functions should do the exact same thing.
+
+map [print\n] [1 2 3]  # returns [print\n 1 print\n 2 print\n 3]
+.. map [print\n] [1 2 3]  # outputs 1\n2\n3\n
+
+map [+] [1 2 3 4]  # returns [+ 1 2 + 3 4]
+print map [+] [1 2 3 4] :0  # returns 3
+print map [+] [1 2 3 4] :1  # returns 7
