@@ -11680,7 +11680,7 @@ new F Vector3 [1 2 3]
 maybe it's simpler to just take a pointer.
 new Vector3 list-ptr  # this makes sense, so [Vector3] should also accept pointers for symmetry.
 
-# I just realized: the [] in [new 3 Vector3 [1 2 3]] is now mandatory, since [new] itself doesn't
+# I just realized: the [] in [new Vector3 [1 2 3]] is now mandatory, since [new] itself doesn't
 # know how many argument to have.
 
 # I think no two functions should do the exact same thing.
@@ -11691,3 +11691,418 @@ map [print\n] [1 2 3]  # returns [print\n 1 print\n 2 print\n 3]
 map [+] [1 2 3 4]  # returns [+ 1 2 + 3 4]
 print map [+] [1 2 3 4] :0  # returns 3
 print map [+] [1 2 3 4] :1  # returns 7
+# no, it can't return like that. we don't know how many arguments [+] or whatever takes, so it
+# needs to be evaluated before returning. 'tis a shame.
+
+# [args] and [opts] at top level.
+args [text]
+print text
+
+    $  0 main.txt "Hello, World!\n"  # outputs "Hello, World!\n"
+
+opts [twice 0]
+if twice [print text] []
+
+    $  0 main.txt "Hello, World!\n" -twice 1  # outputs "Hello, World!\n" x2
+
+togl [twice]
+
+    $  0 main.txt "Hello, World!\n" -twice  # outputs "Hello, World!\n" x2
+
+# if there's not top-level arguments/etc., but you still pass some.
+
+    $  0 main.txt "Hello, World!\n"  # outputs "Hello, World!\n" anyway.
+    $  0 main.txt "Hello, World!\n" > file.txt
+
+# heh, needs refinement.
+
+compile [
+    print "Hello, World!\n"
+] -- [
+    target x86_64 platform linux
+]
+let compile [
+    args [main]  opts [-]
+    ...
+]
+
+compile [] [
+    print "Hello, World!\n"
+]
+# ^ this is maybe better.
+# I don't like miking optional arguments and options tables. do one or the other.
+
+compile [] [
+    print "Hello, World!\n"
+] -target x86_64 -platform linux
+
+let value auto 123
+let value u32  123
+# I guess unless you unfer it back to [auto], the type of value will remain [u32]?
+set value "hello"  # error: [value] cannot be implicitly reassigned.
+let value "hello"  # fine.
+
+# nah, I don't need this.
+# [u32] is only there because you can't infer it. [auto] and [string] and whatever don't exist.
+
+let [obj] [
+    field1.[
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    field2.[
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+]
+print\n obj.field1.sub-field2  # outputs 2
+# I guess?
+# alternatively:
+let [obj] [
+    [field1] [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    [field2] [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+]
+# or going further with the earlier example?
+let obj.[
+    field1.[
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    field2.[
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+]
+# huh.
+let vec.[x 1, y 2, z 3]
+let vec.[x y z] [1 2 3]
+let [Vector] [x y z]
+let vec.Vector [1 2 3]
+# maybe it's different than this?
+set vec.Vector [1 2 3]
+# no. [let] works essentially the same, except for this one thing. I don't like that.
+set vec:quote Vector [1 2 3]
+
+let obj [
+    field1 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    field2 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+
+    method1 {...}
+    method2 {...}
+]
+
+let square {* .}
+let square [* .]
+
+let vec {x 1, y 2, z 3}
+# maybe it's represented without [brackets] or {braces}?
+# ah, but again, it's {} and [] are different, so should "". and now, a lot of problems.
+# maybe it's only for literals, though?
+let temp {* .}
+let square temp
+# yeah, even if passed by symbol, the literal is processed then.
+map {+ 1} [1 2 3 4 5]
+map [+ 1] {1 2 3 4 5}
+# I guess there should be a difference?
+# no, the problem has only ever been for the assigment part of things. everything else is fine.
+# then again, I guess I could make this work?
+let map [
+    args {fn ls}
+    ...
+]
+# you know what? nevermind. the biggest problem is that it's ugly, and I can't have that.
+
+let square fn [* .]
+
+let obj [
+    field1 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    field2 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+
+    method1 fn [...]
+    method2 fn [...]
+]
+
+# if you do this, [map] will just convert it. that's one way to prevent crashes.
+map [+ 1], fn [1 2 3 4 5]  # or maybe it should throw?
+# yeah, that was the reason I didn't want [fn].
+
+let func  [...]
+var value [...]
+# this might be best... except it doesn't solve the objects problem! fuck!!
+# if I do decide to add another way to do functions, [fn] seems to be the cleanest way.
+
+# like, [square] is nice and all~
+let square [* .]
+# but you're forgetting that everything else pays the price.
+let [arr] [1 2 3 4 5]
+
+let func fn[...]
+let func ()[...]
+let func .[...]
+let func :[...]
+
+let func : [...]  # is nice.
+
+let obj [
+    field1 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+    field2 [
+        sub-field1 1
+        sub-field2 2
+        sub-field3 3
+    ]
+
+    method1: [...]
+    method2: [...]
+    # but it does break array indicing.
+
+    method3 .[...]
+    method4 .[...]
+    # this is the nicest looking one.
+
+    method5 fn[...]
+    method6 fn[...]
+    # [fn] feels different when you stick it together like that.
+
+    method7 $[...]
+    method8 $[...]
+]
+
+let square fn[* .]  # I might actually use this. it tickles me. and it's obvious, more importantly.
+
+let Vector3 quote [x y z]  # ["x" "y" "z"]
+let vec: Vector3 [1 2 3]
+# it... kind of makes sense? almost feels like rust...
+# anyway, I don't think object assignments have changed much at all~
+
+for 10 [set vec:it list:it]  # uh...
+
+let [obj field] [field "hi"], ["field"]
+set vec:field "hello"
+# maybe it makes sense? quoted things should be reprensented diffenrently?
+# but I don't want people to do this.
+let Vector3 [[x y z]]
+# still I really think I'm unto something with
+let vec: Vector3 [1 2 3]
+let [vec] new Vector3 [1 2 3]  # is no longer valid.
+let vec new Vector3 [1 2 3]  # not as nice.
+# maybe arrays are really just tables?
+let arr [1 2 3]
+for arr [print\n it]
+let 1 "something else"  # would maybe just index something in the hashmap?
+# we established that value and [value] have no difference,
+let obj [
+    value 123
+    [value] 321
+]
+# so 1 and [1] should be the same.
+let obj [
+    1 123
+    [1] 321
+]
+let arr list[1 2 3]  # [0 1 1 2 2 3]
+for arr [
+    print "%: %\n" id it
+]
+# this is very similar to lua...
+# but I don't like it.
+
+map [+ 1] list[1 2 3 4 5]
+# I guess you can still [car] and [cdr], which makes sense, since you have to traverse the list to
+# find what you want. but how do I low-level this?
+get 1 arr  # still works?
+let arr:-1 "test"  # [-1 "test"]
+set arr:.5 "test again"  # [-1 "test", .5 "test again"]
+arr..5  # error?
+arr:5 arr:"5"  # any difference?
+arr.5 arr.[5]  # now, there SHOULD be a difference!
+# I guess there is: [eval] is called or not on it...
+# I suppose it's consistent, if anything. everything is a prototype.
+
+let Vector3 [x y z]
+let vec: Vector3 [1 2 3]  # [x 1, y 2, z 3]
+let arr [1 2 3]
+let vec: range 0 3 arr  # [1 2 3]
+
+let [[obj]] "hello"  # redundant, maybe?
+
+# by the way, I kind of glossed of that, but damn, tuples are nice.
+let tuple fn[123 "hello"]
+let [number string] .. tuple
+let [number string] tuple:0, tuple:1
+
+x = 1, y = 2
+[x y z] = 1 2 3
+func = fn[
+    print "Hello, World!\n"
+]
+# nah...
+
+let main $[
+    print "Hello, World!\n"
+]
+# [$] is a good contender.
+
+let File import File  # I mean, I could. no reason not to.
+import File .open "file.txt"
+# hell, I could just have all the modules already in here.
+# they are just ignored because they aren't used.
+use File
+
+# it depends on directories?
+.../File/functions.txt  # [File.open] & [File.close] & ...
+.../File/More/functions.txt  # [File.More.misc] & ...
+# makes sense.
+# though to avoid conflicts:
+let func [...]  # ./functions.txt (were main is)
+this.func
+
+use [
+    open  [...]
+    close [...]
+]
+open  # returns [...]
+# ^ I like this... but I can't do this.
+use [File OS HTTP String]
+# honestly, [use] for assignment is redundant with [let]... though it's a good alternative if you
+# need [:] style assignment?
+use File
+use OS
+use HTTP
+use String
+# nah, let's use [use] for it's intended purposes.
+# wait...
+
+for [
+    open  [...]
+    close [...]
+] [use it] -here
+# or?
+for [
+    open  [...]
+    close [...]
+] fn[use it]
+
+let my-list ls[1 2 3 4 5]
+let my-func fn[1 2 3 4 5]
+
+# equivalent?!
+let [[my-func]] [print\n "hello"]
+let [my-func] fn[print\n "hello"]
+
+args [[func] list]  # maybe?
+
+fn     nb value  # error: cannot convert number to function.
+fn any nb value  # ok
+fn! nb value     # ?
+# maybe I should just have types, what with the whole putting [fn] everywhere and stuff...
+
+let func fn[
+    args [value]
+    print\n str value
+]
+func "hello"  # outputs "hello\n"
+func 123      # error: expected [string], but got [number 123]
+# [number 123]... I guess that's how they are represented?
+# and any is just 123?
+
+let Vector3 fields[x y z]
+let vec: Vector3 [1 2 3]
+
+match type value [
+    u32 or u64 or i32 or i64 []
+    _ [error "not found"]
+]
+
+let func fn[
+    args [String value]  # maybe I could?
+    print\n value
+]
+
+# in any case, it's interesting, but it doesn't work, again.
+let func fn[
+    [print\n "hello"]
+]
+fn func  # ... or I guess it does?
+
+# fn, str, char, obj, num, list, type, any
+
+let nums u32[1 2 3 4 5]
+let other-nums u64 nums
+
+# uh... I think I need to take a step back.
+
+let str."Hello, World!\n"
+print str
+# ^ actually works!
+let [str] "Hello, World!\n"
+# and much shorter.
+# maybe the solution was here all along?
+# I'm not adding any feature. just using what was already there.
+# I'm postponing the whole type fiasco, and using this.
+
+let vec.[x y z] 1 2 3  # wait, what happens here?
+# I don't think this is valid.
+
+let str."Hello, World!\n"
+str.Hello,  # technically valid, but will crash.
+
+let [vec] [x 1, y 2, z 3]
+let [vec] mut vec.[x 10]  # [x 10, y 2, z 3]
+
+if [then] [else] condition
+
+let func [
+    if [
+        print "bigger than 0\n"
+    ] [
+        print "smaller than 0\n"
+    ] < 0
+]
+func  123  # outputs "bigger than 0\n"
+func -123  # outputs "smaller than 0\n"
+let func [
+    if [ print "between 0 and 100\n" ] [ print "not\n" ] && < 100 > 0 .
+    if [ print "bigger than 0\n" ] [ print "smaller than 0\n" ] < 0
+]
+func  123  # outputs  "bigger than 0\n" "not\n"
+func -123  # outputs "smaller than 0\n" "not\n"
+func   66  # outputs  "bigger than 0\n" "between 0 and 100\n"
+# this is such a pain.
+
+let Vector.[x y z]
+let vec: Vector [1 2 3]
+# I love it. I just love how it gives the illusion of a type.
+
+let arr .[1 2 3]  # even better!
