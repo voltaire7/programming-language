@@ -12106,3 +12106,376 @@ let vec: Vector [1 2 3]
 # I love it. I just love how it gives the illusion of a type.
 
 let arr .[1 2 3]  # even better!
+
+let true [
+    args [a b]
+    .. a
+]
+let false [
+    args [a b]
+    .. b
+]
+true [print\n "yay"] [print\n "nay"]
+let if [
+    args [condition true-branch false-branch]
+    .. condition true-branch false-branch
+]
+print\n < 1 0  # outputs [false]
+.. < 1 0 [print\n "yay"] [print\n "nay"]  # ... so [if] is just [..] in disguise?
+# no... it works so much better in scheme, where passing functions by value is easier.
+
+let POINTER_LIST.[0x0 ."value1" 0x1 ."value2]
+let ptr 0x0
+get ptr  # returns "value1" ?
+# because how do you represent pointers otherwise?
+# so any number in the env is effectively a pointer?
+# it makes sense, since a program should only be able to access it's own memory.
+
+let func ptr-to [print "hello\n"]
+func  # outputs "hello\n"
+val-of func  # returns 0x...
+let [func] ptr-to [print "hello\n"]
+print\n func  # outputs 0x...
+# so like, quoted numbers behave like values?
+
+# that's an interesting thought, but no.
+let a 1
++ 1 1
++ a a
+# ^ equivalent, so no choice but to make them normal.
+# and anyway, it doesn't bring anything to the table.
+# pass by reference functions are dumb.
+
+let [obj.field .sub-field1 .sub-field2] 1 2
+obj.field.sub-field1  # returns 1
+
+# the best model
+list: 5   # actual index
+list:"5"  # key
+
+let list.[0 1 2 3 4 5 6 7 8 9 10 11 12 13]
+reduce [for 10 [get it] list]  # returns [0 1 2 3 4 5 6 7 8 9]
+# btw list only copied once.
+
+let obj: Object [1 2 3]
+for 0 [import "Debug" .step-into it code let [_] read-key]
+map [reduce [args 3]] [1 2 3 4 5 6]  # returns [[1 2 3] [4 5 6]]
+print object []  # better?
+
+(define x 1 2 3)
+(define  x  "calculate")  # calculate called as func (eager)
+(define (x) "calculate")  # calculate is string
+# so a function is just lazy... there is no difference otherwise
+(define (square) * .)  # can you do this? probably not.
+(define x print 123) (x) # outputs 123, x equivalent to (print 123)
+
+(let (x) 1 2 3)      # multiple return.
+(let (x y z) 1 2 3)  # multiple assign.
+
+(let (say-hello) (print "hello\n"))
+
+(let (func) (for args (print\n it)))
+(func 1 2 3 4)  # outputs "1\n2\n3\n4\n"
+(let (func) (print args))
+(func 1 2 3 4)  # outputs 1 2 3 4
+(func print "hello\n")  # outputs print "hello\n"
+(let (func) (args))
+(func print "hello\n")  # outputs "hello\n"
+
+(for (1 2 3) (print\n it))
+(let list 1 2 3)
+(for (list) (print\n it))
+(let (a b c) 1 2 3)
+(for (a b c) (print\n it))
+
+(let value (+ 1 1))
+value -> 2
+
+(let (value) (+ 1 1))
+value   -> (+ 1 1)
+(value) -> 2
+
+(let (func)
+    (print\n "hello")
+    (print\n "goodbye"))
+(func) -> (print\n "hello") (print\n "goodbye")
+
+# (scheme)
+(define func (quote (display "Hello, World!\n")))
+(eval func)
+# equivalent:
+(let (func) (print "Hello, World!\n"))
+(func)
+# also equivalent
+(define func (lambda () (display "Hello, World!\n")))
+(let func (quote (print "Hello, World!\n")))
+(let func (delay (print "Hello, World!\n")))  # better?
+(let func (async (print "Hello, World!\n")))  # also possible.
+(func)
+# or any function can be called normally, or asynchronously?
+
+(let (if) (args))
+(if true (print\n "true") (print\n "false"))
+(let (true ) ((get 0 args)))
+(let (false) ((get 1 args)))
+((< 0 1) (print\n "true") (print\n "false"))
+
+(let (func) (+ args))
+(func 1 2)  # returns 3
+
+(for (1 2 3) (print\n it))
+(for (delay (1 2 3)) (print\n it))
+(let (for) (args list body)
+    (when (not (empty? list))  # god, this is verbose.
+        (let it (car list) (body))  # hmm... I don't think so. but I don't know how else yet.
+        (for (cdr list) body)))
+(for (1 2 3) (as value (print\n value)))
+for [1 2 3] as value [print\n value]
+# damn, model 1 is so much cleaner. I don't think anything will come of model 2, but let's continue
+# observing. it's very intersting.
+
+(when (not (empty? list)) (print\n "not empty"))
+if list [print\n "not empty"] []
+# I mean, wtf?
+
+(map (+ 1) (map (+ 2) (1 2 3)))  # here, the inner map is treated as a list, not a function.
+# it won't be called, because of that. and therefore, there's a bug.
+# unless I can figure this out, this model is DOOMed.
+
+(map [+ 1] (map [+ 2] [1 2 3]))  # this maybe makes more sense?
+
+# but it causes problems? (while solving others)
+(let  func  (+ 1 1))
+func -> 2
+(let [func] (+ 1 1))
+ func  -> (+ 1 1)
+(func) -> 2
+(let symbol "func")
+(let (symbol) (+ 1 1))
+(func) or (symbol) or ([func])
+# so like, [] is equivalent to delay.
+(let [func] (print "Hello, World!\n"))
+(let func [(print "Hello, World!\n")])
+# equivalent:
+(let (delay func) (print "Hello, World!\n"))
+(let func (delay (print "Hello, World!\n")))
+
+(let [func] (* (dup)))
+(func 2) -> 4  # because [dup] is called first?
+
+(let func [(args name) (print\n name)])
+(let [func] (args name)
+    (print\n name))
+(func "John")  # outputs "John"
+([(args name) (print\n name)] "John")  # outputs "John"
+
+(let print-line print\n)
+(print-line "hello")
+(let [print-line] print\n)
+((print-line) "hello")
+
+(let value)  # declaration, but not definition
+(value 123)  # error: "value" is not a function.
+
+()  # nothing happens?
+[]  # empty string, basically.
+""  # ^
+
+(for (args) [print\n it])
+(let [func] (+ (args)))
+(func 1 2)  # returns 3
+# there's a problem here.
+
+(let [func]
+    (for args [print\n it]))
+(func 1 2 3) -> ((for args [print\n it]) 1 2 3) (for [1 2 3] [print\n it])
+(let [func] (+ (first 2 args)))
+(func 1 2)
+
+let func [+ 2]
+func 3
+(let [func] (+ 2))
+(func 3)
+
+# better for formatting.
+print-object [x 1, y 2, z 3]
+print-bool T
+
+((for args [print\n it]) 1 2 3)  # outputs "1\n2\n3\n"
+# it reduces to () so nothing happens.
+# also.
+(let func [(print\n "hello")])
+(func)  # becomes (print\n "hello"), not [(print\n "hello")]
+# (delay (print\n "hello")) has already been called.
+(for args [print\n it]) 1 2 3
+
+# wait
+[1 2 3] -> 1 2 3  # right? since [] isn't actually a list or anything.
+(for args [print\n it])
+(+ args)  # both are valid!
+
+(+ [1 2])
+(+ 1 2)
+# okay, nvm. this shouldn't be the same.
+
+(+ 1 2)
+(((+) 1) 2)  # equivalent?
+
+(let [func] (print\n args) (print\n args))
+(func 1 2 3)
+([(print\n args) (print\n args)] 1 2 3)
+# yeah, you need [], otherwise...
+
+# should I throw an error if the arguments are unused? I should, but then again...
+
+# something has been bothering me for a while.
+(let x 1 2)
+x -> 1 2
+(+ x) -> 3
+
+(let [list] 1 2 3)
+ list  -> [1 2 3]
+(list) ->  1 2 3
+# right?
+# so like
+(let [func] (+ (args)))
+(func 1 2)
+# it works a bit like [..].
+# ... not 'a bit', a LOT!
+.. [print\n "hello"]
+([(print\n "hello")])
+.. [1 2 3]
+([1 2 3])
+
+(let [func]
+    (print\n "started")
+    (print\n args))
+# ... I don't think I can do currying, though.
+
+(let vec [1 2 3])
+(let [x y z] (vec))
+# but that doesn't work, since [] makes it lazy.
+(let func
+    (print\n "hello")
+    (print\n "goodbye"))
+# this is lazy then?
+
+# btw.
+(let [x y z] (args))
+# also, we can do discards.
+([(let [x y] (args))] 1 2 3)
+
+# I think it makes more sense for just the function to be able to do multiple return.
+# variables should be capable of discards instead. it works well with (args)
+
+(let x 1)
+x -> [1]  # that's... well, weird.
+(x) -> 1
+# I... can't proceed, unless I figure this out.
+
+(let func [
+    (print\n "hello")
+])
+(func)
+(let str "hello")
+
+(let x 1 2 3)
+x -> 1 2 3
+(let [x] 1 2 3)
+x -> 1
+
+(let func  [(print\n "hello")] 1 2 3)
+(func) -> ([(print\n "hello")] 1 2 3)
+# I think this is good.
+
+(let [x y z] 1)  # error: insuffient argument count
+
+(let print\n [(print "%\n" (format (args)))])
+let print\n [print "%\n" format]
+
+(let square [(* (dup (args)))])
+(let square [(* . dup . args)])  # surprisingly the same char count.
+(let square $ (* . dup . args))  # in other words, useless feature... though it looks nice.
+(let square $ . * . dup . args)
+(let square $.*.dup.args)        # maybe?
+let square [* dup]
+(square 5) -> 25
+ square 5  -> 25
+
+# I've played with this shit a lot, but it's obvious I'll never implement it.
+# maybe it's time to put it to rest?
+
+let map [
+    let [list] reduce + args 2
+    + car list, if cdr list [map func, cdr list] [[]]
+]
+let [list] [1 2 3 4]
+car list -> 1
+cdr list -> [2 3 4]
+map [+] list -> [3 7]
+# what if list is a pointer?
+
+(let apply [
+    (let [operator operands] (car args) (cdr args))
+    (operator (operands))
+])
+(apply + [1 2 3 4])
+# honestly, I'm starting to think scheme is cleaner.
+# well, I could probably make it cleaner, but at that point, I'd rather use scheme.
+
+let my-queue: Queue []
+my-queue.insert 1
+my-queue.insert 2
+my-queue.insert 3
+my-queue.insert 4
+my-queue.delete
+my-queue.delete
+print\n my-queue.get
+# I don't know about this.
+# anyway, if I did do it this way, there shouldn't be an overhead from the carrying the methods.
+let my-queue.[]
+use Queue
+insert my-queue 1
+insert my-queue 2
+insert my-queue 3
+insert my-queue 4
+delete my-queue
+delete my-queue
+print\n my-queue
+# you know, not going full OOP and stuff, but still having structures; seperating data and logic.
+Queue.insert my-queue 5
+# this is... nice.
+
+use Queue
+insert my-queue 5
+delete Queue
+insert my-queue 5  # error: Queue.insert is not bound. (or defaulting to basic list insert)
+# so I guess [use] has to remember things.
+
+# I should be able to do this.
+import "Debug" .step-into [print "Hello, World!\n"]
+import "Debug" .step-into 2 [print "Hello, World!\n"]
+# but the program should able to detect bugs due to variable argument count.
+let func [
+    import "Debug" .step-into args 1
+    print\n "fucking whatever"
+]
+func [print\n "hello"]
+func 2  # error: expected string, got number.
+# that or...
+func [print\n "hello"]
+func 2 [print\n "hello"]  # still valid. [args] is smart, and can figure things out?
+# I think the second one is ideal.
+# then again, isn't the first one already implemented?
+# [.step-into] expects two arguments, but will only get one.
+print
+let x 1
+# ^ like this.
+
+let func [
+    import "Debug" .step-into .. args 1
+    print\n "fucking whatever"
+]
+func [[print\n "hello"]]
+func [2 [print\n "hello"]]
+# also works, I suppose.
