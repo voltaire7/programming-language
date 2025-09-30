@@ -12160,7 +12160,17 @@ reduce [for 10 [get it] list]  # returns [0 1 2 3 4 5 6 7 8 9]
 let obj: Object [1 2 3]
 for 0 [import "Debug" .step-into it code let [_] read-key]
 map [reduce [args 3]] [1 2 3 4 5 6]  # returns [[1 2 3] [4 5 6]]
+
 print object []  # better?
+# no, I think I should do this.
+print-object [x 1, y 2, z 3]
+print-function [print "Hello, World!\n"]
+print-bool T
+# this is useful – not just for the formatting, but also if it has [%] inside.
+# maybe even this?
+debug-object [x 1, y 2, z 3]
+debug-function [print "Hello, World!\n"]
+debug-bool T
 
 (define x 1 2 3)
 (define  x  "calculate")  # calculate called as func (eager)
@@ -12296,10 +12306,6 @@ let func [+ 2]
 func 3
 (let [func] (+ 2))
 (func 3)
-
-# better for formatting.
-print-object [x 1, y 2, z 3]
-print-bool T
 
 ((for args [print\n it]) 1 2 3)  # outputs "1\n2\n3\n"
 # it reduces to () so nothing happens.
@@ -12479,3 +12485,397 @@ let func [
 func [[print\n "hello"]]
 func [2 [print\n "hello"]]
 # also works, I suppose.
+
+# I love how I'm not using [/] anymore. I guess it was just a passing fad.
+Queue/insert my-queue 1
+# yeah, I don't like it.
+
+use import "Basic"  # this might be required.
+
+let [Basic] import "Basic"
+Basic.+ 1 [2 3]  # returns [1 2 3]
+
+# I should try making [Basic] as small as possible, so as to not have too much overlap.
+# in other words, no pow operator – not that I need it with [* .].
+
+using Queue [
+    insert my-queue 1
+    insert my-queue 2
+    insert my-queue 3
+    delete my-queue
+    delete my-queue
+]
+# yeah, C# style is good too.
+
+using [Queue Math] [
+    insert my-queue 1
+    delete my-queue
+    log 10
+]
+# right, I can't forget that like [let], [use] is overloaded of the symbol type, not value.
+# same with [using].
+
+use list [File OS HTTP String]  # [list] removes quotes?
+# I think I like this. although, it should probably be another value then [list], the whole
+# chaining functions thing is extremely nice.
+
+use list-of [File OS HTTP String]
+use concat [File OS HTTP String]
+use flat [File OS HTTP String]
+# I need to find a good name...
+
+use-for [File OS HTTP String]
+using-for [File OS HTTP String] [
+    open "file.txt"
+]
+
+# optional args?
+use -for [File OS HTTP String]
+use -$ [File OS HTTP String]
+
+# maybe?! I mean, isn't it clever?
+for [File OS HTTP String] use it
+# no, the body should only be called once, if it's a symbol: to get the actual body.
+
+# um, no. unfortunately.
+for [Queue Math] using it [
+    insert my-queue 1
+    delete my-queue
+    log 10
+]
+
+map [use  ] [File OS HTTP String] -here  # this works but...
+map [using] [File OS HTTP String] -here  # this doesn't
+
+use flat    [File OS HTTP String]  # only one layer?
+use flatten [File OS HTTP String]  # flatten completely?
+# ^ aside from the name, this seems to be the cleanest way of doing things.
+using flat [File OS HTTP String] []
+
+using in [File OS HTTP String] []
+# [in] is pretty nice. typically used in [for] loops.
+
+# it's still debatable if this is better than just using a macro.
+use [File OS HTTP String]
+use import [File OS HTTP String]
+# ^ both valid.
+
+let [File  ] import "File  "
+let [OS    ] import "OS    "
+let [HTTP  ] import "HTTP  "
+let [String] import "String"
+
+use in [File OS HTTP String]
+use import [File OS HTTP String]
+# I think, since I expect [use] to be used a lot, for it to be a macro like [let].
+# it's not like macros are bad, or anything. they just have to be used in moderation.
+
+let my-macro [
+    let x 1
+    let y 2
+    let z 3
+] -here
+my-macro
+print\n "x=%, y=%, z=%" x y z
+
+print\n "#=%, #=%, #=%" x y z  # [#] for symbol – actually, while making this comment, I remembered
+# that [#] was for making comments...
+
+print\n "%=%, %=%, %=%" sym-val [x y z]
+
+for fields obj []
+for values obj []
+
+for keys obj []
+for vals obj []
+
+html [
+    <div>Hello, World!\n</div>
+]
+
+map (+) [1 2 3 4]  # returns [3 7]
+# (+) being equivalent to [unquote []].
+let func (
+    print "Hello, World!\n"
+)
+func  # outputs "Hello, World!\n"
+let func [
+    print "Hello, World!\n"
+]
+func  # returns [print "Hello, World!\n"]
+# if I do that, everything now has to also overload over functions as well...
+
+# ...
+let square [* .]
+square  # returns [* .]
+let square (* .)
+square 5  # returns 25
+
+let value [square]
+let (value) (* .)
+square 5  # returns 25
+# so like, when it's a macro, {} allows you to circumvent it?
+
+map (+) (1 2 3 4)  # and yet...
+
+let func [
+    import "Debug" .step-into args 1
+    print\n "fucking whatever"
+]
+func ([print\n "hello"])
+func (2 [print\n "hello"])
+# you know, the earlier thing?
+# anyway, it would just work. but also break things.
+
+# wait, does it work? no, right? I mean, you have to run the thing, or bind it to a variable,
+# then run it...
+# I guess everything is a function, and everything is always run, you just don't realize it.
+# it's not obvious.
+
+let list [4 3 2 1 0]
+set list: (1 2 3) [10 20 30]
+print\n list  # outputs [4 10 20 30 0]
+
+let obj []
+set obj: [1 2 3] (10 20 30)
+print\n obj   # outputs [1 (10) 2 (20) 3 (30)]
+set obj: [1 2 3] [10 20 30]
+print\n obj   # outputs [1 [10] 2 [20] 3 [30]]
+# maybe I should seriously consider it?
+
+use [
+    open  (...)
+    close (...)
+]
+use (File OS HTTP String)
+
+# () is like a bubble: it pops easily.
+# [] is more solid, harder to break.
+
+let print\n (print "%\n" format)
+let my-print (print)
+
+set list: (1 2 3) [10 20 30]
+let indices (1 2 3)
+set list:  indices  [10 20 30]  # won't work!
+set list: (indices) [10 20 30]  # better.
+
+set list: $[1 2 3] [10 20 30]
+let indices [1 2 3]
+set list:   indices [10 20 30]  # also won't work!
+set list: $ indices [10 20 30]  # also better.
+
+let Vector3 [x y z]
+let vec:   Vector3 [1 2 3]  # [x 1 y 2 z 3]
+let vec: $ Vector3 [1 2 3]  # [x $ 1 y $ 2 z $ 3]
+# like, they are functions and stuff?
+let vec:   Vector3 [[...] [...] [...]]  # [x  [...] y  [...] z  [...]]
+let vec: $ Vector3 [[...] [...] [...]]  # [x $[...] y $[...] z $[...]]
+# because of the way tables work, [$] is run everytime you try to get a value.
+
+# $[] symbol for the language?
+
+let list: index-list:: index-index-list::: 0 123
+# I guess this works? though it's hella ugly.
+# but so is [..] for field access.
+
+let list: index-list:index-index-list::0 123  # valid?
+
+# anyway, I have a good feeling about [$]. I'll figure out [:] at a later date.
+# [$] is solving one of my major gripes actually... you know, [:0] vs [:"0"].
+
+# damn, that also means this.
+let  value  [print\n "hello"]
+let [value] [print\n "hello"]
+# ^ now behave the same.
+
+let [square] [* .]
+let square $ [* .]
+let square [* .]
+let square.[* .]
+
+[x  [...] y  [...] z  [...]]
+[x $[...] y $[...] z $[...]]
+
+[x [...] y [...] z [...]]
+[x.[...] y.[...] z.[...]]
+
+ square   # symbol
+[square]  # list of symbols
+
+map 1 [1 2 3 4]  # returns [1 1 1 1 1 1 1 1 1 1 1 1 1 ...]
+# if
+map [+] [1 2 3 4]  # returns [3 7]
+# then again, no. not if you keep a copy of the original.
+
+map $[+] [1 2 3 4]
+# vs
+map [+] [1 2 3 4]
+
+map [+] $[1 2 3 4]
+
+# [$] is now required when passing, because you can't do this.
+args [[func] value]
+# well, you can, but it's not very consistent.
+
+# can't forget about this.
+let value [[]]
+let [value] []
+
+let value []
+let value.[]
+
+# it is the shortest one, at the end of the day.
+# it's unfortunate for [:], but I'll figure something out.
+
+let func [
+    args [[f]]
+    f "hello"
+]
+func [print\n]
+
+let func $[
+    args [f]
+    f "hello"
+]
+func $[print\n]
+# these two are the same char length...
+# a function is only defined once, but can be called multiple times.
+# it's obvious which I should pick.
+
+let func [
+    args [f]
+    .. f "hello"
+]
+func [print\n]
+
+let func [
+    .. arg "hello"
+]
+func [print\n]
+
+let func $[
+    let f arg
+    f "hello"
+]
+func $[print\n]
+
+let func $[
+    arg "hello"  # not possible?
+]
+func $[print\n]
+# and shit gets real fucked when you do [args 2].
+
+let [value] 123
+let [square] $ [* .]
+let value 123
+let square [* .]
+
+func $[random]
+func [random]
+# ^ get random value everytime.
+
+# convention: a function should only ever return a number or a quote. the same goes for passing
+#             arguments to a function.
+
+# instead of it being [unquote], how about making [$] be [quote]?
+
+let Vector3 [x y z]
+$ Vector3  # returns ["x" "y" "z"]
+# or
+$ Vector3  # returns [$ x $ y $ z]
+# same length! though it doesn't really work, because of how tables work.
+# [[x] [y] [z]] it is.
+
+let vec:   Vector3 [1 2 3]  # [x 1 y 2 z 3]
+let vec: $ Vector3 [1 2 3]  # [[x] 1, [y] 2, [z] 3]
+let vec: Vector3 $ [1 2 3]  # [x [1], y [2], z [3]]
+# yeah, I don't mind this. I was already using [quote] before. I just didn't like the word.
+
+let vec:   Vector3 [[...] [...] [...]]  # [x [...] y [...] z [...]]
+let vec: $ Vector3 [[...] [...] [...]]  # [x.[...] y.[...] z.[...]]
+let vec: $ Vector3 [[...] [...] [...]]  # [[x] [...] [y] [...] [z] [...]]
+let vec: Vector3 $ [[...] [...] [...]]  # [x [[...]] y [[...]] z [[...]]]
+# I think I've taken a liking to this. now I just need to figure out how to do good indicing.
+
+# [unquote] breaks things, [quote] can too, but in a chill way. (in a non-catastrophic way)
+
+let list: [0 1 2] [1 2 3]  # [0 1, 1 2, 2 3]
+
+let list.[0 1 2 3]
+set list:  0  123  # [123 1 2 3]
+set list: [0] 321  # error: field [0] not found.
+set list: [2] 321  # [123 1 2 321]
+
+set list: [[2]] 321  # [123 1 [2] 321]
+set list: [2] [321]  # [123 1 2 [321]]
+
+for $ fields obj []
+
+# oh!
+set list: [0 1 2] [1 2 3]  # [[0 1 2] [1 2 3]]
+# I think I'm unto something.
+set list: [0] 1  # [[0] 1]
+set list: [0] [1]  # [[0] [1]]
+# wait, no. I can't do that... [[0 1 2] 1 2 3] is how it works normally.
+set list: [0 1] 1 2  # [[0 1] 1 2] ?
+
+# maybe I really should just indexify everything?
+# and the use [car] and [cdr] to actually parse things.
+
+let list: Array [1 2 3]
+for list [
+    print\n "% %" id it
+]
+
+let list.[0 1 2 3]
+set list: 0 123            # [123 1 2 3]
+set [list: 1 2] 321 -123   # [123 321 -123 3]
+# because technically, they're unquoted right?
+set [list: [-123]]  -321   # [123 321, -123  -321 ]
+set [list: [-123]] [-321]  # [123 321, -123 [-321]]
+
+let [list:   [x]] "Hello, World!\n"  # [123 321, -123 [-321], x "Hello, World!\n"]
+let [list: $ [x]] "Hello, World!\n"  # [123 321, -123 [-321], x."Hello, World!\n"]
+let [list: [[x]]] "Hello, World!\n"  # [123 321, -123 [-321], x."Hello, World!\n"]
+let [list: [x]] ["Hello, World!\n"]  # [123 321, -123 [-321], x."Hello, World!\n"]
+
+let [list: $ [x y]] "hello" "bye"  # [123 321, -123 [-321], [x y] "hello" "bye"]
+let [list:   [x y]] "hello" "bye"  # [123 321, -123 [-321], x "hello", y "bye"]
+
+# I think I figured it out. though I still don't know about this.
+let vec: Vector3 [1 2 3]
+# vs
+let vec: Vector3 1 2 3
+
+let  obj:   "0"   1   # [ 0   1 ]
+let  obj:   "x"   1   # [ x   1 ]
+let  obj: $ "0"   1   # [[0]  1 ]
+let  obj: $ "x"   1   # [[x]  1 ]
+let  obj: $ "0"  [1]  # [[0] [1]]
+let  obj: $ "x"  [1]  # [[x] [1]]
+let  obj:   "0"  [1]  # [ 0  [1]]
+let  obj:   "x"  [1]  # [ x  [1]]
+let [obj:   "0"] [1]  # [ 0  [1]]
+let [obj:   "x"] [1]  # [ x  [1]]
+let [obj:    0 ] [1]  # [    [1]]
+let  obj:    0   [1]  # [     1 ]
+let  obj:    0    1   # [     1 ]
+let [obj:    0 ]  1   # [     1 ]
+
+# yeah, I think this is it. I don't see how I could improve upon it.
+# you can get a [range] in the index list, you can expand the list.
+
+let list.[1 2 3 4 5]
+set [list: .. range 0 3] 10 20 30  # [10 20 30 4 5]
+set [list: 0] [100 200 300]  # [[100 200 300] 20 30 4 5]
+set  list: 0  [100 200 300]  # [ 100 200 300  20 30 4 5]
+# I see.
+set [list: 0 1 2] 10 20 30   # multiple indices.
+set [list: 0] [100 200 300]  # just one index.
+set  list: 0  [100 200 300]  # same here.
+# how can I use this?
+set  obj: [x y z]   [1 2 3]  # [[x y z]  1 2 3 ]
+set [obj: [x y z]]  [1 2 3]  # [[x y z] [1 2 3]]
+# I unironically feel so smart right now...
+# did I seriously just do this?!
