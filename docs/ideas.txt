@@ -12879,3 +12879,59 @@ set  obj: [x y z]   [1 2 3]  # [[x y z]  1 2 3 ]
 set [obj: [x y z]]  [1 2 3]  # [[x y z] [1 2 3]]
 # I unironically feel so smart right now...
 # did I seriously just do this?!
+
+# wait.
+let  obj:   "0"   1   # [ 0   1 ]
+let  obj:   "x"   1   # [ x   1 ]
+let  obj: $ "0"   1   # [[0]  1 ]
+let  obj: $ "x"   1   # [[x]  1 ]
+let  obj: $ "0"  [1]  # [[0]  1 ]
+let  obj: $ "x"  [1]  # [[x]  1 ]
+let  obj:   "0"  [1]  # [ 0   1 ]
+let  obj:   "x"  [1]  # [ x   1 ]
+let [obj:   "0"] [1]  # [ 0  [1]]
+let [obj:   "x"] [1]  # [ x  [1]]
+let [obj:    0 ] [1]  # [    [1]]
+let  obj:    0   [1]  # [     1 ]
+let  obj:    0    1   # [     1 ]
+let [obj:    0 ]  1   # [     1 ]
+# had to change a few of them, but it still works.
+
+let  vec:      [x y z] [1 2 3]  # [[x y z] 1 2 3]
+let [vec: .. $ [x y z]] 1 2 3   # [x 1 y 2 z 3]
+
+let Vector3.[x y z]
+let vec: Vector3 [1 2 3]  # [[x y z] 1 2 3]
+# yep, got what I wanted. even better, actually, since I don't have to do [$ Vector3].
+# wait, no... what am I smoking? if I don't have to use [$], how do assign a function?
+
+let  vec:   [x y z]  [1 2 3]  # [ x  1  y  2  z  3]
+let  vec: $ [x y z]  [1 2 3]  # [[x] 1 [y] 2 [z] 3]
+let [vec:   [x y z]] [1 2 3]  # [ x  [1]  y  [2]  z  [3]]
+let [vec: $ [x y z]] [1 2 3]  # [[x] [1] [y] [2] [z] [3]]
+# not as elegant as before, but as hard to implement either.
+# also, there would be a bug, if [x] in [x y z] was assigned, but not the other fields.
+# it was never going to work out.
+
+let Vector3.[x y z]
+let vec:   Vector3 [1 2 3]  # [ x  1  y  2  z  3]
+let vec: $ Vector3 [1 2 3]  # [[x] 1 [y] 2 [z] 3]
+# I still got what I wanted. not "even better", but whatever.
+# at least for [Vector3] I don't expect to use [$].
+
+map $[+    ] $[1 2 3 4]  # [+ + + +]
+map  [+    ] $[1 2 3 4]  # ["12" "34"]
+map  [+ "."] $[1 2 3 4]  # [".1" ".2" ".3" ".4"]
+# then maybe [to-num] to change it back to a number?
+map [to-num + "."] $[1 2 3 4]  # [.1 .2 .3 .4]
+map [/ arg 10    ] $[1 2 3 4]  # [.1 .2 .3 .4]
+
+let Vector3.[
+    x [i32]
+    y [i32]
+    z [i32]
+]
+new Vector3[1 2 3]        # [x 1 y 2 z 3]
+new Vector3["1" "2" "3"]  # [x 1 y 2 z 3]
+new Vector3["hello" 2 3]  # error: function [i32] tried to convert "hello" into a number.
+# basically, the name of the field, and the function called on it at the time of initialization.
