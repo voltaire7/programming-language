@@ -12935,3 +12935,184 @@ new Vector3[1 2 3]        # [x 1 y 2 z 3]
 new Vector3["1" "2" "3"]  # [x 1 y 2 z 3]
 new Vector3["hello" 2 3]  # error: function [i32] tried to convert "hello" into a number.
 # basically, the name of the field, and the function called on it at the time of initialization.
+
+$ [x y z]  # [[x] [y] [z]]
+$ [x y z]  # [[x   y   z]]
+# which is better? I'm thinking the second one, since [$] can now accept numbers.
+
+let vec.[x 1, y 2, z 3]
+vec: "x"  # 1
+vec: "x y"  # 1 2
+
+compile [] [] -run
+compile [] [] args
+# 0 main.txt -run
+# though [args]?
+
+# i32 throws an error if type can't be converted?
+i32 "hello"  # error
+
+type Vector3 [x [i32], y [i32], z [i32]]
+let [vec] Vector3[x 1, y 2, z 3]
+
+# I really need to find use cases for types. [Number] vs [i32] is one example.
+
+# if I do add types, it would completely change the language...
+args [[x]]  # would not behave the same.
+args [[x i32] [y u64]]
+args [x i32, y u64]  # better.
+
+# [typed-args] ?
+# or maybe like haskell.
+let square Fn[i32 i32 i32] [* .]
+square 123 123  # Fn[] check the types before any code is called in the function.
+
+# I've been trying to rethink the language but with types; that said, I don't think I really need
+# to abandon the current model? what if we use the superset idea? like with javascript and typescript?
+
+set Types.Object []
+
+# [-type], the function itself doesn't check for types, it validates the passed args, the
+
+print Object []  # type casting?
+
+# maybe I can do overloading since default [Any]?
+
+loop as it [break it]
+for 0 [
+    import "Debug" .step-into it [
+        print "Hello, World!\n"
+    ]
+    read-key
+]
+
+let bool enum [F T]
+let [T F] 1 0
+# how do I do enums again?
+
+import "Types"  # this might the strongest idea for the 'superset' faction.
+
+mut list:0 1
+mut list 0 1
+# ?
+
+get 0 list
+mut 0 list 1
+mut list:0 1  # still works?
+# I don't see why not. though it is redundant.
+
+let NewType [i32]
+let RefType 0xfff...  # i.e. pointer
+
+import "Types"
+let square Fn[i32 i32] [* .]
+square  5  # 25
+square .5  # error: cannot convert .5 into [i32]
+
+let square Fn[i32 i32] [f32 * .]
+square 5  # error: expected a return value of type [i32], got [f32].
+
+Fn[i32 i32] [f32 * .]  # returns [
+    i32 (.. [f32 * .], i32 arg)
+]
+# ... so types are just wrapper functions.
+
+let value i32 123
+type value  # Fn[i32] or function that takes nothing, and returns and [i32].
+# you can't overload it, since overloading is done one a argument basis.
+let + Fn[i32 i32][i32] [i32.add]
+let + Fn[f32 f32][f32] [f32.add]
+
+# then again.
+let func1 Fn[MyType][] [...]
+let func2 Fn[MyType][] [...]
+let func3 Fn[MyType][] [...]
+
+let x MyType[]
+
+func1 x
+func2 x
+func3 x
+
+# vs
+let MyType.[
+    func1 [...]
+    func2 [...]
+    func3 [...]
+]
+
+let x []
+
+MyType.func1 x
+MyType.func2 x
+MyType.func3 x
+
+use MyType
+func1 x
+func2 x
+func3 x
+# the second model is just simpler and more consistent.
+
+# I guess I can do overload, just not in the typical multiple [let] assignments way?
+let print [
+    args [first-arg]
+    match type first-arg [
+        [Number] or [String] [print-as-is format]
+        [Object] [print-as-is format-object]
+        [Array] [print-as-is format-array]
+    ] first-arg
+]
+# like this?
+
+# but I don't know. I really need to analyse typescript. there's a lot of lessons to take from there.
+
+let . [
+    args [value]
+    value value
+]
+type [.]  # inferred as Fn[Any][Any Any]
+
+Array[i32]
+Array 10 [i32]
+
+# maybe [use] is overloaded on function types?
+use File
+use [File]
+use [File.open]
+# all allow:
+open "file.txt"
+# although [use [File.open]] only does this for [open].
+close file  # doesn't work for the last one.
+# then again...
+let open ["Hello, World1\n"]
+let [open] [something [...]]
+# I don't think I can do this.
+extract [open] File
+extract [File.open]  # same length if the function name was shorter.
+
+let func [
+    reduce [
+        for 100 [arg]
+    ]
+]
+func 1 2 3 4 5 6 7 8 9 10 ...
+
+# the whole inserting a number when expecting a list thing is clever bug dodgy.
+# I'll have to figure it out one of these days. one of these days...
+
+Fn[i32 i32] [f32 * .]  # returns [
+    i32 (.. [f32 * .], i32 arg) end
+]
+# [end] is like [let], but it does nothing, returns nothing. if the function block tries to get
+# more arguments than the specified block, there will be an error.
+
+= a b .then [print "yay"] .else [print "nay"]
+# now this reminds me of the io programming language.
+# but this isn't good. if I just do [.then], it will still return the object.
+# how do I get rid of it?
+if = a b [print "yay"] [print "nay"]
+# this, is just the most elegant fucking thing.
+let [answer] if = a b ["yay"] ["nay"]
+print if = a b ["yay"] ["nay"]
+
+print if = a b ["yay"] ["nay"] -no\n
