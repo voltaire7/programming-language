@@ -13872,6 +13872,7 @@ y  # []
 # then again, it's one less parenthesis.
 (use Iter)
 (use Iter List)  # basically function type signature.
+# not to mention: data-oriented programming.
 
 (exec 0xff 0xfa 0xbb ...)  # most primitive function.
 (let [Asm.aarch64] [
@@ -13907,3 +13908,244 @@ y  # []
 (mv "file1" "file2" "file3" "folder/")
 
 # ah... the pros and cons of parentheses.
+
+# wait, what happens when you print this?
+(lambda [x y] [(print\n x y)])
+# ... maybe it's better if I omit the body.
+(lambda [mandatory-args] [optional-args] [toggle-args])
+
+(lambda [man-arg1 man-arg2 [opt-arg1 123] [opt-arg2 321] [tog-arg])
+
+# I guess I can do this?
+(lambda [x y z])  # equivalent to
+(lambda [x] [y] [z])
+
+(lambda [[x 1] [y 2] [z 3]])
+(lambda [[x (u32)] [y (u32)] [z (u32)]])  # clever way to do typing?
+
+(lambda [x y z] 1 2 3)  # though this is cleaner.
+# and honestly, I haven't addressed how I actually pass the optional args.
+# I can't just do this:
+(func [opt-arg 1])
+# what if [func] expects a string there?
+
+# the better way to do this, is as I've mentioned before. passing the object.
+(let [func] [
+    (lambda [x y optional])
+])
+(func 1 2)  # optional == []
+(func 1 2 [[opt-arg1 123]])  # I think there might a benefit to doing objects like this.
+(func 1 2 [[opt-arg1 123] [tog-arg1]])  # like this.
+# I guess you can't do both optional arguments and variable args?
+
+(func 1 2 [[opt-arg1] 123])
+# or
+(func 1 2 [[[opt-arg1] 123]])
+(func 1 2 [[[opt-arg1] 123] [[tog-arg1]]])
+
+[[[x] 1] [[y] 2] [[z] 3]]  # these objects are getting real complicated. all for some toggles.
+
+# I think it's faster to just pass a boolean to an optional arg.
+(func 1 2 [[opt-arg1] 123])
+(func 1 2 [[opt-arg1] 123 [opt-arg2] T)
+
+[
+    [[field1] 1]
+    [[field2] 2]
+    [[field3] 3]
+]
+# vs
+[
+    [field1] 1
+    [field2] 2
+    [field3] 3
+]
+
+# null values
+[
+    [[field1]]
+    [[field2]]
+    [[field3]]
+]
+[
+    [field1] []
+    [field2] []
+    [field3] []
+]
+
+# what if you're not supposed to iniliaze these objects by hand?
+(let [obj: [x y z]] 1 2 3)
+obj.x
+
+# I guess I could do this.
+(let [Vector3] [[x] [y] [z]]
+(let [obj.(Vector3)] 1 2 3)
+# nvm, it doesn't really work.
+(let [obj.[x] [y] [z]] 1 2 3)
+
+# ... I say not to initialize by hand, but I have to for optional args.
+
+(func 1 2 [[opt-arg1] 123 [tog-arg1]])  # not arg at the end? not sure how that'll work though.
+# hmm, though that might work.
+
+(func 1 2 [
+    [opt-arg1 opt-arg2] 123 321
+    [tog-arg1 tog-arg2]
+])
+# the field doesn't necessarily have to be a boolean, right?
+# just the fact that the field exist should be enough, right?
+
+(func 1 2 [
+    [[opt-arg1] 123]
+    [[opt-arg2] 321]
+    [[tog-arg1]]
+    [[tog-arg2]]
+])
+
+(let [obj] [
+    [[field1] 1]
+    [[field2] 2]
+    [[field3] 3]
+])
+obj.field1
+(for obj [
+    (print\n it)
+])
+# I'm starting to think, not matter how ugly and cumbersome it is, that it's better.
+(for obj [
+    (print\n it:0 it:1)
+])
+# like, a hashmap is an array of key/value pairs, right?
+
+(func 1 2 [
+    [[opt-arg1 opt-arg2] 123 321]
+    [[tog-arg1] [tog-arg2]]  # wait, no. this doesn't work.
+])
+
+(for obj [(print\n it)])  # prints fields and values, one after another.
+(for (fields obj) [(print\n it)])  # prints only fields.
+(for (values obj) [(print\n it)])  # prints only values.
+
+(for obj [
+    (let [field value] (it))
+    (print\n field " = " value)
+])
+# I think this might have just decided it for me. (pun not intented)
+
+# I guess I can still do this:
+[[opt-arg1 opt-arg2] 123 321]
+# just that for
+(print\n field " = " value)  # outputs [opt-arg1 opt-arg2 = 123 321]
+# I guess that's fine. whatever.
+
+(let [arr] [1 2 3 4])
+(for (enumerate arr) [
+    (let [index value] (it))
+    (print\n index ": " value)
+])
+# e.g. [1: 2]
+# this is honestly so nice...
+
+# I think this file is becoming too big. it's getting laggy in here.
+
+(define (func x y)
+    (display (+ x y)) (newline))
+func
+# instead of printing #<procedure func>, which is somewhat useless,
+# it will print (lambda (x y) (display (+ x y)) (newline)),
+# or better yet, (lambda (x y) ((lambda (...) ...) (+ x y)) ((lambda (...) ...))).
+# all the code until assembly and shit.
+# of course, if the function calls itself, it will simply remain a symbol.
+
+(lambda [x y])  # 2 obligatory args, args list is also functional
+(lambda [x y] [[[x] 123]])  # 2 obligatory args, 1 optional. args list is matched with optionals.
+
+# or maybe it's better if I had a 'if this field doesn't exist' matching style function?
+(lambda [x y opts])  # 2 obligatory args, 1 optional. args list is matched with optionals.
+(bind opts [
+    [[opt-arg1] 123]  # will assign if field doesn't exist.
+])
+
+(lambda [x y] [opt-arg1 123] [opt-arg2 321] [tog-arg1] [tog-arg2])  # this though...
+# I think this is the best model. the least amount of nesting too.
+
+# I should try writing pmatch in this language eventually.
+
+(print\n ([1 2 3 (next 4 [(+ 1 (args))])]))  # [print\n] should print things progressively.
+
+# could I do this, then?
+fibs :: [Integer]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
+fib :: Int -> Integer
+fib n = fibs !! n
+
+(let [fibs] [0 1 (zip-with + fibs (tail fibs))])
+# ... so that's it? is it really that nice?
+# wait no. I think I have to double call it, since [zip-with] returns a list.
+(let [fibs] [0 1 ((zip-with + fibs (tail fibs)))])
+# still pretty good.
+(let [fibs] (append [0 1] (zip-with + fibs [tail fibs])))
+
+(let [fibs] [
+    0 1 ((zip-with + fibs [tail fibs]))
+])
+
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+(= fibs [0 1 ((zipWith + fibs (tail fibs)))])
+(= fibs (: 0 (: 1 (zipWith + fibs (tail fibs)))))
+(= fibs (: 0 1 (zipWith + fibs (tail fibs))))
+# suprising.
+
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+(= [fibs] [0 1 ((zipWith + fibs [tail fibs]))])
+= fibs.[0 1 .. zipWith [+] fibs tail fibs]
+# it's also suprising that the old model isn't that much shorter.
+
+# I guess [fibs] should also be memoized and shit.
+
+fib n = fibs !! n
+(let [fib] [(lambda [n]) fibs:n])
+(let [fib] [fibs:(args)])
+(= fib [fibs:(args)])
+(= fib [fibs:(get 1 args)])
+(= fib [fibs:(car args)])
+
+#
+#                       _oo0oo_
+#                      o8888888o
+#                      88" . "88
+#                      (| -_- |)
+#                      0\  =  /0
+#                    ___/`---'\___
+#                  .' \\|     |// '.
+#                 / \\|||  :  |||// \
+#                / _||||| -:- |||||- \
+#               |   | \\\  -  /// |   |
+#               | \_|  ''\---/''  |_/ |
+#               \  .-\__  '-'  ___/-. /
+#             ___'. .'  /--.--\  `. .'___
+#          ."" '<  `.___\_<|>_/___.' >' "".
+#         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+#         \  \ `_.   \_ __\ /__ _/   .-` /  /
+#     =====`-.____`.___ \_____/___.-`___.-'=====
+#                       `=---=' 
+#
+#
+#     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#               Buddha bless the code
+#
+
+(let [f100] (take 100 Natural))
+f100  # [1 2 3 4 .. 99 100]
+# where [Natural] is a lazy list.
+(let [Natural] [1 (next 2 [(+ (args))])])  # or something.
+
+# I really need to figure out [args]. it's so awkward.
+
+map [(+ 1] [1) 2) 3) 4)]  # maybe I'm unto something?
+
+# I guess [.] should be a sort of syntax plugin? would be nice if I could add and remove them.
+# like adding [..] for ranges.
+# I suppose it's fine to just make it a macro.
