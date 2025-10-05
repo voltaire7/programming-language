@@ -13116,3 +13116,794 @@ let [answer] if = a b ["yay"] ["nay"]
 print if = a b ["yay"] ["nay"]
 
 print if = a b ["yay"] ["nay"] -no\n
+
+# I guess [unqote] is just [..].
+   ["hello"]  # returns ["hello"]
+.. ["hello"]  # returns  "hello"
+
+# then again, maybe not?
+let [value] .. ["hello"]  # it works.
+let [value] "hello"       # it works.
+let [value] .. [print\n "hello"]  # doesn't work.
+
+let new-let [
+    let [symbol value] get-token, arg
+    if quote? symbol [
+        env.next.next: (unquote symbol) value
+    ] [
+        env.next.next: symbol (unquote value)
+    ]
+]
+new-let [value] [print "hello"]
+print value  # outputs [print "hello"]
+new-let  value  [print "hello"]
+value  # outputs "hello"
+
+# I really do need a [unquote] function...
+# I guess I'll go back to what I said earlier: it's a convention not to use [unquote].
+
+# maybe [$] is a toggle quote?
+$   [print]  # returns  print
+$ $ [print]  # returns [print]
+# it first checks if it's quoted (starts and end with brackets), then applies the correct
+# procedure: [quote] or [unquote].
+
+for   [x 1 y 2 z 3] [print\n it]  # error: symbol [x] not bound.
+for $ [x 1 y 2 z 3] [print\n it]  # outputs "x\n1\ny\n2\nz\n3\n"
+
+# equivalent?
+let obj: unquote [x y z] [1 2 3]
+let obj:   quote [x y z] [1 2 3]
+# because [x] and [[[x]]] are the same?
+
+# again, it's a convention not to do this, but you can do it.
+
+# btw
+for quote [x 1 y 2 z 3] [print\n it]
+# so
+quote [x 1 y 2 z 3]  # returns [[x] [1] [y] [2] [z] [3]]
+# not [[x 1 y 2 z 3]], otherwise it would be treated as a string.
+
+let $ [
+    args [value]
+    if quote? value [unquote value] [quote value]
+]
+# simple right?
+
+use identity [
+    open  [...]
+    close [...]
+]
+
+# what if you did know the args count?
+let [add a b] + a b
+add 1 2
+# but you can't do this anymore.
+let square [* .]
+# but maybe that's good thing? or at least, I could try to figure it could later.
+
+args [list:0]  # what happens here?
+let func [
+    args [obj .x .y]
+    print "% %\n" obj.x obj.y
+]
+func 1 2  # outputs "1 2\n"
+# I think this makes sense.
+
+let func fn [a b] + a b
+
+# the language will be far safer if you can't do the [square] thing. though less powerful too. and
+# more verbose.
+
+# honestly, I dont like [args 1] much...
+# it will be real awkward when I go back to it.
+
+fn [] {}
+fn {}  # no args.
+# hmm, no. the new model should take a fixed number of args, always. unless...
+
+# I want to test this out the same way I tested out parentheses.
+# also, I should test this new model but with parentheses as well, though I'm not expecting much.
+# parentheses might work better though: no .. [] everywhere, after all~
+
+let [obj field] match field [
+    .field1 print "hello"
+]
+
+print "%" 123 though...
+# I can no longer do variable length shit. unless I have parentheses. or string interpolation. or
+print "%" [123]
+(print "%" 123)
+
+print "" []
+(print "")  # shorter!
+
+let [func 1 y] + 10 y
+let [func x y] + x y
+.field1  # quoted
+let [obj .field1] 123
+# old idea but it's been a while.
+
+let [func #]  # number overload
+let [func @]  # string overload
+
+# or just this
+let [func x:i32]  # number overload
+let [let x:Symbol y:Value]
+
+map $+ []
+# [$] is shorthand for fn [whatever-arguments] func whatever-arguments. not a pointer.
+# you're creating a new function.
+
+# I want to compare this old model to the new one.
+
+
+if true, let x 1, .. []
+print\n x
+# because .. [] creates a new scope?
+# or manybe not. [fn [a b]] already belong to a new scope, so its already created. [.. []] is not
+# the thing creating scopes. it groups function.
+
+# equivalent
+if true {} {}
+if true .. [] .. []
+
+# hmm, problem.
+func fn [a b] + a b
+let [func f] f 1 2  # ok
+
+func fn [a] + a 1
+let [func f] f 1 2  # not ok...
+# hell, how do you even know the type of [f] before it's called?
+# this model is inherently flawed, like my previous one.
+# the parentheses are just better in this respect. no ambiguity. no need for types!
+
+map {
+    let [add x y] + x y
+    $ add
+} [1 2 3 4]
+
+map + 1 $ [1 2 3 4]  # [2 3 4 5]
+
+(let (add x y) + x y)
+(let add (fn (x y) + x y))
+let [add x y] + x y
+let add fn [x y] + x y
+
+(let (func f) (f 1 2))
+(func (fn (a) (+ a 1)))
+let [func f] f 1 2
+func fn [a] + a 1
+
+(let file ((import "File") .open "file.txt"))
+let file import "File" .open "file.txt"
+
+(let File (import "File"))
+let [File] import "File"  # but this doesn't work, does it? does it return? does it run?
+# and how is [.open] passed?
+# also, so I AM doing variable length params?
+# honestly, not really worth considering without the parentheses. too many flaws.
+
+(define (collect . args) args)
+(collect 1 2 3 4)  # (1 2 3 4)
+
+# I should try with the quotation+parentheses model again, but more strict args.
+(let [hello] (print "Hello, World!\n"))
+(let hello [(print "Hello, World!\n")])
+ hello   # [(print "Hello, World!\n")]
+(hello)  # "Hello, World!\n"
+
+(let [square] (* (. (args 1))))
+# no. it just doesn't make sense. type checking should be at the type level.
+# not the body.
+(let [square] (* (. (car args))))  # this makes more sense.
+(let (square x) (* (. x)))  # this makes even more sense.
+
+# I guess that's why there is no such thing as truthy and falsy in scheme. the language is already
+# dynamic and shit, we don't need any more weirdness to it.
+
+# is that the final lesson of this language? just use scheme? I wasted my time?
+
+(let (square x) (* (. x)))
+let square [* .]  # then again...
+
+(let (obj field . args)
+    (match field
+        'field1 (apply + args)
+        'field2 (apply - args)))
+(obj 'field1 1 2)
+
+(for 0 ((import "Debug") 'step-into it '(print "Hello, World!\n")))
+for 0 [import "Debug" .step-into it [print "Hello, World!\n"]]
+
+# these are both really good models, and they both come with their own pros and cons.
+# as intersting as the scheme model is, the whole reason I created this language was because it
+# wasn't satisfying.
+
+# it fundamentely comes down to this:
+let [a b] .. [1 2]
+# vs
+let [a b] + 1 b
+# you can't have both, unless you create separate functions. and change how returns work.
+# if you have multiple return, you must have multiple assign.
+
+let list.[for 100 0]
+(let list [(for 100 0)])
+
+# I guess the no parentheses+quotation model is also kind of good, since if you don't pass the
+# right argument count, it just breaks the program.
+
+(let obj (object 'field1 (print "Hello, World!\n") 'field2 (print "Goodbye, World!\n")))
+(obj 'field1)
+(obj 'field2)
+
+((obj 'field1) 1 2)  # message passing style is better.
+# without it, you can do arg count checking...
+# or can you? wait, you could right? all . args is doing is applying it to the function.
+# the args count is checked then.
+
+(let obj (object
+    'field1 (apply + args)
+    'field2 (print "Goodbye, World!\n")))
+(let (obj field . args)
+    (match field
+        'field1 (begin (apply + args) obj)
+        'field2 (print "Goodbye, World!\n")))
+(obj 'field1 1 2)
+((obj 'field1 1 2) 'field2)
+# single return is better if we don't have multiple assign, and therefore no way to spread.
+# this is just scheme at this point...
+
+(define (func) func)
+(eq? func (func))  ; => #t
+
+# anyway, message passing style is still better.
+(define field1 (obj 'field1))
+# vs
+(define (field1 x y) (obj 'field1 x y))
+
+(field1 1 2)
+
+((((iter vec) 'map) (lambda (x) (+ 1 x))) 'collect)
+
+;; Create an iterator from a vector (list in this example)
+(define (iter xs)
+    (lambda (msg)
+        (cond
+            [(eq? msg 'map) (lambda (f) (iter (map f xs)))]
+            [(eq? msg 'collect) xs]
+            [else (error "unknown message" msg)])))
+
+(display ((((iter '(1 2 3)) 'map) (lambda (x) (+ 1 x))) 'collect)) (newline)
+;; => (2 3 4)
+
+(define (obj msg)
+    (case msg
+        [(add) (lambda (x y) (+ x y))]
+        [(sub) (lambda (x y) (- x y))]
+        [else (error "unknown message" msg)]))
+
+((obj 'add) 1 2)
+((obj 'sub) 1 2)
+
+(define-syntax define-object
+    (syntax-rules () (
+        (_ name (
+            (msg1 body1)
+            (msg2 body2)
+            ...
+        ))
+        (define (name msg)
+            (case msg
+                [(msg1) body1]
+                [(msg2) body2]
+                ...
+                [else (error 'name "unknown message" msg)]
+            )
+        )
+    ))
+)
+
+;; Example usage:
+(define-object my-obj (
+    (add   (lambda (x y)  (+ x y)))
+    (sub   (lambda (x y)  (- x y)))
+    (greet (lambda (name) (string-append "Hello, " name ".")))
+))
+
+;; Calling methods:
+(display ((my-obj 'add)      2 3)) (newline)  ;; => 5
+(display ((my-obj 'sub)     10 4)) (newline)  ;; => 6
+(display ((my-obj 'greet) "John")) (newline)  ;; => "Hello, John."
+(display ((my-obj 'mul)      2 2)) (newline)  ;; => error "unknown message"
+
+# I think I have a new found appreciation for scheme.
+# I understand now that, for the model it chose, it is extremely well thought out.
+# I'll make sure to learn scheme well.
+
+let func [
+    @[x y -opt-arg 123]
+    + x y
+    opt-arg
+]
+let [added opt] func 1 2 -opt-arg 321
+print\n added  # 3
+print\n opt    # 321
+# that's great, but how do I do toggles?
+# or macros... I think it's better to use different functions.
+
+# that a great aspect of the programming language: the function decides how to process it's own
+# arguments. every function can be a macro if it wants.
+
+args [argument]
+toks [token]
+
+# or maybe I should just...
+let func [
+    next-token program
+    peek-token program
+]
+
+let func [
+    if T [
+        args 1  # [args] here works for [func], not [if].
+    ] []
+]
+# I guess the rule is that [args] called for where the string was first initialized?
+
+# I still think variables should be constant by default.
+
+let [vec] [x 1 y 2 z 3]
+print\n vec.x  # outputs 1
+set vec.x 10   # error: tried to mutate an immutable value.
+
+let [vec] mut [x 1 y 2 z 3]  # [mut] is a type signature.
+set vec.x 10
+print\n vec.x  # outputs 10
+
+type vec  # Object + Mutable ?
+
+let [vec] [x 1, y 2, z 3]  # immutable
+let [vec vec.x] mut vec, 5  # maybe?
+# before, [mut] was for exactly that: mutate the copied value.
+alter vec [x 10, y 20]
+
+let [vec] [x 1, y 2, z 3]
+let [vec] vec.[x 10]
+# because, I mean.
+vec:[x]     # returns 1
+vec.[x 10]  # returns [x 10, y 2, z 3]
+# if they did the same thing, it would be redundant.
+
+let [vec] [x 1, y 2, z 3]
+vec. x     # 1
+vec.[x]    # error: expecting value for [x], got nothing.
+vec:[x]    # 1
+vec:[x y]  # 1 2
+vec:[1]    # error: field [1] not found on object [vec].
+vec: 1     # error: [x] is not bound.
+
+let [vec] [1 2 3]
+vec:    0   # 2
+vec:   [0]  # error: field [0] not found on object [vec].
+vec: $ [0]  # 1
+vec: [[0]]  # 1
+vec: [[0 1 2]]  # 1 2 3
+
+(let func [
+    (let [a b] (args))
+])
+(func 1 2  )  # valid
+(func 1 2 3)  # invalid (throws an error)
+# but how do I do optional args?
+# or maybe not?
+(let func [
+    (let [a b] (args) 1 2)
+])
+(func 1 2)  # valid
+(func)      # valid
+# no, that will cause a lot of problems.
+# it has to match it exactly.
+
+# huh.
+(let a b 1 2)  # valid.
+(print a b)    # outputs 1 2
+# I mean, why not? then again, I don't see the benefits.
+
+(let func (print "Hello, World!\n"))  # lazy
+(let [value] (+ 1 2))                 # eager
+
+(let (value) (+ 1 2) (+ 1 2))  # error: symbol to value count mismatch.
+# I guess assigning args like that is, well, optional.
+(let func (for args (print\n it)))
+# or just
+(let func (print\n (args)))
+
+(let func (for 100 (get it args)))
+
+(let func
+    (let [x y] (first 2 args))
+    # or
+    (remove-args [x y] args)
+
+    (opts (rest 2 args)
+        'optional-param1 123  # default
+        'optional-param2 321
+    )
+)
+
+(set obj.field1.sub-field1 123)  # valid?
+
+(let [a] 123)  # this should be the only way to initialize a value.
+(let [func] [
+    (print "Hello, World!\n")
+])
+# I mean, with the parentheses and all that, where's the problem?
+
+map [(+ 1 (args))] [1 2 3 4]  # this though...
+# I should have a way to 'consume' a list. it's really awkward otherwise.
+
+((import "File").open "file.txt")
+# I guess I can also define optional types in type signatures?
+(use (import "File" "HTTP" "String"))
+
+(let [func] [
+    (sign a b)  # 'signature'
+    (print a b)
+])
+
+# honestly, I'm kind of liking this.
+let func []  # has constantly fucked with me.
+
+(let [obj] [x 1 y 2 z 3])
+# since this model use parentheses everywhere, I have to selectively trim some other part of code
+# to make it more terse.
+
+# damn, you can easily pass types as values. even in the old model!
+
+# wait.
+(let [a])  # that was valid, right?
+(let [a] 1 2)  # but this isn't?
+
+(let [a] (u32))  # huh.
+(let [a] (u32 123))
+
+(let [func] [
+    (let [type value] (args))
+    (type value)
+])
+(func u32 123)
+
+(let [func] [
+    (print\n args)
+])
+(func 1 2 3 4)  # outputs [1 2 3 4]
+
+(for 0 [
+    ((import "Debug").step-into it [
+        (print "Hello, World!\n")
+    ])
+])
+
+for 0 [
+    import "Debug" .step-into it [
+        print "Hello, World!\n"
+    ]
+]
+
+# inversely
+(let 'x 1)
+[1 2 3 4].1  # 2
+[1 2 3 4].x  # error: field [x] not found on literal object [1 2 3 4].
+[1 2 3 4].(x)  # 2
+
+[1 2 3 4]:0  # 1
+# well anyway, it works largely the same.
+
+(let [x y] (args))  # it would be nice if this code just removed the first 2 values from [args].
+# you know what? I'll do that. and I'll see what happens.
+
+# if that's what I need, I'll make it happen.
+
+(let [] (args))  # [] discards everything?
+
+(display ((((iter '(1 2 3)) 'map) (lambda (x) (+ 1 x))) 'collect)) (newline)
+(print (((iter [1 2 3]).map [+ 1 (args)]).collect)) (print\n)
+
+(newline)
+(print\n)  # damn!
+
+# wait, if it consumes...
+map [(+ (args))] [1 2 3 4]  # [3 7]
+# right? because it CONSUMES!!!
+map [
+    (let [x y] (args))
+    (+ x y)
+] [1 2 3 4]
+# ^ this makes more sense.
+map [(+ (get 2 args))] [1 2 3 4]
+
+(print\n args)    # [1 2 3 4]
+(print\n (args))  # 1 2 3 4
+
+# I think I should focus more on what would be nice first, then try to implement it.
+
+# both valid.
+(let [file err] ((import "File").open "file.txt"))
+(let [file] ((import "File").open "file.txt"))
+
+(if err (throw err))
+# or just
+(throw err)  # only throws if [err] is not nil.
+
+# can't forget about [unwrap]!
+(let [file] (unwrap ((import "File").open "file.txt")))  # throws if [err].
+
+# I guess (args) behaves a bit like [yield]?
+
+# I know I said to make it short... but this fall more in line with the rest of the language.
+(let [vec] [[x] 1 [y] 2 [z] 3])
+
+(let [print\n] [
+    (for args [(print it " ")])
+    (print "\n")
+])
+
+(for args [(print my-iter " ")] [my-iter])
+
+(reduce [(for 100 it)])
+
+# I know this is scary, but I am seriously – I mean SERIOUSLY considering switching to parentheses
+# for my main model. it's insanely verbose, but if you ignore that: DAMN, is it nice!
+
+# if I do that, I'll have to redo the interpreter from scratch... again. not that I dislike it.
+
+(let [a b] (u32))  # both are [u32]?
+
+(let [spread] [(args)])
+(spread 1 2 3)  # 1 2 3
+(spread (spread 1 2 3))  # identical.
+
+(let [obj] [])
+(var [obj] [])  # I think I prefer this for the parentheses model.
+
+[[x][y][z]]  # this ain't so bad~
+
+(let [func] [
+    (for 100 [
+        (if (= 88 value) [(return "passed")])
+    ] [value])
+    (exit 1)
+])
+(print\n (func))  # outputs "passed"
+# [return] returns for the function where the quote was initialized first.
+# like [args]... but will it be that simple?
+# what about [break]? [continue]?
+# maybe the sub-quote inherits those values from the super quote?
+
+# I guess my language has swizzling now.
+
+(let [a b] (args))  # what if [args], or any such function was required to return something?
+(let [a b])         # this is still valid.
+(let [a b] (return-nothing))  # this isn't.
+
+# man, since I don't do unquoting anymore, a lot of things have to be reworked.
+
+(print\n it: 0 )  # index
+(print\n it: x )  # index or field
+(print\n it:[0])  # field
+(print\n it:[x])  # field
+
+(print\n it.0)  # field
+(print\n it.x)  # field
+
+(print\n it.[x 10])  # mutates object, and returns it
+
+(print\n it:[0 1])  # field
+(print\n it:[x y])  # field
+(print\n it:[x y])  # field
+
+# then again...
+(let [x] [1])
+(print\n it.(x))  # field
+# so [:] would only be for indices.
+# but also...
+(print\n it.(x))  # will become
+(print\n it.[x])  # right?
+# and () is exclusively for function calls. you're not calling [x].
+
+# unless...
+(let [vec] [[x] 1 [y] 2 [z] 3])
+(let [new-vec] (mut vec [x 1]))
+# but that doesn't solve the issue.
+
+# () only works on [].
+(let [f] []) (f) or ([])
+
+(var [it] [[x] 1 [y] 2 [z] 3])
+(set [it.x] 10)
+it  # returns [[x] 10 [y] 2 [z] 3])
+(set [it.[x y]] 100 20)
+it  # returns [[x] 100 [y] 20 [z] 3])
+
+it.x  # returns 100
+it.y  # returns 20
+
+it.[x y]  # returns 100 20
+# ^ list of symbols.
+it:[x y]  # list of values.
+
+# that seems coherent.
+
+it:[[x]]  # to get symbol?
+(let [symbol] [x])
+it:[symbol]
+it:symbol  # invalid?
+# then again, you've already 'evaluated' the thing...
+
+it:(range 10)  # equivalent to
+it:[0 1 2 3 4 5 6 7 8 9]
+# this won't change. I have to work around this.
+it:[(+ 1 1) (- 5 2)]  # should be valid.
+it:[(dup index)]
+(dup it:index)
+
+# ... alright, I've decide: [reduce] will be call on it.
+# that makes things simple.
+# it:[[1]] and it:[1] are no longer the same.
+# it:[[[1]]] will just throw an "invalid symbol name" error.
+
+(let [fields] (get-fields [[x] 1 [y] 2 [z] 3]))
+fields  # [[x] [y] [z]]
+(print\n (fields))  # "x" "y" "z"
+(for fields [(print it) (print\n)])  # "x" "y" "z"
+
+# wait, no. what if I do allow it?
+(if (let [x] (= a b)) x [
+    (print "They are equal!\n")
+])
+# this... should be allowed?
+# of course, [x] is only available in the [if] call.
+
+# [let] in this language is evaluated in parallel. in other words, you can't refer to a variable
+# defined earlier in the same [let].
+(let [x y] 1 2)
+(let [x y] 10 x)
+(print\n x y)  # outputs 10 1, not 10 10.
+
+(let [x] [x])
+(x)  # infinite loop.
+
+(let [x])
+x  # []
+(let [x y] 1)
+x  # 1
+y  # []
+
+(let [func] [
+    (let [x y z] (args))
+    (print\n x y z)
+    (manage-opt-args z)
+    (if z (print\n z.opt-arg1))
+])
+(func 1 2)  # 1 2 []
+(func 1 2 [[opt-arg1] 123])  # 1 2 [[opt-arg1] 123]
+                             # 123
+# I think this is a clever way to do optional arguments?
+(let [new-preset-opt-args] (mut preset-opt-args z))
+(set [new-preset-opt-args:(get-fields z)] (get-values z))
+
+(if F [(print\n "hello")])  # warning: the expression will always resolve to the same outcome.
+
+(define-syntax define-object
+    (syntax-rules () (
+        (_ name (msg body ...))
+        (define (name m)
+            (case m
+                [(msg) body ...]
+                [else (error 'name "unknown message" m)]
+            )
+        )
+    ))
+)
+
+(define count 0)
+(define-object counter (inc (set! count (+ count 1)) count))
+
+(counter 'hello)  # Exception in counter: unknown message with irritant hello
+(counter 'inc)    # 1
+
+
+; okay, NOW it's fixed!
+(define-syntax define-object
+    (syntax-rules () (
+        (_ name (msg body ...) ...)
+        (define (name m)
+            (case m
+                [(msg) body ...]
+                ...
+                [else (error 'name "unknown message" m)]
+            )
+        )
+    ))
+)
+
+(define count 0)
+(define-object counter
+    (inc (set! count (+ count 1)) count)
+    (test (display "Hello, World!\n"))
+)
+
+; (counter 'hello)
+(display (counter 'inc)) (newline)
+(counter 'test)
+(display (counter 'inc)) (newline)
+
+
+; that said... I want this.
+(define-object my-obj (
+    (add   (x y)  (+ x y))
+    (sub   (x y)  (- x y))
+    (greet (name) (string-append "Hello, " name "."))
+))
+
+(display ((my-obj 'add)      2 3)) (newline)  ;; => 5
+(display ((my-obj 'sub)     10 4)) (newline)  ;; => 6
+(display ((my-obj 'greet) "John")) (newline)  ;; => "Hello, John."
+(display ((my-obj 'mul)      2 2)) (newline)  ;; => error "unknown message"
+
+(define x 10)
+(define (square n) (* n n))
+(define (sum-of-squares a b) (+ (square a) (square b)))
+(display (sum-of-squares x 5)) ; → 125
+
+((lambda (x)
+    ((lambda (square)
+        ((lambda (sum-of-squares) (display (sum-of-squares x 5)))
+            (lambda (a b) (+ (square a) (square b)))
+        )
+    ) (lambda (n) (* n n)))
+) 10)
+
+# btw, I think there is merit to this model:
+(print\n (((Iter [1 2 3]).map [+ 1 (args)]).collect))
+# vs
+(print\n (Iter.collect (Iter.map [+ 1 (args)] [1 2 3])))
+# then again, it's one less parenthesis.
+(use Iter)
+(use Iter List)  # basically function type signature.
+
+(exec 0xff 0xfa 0xbb ...)  # most primitive function.
+(let [Asm.aarch64] [
+    [mov] [(exec (insert-complicated-logic-here args))]
+    (...)
+])
+
+[(lambda [x y]) (print\n x y)]  # ... I guess?
+(lambda [x y] [(print\n x y)])  # both could be valid, lol.
+(lambda [x y] [(print\n x y)] [])  # optional arguments, maybe?
+
+(let [func] [
+    (lambda [x y])
+    (print\n x y)
+])
+(let [func] (lambda [x y] [
+    (print\n x y)
+]))
+
+(let [func] (lambda [x y] [
+    (print\n x y)
+    (print\n option)
+] [option 123]))
+(func 1 2 3)  # 1 2\n3\n
+(func 1 2)  # 1 2\n123\n
+
+# btw, [args] is still available, even with [lambda]. [lambda], of course, consumes a few values.
+
+# can't forget about this!
+[1 2 3 (next 4 [(+ 1 (args))])]
+
+# I guess I can do this.
+(mv "file1" "file2" "file3" "folder/")
+
+# ah... the pros and cons of parentheses.
