@@ -14085,10 +14085,10 @@ fib n = fibs !! n
 # wait no. I think I have to double call it, since [zip-with] returns a list.
 (let [fibs] [0 1 ((zip-with + fibs (tail fibs)))])
 # still pretty good.
-(let [fibs] (append [0 1] (zip-with + fibs [tail fibs])))
+(let [fibs] (append [0 1] (zip-with + fibs (tail fibs))))
 
 (let [fibs] [
-    0 1 ((zip-with + fibs [tail fibs]))
+    0 1 ((zip-with + fibs (tail fibs)))
 ])
 
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
@@ -14098,7 +14098,7 @@ fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
 # suprising.
 
 fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
-(= [fibs] [0 1 ((zipWith + fibs [tail fibs]))])
+(= [fibs] [0 1 ((zipWith + fibs (tail fibs)))])
 = fibs.[0 1 .. zipWith [+] fibs tail fibs]
 # it's also suprising that the old model isn't that much shorter.
 
@@ -14144,8 +14144,732 @@ f100  # [1 2 3 4 .. 99 100]
 
 # I really need to figure out [args]. it's so awkward.
 
-map [(+ 1] [1) 2) 3) 4)]  # maybe I'm unto something?
+(map [(+ 1] [1) 2) 3) 4)])  # maybe I'm unto something?
 
 # I guess [.] should be a sort of syntax plugin? would be nice if I could add and remove them.
 # like adding [..] for ranges.
 # I suppose it's fine to just make it a macro.
+
+(Syntax.disable [ array-notation])
+(Syntax.disable [object-notation])
+# only takes effect after the function calls.
+(Syntax.disable [object-notation])  # error: variable [Syntax.disable] not bound.
+# ^ treats it as one symbol.
+
+# since I'm willing to do parentheses and stuff, might as well try the old model again.
+
+let [square] $[* .]
+
+let [obj] [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+obj.x
+
+# wait a second.
+let [func] $ [
+    args [f]
+    f 1 2
+]
+func $[+]
+
+let [func] $ [
+    args [f]
+    (f 1 2)
+]
+func [+]
+# what if I do add parentheses, but only selectively?
+# then again, no. I'm already using [$] everywhere...
+
+# then AGAIN, [import] can be a little weird?
+for 0 [
+    import "Debug" .step-into it [
+        print "Hello, World!\n"
+    ]
+    read-key
+]
+# ok
+for 0 [
+    (identity import "Debug").step-into it [
+        print "Hello, World!\n"
+    ]
+    read-key
+]
+# I guess () is only there for precedence?
+# ..step-into was very ugly.
+# you know what? you can use parentheses everywhere. you can.
+
+# or not?
+let [func] $ [
+    arg
+]
+func $[+]
+# what happened here again?
+# I guess it just returns.
+# unless...
+let [func] $ [
+    (arg 1 2)
+]
+func [+]
+# maybe the best is really to mix it up?
+
+# think about it
+(identiy import "Debug").step-into it [
+    print "Hello, World!\n"
+]
+# say [identity] is a quote; then the () runs it.
+# if it's not a quote, then as per the language's usual movements, it runs and call [import] in
+# turn... hmm. no, something doesn't click. I thought I had it.
+
+( [+] 1 2)  # returns [+] 1 2
+($[+] 1 2)  # returns 3
+# this might be it. it runs unquoted stuff.
+
+(f)
+.. f
+
+$[+]
+$ [
+    +
+]
+# this should be the convention?
+
+# although, will I still have this?
+(for obj [
+    (let [field value] (it))
+    (print\n field " = " value)
+])
+for obj [
+    let [field value] .. it  # arguably even better?
+    print\n strcat [field " = " value]
+]
+
+(let [arr] [1 2 3 4])
+(for (enumerate arr) [
+    (let [index value] (it))
+    (print\n index ": " value)
+])
+# e.g. [1: 2]
+let [arr] [1 2 3 4]
+for enumerate arr [
+    let [index value] .. it
+    print\n strcat [index ": " value]
+]
+
+for 100 as [index] [
+    print\n index
+]
+
+use [
+    [[open ] $[...]]
+    [[close] $[...]]
+]
+
+(print\n field " = " value)  # this is really nice though...
+# what if you can still do this?
+
+(mv "file1" "file2" "folder/")
+mv "file1" "folder/"  # both valid?
+
+(let [x y])
+let [x y] 1 2
+
+let [field value] .. it
+(let [field] .. it)  # discard?
+
+let [func] $ [
+    for args [
+        print\n it
+    ]
+]
+func 1 2 3 4 5 6 ...  # until the end of the application.
+(func 1 2 3) 5 6 ...  # until 3
+# but how does it work? how can I make it work?
+
+let [field value] .. it;
+(let [field value] .. it)
+
+# for a language without syntax, it sure has a lot of it.
+# anyway, [;] is no good. I've been thinking about it, and I have to choose either fixed argument
+# count, or unfixed.
+
+let [func] $ [
+    for args 1 [
+        print\n it
+    ]
+]
+func [1 2 3 4]
+
+# honestly, they're both just as bad.
+args 1
+(args)
+
+# you know what? I think I'm going to stick with parentheses for a while.
+# there is a lot of really nice code there. there is also ugly code, but the old model isn't
+# innocent in that respect either.
+
+(map (lambda [x] [+ 1 x]) [1 2 3 4])  # [2 3 4 5]
+# maybe this is the way?
+(map [(lambda [x]) [+ 1 x]] [1 2 3 4])
+# yeah, it's clean. I like it.
+
+(let [func] [
+    (lambda [x y -z 3 -toggle])
+    (print\n x y z)  # no, seriously, I love the [print\n] in this model.
+    (if toggle [(print\n "Hello, World!\n")])
+])
+(func 1 2)          # 1 2 3
+(func 1 2 -z 30)    # 1 2 30
+(func 1 2 -toggle)  # 1 2 3\nHello, World!\n
+
+# all I have to do is use a few 'macros' here and there,
+# and I'll reduce the parentheses significantly.
+
+(lambda [x] [+ 1 x])  # returns [(lambda [x]) [+ 1 x]]
+# I mean, why not?
+
+# I'll have to work hard to make the the language as readable as possible.
+# I should look at Haskell, and it's function composition thingies. it may prove useful.
+
+(let [square] * $ dup)
+
+# maybe [$] is like in Haskell?
+
+print (sqrt (1 + 2))
+print $ sqrt (1 + 2)
+
+print (map (*2) (filter even [1..10]))
+print $ map (*2) $ filter even [1..10]
+
+result = sum $ map (^2) [1..10]
+main = print . sum . map (^2) $ [1..5]
+
+# I should try this language but with actual currying, and therefore fixed arguments.
+
+(print\n (sqrt (+ 1 2)))
+(print\n $ sqrt (+ 1 2))
+(print\n $ sqrt $ + 1 2)
+# basically, [$] put the rest of the arguments in parentheses.
+
+(print\n (sqrt (+ 1 2)))
+(print\n . sqrt (+ 1 2))
+(print\n . sqrt . + 1 2)
+# [.] looks nicer. but isn't there an overlap?
+
+(map (lambda [x] [+ 1 x]) [1 2 3 4])
+(map [+ 1 $ car args] [1 2 3 4])
+
+(let [field value] (it))
+(let [field value] . it)
+
+(let [square] [(* (dup (args)))])
+(let [square] [$ * (dup (args))])
+(let [square] [$ * $ dup (args)])
+(let [square] [$ * $ dup $ args])
+
+(let [square] [(* (dup (args)))])
+(let [square] [. * (dup (args))])
+(let [square] [. * . dup (args)])
+(let [square] [. * . dup . args])
+# yeah, I prefer the point by a long shot. [$] is almost as visually noisy as the parentheses.
+
+# by the way, this isn't a new feature. I clearly remember having tested this out.
+
+(let [square] [(* . dup . args)])  # this is probably the best. I shouldn't abuse it.
+(let [square] [(*.dup.args)])  # what would I have to do to make this work?
+
+# hmm, I should probably keep the space. no just because I can't make this work, but also, I like
+# the fact that it's the same character count, with or without the parentheses. in other words, if
+# people choose to use it, it will only be to make it easier to read, not because the code will
+# become shorter.
+
+# see? very clean.
+(let [fibs] [0 1 . (zip-with + fibs . tail fibs)])
+(let [fibs] [0 1 ((zip-with + fibs (tail fibs)))])
+
+(let [++] . lambda [x] [x x])
+(print\n (++ 5))      # 5 5
+(print\n (* (++ 5)))  # 25
+(print\n (* . ++ 5))  # 25
+(print\n (square 5))  # 25
+
+(let [fibs] [0 1 .. zip-with + fibs . tail fibs])
+# intersting... but again, the character count should be the same.
+
+(let [x y z] 1 2 3)
+(print\n x y z)  # 1 2 3
+(print\n x y z -no-spaces)  # 123
+
+(print\n)  # if I don't do parentheses, I won't have this...
+
+(let [fibs] [0 1 . (zip-with + fibs . tail fibs)])
+(let [fibs] $ 0 1 . (zip-with + fibs . tail fibs))
+(let [fibs] $ 0 1 . . zip-with + fibs . tail fibs)
+
+(if T [(print\n "Hello, World!\n")])
+(if T $ (print\n "Hello, World!\n"))
+# I should add [$] for quoting the rest. that said, I doubt I'll use it much.
+
+(Vector3.new [1 2 3])  # [
+    [[x] 1]
+    [[y] 1]
+    [[z] 1]
+]
+
+(define (square x) (* x x))
+(define (square x) (* x x))
+(define [square] . lambda [x] [(* x x)])
+(define square (lambda (x) (* x x)))
+# I should figure how to make it shorter.
+(let [square] . fn [x] [(* x x)])
+# this is one way.
+(let [square] . λ [x] [(* x x)])
+(define square (λ (x) (* x x)))
+
+(let [λ] lambda)
+
+(define-syntax λ
+    (syntax-rules () (
+        (_ args body ...)
+        (lambda args body ...)
+    ))
+)
+(define square (λ (x) (* x x)))
+(square 5) ; => 25
+
+(define add (λ (x y) (+ x y)))
+(add 2 3) ; => 5
+
+(let [square] . λ [x] [
+    (* x x)
+])
+
+(= fibs $ 0 1 . . zipWith + fibs . tail fibs)
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+= fibs.[0 1 .. zipWith [+] fibs tail fibs]
+
+(define (square x) (* x x))
+(let square . λ x [(* x x)])
+
+(define (square x y) (* x x))
+(let square . λ [x y] [(* x x)])
+# I shouldn't stive for these small wins.
+
+# this is the shortest [square] function possible.
+(let [square] . λ [x] [(* x x)])
+let square [* .]
+# damn...
+
+# is this really the way to go?
+
+(define [x y z] 1 2 3)
+(define square [x] (* x x))
+(define (square x) (* x x))
+# what if I make [let] a macro?
+
+(let square [x] (* x x))
+(define (square x) (* x x))
+
+(let square [x] (* x x))
+let square [* .]
+
+(define func[] (display "hello"))
+(define (func) (display "hello"))
+
+(define square[x] (* x x))
+(define (square x) (* x x))
+
+# I can't forget that, while it is more verbose, it is also more powerful.
+(print\n)
+print "\n"
+print \n  # then again...
+
+(let [x y z] 1 2 3)
+(print\n x y z)
+let [x y z] 1 2 3
+print\n "% % %" x y z
+print\n reduce [x y z]
+
+(use File OS HTTP String)
+use [File OS HTTP String]
+(use [
+    [[x] 1] [[y] 2] [[z] 3]
+])  # can't do this in a clean way.
+use [
+    [[x 1] [y 2] [z 3]]
+]  # ?
+
+# it is far less dangerous, of course.
+
+# btw, I don't really like this.
+(let square [x]
+    (* x x)
+)
+# better.
+(let square [x] [
+    (* x x)
+])
+(let [square] . λ [x] [
+    (* x x)
+])
+(let [square] [
+    (* . get 2 args)
+])
+
+(print)    # not allowed?
+(print\n)  # allowed?
+
+# (old model)
+print "% % %" x y z
+(print "% % %" x y z)
+(print "% % %" x) y z  # error: insuffient argument count?
+# still fixed arguments, but will throw instead of destroying the application?
+
+print\n [x y z]
+(print\n x y z)
+
+let func [
+    args [f]
+    (.. f 1 2)  # ideal?
+]
+func [+]  # 3
+
+let func [
+    args [f]
+    (f 1 2)  # I'm still thinking this is possble.
+]
+func [+]  # 3
+# here's what I'm thinking: if the value of [f] is unquoted, it is simply called, the result from
+# the call is ignored by the (); if it's a quote, [..] is applied to it – and again, the result of
+# the call is ignored by ().
+
+let [func] [
+    args [f]
+    (f 1 2)  # I'm still thinking this is possble.
+]
+(func [+])
+.. func [+]
+
+(let [field value] .. it)
+(let [field] .. it)  # what happens here? I'm thinking discard?
+
+let mul-ret [
+    [x 1, y 2, z 3]
+    [field1 123, field2 321]
+]
+[mul-ret]:0 .x       # 1
+[mul-ret]:1 .field1  # 123
+
+(let [map] [
+    (args [f l]) . while l [(f . l)]
+])
+(map + [1 2 3 4])  # [3 7]
+# if function take a fixed number of arguments... and we can do currying, that might fix things?
+
+(+ 1 2)  # 3
+(+ 1 2 3)  # error: incorrect argument count ?
+# or 3 is just ignored?
+
+(take 50 (map + Natural))  # [3 7 11 15 19 23 27 31 35 39 43 47 51 55 59 63 67 71 75 79 83 87 91 95 99 103 107 111 115 119 123 127 131 135 139 143 147 151 155 159 163 167 171 175 179 183 187 191 195 199]
+
+# equivalent to
+
+(define nums (cdr (iota 101)))
+(define (sum-pairs lst)
+    (if (or (null? lst) (null? (cdr lst)))
+        '()
+        (cons (+ (car lst) (cadr lst))
+              (sum-pairs (cddr lst)))))
+(sum-pairs nums)
+
+# curried.
+(map (+ 1) [1 2 3 4])  # [2 3 4 5]
+(map (- (swap 1)) [1 2 3 4])  # [0 1 2 3]
+(map (- . swap 1) [1 2 3 4])  # [0 1 2 3]
+
+map [+ 1] [1 2 3 4]
+map [- swap 1] [1 2 3 4]
+# the thing is: ^, the currying feels extremly natural.
+# it is a consequence of design choices.
+# with (), you forced it to happen.
+
+(let [print\n] [
+    (for args [
+        (print it " ")
+    ])
+    (print "\b" "\n")
+])
+# wait, do I even have to do "\b"?
+printf "xx\b \n"
+
+(let [print\n] [
+    (for args [
+        (print it " ")
+    ])
+    (print "\n")
+])
+(let [name] "John")
+(print\n "Hello," name ".")  # "Hello, John.\n"
+# ^ now THIS, this here is beautiful code. no ugly parts of the language.
+
+# I should make a list of all the beautiful parts of the program; as well as the ugly parts.
+
+# yeah, I really can't do currying.
+(let [x y z])
+
+(let square [x] (* x x))
+(let (square x) [* x x])
+
+(let [func] [(print "Hello, World!\n")])
+(let (func) (print "Hello, World!\n"))
+
+# I guess I should make this a general rule for macros?
+(let square [x] (* x x))
+(let [symbol] [square])
+(let (symbol) [x] (* x x))  # (symbol) is not a function call. ((symbol)) is.
+
+# in other words...
+obj.(x)  # is valid, because it is a macro.
+
+# alright. macros are a thing now. and they always were – I was just reticent towards admitting it.
+(lambda [x y -z 3 -toggle])
+(lambda [x . args])  # like scheme?
+
+(let func [name] (print "Hello," name ".\n"))
+(let [func] [(print "Hello," (args) ".\n")])
+
+(let [new-let] [
+    (λ [symbols])
+    (let [next-env.(symbols)] . args)
+])
+
+(let [my-func] [
+    (λ [list obj fn]) (use Iter List Matrix)
+    (...)
+])
+# I suppose this is what a professional function would look like.
+(let my-func [list obj fn] (use Iter List Matrix)
+    (...))
+# or this... but I hate it.
+# worst: there are fewer characters. and even worse, far fewer.
+
+# this is still fewer, but at least it's cleaner.
+(let my-func [list obj fn] [
+    (use Iter List Matrix)
+    (...)
+])
+# hmm... I hate how it reminds of common lisp, but I think it's clever.
+# I'll probably keep it.
+
+(...)  # error: not implemented yet.
+
+(use (import "File" "HTTP" "String" "OS"))
+(use . import "File" "HTTP" "String" "OS")
+# clean.
+
+(123)  # error: cannot apply a non-quote type.
+([123])  # 123
+
+# nah... there's no reason not to have a shorthand for arguments.
+(let [my-func] [
+    (let [list obj fn] . args) (use Iter List Matrix)
+    (...)
+])
+
+(for args (as [value] [(print\n value)]))
+(for args . as [value] [(print\n value)])
+(for args [(print\n value)] [value])  # this is just better.
+# it's unfortunate, but whatever.
+
+(break it)
+(break value)
+
+(return func-name)  # becomes pointer, so it still works when you rename the function.
+
+(import "File" "HTTP" "String" "OS")  # returns env, but also assigns?
+(use . import "File" "HTTP" "String" "OS")
+(File.open "file.txt")
+(open "file.txt")
+
+# hmm... maybe not?
+(let [File] . import "File")
+(let [SomethingElse] . import "File")  # we should have both [File] and [SomethingElse].
+
+((import "File").open "file.txt")  # *chef's kiss*
+# I guess the macro only applies after the object?
+# or rather, the macro/syntax is only [.open]
+((import "File")
+    .open "file.txt")  # still valid.
+((import "File").
+    open "file.txt")   # still valid?
+# I mean, I guess I don't really see why not.
+# alright, it is valid. it's decided. until I see a reason not to.
+
+# once this language becomes more refined, one of the tests of it's capabilities will be to
+# recreate Jai in it, syntax and all.
+
+(let [File] . import "File")  # is there a way to avoid duplicate values?
+
+(as "File" import)
+(let as [symbol function] [
+    (let [next-env.(symbol)] . function symbol)  # maybe?
+])
+# I think I have the right idea, but maybe I can rearrange it better?
+
+(import as "File")
+
+# for [if] statements, what if [next-env] is skips the [if] statement's environment?
+
+# what if the top-level automatically assigns add a parenthesis to the start and end of the file?
+# and [;] is equivalent to [)(]?
+as "File" import;
+let [File] . import "File";
+
+let as [symbol function] [
+    (let [next-env.(symbol)] . function symbol)  # maybe?
+];
+# if I do a cli, it will be like this.
+# ... you know, the more I think about it, isn't this like, real good?
+# I mean, you know, it removes A LOT of parentheses.
+# it make my code look like the old model, but it isn't really.
+# it's like that 'middle ground' I was seeking.
+# the best of both worlds.
+
+(let (square x) (* x x))
+let square [x] [(* x x)]  # ... I mean, I should.
+
+# ... what if all [] are like that?
+[* x x]  # () are automatically add at the start and end.
+
+let square [x] [* x x]  # bro, this is starting to look an awful lot like the old model.
+# I'm getting rid of the parentheses using stupid syntaxic sugar...
+
+let my-func [list obj fn] [
+    use Iter List Matrix;
+    ...
+]
+# why... just why.
+# and you know what? () does nothing, but it is still valid syntax.
+# and so, I present you with:
+let my-func [list obj fn] [
+    use Iter List Matrix;
+    ...;
+]
+# what the fuck is even going on anymore.
+
+# top-level, so this...
+[
+    print "Hello, World!\n";
+    print . args;
+] 1 2 3
+# outputs:
+# "Hello, World!\n"
+# 1 2 3
+
+# I want to cry. I seriously want to cry.
+# I'm pretty sure not even [;] is a new idea. why did I forget it?
+# probably because I didn't find enough reason to consider the switch.
+
+# ... wait, shit.
+let [list] [1 2 3];
+let [x y z] . list;  # right?
+# wrong!
+# you cannot run [1] as a function!
+
+let [list] [[1] [2] [3]];
+let [x y z] . list;
+print x y z;
+# maybe I'm abusing it. maybe it should only be on the top-level?
+
+# this works...
+let [list] [[1 2 3]];
+let [x y z] . list;
+print x y z;
+
+print "Hello, World!\n";
+
+let square [* .]
+let square [x] [* x x]
+let square [args [x] * x x]  # suprising like suck when there are named variables.
+let [square] [* . d . args]  # [d] is for [dup].
+
+(let [fibs] [0 1 . (zip-with + fibs . tail fibs)])
+
+# what if [args] is renamed to something shorter? like [@] or [%] or... [_].
+
+(let [print\n] [
+    (for _ [
+        (print it " ")
+    ])
+    (print "\n")
+])
+(let [name] "John")
+(print\n "Hello," name ".")
+
+let [print\n] [
+    for _ [
+        print it " ";
+    ];
+    print "\n";
+];
+let [name] "John";
+print\n "Hello," name ".";
+
+# ... you know, the semi-colons are not that much better.
+# but anyway, I'm really liking [_] for [args].
+
+let [square] [* . d . _];
+
+# wait, what about {}?
+# what if '{' was equivalent to '[('?
+# and anyway: ';' and '{' and '}' just go hand in hand!
+
+let [print\n] {
+    for _ {
+        print it " ";
+    };
+    print "\n";
+};
+
+# again, it's just a macro. treat {} as [()].
+# yeah, I think I like this. you can basically choose your style.
+# I might've accidentally created something incredibly sexy – forgive me, World!
+
+[(print "hello"; print\n)]
+
+# I suppose I should also make it so that [] is syntax.
+[1 2 3]
+(quote 1 2 3)
+# same goes for "".
+"hello"
+(quote hello)
+
+# I guess I'll call it 'evaluating a quote'.
+
+for _ {
+    print\n it;
+} -as [it];
+
+# btw
+let [symbol] [it];
+for _ {
+    print\n it;
+} -as [(symbol)];
+# you can do this.
+# though this is arguably better...
+for _ {
+    print\n it;
+} -as symbol;
+
+let [func] {
+    for . _ };
+func [1 2 3] {print value} -as [value]  # this should work.
+
+# though this is arguably far simpler.
+let [func] for;
+
+# anyway, I think this settles it. this is most likely going to become the main model.
+# I cannot find anyway the old model is better than this (expect currying and terseness).
+
+let [value] . take 50 . map + Natural;
