@@ -14863,7 +14863,8 @@ for _ {
 } -as symbol;
 
 let [func] {
-    for . _ };
+    for . _
+};
 func [1 2 3] {print value} -as [value]  # this should work.
 
 # though this is arguably far simpler.
@@ -14873,3 +14874,715 @@ let [func] for;
 # I cannot find anyway the old model is better than this (expect currying and terseness).
 
 let [value] . take 50 . map + Natural;
+
+# the REPL should be extremely powerful.
+# I should look nice (like my current one), have colors and shit, as well as plugins to change the
+# font and whatever. maybe even an editor more. anyway, then some sort of auto completion as well.
+# and everything should be configurable easily from the terminal or a file, using that very same
+# language.
+# hell, like a Jupyter Notebook, you should even be able to edit old code (although you can't undo
+# a file deletion or whatever).
+# no more shit REPLs!!
+
+print Numbers.Natural;  # [ (next 1 { + 1 . _ }) ] or something.
+use Numbers;
+
+map (λ [x y] { + x y }) [1 2 3 4]
+map (λ [x y] [(+ x y)]) [1 2 3 4]
+
+let [add-all] $ . let [i] 0; for _ $ . set [i] + i it;
+let [add-all] $ . let [i] 0; for _ { set [i] + i it };  # looks better and matches with spaces...
+add-all 1 2 3 4 5 6 7 8 9;  # 45
+# wait, no. I don't think it works... there cannot be 2 semi-colons.
+let [add-all] $ . let [i] 0; for _ $ . set [i] + i it;
+let [add-all] [(let [i] 0)(for _ [(set [i] + i it)])];  # yeah, [let [i] 0] would be the only part.
+let [add-all] [(for _ (let [i] 0) [(set [i] + i it)])];
+# ^ like this?
+let [add-all] { for _ (let [i] 0) { set [i] + i it } };
+let [add-all] $ . for _ (let [i] 0) $ . set [i] + i it;  # it's a little longer, but it works.
+# I guess I'll make it standard to space {}.
+
+# what if this was valid?
+let [add-all] $ . for _ . let [i] 0 $ . set [i] + i it;
+# like, 'let' takes in the body... but maybe it also returns it if unused?
+# I feel like if that's the case I'll have to rethink some things.
+
+# either that or I come up with an alternative to ';'.
+# like ';' is for ')(', but maybe I also need ')['?
+# then again, no. I don't see a way to make it work with '$'. it's not like it replaces it.
+# you still the ']' thing at the end. nevermind I guess.
+
+# eh?
+for _ (let [i] 0) [(set [i] + i it)]
+for _ (as value) [(set [i] + i value)]
+for _ . as value [(set [i] + i value)]  # wait, no. doesn't work. or does it? I can overload it?
+for _ [(set [i] + i value)] . as value
+# ok.
+
+# btw, top-level so...
+for _ {
+    print it " ";
+};
+# shell:
+
+    $ 0 main.txt 123 321 "Hello, World1"
+
+# outputs main.txt 123 321 "Hello, World1"
+
+# wait a second... I want the shell to behave like the language, so...
+load "file.txt"
+
+    $ load "file.txt"
+
+# I mean, right?
+# so the binary used for other shell should be called 'load'.
+
+# this doesn't work, btw.
+
+    $ load file.txt  # error: variable 'file' not bound.
+
+# this does.
+
+    $ load (print\n "hello") "file.txt"
+
+# hmm, so the first argument is the file you want to load, then the arguments you want to pass to
+# the file. I think I like that. nice.
+
+# what was the test again? for if something is lazy evaluated or not?
+(define (p) (p))
+(define (test x y) (if (= x 0) 0 y))
+(test 0 (p))
+
+p = p
+test x y = if x == 0 then 0 else y
+main = print (test 0 p)
+
+let [p] $ . p;
+let test [x y] $ if (= x 0) 0 y;
+test 0 (p);
+# ... I would imagine that it's eager. it's pretty obvious when it's not eager.
+# the only reason why my language has infinite lists, is because of quotation.
+
+# then again... is it that obvious?
+(func (+ 1 1) (- 1 1))  # everything is eager.
+let [x y] . [(print "1 called, ") 1 (print "2 called, ") 2 (print "3 called, ") 3];
+# outputs "1 called, 2 called, "
+# but if that's the case, why is this fully evaluated?
+([(print "hello") (print " ")])
+# because 'eval' is running in a loop?
+# what if it semi-evaluates?
+# ([(print "hello") (print " ")]) -> (print "hello") (print " ") ?
+
+# maybe the reason this works is because the rest in put in [_]? which it itself is quoted?
+let [func] {
+    print\n _;  # outputs [(print "1 called, ") 1 (print "2 called, ") 2 (print "3 called, ") 3]
+};
+func (print "1 called, ") 1 (print "2 called, ") 2 (print "3 called, ") 3;
+# know that I think about it, you don't even need to evaluate shit.
+# unlike the old model, you know the argument count!
+# ... or not. sometimes things don't return anything, or returns multiple values.
+
+# so all the arguments are simply in a quoted list...
+let [func] {
+    for _ { print it ", intermediate action, " }
+};
+func (print "1 called, ") 1 (print "2 called, ") 2 (print "3 called, ") 3;
+# outputs "1 called, 1, intermediate action, 2 called, 2, intermediate action, 3 called, 3, intermediate action, "
+
+# (quote) == [] ?
+# a large portion of the interpreter will have to be defined without macros...
+
+# this code might not be possible...
+for _ { set [i] + i value } . as value;
+# then again, maybe it is?? argh...
+
+for _ { set [i] + i value } . as value;
+# ... maybe it's easier if I just say the language is lazy?
+
+let [-opt-arg1 123 -opt-args2 321];  # this works too.
+
+# ??
+let func [x y];
+# like in C? define the signature, but don't assign it yet?
+
+# oh.
+let [a b] . mut;  # both are mutable? because both [] are passed to 'mut'?
+let [a b] (mut [] []);
+let [a b] (int 12 21);
+print\n a b;  # outputs 12 21
+
+let [a b] (int 12) (f32 21);
+
+# put '$' at the top of the file make it so that you have to use ()s everywhere again.
+# you can just turn {} mode off. although it fucks with CLI args...
+
+# the ideas just keep on coming. it's been a few days, and I can't stop thinking about this shit.
+
+# what if every function is yielded by default? but once you reach the end of it, it loops back?
+let [a b] . _;
+for _ [];
+# ^ other this doesn't work.
+
+let [list] [1 2 3];
+let [x] . list;
+let [y] . list;
+let [z] . list;
+print x y z;  # 1 2 3
+# do I want this?
+
+let [value err] . func;
+let [value] . func;  # you can do this, if you expect you won't be using 'func' again?
+
+# this works, btw. it loops back around.
+for _ [];
+for _ [];
+
+# basically 'eval'?
+for _;
+
+# I should really detect it though. there should be a way to find out if all the arguments have
+# been used in a function, and throw and error in not. some sort of dependant typing, maybe.
+
+for _ { set [i] + i value } . as value;
+# what if it's an error that '. as value' is unused?
+
+# how about this:
+let [a b] . [1 2 3];
+# the entire list is evaluated, like a function.
+# but after evaluation, the things not assigned are put back into the list?
+
+# here though, it's different. it works a bit like the old language model.
+let [a b] . take 2 [1 2 3];
+# notice that at no point in time is the list itself evaluation.
+# only 'take' is being evaluated.
+
+# wait, wait, wait. no, wait a second.
+let [fibs] [0 1 . (zip-with + fibs . tail fibs)]
+take 10 fibs;  # [0 1 1 2 3 5 8 13 21 34]
+
+for 0 $ . print\n it ": " . reduce [0 1 . (zip-with + fibs . tail fibs)];
+# 0: [0 1 1 . (zip-with + fibs . tail fibs)]
+# 1: [0 1 1 2 . (zip-with + fibs . tail fibs)]
+# 2: [0 1 1 2 3 . (zip-with + fibs . tail fibs)]
+# 3: [0 1 1 2 3 5 . (zip-with + fibs . tail fibs)]
+# 4: [0 1 1 2 3 5 8 . (zip-with + fibs . tail fibs)]
+# 5: [0 1 1 2 3 5 8 13 . (zip-with + fibs . tail fibs)]
+# 6: [0 1 1 2 3 5 8 13 21 . (zip-with + fibs . tail fibs)]
+# 7: [0 1 1 2 3 5 8 13 21 34 . (zip-with + fibs . tail fibs)]
+# ...
+# does that fix it? and do parameters really work like this?
+# maybe it's a consequence of how 'zip-with' is defined?
+
+# side-effect are eager, value are not?
+# I think I am over-complicating the situation.
+# how about: it's just lazy. and don't put side-effect function or whatever at the end.
+# lesson learned!
+
+# this is still valid, right?
+((print "hello") (print "\n"))
+
+# in other words, no need for '$' at the start of the file.
+# as long as no function call returns any thing, we're good.
+let [x] 1 ;
+(let [y] 2)
+# (both valid at top-level)
+
+print "Hello, World!\n" ;
+# you know, this is weird, yes, but I feel like ';' should be spaced...
+
+print "hello" ; print "\n" ;
+(print "hello") (print "\n")
+
+let [list] [1 2 3];
+let [x] . list;
+let [y] . list;
+let [z] . list;
+print x y z;
+
+let [list] [1 2 3] ;
+let [x] . list ;
+let [y] . list ;
+let [z] . list ;
+print x y z ;
+
+for _ { print\n it };
+for _ { print\n it } ;
+(for _ { print\n it })
+
+# then again, maybe not.
+
+let [func] {
+    let [a b] . _;  # everything is run here.
+    print\n a b;  # outputs 2 4
+    let [c d] . _;  # everything has already been run. the arg list is memoised.
+    print\n c d;  # outputs 6 8
+    for _ { print\n it }
+};
+func (+ 1 1) (+ 2 2) (+ 3 3) (+ 4 4) (+ 5 5) (+ 6 6) (+ 7 7) (+ 8 8);
+# you know what? no. why should it be run in the function?
+# run it before they are passed to the function. keep it simple.
+# fuck it.
+
+λ [a b]
+
+# is everything lambda calculus underneath?
+
+# there's this thing though.
+let [fibs] [0 1 . (zip-with + fibs . tail fibs)];
+
+let new-let [symbols] {
+    
+};
+new-let [x y z] . fibs;
+
+# in scheme.
+(define (zip-with f xs ys)
+    (if (or (null? xs) (null? ys))
+        '()
+        (cons (f (car xs) (car ys))
+              (zip-with f (cdr xs) (cdr ys)))))
+
+(zip-with + '(1 2 3) '(4 5 6))                                               ; => (5 7 9)
+(zip-with * '(1 2 3 4) '(5 6 7 8))                                           ; => (5 12 21 32)
+(zip-with (lambda (x y) (string-append x y)) '("a" "b" "c") '("x" "y" "z"))  ; => ("ax" "by" "cz")
+
+# should I call my language 'load'?
+let zip-with [f xs yz] {
+    if (or xs ys) [[]] [
+        (cons (f (car xs) (car ys)) (zip-with f (cdr xs) (cdr ys)))
+    ]
+};
+print\n . zip-with + [1 2 3] [4 5 6];                                            # [5 7 9]
+print\n . zip-with * [1 2 3 4] [5 6 7 8];                                        # [5 12 21 32]
+print\n . zip-with (λ [x y] { string-append x y }) ["a" "b" "c"] ["x" "y" "z"];  # ["ax" "by" "cz"]
+# anyway, with this definition, it would obviously take forever to evaluate.
+
+# worst case scenario, even scheme can create 'infinite lists'.
+
+# shit, I just realized.
+let [func] {
+    [(print "Hello, World!\n")];
+    # and so, I can't return a string.
+    "Hello, World!\n"
+}
+# wait... I can't even return a number...
+# damn, things were going SO WELL! too well, really...
+
+let [func] {
+    return "Hello, World!\n" 123 321;  # should I?
+};
+# you know what? why the fuck not! the world is your orchard!! DO IT, MOTHERFUCKER!!!
+
+# ... I guess now I have to figure out how 'return' determines which function to return.
+# so, {} forces explicit return...?
+
+let [i] 10;
+while i {
+    set [i] - i 1; print\n it
+};
+let [i] 10;
+while i (set [i] - i 1) {
+    print\n it
+};
+
+let [func] {
+    print\n _;  # [2 4 6 8 10 12 14 16]
+};
+func (+ 1 1) (+ 2 2) (+ 3 3) (+ 4 4) (+ 5 5) (+ 6 6) (+ 7 7) (+ 8 8);
+
+let [list] [(+ 1 1) (+ 2 2) (+ 3 3) (+ 4 4) (+ 5 5) (+ 6 6) (+ 7 7) (+ 8 8)];
+print\n list;  # [(+ 1 1) (+ 2 2) (+ 3 3) (+ 4 4) (+ 5 5) (+ 6 6) (+ 7 7) (+ 8 8)]
+# at this point, it is still a string.
+let [a b] . list;
+print\n list;  # [(+ 3 3) (+ 4 4) (+ 5 5) (+ 6 6) (+ 7 7) (+ 8 8)]
+# maybe?
+
+# okay, let's think about what's different.
+([(+ 1 1) (+ 2 2)] (+ 3 3) (+ 4 4) [(+ 5 5) (+ 6 6)] (+ 7 7) (+ 8 8))
+# first off, the arguments are evaluated.
+([(+ 1 1) (+ 2 2)] 6 8 [(+ 5 5) (+ 6 6)] 14 16)
+# the strings remain the same – because they are strings.
+# and now, the operator is applied to operands.
+let [operator] [(+ 1 1) (+ 2 2)];
+let [operands] [6 8 [(+ 5 5) (+ 6 6)] 14 16];
+# oh, I like how they are the same character count. never noticed.
+(operator . operands)
+# but maybe because of how eval works, operator is evaluated lazily?
+for operator it;  # evaluates every thing?
+
+let [a b] . _;
+# is something like
+let [symbols] [[a] [b]];
+for symbols {
+    let [next-env.(symbols)] . get _;
+}
+
+let [func] [
+    (_)    # lazy?
+    ((_))  # eager?
+    # it will crash if the first argument is not a function,
+    # but only after the operands are all be evaluated.
+]
+# of course, this will never return.
+
+# ...
+let [fibs] [0 1 . (zip-with + fibs . tail fibs)];
+print\n . fibs;
+# wait, so I can't do this?
+
+# actually, it changes nothing. eventually, it will be passed to a function as an argument, and be
+# evaluated in the argument list.
+# I can't do it. I can't make this work. I thought I had it, but I didn't.
+
+(print\n (fibs))
+# becomes
+([...] 0 1 1 2 3 5 8 13 21 34 ...)  # it never start executing the body of 'print\n'.
+# but if this doesn't work...
+# no, maybe I can save it.
+# let's think about it.
+
+(print\n (+ 1 2) (+ (- 2 5) (- 22 3)) (fibs))
+([...] (+ 1 2) (+ (- 2 5) (- 22 3)) (fibs))
+([...] ([...] 1 2) (+ (- 2 5) (- 22 3)) (fibs))
+([...] 3 ([...] (- 2 5) (- 22 3)) (fibs))
+([...] 3 ([...] ([...] 2 5) (- 22 3)) (fibs))
+([...] 3 ([...] -3 ([...] 22 3)) (fibs))
+([...] 3 ([...] -3 19) (fibs))
+([...] 3 16 (fibs))
+([...] 3 16 ([0 1 . (zip-with + fibs . tail fibs)]))  # no arguments to evaluate.
+([...] 3 16 0 ([1 . (zip-with + fibs . tail fibs)]))  # start by returning 0
+([...] 3 16 0 1 ([. (zip-with + fibs . tail fibs)]))  # then 1
+([...] 3 16 0 1 ([. (zip-with + fibs . tail fibs)]))  # then starts evaluating 'zip-with'.
+([...] 3 16 0 1 ([((zip-with + fibs (tail fibs)))]))
+([...] 3 16 0 1 ([(([...] + fibs (tail fibs)))]))
+([...] 3 16 0 1 ([(([...] [...] fibs (tail fibs)))]))
+([...] 3 16 0 1 ([(([...] [...] [...] ([...] fibs)))]))
+([...] 3 16 0 1 ([(([...] [...] [...] ([...] [...])))]))
+([...] 3 16 0 1 ([(([...] [...] [...] [...]))]))
+# I can't, man. no matter how I look at it, 'zip-with' with go on forever.
+# it will keep doing 'cons' and creating the list without returning anything.
+# I don't know. either arguments returned from the body of the function are lazy,
+# or everytime the function calls itself, it freezes?
+# or checks if the calling function is satisfied?
+# maybe it only works when you're spreading a list?
+# or maybe the function is put on hold the moment it returns a value?
+
+# at least I have this. *sob*
+for fibs {
+    print fibs " "
+};
+print\n;
+# and this.
+let [a b] . . take 10 fibs;
+
+# ...
+# let's see how scheme does it.
+(define-syntax cons-stream
+    (syntax-rules () (
+        (_ a b)
+        (cons a (lambda () b))  ; delay the tail
+    ))
+)
+
+(define (stream-car s) (car s))
+(define (stream-cdr s) ((cdr s)))  ; force evaluation
+
+(define (from n)
+    (cons-stream n (from (+ n 1)))
+)
+
+(define nums (from 0))
+
+(define (stream-take s n)
+    (if (zero? n)
+        '()
+        (cons (stream-car s)
+              (stream-take (stream-cdr s) (- n 1)))
+    )
+)
+
+(stream-take nums 10)  ; => (0 1 2 3 4 5 6 7 8 9)
+
+(define fibs
+    (cons-stream 0
+        (cons-stream 1 (add-streams fibs (stream-cdr fibs)))
+    )
+)
+
+(define (add-streams s1 s2)
+    (cons-stream
+        (+ (stream-car s1) (stream-car s2))
+        (add-streams (stream-cdr s1) (stream-cdr s2))
+    )
+)
+
+(stream-take fibs 10)  ; => (0 1 1 2 3 5 8 13 21 34)
+
+# if it's overly complicated, maybe I shouldn't do it?
+
+# Go enums are intersting.
+type Direction int
+const (
+    North Direction = iota
+    East
+    South
+    West
+)
+North == 0  // returns false. or throw an error.
+
+# anyway, the way the type is done is nice.
+enum [North East South West];
+print\n . = North 0;  # false.
+
+# I can't do this:
+let [x] 1;  # immutable
+var [x] 1;  #   mutable
+# because of this.
+let func [x y];
+# unless...
+var func [x y];
+# no, only 'func' becomes mutable here.
+# and it's equivalent to this, anyway:
+let [func] { λ [x y] };
+# though this works...
+let [func] { let [x y] . _ };
+let [func] { var [x y] . _ };
+
+# the more I think about it... the more it should behave that way.
+let [value err] . function-that-can-fail;
+# obviously, 'function-that-can-fail' should run from start to finish.
+# not doing so is ridiculous.
+# but I suppose we could also memoize it?
+
+let [list] [1 2 3 4 5 6];
+
+let [x y z] . list;
+print x y z;  # [1 2 3]
+
+let [x y z] . list;
+print x y z;  # [1 2 3], returns the same thing.
+
+# but, you can do this:
+for list {
+    print it " ";
+};
+# [4 5 6]
+
+# ... or not.
+let [x y z] . list;
+print x y z;  # [1 2 3]
+
+let [x y z] . list;
+print x y z;  # [1 2 3], returns the same thing.
+
+for list {
+    print it " "
+};
+# [1 2 3 4 5 6]
+# how about we be sane, and not allow a thing to mutate itself weirdly?
+
+let [func] $ . for _ { print it " " };
+func 1 2 3 4;  # 1 2 3 4
+
+let func [x] {
+    print "x =" x "\b, and the rest =";  # I guess this is a nice way to remove the space.
+    for _ { print it " " };
+};
+func 1 2 3 4;  # x = 1, and the rest = 1 2 3 4
+# here, '_' is still bound to the full list?
+
+let func [x . the-rest] {
+    print "x =" x "\b, and the rest =";
+    for the-rest { print it " " };
+}
+func 1 2 3 4;  # x = 1, and the rest = 2 3 4
+
+let [func] {
+    λ [x . the-rest];
+    print "x =" x "\b, and the rest =";
+    for the-rest { print it " " };
+}
+func 1 2 3 4;  # x = 1, and the rest = 2 3 4
+
+let [func] {
+    let [x . the-rest] . _;
+    print "x =" x "\b, and the rest =";
+    for the-rest { print it " " };
+}
+func 1 2 3 4;  # x = 1, and the rest = 2 3 4
+# again, the arguments are only evaluated once. '(_)' is only for spreading.
+# not as fun. but more sane? sure.
+
+let func [x . _] {
+    print "x =" x "\b, and the rest =";
+    for _ { print it " " };
+}
+
+# hah... I still have infinite lists. I do... but damn.
+print\n take 10 fibs;
+# wait, do I? I do... but I might have to rewrite fibs...
+# no, I can't figure out how to do this... I might have to give up...
+# unless there is a way to return a function which is not quoted.
+
+let [Natural] [(next 1 { + 1 . _ })];
+let next [before after] {
+    return before . unquote [next (after before) after];
+};
+print\n . get 0 Natural;  # 1
+print\n . get 1 Natural;  # 2
+print\n . get 2 Natural;  # 3
+
+print\n . car Natural;  # 1
+print\n . cdr Natural;  # [(next 2 { + 1 . _ })], quoted but not double quoted.
+print\n . car cdr Natural;  # 2
+print\n . cdr cdr Natural;  # [(next 3 { + 1 . _ })]
+
+print\n . take 10 Natural;  # [1 2 3 4 5 6 7 8 9 10]
+
+print\n . Natural;  # 1 2 3 4 5 6 7 8 9 10 ...
+print\n . 1 2 3 (next 4 { + 1 . _ });
+print\n . 1 2 3 4 (next 5 { + 1 . _ });
+# it is possible. now I just need to figure out 'fibs'.
+
+# I love how this is taking so much of my time. I need to go to sleep.
+
+# also, I love the implications.
+(func arg1 arg2 arg3)     # all the arguments get executed.
+let [_] [arg1 arg2 arg3]  # then they become part of a list.
+for _ { ... }             # and that list is iterated over.
+# you would be none the wiser if someone inserted something that can still be evaluated in there.
+
+# what if 'int' and other types are also macro, but with side-effects?
+# i.e. they can be placed anywhere. when you compile, the macros go away,
+# but they change the type of the symbol that came after or before it.
+let [x y z] 1 2 3;
+let [x int, y int, z int] 1 2 3;
+# here, the it's in a quote. when you run it, it might as well not be there.
+# though the type is now enforced.
+
+# why don't I experiment with lazy evaluation?
+(print\n (fibs))
+(print\n 0 1 1 2 3 5 8 13 21 34 (fibs))
+# so I guess the args list keeps running until the expected count is reached.
+
+# as a rule, I can this:
+(+ (print "something") 1 1)
+# but not this:
+(+ 1 1 (print "something"))
+# unless the function expects an infinite number of arguments.
+# same goes inside functions. don't put code you want executed after the return values.
+# you should list all the return value.
+# there is no discards, only delays.
+let [value err] . func;
+# if there is code after the return values, it will be executed the second time you run a function?
+
+# in other words, you can do the original thing I liked.
+let [a b] . _;
+for _ { print\n _ };  # print the rest of the values.
+
+# I guess you're not mutating it?
+# it's just a slice. memoized, yes, but everything is memoized.
+
+for 1.. { print it " " };  # equivalent to 'Natural'.
+# I sure use '.' for syntax a lot.
+
+print\n . reduce fibs;  # can you also do this?
+# I mean, a string is just something you print character by character. so I guess, yeah?
+
+# it's either,
+for _ {
+    print\n value
+} . as value;
+# or
+let [fibs] . reduce [0 1 . (zip-with + fibs . tail fibs)];
+print\n fibs;
+
+(define (f x y)
+    (if (= x 0) 0 y))
+(f 0 (/ 1 0))  ; → error: division by zero
+
+# I just realized.
+print it " ";  # puts two spaces in...
+# also, I've been thinking.
+print 1 2;  # 1 2
+print "x=" 2;  # x=2
+# right?
+# because, otherwise how do you do it?
+
+(filter even . takeWhile (< 5)) [1..4]
+filter even . take-while { < 5 . _ } [1..4]
+
+# you know, in the lazy language, everything function is technically 'quote'...
+let [func] {
+    print _
+};
+func Hello, World!\n;  # outputs Hello, World!\n
+# I mean, it's a string? so does '\n' get converted?
+
+# oh my god.
+let [mv] {
+    print\n _
+};
+mv file1 file2 folder/;  # file1 file2 folder/ ...
+# right? so basically, I can literally call functions like the CLI.
+let [mv] {
+    let [dest] . reverse . quote _;
+    for _ {
+        file-move it dest
+    }
+};
+# hmm. even though I can do this, I don't think I should.
+# wait.
+mv (my-file-variable) file2 folder/;
+# because it's essentially a macro...
+# so I guess when you call quote on it...
+# but how do I only quote the first value?
+# then again, it's lazy, so only the first value is quoted?
+# again, it's not like '_' is *actually* mutated. it's only yielded.
+
+# I know this language is supposed to be a scheme, and therefore eager...
+# but damn. just damn. look at THIS, man. maybe I should commit to it.
+# and eager just made me depressed, honestly. it was boring.
+# now this, this puts a smile on my face.
+
+load (print "Hello, World!\n")  # equivalent to [py -c 'print("Hello, World!\n")']
+# but in python, you can't do this: [py main.py -c 'print("hello")'].
+# it's simple here.
+load (print "Hello, World!\n") "main.txt"
+# warning: put you executable code before 'main.txt'
+# does that mean optional args should be put before everything?
+# I think I can make it so it doesn't have to be like that.
+# ^ (what a mouthful...)
+
+# then again...
+load (print "Hello, World!\n") "main.txt" arg1 arg2 arg3
+# we can't forget about this.
+# I guess the order this matters, but you either run it before running the file, or you pass it to
+# the file to be run.
+
+print . quote Hello, World!\n;  # outputs "Hello, World!\n"
+let [mv] {
+    let [list] . map quote _;
+    print\n list;
+};
+mv file1 file2 folder/;  # outputs ["file1" "file2" "folder/"]
+# I think this makes more sense.
+
+# huh.
+let [quote] { _ }
+print . quote Hello, World!\n;  # outputs "Hello, World!\n"
+for (quote 1 2 3) {
+    print it " "
+};  # 1 2 3
+# ^ basically a list.
+
+# shit. I don't think I can use 'load' like that... the shell with probably convert stuff like ()
+# and $ to it's own things.
+
+# maybe '{' is not '[(' but '[(apply'? and that's why you can still do implicit return?
+# or maybe '[(return' or '[(print' for the top-level.
+# I guess ';' would have to be like that too. ')(return'
+# I guess I can make it return for the top-level as well, just with a return to the print function.
+# or '[(push Stack'...
+# anyway, if I do that, implicit return doesn't stop the execution of the function,
+# 'return' does do it. again, if I do implement them.
