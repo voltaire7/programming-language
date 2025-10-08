@@ -16135,12 +16135,6 @@ print\n . map
 
 # damn, I've been using the 'en' dash instead of the 'em' dash this whole time...
 
-print\n map(
-    λ([x] [+(x x)])
-    [1 2 3 4 5 6]
-)
-# an interesting thought, but I don't think so. at most, it looks a little nice.
-
 print\n . map
     . λ [x] [(+ x x)]
     [1 2 3 4 5 6]
@@ -16158,3 +16152,163 @@ print\n . map (λ [x] [(+ x x)]) [1 2 3 4 5 6]
 
 # ... and we are back to square one. the thing that started it all.
 print "Hello, World!\n"
+
+let [func] $
+    let [value] . if condition ["true"] ["true"]
+    print\n value
+# I think this should be valid as well, following on the legacy of '.'.
+# actually, I'll go further, and say this here is NOT VALID!
+let [func]
+    $
+        let [value]
+            if condition ["true"] ["true"]
+        print\n value
+# it is a macro, it will behave like one.
+# ... I just realized, but isn't '$' just 'quote'? like actually?
+quote Hello, World!\n  # "Hello, World!\n"
+$     Hello, World!\n  # "Hello, World!\n"
+# I really think it is...
+# and so '$' can be defined similarly!
+let [$] [_]  # actually beautiful...
+
+    $ 'load "main.txt"' | zeta
+
+# 'zeta' or the programming language binary only has the ability to open the REPL?
+# but if you pipe it, you can execute commands?
+
+print "hello "; print "there\n"  # maybe I'll allow this?
+print "hello "; print "there\n"
+    1 2 3 4
+# it's just, you know.
+# I guess 1 2 3 4 goes to the second print. no need to hurt yourself with this.
+# my language is looking more and modern...
+
+let [identity] [. _]
+print\n . identity  1 2 3 4   # outputs  1 2 3 4
+print\n . identity [1 2 3 4]  # outputs [1 2 3 4]
+
+map indentity [1 2 3 4 5]  # [1 2 3 4 5]
+
+print\n ((my-func))
+print\n
+        my-func
+print\n (other-thing) ((my-func))
+print\n
+    other-thing
+        my-func  # wrong!
+print\n
+    other-thing
+    group
+        my-func  # possible solution.
+print\n
+    other-thing
+    . . my-func  # possible solution as well.
+# wait, no.
+print\n
+    other-thing
+    . my-func    # this is equivalent to (. my-func)! it's already double called!
+
+# wait, I just realized, the definition of '$' doesn't work! '$' is a macro, and runs without ()s!
+let [quote] [_]  # this is the definition of 'quote'!
+# also, there is a real difference between 'quote' and '$' in use.
+func
+    quote 1 2 3 4  # [1 2 3 4]
+    $     1 2 3 4  #  1 2 3 4 — becomes list, then the list gets evaluated.
+
+# I really love how '$' and '.' are opposites.
+# like yin & yang.
+
+let [func]
+    $
+        let [value]
+            if condition ["true"] ["true"]
+        print\n value
+# ... '$' returns a quote, and then it's evaluated. so, I guess it does nothing?
+let [func] ([ (let [value] (if condition ["true"] ["true"])) (print\n value) ])  # "true"
+# ^ equivalent to this
+print\n func  # []
+
+# one big advantage of significan whitespace, is the fact that the code essentially looks the same
+# for everyone. you don't even need a formatter!
+
+let [value] 1
+. match value [
+    [1 [print "the value is 1\n"]]
+    [2 [print "the value is 2\n"]]
+    [3 [print "the value is 3\n"]]
+]
+# "the value is 1"
+
+# nice and clean.
+
+let [value] 1
+. match value [
+    for 1..4 [
+        $ [it [print\n "the value is " it]]
+    ]
+]
+# "the value is 1"
+
+# I guess for anything more complicated, we use 'cond'?
+# I sure say 'I guess' a lot...
+
+let [MyEnum] enum [North East South West]
+let [MyEnum] enum [[North 1] East South West]  # set first value?
+# anyway...
+print\n MyEnum  # [[[North] 0] [[East] 1] [[South] 2] [[West] 3]]
+
+let [value] MyEnum.North
+print\n . match value $ for MyEnum [
+    let [field value] . it
+    $ [value [print\n "the value is MyEnum." field]]
+]
+# "the value is MyEnum.North"
+
+# this is interesting, but how is it useful? I need use cases.
+
+. match value [
+    use MyEnum  # probably not necessary if you pass it the other way?
+
+    [North [...]]
+    [East  [...]]
+    [South [...]]
+    [West  [...]]
+] MyEnum
+# is it that simple? you pass in a type, and 'match' will check if it's exhaustive?
+
+. match value [
+    [North      [...]]
+    [East       [...]]
+    [South West [...]]  # maybe?
+] MyEnum
+
+. match value [
+    [North [...]]
+    [East  [...]]
+    [_     [...]]  # this seems like the best for default.
+] MyEnum
+# '_' is just equal to value.
+
+# assigning something but not using it is an error?
+use MyEnum
+
+# maybe I should try UFCS?
+# no, it only works if there's overloading.
+
+echo 'print("hello")' | py
+echo 'print\n "hello"' | zeta
+
+py -c 'print("hello")'
+zeta 'print\n "hello"'  # same length, nice.
+
+zeta 'load "main.txt" arg1 arg2'
+zeta 'print "Hello, " "World!\n"'
+
+# how about we can't declare the same symbol twice in the same scope?
+let [x] 1
+let [x] 2
+# that will prevent collisions when importing modules.
+
+# I think Jai wasn't about type theory, it was about running code at compile-time and doing some
+# fancy type logic?
+# I think zig also kind of has dependant types to an extent?
