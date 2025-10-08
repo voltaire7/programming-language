@@ -16304,6 +16304,11 @@ zeta 'print\n "hello"'  # same length, nice.
 zeta 'load "main.txt" arg1 arg2'
 zeta 'print "Hello, " "World!\n"'
 
+# I guess 'zeta' is a function that just takes a string and runs it?
+# or start the REPL if no arguments?
+# maybe it's like '.', but not a macro.
+(zeta [print "Hello, " "World!\n"])
+
 # how about we can't declare the same symbol twice in the same scope?
 let [x] 1
 let [x] 2
@@ -16312,3 +16317,37 @@ let [x] 2
 # I think Jai wasn't about type theory, it was about running code at compile-time and doing some
 # fancy type logic?
 # I think zig also kind of has dependant types to an extent?
+
+for (enumerate [
+    let [x y z] 1 2 3
+    x y z
+]) [
+    let [index value] . it
+    print\n index ": " value
+]
+# 0: 1
+# 1: 2
+# 2: 3
+# debug-stack, basically?
+
+let [debug-stack] [
+    for (enumerate . _) [
+        let [index value] . it
+        print\n index ": " value
+    ]
+]
+debug-stack [
+    let [x y z] 1 2 3
+    x y z
+]
+# 0: 1
+# 1: 2
+# 2: 3
+
+let [.] [
+    syntax _ [
+        [[. a ...] [(a ...)]]
+        [[a.b] [a. b] [a .b] [get [b] a]]
+    ]
+]
+# is it that simple?
