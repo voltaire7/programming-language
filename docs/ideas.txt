@@ -15586,3 +15586,575 @@ for (quote 1 2 3) {
 # or '[(push Stack'...
 # anyway, if I do that, implicit return doesn't stop the execution of the function,
 # 'return' does do it. again, if I do implement them.
+# '[(return (' maybe the best?
+# anyway, at the end, I think printing the stack is also good. that's how the REPL works.
+
+# jesus fucking christ. I keep writing and writing...
+
+# if I do things lazily, does that mean I can compose functions?
+# how does it even work?
+
+# scheme if lazy.
+(define ones (cons 1 ones))
+(take 5 ones)  ; => (1 1 1 1 1)
+
+(define fibs
+    (cons 0
+          (cons 1
+                (zip-with + fibs (cdr fibs)))))
+(define (zip-with f xs ys)
+    (cons (f (car xs) (car ys))
+          (zip-with f (cdr xs) (cdr ys))))
+(take 10 fibs)  ; => (0 1 1 2 3 5 8 13 21 34)
+
+(define (safe-div x y)
+  (if (= y 0)
+      'undefined
+      (/ x y)))
+(safe-div 10 0) ; => 'undefined
+
+(define (from n)
+    (cons n (from (+ n 1))))
+(define naturals (from 0))
+(take 10 (filter even? naturals))
+; => (0 2 4 6 8 10 12 14 16 18)
+
+(define (my-if cond then else)
+    (if cond then else))
+(my-if #t (/ 1 0) 42) ; => 42
+
+(define big-list (from 0))
+(define (sum n xs)
+  (if (= n 0)
+      0
+      (+ (car xs) (sum (- n 1) (cdr xs)))))
+(sum 5 big-list) ; => 10
+
+(define (nats)
+    (cons 0 (map add1 (nats))))
+(take 6 (nats)) ; => (0 1 2 3 4 5)
+
+(define squares
+    (map (lambda (x) (* x x)) (from 1)))
+(define evens
+    (filter even? squares))
+(take 5 evens) ; => (4 16 36 64 100)
+
+(define lines (read-lines "bigfile.txt"))
+(display (take 3 lines))
+
+# maybe?
+map (unquote [+ 1]) [1 2 3 4]
+
+let [x y z] 1 2 3;
+print "x=%, y=%, z=%" 1 2 3;  # "x=1, y=2, z=3"
+# this still works.
+
+print . reduce obj;
+
+# both work?
+break;
+break it;
+
+# my god, macros are so easy.
+let [macro] {
+    syntax _ [
+        [[a + b] [+ a b]]
+    ]
+}
+macro 1 + 1;
+# or something like that.
+
+(u32 123)  # returns (u32 123)
+# it's something that follows it everywhere.
+
+# I think this might better than the old model...
+# in the old model you had 'args' and 'tokens' or whatever.
+# but here, you just a string of operands.
+# because you know the size of the argument list,
+# you can just put it all in one variable.
+
+# I should first push this language to the extreme,
+# then decide what to keep, and what to throw away.
+# test every possible combinations, and keep the good ones.
+
+import "File" "String" "HTTP" "OS";
+let [file] . File.open "file.txt";
+use File String HTTP OS;
+# this might actually be the better way of doing things.
+
+let [Modules] [File String HTTP OS];
+import Modules; use . Modules;
+# I don't any poing in renaming them.
+
+import File String HTTP OS;  # what if?
+# no... don't know how to use it.
+
+import "File" "String" "HTTP" "OS" -use;
+import -use "File" "String" "HTTP" "OS";
+# you know, that might be the cleaned way to do it.
+# I mean, you can always 'use' them later, but if you want to do it immediately? this is better.
+
+# delay/force, huh. it's the same character count.
+# maybe all I need to make scheme is redefine 'cdr' to force things, and 'cons' to delay the tail?
+
+import "File" "String" "HTTP" "OS" "File" "String" "HTTP" "OS" "File" "String" "HTTP" "OS" -use;
+# wait. everything is lazy, right? so what is to say that I can import everything in my package
+# forder automatically? it already deals with name overlap, and stuff, since you can't have two
+# folders with the same name. the hierarchy and stuff is already done... to begin with, I did the
+# "" thing with 'import' because I wanted to copy Jai. but clearly I'm not doing that anymore.
+
+# this is all you need. no 'import' or anything.
+use File String HTTP OS;
+
+# lol.
+print\n File;  # [import "File'] or something. it has not been evaluated yet.
+
+type Integer Integer IO;
+let func [x y] {
+    print\n x y;
+};
+func 1 2;
+
+type [Integer] IO;
+let func [x] {
+    print\n . x;
+};
+func [1 2];
+
+type Integer Integer;
+let [x y] 1 2;
+
+type [Integer];
+let [x] [1 2];
+
+# what if the rest of the list is automatically returned?
+let add [x y] {
+    + x y
+};
+map [(add . _)] [1 2 3 4]
+([(add . [1 2 3 4])])
+([3 3 4])
+# so like, that a way to for you to be force to use your arguments.
+# but also to do cool things.
+if (let [i] . dup 10) {
+    print\n i
+};
+# otherwise, you have to do this.
+if (let [i] 10) i {
+    print\n i
+};
+# not the best example, but you see what I mean.
+# problem is here.
+let [a b] . _;
+# or is it?
+
+# it's interesting, but it works best with fixed arguments.
+# I'll think about it some other time.
+
+# if '+' takes 2 arguments, doesn't this just work?
+map + [1 2 3 4]  # [3 7]
+# but it shouldn't, otherwise polynomials and stuff won't be as nice.
+3x^4 − 2x^3 +5x − 7
+(define (p x)
+    (+ (* 3 (expt x 4)) (* -2 (expt x 3)) (* 5 x) -7))
+let p [x] $
+    (+ (* 3 (expt x 4)) (* -2 (expt x 3)) (* 5 x) -7);
+# '**' for 'expt'?
+
+# wait, 'quote' is actually defined like this.
+let [quote] [_]
+# not like this.
+let [quote] { _ }
+# if it was like this, it would have weird behavior.
+quote print "Hello, World!\n";  # returns 2 values: print "Hello, World!\n"
+quote (print "Hello, World!\n");  # outputs "Hello, World!\n"
+let [quote] [(_)]
+
+use File.[open close];  # like rust. again.
+
+use std::{
+    ffi::CString,
+    fs::{File, OpenOptions},
+    os::{
+        fd::{AsRawFd, FromRawFd},
+        unix::fs::MetadataExt,
+    },
+};
+use std.[
+    ffi.[CString]
+    fs.[File OpenOptions]
+    os.[
+        fd.[AsRawFd FromRawFd]
+        unix.fs.MetadataExt
+    ]
+]
+# should I do it like this? no capital letters or anything?
+
+# 'use' is easy to define?
+let [use] {
+    for _ {
+        for modules {
+            let [field value] . it;
+            let [next-env.next-env.next-env.(field)] value;
+        }
+    } [modules]  # simplest way, honestly.
+};
+
+# it's literally impossible to do implicit return with {}...
+let [func] {
+    let [a b] . _;
+};
+# 'let' here is really just a string. and because it is just a string, I just can't do it.
+# you have to call anything that is 'implicitly returned'.
+# well, at least {} won't get anymore complicated that that.
+
+let [func] {
+    # guard. it only executes the rest of the code if true. come on, it's clever.
+    if (! condition) $ .
+
+    let [a b] . _;
+}
+# better than some 'return;' bs, at least.
+# no need to add anything new to the language. literally just using what's already there.
+# wait, fuck. it's only until ';'. damn, I thought I did something clever there...
+# I guess I have to implement a 'return' that short-circuits the code. otherwise,
+# it's the extremely lame 'put everything in {}, which I think everyone agree is shit.
+let [func] {
+    if condition $ . return;
+    let [a b] . _;
+}
+# *sigh*
+
+# btw, while it short-circuits, it only does so for the current scope.
+let [func] {
+    {
+        return;
+        print "this will never print\n";  # it really won't.
+    }
+    print "this will print!";
+}
+# you won't ever have to see this if you stick with an imperative style,
+# but if you want to return from an 'if' statement with {}s...
+# though I suppose it's not very imperative when return doesn't return from the function...
+
+# maybe there 'ret' and 'return'?
+# oh.
+let [func] {
+    let [value] . if condition {
+        $ "true"
+    } {
+        ["true"]
+    };
+    print\n value;
+}
+# isn't that, like way better than 'return'?
+# far shorter; and you can still return multiple values.
+# and philosophically, it's nice. with [], every function call has to have ()s;
+# with {}, every return value has to have []s. that's kind of... that's kind of nice!
+# not to mention that return values should be at the end, so '$' is extremely fitting.
+
+# maybe the language is called '[]s'. or '()s'. it is a LISP (in some way).
+
+λ [x y] [];  # isn't [] the default if the argument is now passed?
+# so how is λ supposed to resolve this?
+λ [x y];
+# well, I guess it's not 'impossible' impossible: I'll maybe have to check the arg count and stuff.
+
+# call the language 'zeta'? after the 'Riemann zeta function'? or after the REPL's 'ζ' symbol?
+# probably better than 'load'?
+
+let [func] {
+    λ [x y];
+    lambda [x y];
+    let [x y] . _;  # only one character shorter!
+};
+
+# I guess 'push-stack' checks if the function should be put on hold? that's one way to do it.
+# now that I think about it, isn't a scope just a 'Program' struct? isn't it kind of easy to delay
+# a function? we already know the position within the scope. though, 'easy' is a misnomer.
+# once I start doing memory management... oh boy.
+# I think I'll start with a garbage collector. anything else, and I'll have to go deep in the type
+# system rabbit hole.
+
+# I'm not going to like, I've been looking up LISP without the parentheses, # and I getting vibes.
+# then again, no. it seems '\n' == function call. but what if you want to pass as argument, without
+# calling? you can't. or at least put it on the same line as the function call.
+
+define
+ fac x
+ if
+  = x 0
+  1
+  * x
+    fac
+     - x 1
+
+let
+ group
+  foo
+   + 1 2
+  bar
+   + 3 4
+ + foo bar
+
+# Denser equivalents using more traditional S-expressions:
+
+define (fac x)
+ if (= x 0) 1
+  * x
+   fac (- x 1)
+
+let
+ group
+  foo (+ 1 2)
+  bar (+ 3 4)
+ + foo bar
+
+# it's nice, but I struggle to fully grasp it.
+# this might be the solution.
+(define-syntax identity
+    (syntax-rules () ((_ x) x)))
+(identity 123)  ; => 123
+# yep. tested it, and it worked. wonderful.
+
+(define-syntax $
+  (syntax-rules () ((_ x) x)))
+# vs
+define-syntax identity
+  syntax-rules () ((_ x) x)
+
+(define (fac x)
+  (if (= x 0)
+    1
+    (* x
+      (fac
+        (- x 1)))))
+# vs
+define (fac x)
+  if (= x 0)
+    $ 1
+    * x
+      fac
+        - x 1
+
+(let (
+    (foo (+ 1 2))
+    (bar (+ 3 4))
+) (+ foo bar))
+# vs
+let
+  group
+    foo
+      + 1 2
+    bar
+      + 3 4
+  + foo bar
+
+# I can make it a rule that the identation can be anything, as long as it's higher than one?
+# then again, 2 spaces everywhere is kind of nice.
+
+# then again... what if the number of spaces was the amount of parentheses?
+let
+    foo
+      + 1 2
+    bar
+      + 3 4
+  + foo bar
+# I'd like to say it's kind of gross, but... I kind of like it?
+# but with 'group' it's so much more readable... so maybe not.
+
+# when in doubt, use a macro.
+(define-syntax group
+  (syntax-rules ()
+    ((_ x ...) (x ...))))
+# vs
+define-syntax group
+  syntax-rules ()
+    (_ x ...) (x ...)
+# even if I don't add this to my language, I want to try and do this in scheme.
+
+# hmm... it's not possible to do this.
+$ 123 321 123 321
+# only this.
+$ 123
+$ 321
+$ 123
+$ 321
+# which fucking sucks.
+
+(map
+  (lambda (x) (* x x))
+  '(1 2 3 4 5 6 7 8 9))
+# vs
+map
+  lambda (x) (* x x)
+  quote 1 2 3 4 5 6 7 8 9
+# shorthand for 'quote' doesn't really work.
+
+# anyway, enough scheme. let's get to the juice.
+let [func] {
+    let [value] . if condition {
+        $ "true"
+    } {
+        ["true"]
+    };
+    print\n value;
+}
+# vs
+let [func]
+  $
+    let [value]
+      if condition ["true"] ["true"]
+    print\n value
+
+let [func] {
+    for _ {
+        print\n it
+    }
+};
+# vs
+let [func]
+    for _
+        print\n it
+# if the space difference is divisible by 4, it's quoted and then called? like with the {}?
+
+# this is valid, for example.
+let [func]
+    let [value]
+      if condition ["true"] ["true"]
+    print\n value
+
+print\n . map (λ [x] [(+ x x)]) [1 2 3 4 5 6];
+# vs
+print\n
+  map
+    λ [x] [(+ x x)]
+    $ [1 2 3 4 5 6]
+# the matching character count was completely by accident...
+
+# btw, is this valid?
+print\n
+  map
+    λ [x] [
+      + x x
+    ]
+    $ [1 2 3 4 5 6]
+# I feel like it should be. also, the implications of that...
+let [func] [
+    let [value]
+        if condition ["true"] ["true"]
+    print\n value
+]
+# right? I feel like this is clever: indentation is ()s; []s are what they are.
+# not to say you can't use '$'. it behaves like any other function. just like '.' does.
+let [a b]
+    . _
+# kind of redundant...
+# right, there is no way to call a function without parentheses.
+# '.' might be useless now...
+
+# heh, '\n\n' is the new ';'.
+# well, not really. you can have statements right next to each other.
+
+# I don't like this. I might actually prefer this over the old new model. it's just so clean!
+
+# this doesn't work.
+λ [x]
+[
+    + x x
+]
+# equivalent to
+λ [x];
+[(+ x x)];
+# this does
+λ [x] [
+    + x x
+]
+# it feels like go...
+λ [x] [
+    + x x
+] 123 321
+# ^ btw, 123 and 321 are passed to λ.
+
+print\n
+    $ 1 2 3 4
+# unlike filthy scheme, this works.
+# though it clearly behave differently...
+print\n
+    [1 2 3 4]
+# okay, this is what we want: multiple return.
+
+for _ [
+    print\n it
+]
+for _ [(print\n it)]
+# I'm seriously considering the switch...
+
+# I guess '   ' are now a macro like '.'?
+# that's one way to do it. not to mention, again, that () does nothing when empty,
+# so any other whitespace anywhere else is ignored.
+    [
+    print\n it
+]
+# ^ this is an error by the way.
+# although, we can't forget about this.
+for _ [
+    print\n it
+
+    print\n it
+
+    print\n it
+]
+# 0 indentation between the 'print\n's.
+# in other words, a new block is not started unless we have call with 0 indentation.
+
+# ah, I just realized: '.' is now useless, and therefore not a macro, and therefore can be used
+# exclusively for object notation! that's good!
+
+print\n
+    map (λ [x] [(+ x x)]) [1 2 3 4 5 6]
+print\n
+    map (λ [x] [
+        + x x
+    ]) [1 2 3 4 5 6]
+# still valid? I would say yes. '])' is very (relatively) old model... before the {}s.
+print\n (map (λ [x] [
+    + x x
+]) [1 2 3 4 5 6])
+# I really don't like though.
+
+print\n . map (λ [x] [(+ x x)]) [1 2 3 4 5 6]
+# maybe '.' still exists?
+print\n . map
+    (λ [x] [(+ x x)])
+    [1 2 3 4 5 6]
+# ^ indentation does not matter inside ()s.
+# nvm, it does. otherwise, how can you tell if they are arguments for 'map'?
+# but anyway, you don't have to use '$' for values! — but you have to use ()s to call...
+
+# damn, I've been using the 'en' dash instead of the 'em' dash this whole time...
+
+print\n map(
+    λ([x] [+(x x)])
+    [1 2 3 4 5 6]
+)
+# an interesting thought, but I don't think so. at most, it looks a little nice.
+
+print\n . map
+    . λ [x] [(+ x x)]
+    [1 2 3 4 5 6]
+# can I?
+print\n . map
+    (λ [x] [(+ x x)])
+    [1 2 3 4 5 6];
+# this might be something that was impossible in the old model...
+# '.' is not that intuitive, but I want it to behave like this.
+# then again, is it really not? for all the arguments passed to 'print\n', they now belong to the
+# function that '.' decides.
+print\n . map (λ [x] [(+ x x)]) [1 2 3 4 5 6]
+
+# anyway, I'm officially getting rid of {} and ';'. goodbye! your service will be remembered!
+
+# ... and we are back to square one. the thing that started it all.
+print "Hello, World!\n"
