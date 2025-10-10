@@ -16351,3 +16351,1064 @@ let [.] [
     ]
 ]
 # is it that simple?
+# wait, no, it doesn't work since you have to call it.
+let [.] unquote []  # maybe?
+# or just
+syntax . [
+    [[_ a ...] [(a ...)]]
+    [[a_b] [a_ b] [a _b] [get [b] a]]
+]
+# or even
+let [.] syntax [
+    [[_ a ...] [(a ...)]]
+    [[a_b] [a_ b] [a _b] [get [b] a]]
+]
+# like with enum?
+# but how do I do set 'vec.x'? are they separate things that look the same?
+# I guess I don't see why not.
+
+let [#] syntax [
+    [[_...] []]
+]
+# comments?
+# and what if it behaves differently if when it's [#...] or [# ...]?
+# I guess it does print with the string, when part of it,
+# but when the string evals, it's no longer there? same with '.'.
+
+# I think unquote [] might be the right way to go for functions that run by themselves.
+
+# ?
+@before
+@after
+# quote of eveything before and after a macro. makes the macro more procedural?
+# though it is not for the whole program, just the scope.
+# I guess my language has both procedural and declarative macros...?
+# and declarative macros are simpler, and use a DSL, but they get converted to procedural?
+# I need to learn more aobut rust macros, and maybe macros in general.
+# I'll have to test out macros by executing them and seeing how they expand.
+
+# maybe 'for _' is called at the end?
+# like 'if _ . for _' ? (if the list hasn't be fully evaluated)
+# maybe it's a convention to handle '_': either discard but still evaluate,
+# or make it part of the function?
+let [a b] . take-or-error 2 _
+# ^ force 2 arguments?
+let func [x y] [
+    if _ [. error ""]
+]
+
+# part the the compilation is putting everything on one line?
+
+zeta '' ''  # separate statements?
+
+# no matter how I think about it, you must pass through twice for the macros.
+# I guess 'get' has to work like a macro too.
+obj.field
+(get field obj)
+
+obj.field.sub-field
+(get sub-field (get field obj))
+
+map [. + . take 2 _]
+# what happens if you don't give a list?
+
+let p [x] $
+    +
+        *  3 . expt x 4
+        * -2 . expt x 3
+        *  5        x
+        $ -7
+# that is... one way of doing it?
+let p [x] $ . + -7
+    *  3 . expt x 4
+    * -2 . expt x 3
+    *  5        x
+# or
+let p [x] $ . + (*  3 . expt x 4) (* -2 . expt x 3) (* 5 x) -7
+# ^ probably the best.
+
+let [print\n] [
+    for _ [
+        print it " "
+    ]
+    print "\n"
+]
+# or just
+let [print\n] [
+    print . _
+    print "\n"
+]
+
+# I should try building a garbage collector for once. that'll help me learn stuff.
+# next version of this language will have a garbage collector.
+# I should implement at least one garbage collector within my lifetime.
+
+# because $ is a macro, it precedes other macros?
+let [func]
+let $ func
+# wait, are there higher-order macro around?
+# ... probably not. higher-order function work because (operator operands...).
+
+# 'a _ b' cannot become '_ a b', _ has to go.
+
+let [fibs] [0 1 . (zip-with + fibs . tail fibs)];
+let [fibs] $ 1 2
+    . zip-with + fibs . tail fibs
+# I like $, it's like ':' (or cons in haskell) but better.
+= fibs $ 1 2 . . zipWith + fibs . tail fibs
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
+# you know, I guess I can do '=' like haskell, if it's a macro for 'let'.
+fibs = $ 1 2 . . zipWith + fibs . tail fibs
+print "hello"  # still valid.
+a, b = 1, 2
+func x y = $ . + x y
+func x y = [
+    print\n x y
+]
+# this is actually kind of nice.
+func x y :: [
+    print\n x y
+]
+a, b := 1, 2
+# wait, if everything is lazy, isn't this lazy too?
+func x y =
+    print\n x y
+# nah, harder to understand. let's keep things simple.
+# at the end of the day, I like the idea that you can print functions.
+# ... I just realized, but functions will always be formatted, right?
+# or not. maybe I can do it like html and ignore newline and stuff. but then, what about spaces?
+
+func x y =
+    print\n x y
+func x y = $
+    print\n x y
+# if everything is memoised, is there really any difference?
+
+let [a b] 1 2
+let a, b 1 2
+# equivalent macro?
+# but you can't do this
+func x, y =
+func [x y] =
+fibs = 1, 2, . zipWith + fibs . tail fibs
+fibs = $ 1 2 . . zipWith + fibs . tail fibs
+# I guess the macros behave a bit like the old model when you chain them.
+
+# equivalent?
+1, [2]
+[1 2]
+
+a, b = 1, 2
+[a b] = [1 2]
+# hmm.
+[x y] = _
+# that's nice...
+
+# if _ == [1 2] and [x y] = _, now _ == []
+# but (_) == 1 2 still
+# maybe.
+
+let [str] "Hello, World!\n"  # invalid
+let  str  "Hello, World!\n"  #   valid?
+
+func = (print\n 1 2)
+let func [] (print\n x y)
+func x y = (print\n x y)
+let func [x y] (print\n x y)
+x, y = 1 2
+[x y] = 1 2
+let [x y] 1 2
+str = "Hello, World!\n"
+let str [] "Hello, World!\n"  # if the parameters of λ are empty, the 'function' is unchanged.
+# I don't like how consistent this all is...
+
+func x y = (+ x y)
+func 1 2
+
+print\n func  # (λ [x y] (+ x y))
+# yes, this is what it returns.
+# everything is lazy.
+# or maybe not... it's not very useful.
+
+func [x y] = . print\n x y
+let func [x y] . print\n x y
+x y = 1 2
+let [x y] 1 2
+
+x, y = 1, 2
+[x y] = [1 2]
+x, y = 1, "hello"
+[x y] = [1 "hello"]
+# ^ this is probably best.
+# wait, but you can't chain then...
+x, y, z = 1, "hello", +
+[x y z] = [1 "hello" +]
+# then again, it is a macro.
+# it's very generic: it only looks for tokens or grouped tokens.
+# this is valid, but I can't do the fibs trick. it's better to have an actual cons function.
+# I guess macros can be recursive? where _ is still in the result, for example.
+
+# I am now second guessing myself...
+# if x, y = _ works, then what's the point of multiple return?
+for obj [
+    field, value = it
+]
+# maybe I still have it, but functions in general avoid doing it?
+# I basically have to for this:
+let [func] [
+    print\n . _
+]
+# to pass the argument list to a function.
+# although...
+let [func] [
+    apply print\n _
+]
+# this also works, and is very lispy...
+
+x, y = _
+λ [x y]
+λ x, y
+λ x, y [. + x y]
+map (λ x, y [. + x y]) [1 2 3 4]
+# now that's just vicious...
+
+let func x, y [
+    print\n x y
+]
+
+func = [
+    x, y, [_] = _
+]
+let func [] [
+    let [x y [_]] _
+    for _ [
+        print\n it
+    ]
+]
+# syntax for taking the rest of the arguments?
+
+# it's not really much shorter.
+x, y = 1, 2
+[x y] = [1 2]
+x, y, z = 1, 2, 3
+[x y z] = [1 2 3]
+x, y, z, a = 1, 2, 3, 4
+[x y z a] = [1 2 3 4]
+# well, I double I'll assign so many arguments on one line much.
+
+# if there wasn't mutation, this syntax would make so much more sense...
+# ..., wait.
+next-env.value = 123
+# this... this IS mutation!
+
+let [\n] "\n"
+print x y \n
+
+# replace $ with :, and you have python...
+
+1 + 2
+1 + 2 3 4 5 6 7 8 9
++ 1 2
++ 1 2 3 4 5 6 7 8 9
+let [+] . syntax [
+    [[a _ b ...] [_ a b ...] [Math.add a b ...]]
+]
+let [-] . syntax [
+    [[a _ b ...] [_ a ...] [Math.subtract a b ...]]
+]
+# also valid, but uglier.
+let [-]
+    syntax [
+        [[a _ b ...] [_ a ...] [Math.subtract a b ...]]
+    ]
+# I still don't know how operator precedence works though.
+
+# maybe everything should be mutable? otherwise you can't do this:
+print "Hello, World!\n"
+set [eval] my-new-evaluator
+print('Hello, World!');
+# or some shit.
+
+for _ [
+print\n  # error: cannot start a new scope without exiting the quote.
+]
+# or
+# contradiction: function call claims to be at the same level despite being inside function.
+# I think it's better if we just say [] doesn't allow a new scope. no need to get fancy here.
+# error: cannot end 'for' function call while still inside [].
+# error: cannot end 'for' function call while still inside it.
+# my programming language is gonna be like go and python, no freedom whatsoever.
+# though I guess python isn't as bad.
+
+for _ [
+  print\n  # error: invalid indentation. only accepting multiples of 4
+]
+for _ [
+	print\n  # error: only spaces can be used for indentation.
+]
+# this might too tyranical, honestly. but whatever.
+
+# I should test how python handles indentation errors.
+IndentationError: unindent does not match any outer indentation level
+IndentationError: unexpected indent
+
+let [a b] 1 2
+    -where ...
+
+# what if I combine '.' and ';' inline?
+let [x] . + 1 2; print "hello"
+# no, it does nothing. rather it works as usual
+let [x] . + 1 2
+print "hello"
+# ^ equivalent to this
+# but what if '.' ignores it?
+
+# do you really need mutation? maybe I should test it out.
+
+# I mean, if you think about it...
+a, b = 1, 2
+[a b] = [1 2]
+str = "Hello, World!\n"
+func = (print "hello")
+
+# wait. it is still multiple return!
+[value err] = my-func
+# you have to partially run the function to get the value.
+[x y] = [1 2]
+[x y] = [(+ 1 2) (- 1 2)]
+
+[value err] = my-func
+if (err) [] []
+[value] = my-func
+if my-func [] []
+# I don't want (begin ...) so I guess 'if' keeps the []s.
+# you know what? so does every other function.
+
+map (λ x, y (+ x y)) [1 2 3 4]
+map
+    λ x, y
+        value = 123
+        + x y value
+    $ [1 2 3 4]
+map (λ x, y [(+ x y)]) [1 2 3 4]
+map
+    λ x, y [
+        value = 123
+        + x y value
+    ]
+    $ [1 2 3 4]
+
+# or maybe not?
+x, y, z = 1, 2, 3
+[x y], z = [1 2], 3
+[[x y] z] = [[1 2] 3]
+# if [] is destructuring (or dearraying? idk), then [[]] is double so!
+# it is valid! no need for complicated macros!
+# wait, but what about this?
+λ x, y, z []
+# and this?
+x, y = _
+# nah... I need to make the macro recursive or something.
+
+func x y = (+ x y)
+x = (+ 2 (func 1 1))
+print\n   x  # (+ 2 (func 1 1))
+print\n . x  # 4
+# I guess it's only really force when you write to a file?
+# it just makes more sense with quotes.
+func x y = [(+ x y)]
+x = [(+ 2 (func 1 1))]
+print\n   x  # (+ 2 (func 1 1))
+print\n . x  # 4
+# and again, more consistent with 'if'.
+
+# wait a second.
+obj.field
+(get field obj)
+let [obj.field]
+let [(get field obj)]
+# if we allowed function calls...
+# wait an even longer second.
+let [(get field obj)]
+get field obj =
+# doesn't it remind you of this?
+# maybe there's something here.
+# like obj is immutable, but the calling function keeps getting overloaded?
+# but I don't know. I can't put my finger on it.
+
+func x y = [
+    + x y
+]
+let [func] λ [x y] [
+    + x y
+]
+let [=] syntax [
+    [[symbols     _] [let [symbols]]]
+    [[symbols ... _] [let [symbols] λ [...]]]
+]
+
+vec = [[[x] 1] [[y] 2] [[z] 3]]  # 'let'
+vec.x = 10                       # 'set'
+# that is great because I always though there was some overlap.
+# and this works very similarly to scheme! (set-car! ...) (set-cdr! ...)
+
+# in other words, I don't need 'set' anymore?
+
+# lol.
+Globals = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+func = [
+    Globals.x = 10
+]
+func
+print\n Globals  # [[x] 10 ...]
+
+# I guess we have to clone things though...
+# or not?
+my-obj = []
+func obj = [
+    obj.x = 123
+]
+func my-obj
+# ??
+# I guess we can still overload on numbers. it's still (get x obj) under there.
+# oh.
+(get x obj)
+(set x obj 123)
+# but I have the idea of referencing and dereferencing things...
+# I think 'clone' is just better.
+# and anyway, if '=' is like 'set-car!' and 'set-cdr!', it should also work like that.
+vec = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+func obj = [
+    obj.x = 10
+]
+func vec
+print\n vec  # [[[x] 10] ...]
+vec.x = 1
+func clone vec
+# that or the function does the cloning.
+# I'll have to figure out the convention.
+# wait, you can even have a function return it's 'Settings'!
+# and change the behavior of the function like that! no need for function objects or whatever!
+
+# I like the general idea.
+obj        # by value
+obj.field  # by reference
+
+x y = 1 2
+func = [
+    x y = . _
+]
+x, y = 1, 2
+func = [
+    x y = _
+]
+func x y = []
+# ^ this is the cleanest and nicest looking.
+for obj [
+    field, value = it
+]
+# and this should be added to my list of beautiful parts of the language.
+
+obj, obj.x = [], 123
+print\n obj  # [[[x] 123]]
+
+let obj [] []
+let obj
+print\n obj  # []
+
+let [x y z]
+
+# you can only mutate objects or arrays.
+# functions don't have to be made immutable since you just can't mutate them!
+# that's why they are lower case. good luck trying to mutate it.
+
+# 'export' might be required. otherwise, every module's 'Globals' will overlap.
+# though I say 'export'... it's just this:
+func1 = [...]
+func2 = [...]
+func3 = [...]
+
+$ func1 func2 func3  # 'exporting'
+# I mean, if we just run the file it's all good right?
+
+# although...
+export [func1 func2 func3]
+# becoming
+[[[func1] func1] [[func2] func2] [[func3] func3]]
+# might be useful.
+
+export list = [
+    $ for (map quote list) [
+        [[it . it]]
+    ]
+]
+
+ptr = [123]
+func ptr = [
+    ptr:0 = 321
+]
+func ptr
+print\n ptr  # [321]
+# I mean, why the hell not, right?
+# no need for this.
+0xffff...:0 = 321
+# number bs.
+# then again, that means no pointer arithmetic...
+# well, I can create a low-level interface for that. easy.
+
+fib 0 = 0
+fib 1 = 1
+fib n = (+ (fib (- n 1)) (fib (- n 2)))
+fib n = $ . + (fib . - n 1) (fib . - n 2)
+print\n (fib 1000)
+
+fib n = $ . . match n [
+    [0 0]
+    [1 1]
+    [_ [. + (fib . - n 1) (fib . - n 2)]]
+]
+print\n . fib 1000
+
+obj "x" = 1
+obj "y" = 2
+obj "z" = 3
+
+obj.x
+(obj [x])
+# as interesting as the concept is, I'm never using functions as objects.
+
+# still, objects aside, how do I do this?
+fib 0 = 0
+fib 1 = 1
+fib n = $ . + (fib . - n 1) (fib . - n 2)
+print\n fib  # what does 'fib' look like?
+[
+    [[0] 0]
+    [[1] 1]
+    [[n] []]
+]
+# no, I think I know how to implement it.
+print\n fib 0  # 0
+print\n fib n  # [(λ [n]) (+ (fib (- n 1)) (fib (- n 2)))]
+# what I'm trying to say it that's it's in the name.
+# but no, it's too much of a pain in the ass.
+
+# types?!?
+func [u32] value = [
+    + value 123
+]
+func [u32] 321
+func 321  # unknow.
+# right, 'unknow'.
+# but anyway, not very good.
+
+x = . u32 123
+print\n x  # [[[type] [u32]] [[value] 123]]
+# maybe this is it? just make is convention?
+# or maybe this is better
+x = [123 u32]
+value, type = x
+value-of x = x:1
+type-of x = x:1
+print\n u32  # "u32"
+# the type is equal to it's symbol in string form
+# I mean, isn't that all low-level stuff really needs?
+# but I guess you can't do this then:
++ "string1" "string2"
+# which I guess is fine? there was impasse where I couldn't decide if it was strings or arrays.
+# I'll have to thoroughly explore how this works...
+# and something tells me it's gonna be a little weird.
+
+# didn't the ODIN programming language do explicit overloading? isn't that kind of nice for this?
+# also, types should be hidden, and put on every variable.
+x = 1
+print\n (meta x)  # [[[value] 1] [[type] [any]]
+print\n (type x)  # [any]
+&x = (meta x)  # hmm, I don't know~
+print\n (meta x).type
++ x 2  # 3
+((meta x)).type = "string"
++ x 2  # error: cannot add 2 of type "any" to 1 of type "string".
+type x = (meta x).type
+
+# what if u32 was a macro?
+u32 = . syntax [
+    [[_ x] [(((meta x)).type = "u32") x]]
+]
+
+# I've been thinking, do I seriously need types at this point?
+# it's not like the old model: it won't break the application if you pass in the wrong number of
+# arguments. duck typing is good. we already have 'use' which is de facto typing. the only reason
+# we may want types, is overloading and making it harder to break the app, I guess.
+# oh, and optimizations.
+
+func x = [
+    x, type = x
+    if (== type "MyType") [. error "Wrong type."]
+    ...
+]
+
+Arithmetic = . type [int int] [int]
+add x y = Arithmetic [
+    + x y
+]
+func f val1 val2 = type [Arithmetic int int] [int] [
+    f val1 val2
+]
+func add 1 2  # 3, okay
+func   + 1 2  # error: expected type [Arithmetic], got type [].
+
+# alias type
+Days = int
+
++ x y = [
+    match (type x) [
+        [[u32] [Intrinsics.u32.add x y]]
+        ...
+    ]
+]
+# or something.
+
+# I'm really thinking I should make '+', '-'... you know — the whole shebang — into infix operators
+Math.add 1 2 3 4 5 6  # works like normal.
+1 + 2  # doesn't work like normal...
+# I probably can't do operator precedence though...
+
+# wait.
++ = syntax [
+    [[_ a b] [Math.add a b]]
+]
+...
+# and all the other operators.
++ - 1 2 - 3 4
+# so I could do this?
+(Math.add (Math.subtract 1 2) (Math.subtract 3 4))
+
+# is 'syntax' a type?
+
+# what if it was the old model, but with significant whitespace?
++ - 1 2 - 3 4
+print\n 1 2 3 4
+# how did it even work again?
+# oh right.
+let square [* .]
+square = * .
+# oh my god.
+# to not have the [], just don't put them.
+# wait, is this shorter? the fuck?
+map [+] [1 2 3 4]
+# I guess I'm doing fixed number of args, fuck it.
+apply f x y = f x
+apply [+] 1 2
+# does it work like that?
+# maybe. if it's the first arg, for example.
+say-hello = print\n "Hello, World!\n"
++ x y = add x y
+str = "hello"
+# nah, it doesn't work.
+apply f x y = . f x
+# better.
+apply f x y =
+    f x
+# no, there's just a lot of weirdness.
+
+x = 123
+str = "hello"
+
+# wait, does this get evaluated immediately?
+say-hello = print\n "Hello, World!\n"
+calculate = + 1 2
+# probably, right?
+# then again, how about no?
+add x y = + x y
+add = λ [x y] + x y
+. x = x x
+square = * .
+squared = square 25
+add1 = + 1
+add1 n = + 1 n  # both valid.
+print\n add1 2  # 3
+print\n "Value of add1 2:" add1 2  # "Value of add1 2: 3\n"
+# so does the assignment determin if the function can run by itself?
+
+# or like here, 'n' is assigned to something like 'promise' so '+' curries automatically?
+add1 n = + 1 n
+
+map f ls = [...]
+map (λ [x y] [(value = y) (+ x val)]) [1 2 3 4]
+map λ [x y] [val = y; + x val] [1 2 3 4]
+# so like, indentation is only there to limit passed arguments.
+
+# I can't forget. everything is a function.
+x = 123
+str = "hello"
+# these two are functions. they just take no parameters and returns the same thing.
+# the way you create a new function is by putting function inside a function.
+say-hello = print "Hello, World!\n"
+say-hello  # "Hello, World!\n"
+say-hello  # "Hello, World!\n"
+# it prints everytime, so you have to put things you only want executed once outside.
+add x y = + x y
+func f = f 1 2
+func (add)  # better.
+# looking more and more like haskell.
+print\n (add)  # [λ [x y] + x y]
+print\n (str)  # [λ [] "hello"]
+# that's how you print a function.
+print\n (add 1)  # [λ [y] + 1 y]
+func = + 1 2 + 3 4
+func  # 3 7 ?
+# we already know the argument count.
+map λ [x y] [val = y; + x val] [1 2 3 4]
+# like this
++ - 1 2 - 3 4
+# if _ is unused, it is run or returned or whatever..
+# I think that's pretty clever.
+
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+
+fibs = [1 2 .. zipWith (+) fibs tail fibs]
+= fibs.[0 1 .. zipWith [+] fibs tail fibs]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+
+fibs = : : 1 2 zipWith (+) fibs tail fibs]
+
+take 10 fibs
+
+# maybe it should throw an error to return more than one value?
+# maybe not.
++ . _
+
+for _ as arg [
+    print\n arg
+]
+
+p x = (+ (* 3 (expt x 4)) (* -2 (expt x 3)) (* 5 x) -7)
+p x = + + + * 3 expt x 4 * -2 expt x 3 * 5 x -7
+# infinitely better.
+# although... it is hard to read.
+p x = 3 * x expt 4 + -2 * x expt 3 + 5 * x + -7
+# the key is always to have a few parentheses.
+p x = + + + (* 3 expt x 4) (* -2 expt x 3) (* 5 x) -7
+# you know, even if + takes more than one argument, this still works.
+p x = + (* 3 expt x 4) (* -2 expt x 3) (* 5 x) -7
+# but it breaks the other one...
+# the big question: if it is redundant with fold-left, should you do it?
+p x = ford-left (+) [(* 3 expt x 4) (* -2 expt x 3) (* 5 x) -7]
+
+# $ no longer works the same? though it will probably be easier to implement (just a function).
+
+a, b = [], []
+a, b = []  # error: no values to extract for [a b].
+
+i = 10
+white < 0 i [
+    i = - i 1  # I can't do this...
+]
+# I just realized, but I never fixed the problem with 'while'.
+i = [10]
+white < 0 i:0 [
+    i:0 = - i:0 1
+]
+i = 10
+white < 0 i [
+    .i = - i 1
+]
+# just realized I wrote 'white'... as intented.
+
+while =
+    bool, body = _
+    if bool [
+        .. body _
+        while
+    ]
+
+# if it was like this, 'while' would be an argument for body.
+.. body _
+    while
+
+while = (
+    bool, body = _
+    if bool [
+        .. body _
+        while
+    ]
+)
+
+say-hello = print "Hello, World!\n"  # I like this.
+say-hello = [
+    print "Hello, World!\n"  # and I also like this.
+]
+# how do I put them together?
+# I'm thinking it only accepts one function call?
+array = [1 2 3 4]
+func = [
+    1 2 3 4
+]
+# maybe? maybe the indentation does something?
+# but I don't think this is a good idea.
+vec = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+
+say-hello =
+    print "Hello, World!\n"
+# I guess this is still permitted.
+say-hello =
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+# this isn't?
+
+# I find it ugly, but I have no reason not to accept it...
+# though it's so ugly, I might just not do it at all.
+
+# I should be careful: the second 'print' runs first.
+say-hello = print "Hello, World!\n" print "Hello, World!\n"
+# wait, no it doesn't! since 'print' prints things progressively!
+# anyway, be careful anyway.
+
+while = .. [
+    bool, body = _
+    if bool [
+        .. body _
+        while
+    ]
+]
+
+say-hello = .. [
+    print "Hello, World!\n"
+]
+say-hello = do [
+    print "Hello, World!\n"
+]
+
+Vector3 x y z = [
+    [[x] x]
+    [[y] y]
+    [[z] z]
+]
+Vector3 1 2 3
+# or
+Vector3 [x y z] = [
+    [[x] x]
+    [[y] y]
+    [[z] z]
+]
+Vector3 [1 2 3]
+
+# a big problem is how 'if' and 'else' still use quotes... I need consistency.
+
+while =
+    bool, body = _
+    if bool
+        .. body _
+        while
+    else
+        print\n "while over"
+
+
+# I don't know. if I make 'else' a macro, I could probably make it work?
+# what if it only look at new lines?
+
+# no longer valid
+while =
+    bool, body = _
+    if bool
+        .. body _
+        while
+    else print\n "while over"
+
+while = .. [
+    bool, body = _
+    if bool [
+        .. body _
+        while
+    ] [
+        print\n "while over"
+    ]
+]
+
+print "Hello, World!\n"  # valid
+                print "Hello, World!\n"  # also valid
+
+# indentation doesn't matter anymore.
+# ... though, I'll throw that back around and say: how does that help me?
+# significant indentation has a purpose at least! fewer parentheses!
+
+# going python style is probably the way.
+while =
+    bool, body = _
+    if bool
+        .. body _
+        while
+    else print\n "while over"
+# honestly, I never expected the language to go in this direction...
+
+# I guess '.' is no longer for calling stuff... so it can be for duplicate!
+
+square = * .
+# I still can wrap my head around how simple this is...
+# I used 'square' to determine how powerful the language was, and damn!
+# I should have a list of all the iterations of 'square'.
+
+if condition
+    do-this
+else
+    do-that
+# maybe it's not that hard to implement?
+if condition ...
+print\n _internal.if-boolean-result
+else ...
+# where 'else' checks '_internal.if-boolean-result'?
+# it's kind of like a global value, but as you can tell by the '_', it goes deeper than that.
+# there's a worry about async, but I'll figure it out.
+
+# btw, I can do this.
+if condition
+    do-this
+else if other-condition
+    do-that
+else
+    do-_-um-something?
+finally
+    do-shit
+# or just 'final'?
+# then again, ugh... I don't need it, do I?
+# just de-indent 'do-shit'.
+
+# I think I want '..' to be the range operator.
+# and since I'm not going to be running quotes much, this might be good.
+do [
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+]
+
+quote = _
+expand quote = _  # let quote [] _
+
+my-obj.x
+my-obj
+    .x
+my-obj
+.x  # invalid?
+
+x, y = y, x
+# this should be possible!
+
+# oh! doesn't that mean I can mix functions and macros?
+# so...
+1 + 1
++ 1 1
+# are both valid?
+# no need for 'Math.add'?
+# I'll try it, at least.
+
+# I should really try this:
+fib 0 = 0
+fib 1 = 1
+fib n = + fib (- n 1) fib (- n 2)
+
+fib n = fib (n - 1) + fib (n - 2)
+# it makes it so much cleaner!
+
+fib n = match n
+    [0 0]
+    [1 1]
+    [n [+ fib - n 1 fib - n 2]]
+# this feels so fucking wrong...
+match n [
+    [0 0]
+    [1 1]
+    [n [+ fib - n 1 fib - n 2]]
+]
+
+fib n = match n [
+    [0  0]
+    [1  1]
+    [n  + fib - n 1 fib - n 2]
+]
+
+# btw, 'as' works differently!
+for _ as val
+    print\n it
+# okay, that's kind of sexy.
+for _ as val  print\n it
+
+λ [x y] [+ x y]
+# is better than
+λ [x y]  + x y
+# (it's a way to convert a quote into a function?)
+
+# then again, maybe not
+add x y = + x y
+add = λ [x y] [+ x y]
+add x y = do [+ x y]
+# there are actually many way to convert a quote into a function.
+
+# still, there is a reason to do it.
+map λ [x y] [+ x y] [1 2 3 4]
+# this is *clean*.
+map (+ .. take 2 _) [1 2 3 4]
+# same count, surprisingly.
+map (+ .. _) [1 2 3 4]
+map (+) [1 2 3 4]
+
+# I guess .. can both be a spread operator and a function? like '.', I mean.
+
+map λ [x y] [+ x y] [1 2 3 4]
+map
+    λ [x y] [
+        + x y
+    ]
+    [1 2 3 4]
+map (λ [x y] + x y) [1 2 3 4]
+map
+    λ [x y]
+        + x y
+    [1 2 3 4]
+# the second one might be better, honestly.
+# it matches with (+), for example... and literally the rest of the language.
+map λ [x y] + x y - y x print "hello\n"
+    [1 2 3 4]
+
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+
+map _ [] = []  # _ isn't syntax or anything. it's convention for "I don't care about it".
+map f x = : f car x map f cdr xs
+
+# what if 'as' renames the last assignment?
+import "File" as fi
+# oh.
+import "File" as F "String" as S "HTTP" as H "OS" as O
+# I think I can do something so egregious...
+
+import "File" "String" "HTTP" "OS" as [F S H O]
+
+func
+        inner-func  # error: missing intermediate function call(s).
+
+# it's possible for a function to return nothing...
+func = print ""
+# but how do you assign that?
+x, y =  # like this?
+x, y = nil  # might be better.
+
+x, y = 0   # zero for both
+x, y = []  # []   for both
+x, y = 10  # 10   for both
