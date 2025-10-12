@@ -18225,3 +18225,217 @@ say-hello
 # this is the model I will likely keep.
 # no matter how much I change my mind, this will not change.
 # the end result is set in stone.
+
+# my only complaint about this model is that it is (more) verbose...
+# ((all hail the parentheses God!))
+
+# wait a second.
+if condition [
+    do-something
+] if condition [
+    do-something
+] [
+    do-something
+]
+# I don't think I need '.' for this...
+# 'if' runs the else block. the body of 'else' is the definition of 'if'.
+# and the 'if' statement as a whole should be able to take extra arguments...
+# or not?
+if condition [
+    do-something
+] [...] condition [
+    do-something
+] [
+    do-something
+]
+# hmm...
+if condition [(print\n . _)] [(print . _)] "hello"
+# here, "hello" should be returned as an unused argument.
+# and the prints, should print the argument of the function or the top-level.
+
+if condition [(do-something)] . if . _
+# I guess it is equivalent to something like this?
+# *sigh*, I haven't defined the rules for how _ works yet... I don't know.
+# know what what? no, it doesn't work.
+if condition [(do-something)] . if ["hello"]  # error: symbol 'hello' not bound.
+# this returns an error, because the first 'if' excepts a string to run.
+# huh.
+if condition print\n "true"
+# so... logical conclusion, is that this here works?
+# that's, like, wild.
+
+# dear lord, I have to define the rules for _.
+# this is going nowhere.
+# though it might be impossible without defining how 'if' works first.
+
+func = [
+    inner-func = [
+        print\n . _
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+# big question: what happens here.
+# I think 'inner-func' should print '5 6 7 8'.
+# there is no reason for it to behave differently than 'func'.
+# it's not like there isn't a _ variable at the top-level. (cli args)
+# if I did want this to work, I should rename _, or pass it as an argument.
+
+# rename.
+func = [
+    rename _ args
+    inner-func = [
+        print\n . args
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+
+# pass as arg.
+func = [
+    inner-func = [
+        print\n . _
+    ]
+    inner-func . _
+]
+func 1 2 3 4
+
+# ... I think this is good as a way to rename as well.
+func [args] = [
+    inner-func = [
+        print\n . args
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+
+# then again...
+func = [
+    [args] = _
+    inner-func = [
+        print\n . args
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+
+# wait, no. this isn't what's happening!
+func = [
+    [[args]] = _
+    inner-func = [
+        print\n . args
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+
+# okay, I think this works.
+func = [
+    x, y, [args] = _
+    inner-func = [
+        print\n . args
+    ]
+    inner-func 5 6 7 8
+]
+func 1 2 3 4
+
+# ... I know. for a while now, I've failed to address the elephant in the room.
+# "what about optional arguments?"
+# what about them? I don't fucking know! that's fucking what!!
+# trying to make them work with currying, with _ returning, with the = macro... dear lord.
+# fuck. that reminds me. I have yet to figured out how to make '.' and ':' work with '='...
+
+# I guess for 'if', _ is in fact like a new function, but 'if', when calling the new function, also
+# passes in the the outer _?
+new-if cond then else = [
+    if cond [
+        then . _
+    ] [
+        else . _
+    ]
+]
+# I don't think that cleared anything up... I'm even more confused now.
+# ... then again, maybe not. _ is clearly anything that comes after 'cond', 'then' and 'else'.
+
+[(print\n . _)] 1 2 3 4  # 1 2 3 4
+print\n   . _   1 2 3 4  # (outputs cli args) 1 2 3 4
+
+add evaluation-steps [=]
+# like, macros or syntax have to be added to a list of steps?
+# I imagine significant indentation is in there too.
+
+if condition
+    [(print\n . _)] 1 2 3 4
+    [(print\n . _)] 1 2 3 4
+# returns curried if.
+
+# is there a general rule that I can come up to make _ work both ways?
+# like maybe it's not passed any arguments, it defaults to the upper scope?
+# or the arguments of the upper scope is automatically appended at the end?
+# but if I did that...
+func = [
+    [(print\n . _)] 1 2 3 4
+]
+func 5 6 7 8  # outputs 1 2 3 4 5 6 7 8
+# do I want this?
+# if I don't solve this... even the for loop would be affected...
+for _ [
+    print\n it
+]
+# then again, maybe not as much.
+
+if condition [
+    print\n . _
+] [
+    print . _
+] . _
+# I really need to figure this out...
+
+if condition print\n "true"
+# okay, I have a better undestanding of this.
+# it doesn't work.
+if condition print\n [] "true"
+# but this does.
+# just make sure the obligatory 'else' branch gets it's value, and you're good.
+
+# hmm. I have to redefine 'new-if'.
+# otherwise, it will be curried if the 'else' branch is not given.
+
+# still, there's maybe a way for me to make it work differently?
+
+# I just realized, even this doesn't work.
+new-if cond then else = [
+    if cond [
+        then . _
+    ] [
+        else . _
+    ]  # gotta add '. _' here.
+]
+# the inner 'if' has no extra arguments, lol.
+new-if cond then else = [
+    if cond [
+        then . dynamic-scope._
+    ] [
+        else . dynamic-scope._
+    ]
+]
+
+# should I fix it? or does it work as intended?
+
+new-if cond then else = [
+    if cond [
+        then . _
+    ] [
+        else . _
+    ] . _ . @_  # dynamic _?
+]
+
+# I suppose this works now, unfortunately.
+if condition [
+    do-something
+] if condition [
+    do-something
+] [
+    do-something
+]
+# it's consistent, at least.
