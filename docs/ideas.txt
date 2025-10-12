@@ -17412,3 +17412,505 @@ x, y = nil  # might be better.
 x, y = 0   # zero for both
 x, y = []  # []   for both
 x, y = 10  # 10   for both
+
+# html works again, but is weird.
+div class [my-class1] style [background: black]
+    content "Hello, World!" br
+
+# wait we can't do this...
+x, y = []
+# it was already explained why.
+x, y = [[] []]
+x, y = [], []
+
+bool x = if x "true" else "false"
+# still works even though 'else' is inside true block?
+
+vec.(symbol)  # can be both a function call, or a variable... although variables are functions.
+
+# JS style objects?
+[
+    name: "age"
+    age: 21
+]
+; separates inline things.
+[ name: "age"; age: 21 ]
+
+# 'as' is technically inside the body.
+
+# best:
+while (i=10) < 0 i
+    print\n i
+    i = - i 1
+
+# wait
+while (i = 10; < 0 i; i = - i 1)
+    print\n i
+
+# now this is just a classic for loop! (boomer loop)
+# the fuck, I can even do do/while this way... as long as it doesn't return any value.
+# though I can learn from if/else and do it the normal way too.
+
+p x = + + + * 3 expt x 4 * -2 expt x 3 * 5 x -7
+p x = + + + * expt x 4 3 * expt x 3 -2 * x 5 -7
+# how do I put all the function calls on the left?
+
+i = 10
+i = while < 0 i
+    print\n i
+    - i 1
+# no... it doesn't work.
+
+obj
+    .x = 123
+...
+obj.x = 123
+
+# honestly, don't like .i = - i 1 as 'set' equivalent.
+
+# anyway, the language heavily favors
+x = if ...
+# and stuff like that
+
+do
+    print\n "hello"
+while condition
+
+indentation->parentheses []
+
+i = [10]
+while [> i:0 0]
+    print\n i
+    i:0 = - i:0 1
+# the only way it actually works.
+
+    i:0 = - i:0 1
+    *i = - *i 1
+    i.* = - i.* 1
+    &i = - &i 1
+
+# maybe things should just be immutable, and the language requiring declarativeness?
+# but then, no _internal.if-boolean-result...
+
+# :: and := might be required...
+
+func: print "hello"
+# is better than
+[[func] print "hello"]
+
+field, value = it
+print\n value  # prints properly even if function.
+# 'get' is the thing that runs the function.
+
+# it's always trade off after trade off after trade off: for one part of the language to look
+# pretty, the other has to look ugly.
+
+# one of the case for useful overloading: hashmaps. you can use all the standard functions, even
+# print prints the thing like a normal list.
+
+func = + 1 2 3 4
+func -> 3 3 4
+# I should try _ returning with the older model.
+
+# returning _ forces you to handle it without exceptions. it's good! and even if you don't handle
+# it, it still useful!
+
+[[str] ["hello"]]  # everything is a function.
+# this is probably the better way to do objects in the new model.
+
+File = [
+    open:  ...
+    close: ...
+]
+
+Object = [
+    say-hello:
+        print "Hello, World!\n"
+    say-goodbye:
+        print "Goodbye, World!\n"
+]
+Object.say-hello
+Object.say-goodbye
+# this is kind of nice.
+
+Arithmetic = [
+    add      x y: + x y
+    subtract x y: - x y
+    multiply x y: * x y
+    divide   x y: / x y
+]
+# no as nice.
+Arithmetic = [
+    add x y:
+        + x y
+
+    subtract x y:
+        - x y
+
+    multiply x y:
+        * x y
+
+    divide x y:
+        / x y
+]
+
+Arithmetic = [
+    add x y = + x y
+    subtract x y = - x y
+    multiply x y = * x y
+    divide x y = / x y
+]
+
+Object = [
+    say-hello =
+        print "Hello, World!\n"
+    say-goodbye =
+        print "Goodbye, World!\n"
+]
+Object.say-hello
+Object.say-goodbye
+
+Object = [
+    field say-hello
+        print "Hello, World!\n"
+    field say-goodbye
+        print "Goodbye, World!\n"
+]
+
+vec = [ x: 1; y: 2; z: 3 ]
+vec = [
+    x: 1
+    y: 2
+    z: 3
+]
+vec = [
+    x = 1
+    y = 2
+    z = 3
+]
+
+Object: [
+    say-hello:
+        print "Hello, World!\n"
+    say-goodbye:
+        print "Goodbye, World!\n"
+]
+# maybe I should go the 'red programming language' route?
+vec: [ x: 1; y: 2; z: 3 ]
+
+# maybe I should go back to that one old idea, where functions are objects? just quoted.
+# I mean, it's looking an awful lot like a function here.
+# wait, maybe I'm unto something?
+Object :: [
+    say-hello   :: print "Hello, World!\n"
+    say-goodbye :: print "Goodbye, World!\n"
+]
+# right? you can make fields immutable this way.
+
+vec: [ x: 1; y: 2; z: 3 ]
+vec = [ x = 1; y = 2; z = 3 ]
+# hmm. what if a single ':' is for mutable stuff?
+x, y: y, x
+# no, this looks ugly.
+x, y := 1, 2
+x, y = y, x
+
+x, y: int
+
+vec = [ x = 1; y = 2; z = 3 ]
+# the problem I have with this is as follows:
+for vec
+    field, value = it
+    print field "=" value
+# right? if '=' returned a value, this might work. but it doesn't does it?
+# if it did return a value, I would have to rework everything.
+# even assuming '.x' ran the object as a function, and got the environment from it,
+# how would I do mutation?
+
+# what if '=' was just made to look like a function?
+# but it's not actually? like the macro is replaced temporarily?
+# to begin with, there's no way to accidentally access the field of a function, since functions run
+# automatically. and since they run automatically, only actual object would have '=' in them.
+# maybe there's something to be done with memoization?
+# like you run 'vec', but then the value of 'vec' is replaced with it's environment?
+# but then, how do you handle subsequent '.x's?
+
+# and that doesn't explain this:
+field, value = it
+# this is extremely important.
+vec = [
+    [[x] [1]]
+    [[y] [2]]
+    [[z] [3]]
+]
+# this might be the only way.
+# and yet...
+Object = [
+    [[say-hello]
+        print "Hello, World!\n"
+    ]
+    [[say-goodbye]
+        print "Goodbye, World!\n"
+    ]
+]
+
+vec = object [ x = 1; y = 2; z = 3 ]
+print\n vec  # [ [[x] [1]] [[y] [2]] [[z] [3]] ]
+# as usual, macros make everything nicer.
+
+# though, I considering this.
+vec = object
+    x = 1
+    y = 2
+    z = 3
+# right? because []s are a taboo now.
+
+Object = object
+    say-hello
+        print "Hello, World!\n"
+    say-goodbye
+        print "Goodbye, World!\n"
+# maybe this is the best?
+
+# then again, maybe not.
+Object = object
+    say-hello =
+        print "Hello, World!\n"
+    say-goodbye =
+        print "Goodbye, World!\n"
+
+    other-fields  # functions can be called like this.
+
+vec = object (x = 1; y = 2; z = 3)
+# very weird...
+
+# when you do this,
+vec.x = 10
+# doesn't the whole object just get rebuilt?
+vec = [
+    x = 1
+    y = 2
+    z = 3
+
+    env  # return environment
+]
+
+x: 1  # returns [[x] [1]]
+# this maybe just be the right way to go...
+
+Arithmetic = [
+    add: +
+    subtract: -
+    multiply: *
+    divide: /
+]
+# best of all:
+Object = [
+    say-hello:
+        print "Hello, World!\n"
+    say-goodbye:
+        print "Goodbye, World!\n"
+
+    other-fields  # here, 'other-fields' only has to multiple return [[field] [value]]!
+    # or really, and bear with me...
+    do any-object
+]
+# amazing.
+
+# btw,
+func x y:
+    + x y
+# is a little ugly.
+func:
+    x, y = _
+    + x y
+# might be the convention to follow.
+# though, just in case, I should make ':' work kind of like '='.
+
+# damn, that means I get to keeps this!
+vec = [ x: 1; y: 2; z: 3 ]
+# and this!
+Object = [
+    say-hello:
+        print "Hello, World!\n"
+    say-goodbye:
+        print "Goodbye, World!\n"
+]
+# they were the most beautiful!
+# though there is still that one problem of []s...
+# but that can be saved with $!
+
+# wait, fuck. what do I do for indexing now...
+
+i = [10]
+while [> i:0 0]
+    print\n i
+    i:0 = - i:0 1
+# with immutability
+loop [10]
+    [i] = _
+    print\n i
+    it - i 1
+
+else = T
+if F [
+    do-something
+] F [
+    do-something
+] else [
+    do-something
+]
+# builtin 'else if'!
+# wait, do I even need 'cond' at this point?!
+# even better, the 'else if' conditions don't even get run, since the language is lazy!
+
+# I think I should one again consider doing the older model when functions are just strings.
+# this is extremely interesting, mind you, but I've explored it enough to see some road blocks...
+
+let p [x] $ . + (*  3 . expt x 4) (* -2 . expt x 3) (* 5 x) -7
+p x = $ . + (*  3 . expt x 4) (* -2 . expt x 3) (* 5 x) -7
+
+# how about this:
+.x = 10
+# equivalent to 'set'.
+# but I figure out the details later.
+i = 10
+while [< 0 i] [
+    print\n i
+    .i = - i 1
+]
+
+vec = [[[x] 1] [[y] 2] [[z] 3]]
+# huh.
+i:0 =
+[[i] 0] =
+let [[i] 0]
+# maybe they are less mutually exclusive than I thought...
+# maybe I can make something of this.
+i.x =
+[[i] [x]] =
+let [[i] [x]]
+# the problem is 'get'.
+i:0
+(get-index i 0)
+i.x
+(get-field i "x")
+
+vec = [x: 1; y: 2; z: 3]
+vec = [(get-index x 1); (get-index y 2); (get-index z 3)]
+# or not... I don't how to make this work.
+i = []
+i:0 = 10
+get-index "i" 0 = 10
+print\n i:0
+print\n get-index "i" 0
+# um, does that mean anything can be an array?
+# no, this is too scuffed. the more I think about it, the more... ugh.
+
+# btw, get-index is also often overloaded, so you can do low-level array shit too.
+
+get-index-typed "HashMap" list index = HashMap.get-index list index
+get-index list index = get-index-typed (type list) list index
+get-index list index = get-index-typed type . list index  # duplicate list
+# not gonna lie, this is a pretty suave to do overloading.
+
+overload get-index [
+    [[HashMap] HashMap.get-index]
+    [[Array]     Array.get-index]  # low-level shit
+]
+
+Object = $
+    say-hello:
+        print "Hello, World!\n"
+    say-goodbye:
+        print "Goodbye, World!\n"
+
+Object = [
+    say-hello: [
+        print "Hello, World!\n"
+    ]
+    say-goodbye: [
+        print "Goodbye, World!\n"
+    ]
+]
+
+Object = [
+    $ [say-hello] [
+        print "Hello, World!\n"
+    ]
+    $ [say-goodbye] [
+        print "Goodbye, World!\n"
+    ]
+]
+# this is ironically the most sensible.
+# but ':' is just really nice. I probably won't do it though.
+
+map [. + . take 2 _] [1 2 3 4]
+
+# I just realized.
+i:0 = 10  # this might be impossible.
+# because the ':' macro runs first.
+get-index i 0 = 10
+# unless I actually do this.
+get-index "i" 0 = 10
+
+x = [] as HashMap  # 'as' is for typing?
+
+# this works if _ automatically returns!
+for _ . as val [
+]
+while . i = 10 [< 0 i] [
+    print\n i
+    i = - i 1
+]
+# here too.
+loop . as my-loop . i = 10 [
+    print\n i
+    my-loop - i 1
+]
+# the '.' naturally separates things...
+# though this doesn't work.
+loop . as my-loop [
+    i = . _
+    print\n i
+    my-loop - i 1
+] 10
+loop 10 as my-loop
+    [i] = _
+    print\n i
+    my-loop - i 1
+# ...
+
+let [.] syntax [
+    [[_ a ...] [(a ...)]]
+    [[a_b] [a_ b] [a _b] [get [b] a]]
+]
+. = (syntax [
+    [[_ a ...] [(a ...)]]
+    for [[a_b] [a_ b] [a _b]] $ [it [get [b] a]]
+])
+
+# wait, I just realized.
+bool x = if x "true" else "false"
+# this DOESN'T work!
+# since 'else' only inside the body of 'if', and therefore doesn't run when x is false!
+# this was an interesting diversion, but let's go back to using parenthese everywhere, while also
+# hiding them all with macros.
+
+bool x = $ . if x ["true"] else ["false"]
+
+map . λ [x y] [. + x y] [1 2 3 4]  # valid because _ returns!
+
+ x = 1  # let
+.x = 1  # set
+
+obj.x
+obj
+    .x  # doesn't make sense.
+# equivalent to this:
+obj(.x)
+
+# this means: let the interpreter figure out the number of 'next-env.next-env.next-end..' you need.
+.x = 1
+
+map .λ [x y] [.+ x y] [1 2 3 4]  # ...
