@@ -17914,3 +17914,314 @@ obj(.x)
 .x = 1
 
 map .λ [x y] [.+ x y] [1 2 3 4]  # ...
+# nah, I like that it's same the character count.
+
+print\n . ((Iter [1 2 3]).map [+ 1 (args)]).collect
+
+# maybe macros can set their own precedence?
+# that or repeatedly expand into a list of things.
+
+macro = . syntax [
+    [[_ a ...] [5 _ a ...)]]
+    [[5 _ a ...)] [4 _ a ...]]
+    [[4 _ a ...)] [3 _ a ...]]
+    [[3 _ a ...)] [2 _ a ...]]
+    [[2 _ a ...)] [1 _ a ...]]
+    [[1 _ a ...)] [(_ a ...)]]
+]
+
+# I still think numbers shouldn't be assignable to hashmaps.
+vec = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+# if that's the case, I can do this:
+vec = [
+    x: 1
+    y: 2
+    z: 3
+]
+# hell, they ARE assignable, just not like normal.
+enumerate [1 2 3]  # [
+    [[0] 1]
+    [[1] 2]
+    [[2] 3]
+]
+for . enumerate [1 2 3] [
+    index, value = it
+    print\n index ": " value
+]
+# 0: 1
+# 1: 2
+# 2: 3
+
+# ... no. I shouldn't destroy something that works, just because I want some nice syntax. let's
+# give up on ':' for objects.
+
+# 'debug' shows the real stuff, like metadata with the type and content.
+# 'print' overloads on the type, and prints accordingly.
+# I guess some types can be printed unless you defined how to first?
+# like rust traits.
+# I should probably make things fairly easy to overload and 'derive' from.
+
+# 'take' should probably multiple return.
+map [. + . take 2 _] [1 2 3 4]
+fib-10 = [. take 10 fibs]
+
+# what if the old everything is a function model, but I don't remove []s?
+for enumerate [1 2 3] [
+    index, value = it
+    print\n index ": " value
+]
+# 0: 1
+# 1: 2
+# 2: 3
+
+func x y = [+ x y]
+str = $ "hello"  # heh. $ for $tring
+x = 123
+
+say-hello = [
+    print "Hello, World!\n"
+]
+
+for _ as arg [
+    print\n arg
+]
+
+map [+ take 2 _] [1 2 3 4]
+map λ [x y] [+ x y] [1 2 3 4]
+
+Object = [
+    $ [say-hello]
+        print "Hello, World!\n"
+    $ [say-goodbye]
+        print "Goodbye, World!\n"
+]
+
+Object = [
+    $ [say-hello] [
+        print "Hello, World!\n"
+    ]
+    $ [say-goodbye] [
+        print "Goodbye, World!\n"
+    ]
+]
+# better, but you have to run for numbers and strings.
+
+# ... no, I'm done with this for a while.
+str = "hello"  # it has to look like this.
+# it fails at something basic like this, so no thanks.
+# plus the objects are ugly. just no thanks.
+
+if condition
+    do-something
+else
+    do-something-else
+# it had some sexy code, I'll say that much.
+if condition [
+    do-something
+] else [
+    do-something-else
+]
+
+if condition [
+    do-something
+] condition [
+    do-something
+] else [
+    do-something
+]
+# then again... well, sure. it is 'cond' basically.
+
+if condition [ do-something ] [ do-something ]
+if condition [ do-something ] . else-if condition [ do-something ]  # this might be nicer.
+# wait, because the language is lazy... you don't even need 'else-if', just 'if'...
+if condition [ do-something ] . if condition [ do-something ]
+
+if condition [
+    do-something
+] . if condition [
+    do-something
+] [
+    do-something
+]
+# I think this is it. especially considering how easy it is to refactor...
+
+# maybe I should do this now?
+true  x y = $ . x
+false x y = $ . y
+
+class [my-class1] . style [background: black] . div [
+    $ "Hello, World!" . br
+]
+# uh. I don't know.
+
+# what if macros run from the right? the only reason for that of course being this:
+obj.x = 123
+# but then...
+x, y = y, x
+
+# btw, let's just do currying.
+map (+) [1 2 3 4]
+(+)  # returns the function partially executed.
+
+# wait a second. 'partially executed'?
+square = . * . d
+# so like, this works? I mean, they return 'functions', right?
+let square [* .]
+square = * .
+
+# I should try 'let' again.
+let [square] . * . d
+
+x = 123 is u32
+# 'compile' is also overloaded?
+# oh my god:
+if . my-cond = dup T [
+]
+
+say-hello = print "Hello, World!\n"
+say-hello = {
+    print "Hello, World!\n"
+}
+# maybe it is time for reintroductions?
+# "why do we need this?" you may ask.
+# here's why:
+say-hello =
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+# this is no longer valid.
+x = 1 2    # returns 2
+print\n x  # outputs 1
+
+# ... ok, I thought about it more thoroughly.
+say-hello =
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+# this is not valid, because like the ()s model, it runs...
+# okay, no. seriously, why is it not valid?
+
+# fuck it, it is valid, but {} is equivalent to 'do []'.
+say-hello = do [
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+]
+say-hello = {
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+}
+
+func =
+    +
+        + 1 2 + 3 4
+    -
+        - 1 2 - 3 4
+# I guess this isn't valid??
+# well, it can be, but '=' and 'let' decide not to do so.
+# only one thing is being assigned to 'func'.
+# but that doesn't work. the only way this works is this isn't a function anymore.
+say-hello = print "Hello, World!\n"
+# and this is unquoted:
+say-hello = { print "Hello, World!\n" }
+# but then, it doesn't follow the everything is a function thing...
+
+# alright, here's what I'm thinking:
+if condition {
+    do-something
+} if condition {
+    do-something
+} {
+    do-something
+}
+if condition { do-something } if condition { do-something } { do-something }
+# this should be possible.
+if condition "my-string" if condition "my-string" "my-string"
+# this as well.
+if condition [1 2 3 4] if condition [1 2 3 4] [1 2 3 4]
+# and this.
+# now, does it actually works?
+# my thinking is that {} returns an unquoted string.
+# if doesn't overload on it, he just runs the body like a function, returns whatever.
+
+let square [* .]
+square = {* .}
+# eh.
+# wait, no. CURRYING!
+square = * .  # this returns a curried function!
+# this still fucking works!
+# and this!
+my-print = print
+# Haskell Curry would be proud.
+
+# still, I should be careful. this here is a function that returns a function!
+square = {* .}
+
+# $ should probably be for {}.
+say-hello = $ print "Hello, World!\n"
+
+# god, I want this to work.
+# the best 'square' implementation.
+# currying, short function chaining, no parentheses...
+# no python style, functions with variable arg count, powerful macros (functions)...
+# please, make it work.
+
+say-hello = λ [] [print "Hello, World!\n"]  # maybe [] to convert?
+say-hello  # outputs "Hello, World!\N"
+λ [] [print "Hello, World!\n"]  # returns {print "Hello, World!\n"}
+# but can you run it immediately?
+(λ [] [print "Hello, World!\n"])  # do parentheses do the job?
+# I don't know, though... ()s are used for currying and limiting the number of arguments.
+# λ is still a function like any other.
+
+unquote []
+λ [] []
+lambda [] []
+
+quote = { _ }
+quote = $ _
+
+{ print\n .. _ }
+
+# what if we combine {} and currying?
+print123 = { print\n .. _ } 1 2 3
+# no.
+say-hello = {
+    print "Hello, World!\n"
+}
+# doesn't work for side-effects, or in general.
+
+# fucking unquote.
+# I've been struggling with this fucking function for so fucking long...
+
+.. [print\n .. _] 1 2 3  # outputs 1 2 3
+# this is how you run a function inline.
+# λ is exclusively for returning.
+.. λ [] ["hello"]  # error: symbol 'hello' is not bound.
+# because λ already unquoted the thing.
+
+# even then. even then, I don't think this will work.
+# the model where you explicitely call a string using ()s is just better.
+# no ambiguity to anything. sure, it is more verbose, but I've seen how those '.'s could separate
+# function calls and make it easier to read. it's not like it's impossible to be nice.
+
+# I should let it die.
+# I need to let it die.
+# parentheses are the future.
+# return to simplicity.
+# even though it is verbose, it is simpler.
+# it is easier to think about, and that is better than terseness.
+# at this point, if I want 'everything is a function', I might as well go with python style.
+# I might as well go all the way.
+# but I don't want to.
+# so I am keeping the parentheses.
+
+say-hello = [
+    print "Hello, World!\n"
+]
+say-hello
+# there is nothing that can be done.
+# this is the model I will likely keep.
+# no matter how much I change my mind, this will not change.
+# the end result is set in stone.
