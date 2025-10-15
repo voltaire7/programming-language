@@ -18439,3 +18439,248 @@ if condition [
     do-something
 ]
 # it's consistent, at least.
+
+# I know it's weird... but I think I should force both branches to be passed.
+# otherwise, it's curried.
+if condition [] []  # valid.
+if condition []     # invalid.
+
+new-if cond then else [args] = [
+    if cond [
+        then . _
+    ] [
+        else . _
+    ] . args . _
+]
+new-if cond then else [args] = [
+    if cond [
+        then . _
+    ] [
+        else . _
+    ] . . if args args @_
+]
+
+new-if = [(if . _)]
+new-if = $ . if . _
+new-if . ...
+
+@._  # dynamic env?
+# I think I need a way to do it.
+
+# or maybe 'next-env' is a dynamic scope?
+# I admit I haven't thought this through...
+
+# maybe @ is a macro for dynamic scope?
+# oh, that brings me back... I remember trying to figure this shit out.
+
+say-hello = print "Hello, World!\n";
+say-hello =
+print "Hello, World!\n";
+# ^ equivalent.
+
+say-hello = {
+    print "Hello, World!\n";
+    print "Hello, World!\n";
+}
+
+# one argument is passed.
+say-hello =
+    print "Hello, World!\n"
+
+# two argument is passed, the second one is returned with _.
+say-hello =
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+
+str = "hello"
+func = { + 1 1 }
+if condition str
+if condition func
+if condition "hello"
+if condition { + 1 1 }
+
+apply λ [x y] [ + x y ] [1 2 3 4]
+
+if condition print "Hello, World!\n"
+if condition
+    print "Hello, World!\n"  # if
+    print "Hello, World!\n"  # else
+if condition {
+    print "Hello, World!\n"  # if
+} {
+    print "Hello, World!\n"  # else
+}
+# so {} is really for group arguments?
+if condition
+    group
+        print "Hello, World!\n"
+        print "Hello, World!\n"
+    group
+        print "Hello, World!\n"
+        print "Hello, World!\n"
+# like this?
+
+# ??
+say-hello = {
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+}
+say-hello = { print "Hello, World!\n"; print "Hello, World!\n" }
+# but...
+say-hello = ( print "Hello, World!\n"; print "Hello, World!\n" )
+# right? aren't {}s just ()s?
+
+# what are the implications of this? anywhere you can put {}s, you can put a single statement?
+map λ [x y] + x y
+map λ [x y] { + x y }
+
+# {}s compress many into one.
+# function calls decompress one into many.
+
+# oh.
+Hello = [
+    [[say-hello] {print "Hello, World!\n"}]
+]
+# I guess this looks better.
+
+print\n if T + 1 1 + 2 2  # outputs 2
+print\n if F + 1 1 + 2 2  # outputs 4
+
+# I know I said I won't be doing this anymore, but that ordeal with _ and 'if' statements hurt me.
+# it showed me that that model isn't just verbose; it has other flaws as well.
+# everything comes with pros and cons. everything. there is no perfection, only trade offs...
+
+do [print "hello"]
+func' = [print "hello"]
+do func
+func  = {print "hello"}
+do func  # func gets called anyway. nothing is passed to 'do' (unless 'func' returns something).
+
+# do the rules for 'if' and _ change in this model? I feel like they do...
+# I feel like it should, right?
+if condition  print\n _
+# I mean, you're not creating a new function here?
+# then again...
+func = print\n _
+func 1 2 3 4
+
+func = for _ print\n it
+func 1 2 3 4
+# oh... that's nice. real nice.
+
+# you know what? fuck it. however I want it to work, it will work.
+# the language is powerful. functions are powerful. I will will make things work!
+
+# still need to figure out what happens here.
++ {1 2}
+
+# I guess these two aren't the same...
+print\n _
+print\n for _ it
+# one prints the quoted/lazy list of arguments, the other evaluates everything, then prints it.
+
+# oh.
+.. = for _ it
+
+# alright, I can't delay it any longer:
+# how does one know that something is or is not a statement.
+say-hello = print "Hello, World!\n" print "Hello, World!\n"
+# here, the first print takes in the second print as an argument.
+# I guess it's better to show it like this.
+func = + 1 1 + 2 2
+# okay. here, the first + take in the second. since the language doesn't check for argument count
+# until evaluation, what is actually assigned to 'func'? both '+ 1 1' and '+ 2 2'.
+# this seemingly contradicts my statement that a function can't have multiple return values without
+# the {}s.
+func =
+    + 1 1
+    + 2 2
+# here, I said here that 'func' is now bound to '+ 1 1', and that '+ 2 2' is returned from '='.
+# this makes sense, since the indentation says they are both arguments to '=', unlike before where
+# one '+' was the argument of another.
+func = + 1 1
+    + 2 2
+# here, you might as well put it on one line; they won't be any difference.
+# anyway, my question is: what's the point?
+map λ [x y] + x y [1 2 3 4]
+# this isn't valid. the list is part of the array.
+# also, how is this represented in _?
+func =
+    + 1 1
+    + 2 2
+# this is just... really scuffed.
+# or is it?
++
+    1
+    1
+    2
+    2
+# it's essentially this.
+# ...
+func =
+    + 1 1
+    + 2 2
+# becomes
+func = (+ 1 1) (+ 2 2)
+# ?
+# or
+func = {+ 1 1} {+ 2 2}
+
+# the same?
+map (λ [x y] + x y) [1 2 3 4]
+map λ [x y] (+ x y) [1 2 3 4]
+map {λ [x y] + x y} [1 2 3 4]
+map λ [x y] {+ x y} [1 2 3 4]
+# no, I don't think so.
+map {λ [x y] + x y} [1 2 3 4]  # this a function that returns a function.
+
+map {print\n take 2 _} [1 2 3 4]
+# 1 2
+# 3 4
+
+func =
+    group
+        + 1 1
+        + 2 2
+
+func = {
+    value = take 1 _
+    print\n value
+}
+func 123
+# ...
+func = for _ print\n it
+# ^ this is impossible then.
+# it has to be eager without quotation. other wise, you can't do anything.
+# wait... so in general, no matter the model, this is impossible?
+
+func [_] = for _ print\n it
+# nah, this doesn't hit the same.
+
+func = λ [x] [x]
+func 123  # [123]
+func = λ [x] {x}
+func 123  #  123
+
+# a problem.
+func = λ {x} {x}
+# this shouldn't be allowed.
+# this would cause the function to completely break because a function would be called where it
+# isn't supposed to.
+# it gives too much power to the calling side, when it's the definition side that should decide if
+# something is a function or not.
+
+# you know what? fuck it.
+# this model already became unappealing when
+func = for _ print\n it
+# became impossible.
+# I know it keeps happening, but the '.' model is consistently just better.
+
+identity = []
+identity 1 2 3 4 5  # 1 2 3 4 5
+identity = [. _]  # also valid.
+
+# maybe I should rethink currying?
+# maybe take from the older older model?
+square = [. * . dup]
+# ^ this automatically takes from _?
