@@ -18684,3 +18684,78 @@ identity = [. _]  # also valid.
 # maybe take from the older older model?
 square = [. * . dup]
 # ^ this automatically takes from _?
+
+# what about significant whitespace, but no function call on newline? and we use {} like old times?
+func = { print "Hello, World!\n" }
+func = {
+    print "Hello, World!\n"
+}
+func = { print "Hello, World!\n"; print "Hello, World!\n" }
+func = {
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+}
+func = { print "Hello, World!\n" "Hello, World!\n" }
+func = {
+    print
+        "Hello, World!\n"
+        "Hello, World!\n"
+}
+
+# shit, just realized: objects are also affected by intentation...
+# could the object problem with indentation be fixed with {}? again, without completely getting rid
+# of significant whitespace.
+arr = [1 2 3]
+arr = [
+    1
+    2
+    3
+]
+vec = [[[x] 1] [[y] 2] [[z] 3]]
+vec = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+# because you have to run the list as a function to get the values.
+
+# how many situations do you have to use _ in 'if'?
+# and I kind of glossed over it, if/else is really cool!
+if condition [] if condition [] []
+
+
+if condition do-something; else do-something
+value = (if condition do-something; else do-something)
+# ^ I guess I don't have to worry about the _ dilemma with this.
+
+# what if 'map _ [] = []' is actually memoization?
+
+# I should make overloading very easy. like 'overload HashMap',
+# HashMap being an object with all the functions.
+
+while {< 0 i} {
+    print\n i
+    .i = . - i 1
+}
+# maybe I should try going back to my (((roots)))?
+
+x, y = 1, 2 -> let [x y] . [1 2]
+# doesn't have to completly match.
+
+# ternary logic?
+F = -1  # false
+U =  0  # unknown
+T =  1  # true
+# or should it be 'maybe'?
+M =  0 # maybe
+
+# what if the it's like this?
+while {
+    condition
+    body...
+}
+while {
+    < 0 i
+    print\n i
+    .i = . - i 1
+}
