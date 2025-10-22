@@ -18759,3 +18759,104 @@ while {
     print\n i
     .i = . - i 1
 }
+
+quote [_] = _
+quote $ _ = _
+
+let [key-value-pairs] []
+Hashmap.insert key-value-pairs "symbol" 123
+let [key-value-pairs] Hashmap.new []
+insert key-value-pairs "symbol" 123
+# so I should allow both?
+# I mean, that's what odin does. it has overloading, but you can call the specific functions.
+
+let [key-value-pairs] new Hashmap []
+key-value-pairs.insert "symbol" 123
+# I feel disgusted, but this is kind of good.
+# I mean, it just kind of fixes my problem, you know?
+# I don't want things that aren't of type 'Hashmap' to use the functions.
+# Hell, this IS typing. duck typing.
+# no need to add extra types, just create objects, and attach functions to them.
+# then again, even so, it would be better to have this...
+
+let [key-value-pairs] Hashmap.new []
+Hashmap.insert ...
+# ^ both valid?
+# then again... 'Hashmap' must have 'insert' defined in it, so both would be doable.
+let [key-value-pairs] new Hashmap []
+Hashmap.insert ...
+# like, 'new' only ever takes two values. but the second value can be a number, a string, and list,
+# and object, etc.
+set Hashmap.upsert [symbol value] {
+    let [pair] find this symbol
+    if pair {
+        set [pair.value] value
+    } {
+        insert this symbol value
+    }
+}
+# like this?
+Hashmap.upsert symbol value = {
+    pair = find this symbol
+    if pair {
+        pair.value = value
+    } {
+        insert this symbol value
+    }
+}
+# or this?
+# where 'this' is assigned in the local environment as whatever second value 'new' takes?
+# in this case, an array of linked lists.
+# ... but how do I do this then?
+Hashmap.upsert ...
+# if 'this' is not an argument?
+# or I guess 'new' make it's second argument automatically use 'this'?
+hash-obj = new Hashmap []
+print\n hash-obj  # [
+    [[this] []]
+
+    [[upsert symbol value] {
+        Hashmap.upsert this symbol value
+    }]
+]
+# like this?
+
+# this should be allowed.
+hash-obj = new Hashmap
+# and equivalent to this:
+hash-obj = new Hashmap []
+# maybe.
+
+new int
+new int 123
+new int []  # list of int.
+
+# ah. but then you NEED to have functions be called automatically...
+number = new int
+number = . new int
+# yeah...
+# then again, it's not that bad.
+
+my-insert = Hashmap.insert
+# can't forget that this still works, and is the same for both versions.
+
+print\n hash-obj  # [
+    [[this] []]
+
+    [[upsert] { Hashmap.upsert this . _ }]
+]
+# even this...
+
+# if I use
+number = . new int
+# it's still kind of lispy, once you expand the macros.
+# but if you use
+number = new int
+# there are no macros to expand...
+# — well, there is (=), but you know what I mean.
+# the advantage is that everything is a function, even macros.
+# but if that's the case, you just can't have symbols before '='...
+# ah... I will take forever to figure this one out.
+
+# for the language, one model is nice with macro, but is really just parentheses,
+# the other change things entirely.
