@@ -18860,3 +18860,200 @@ number = new int
 
 # for the language, one model is nice with macro, but is really just parentheses,
 # the other change things entirely.
+
+# I really think that for low-level arrays, at least, there shouldn't be OOP?
+
+# also, what if methods aren't part of the object? like when you print it?
+obj.print-all = []
+get [obj] [print-all] = []  # overload?
+# or
+obj = 123
+obj.x = 321
+print\n obj  # 123
+print\n obj.x  # 321
+# this might be the best if I do in fact do methods? but there is so much ambiguity...
+# no, this might be better:
+obj = 123
+obj:x = 321
+print\n obj  # 123
+print\n obj:x  # 321
+# so we can attach things to the object, without then being 'part' of it!
+# and it also works for functions?
+
+vec = [
+    .x = 1
+    .y = 2
+    .z = 3
+]
+
+# what about this?
+n = 123 as int
+n:add 6
+# or
+value = 123 inherit int Debug  # , etc.
+# maybe...
++ x y = {
+    x:add y
+}
+# ?
+# at this point, infix '+' might be the way to go.
+
+# maybe . stores things as values and : as reference?
+# or maybe is just a [pointer] style reference for both? since Hashmap.insert is the real thing?
+
+print . meta obj  # get all the methods?
+x:int = 123  # I mean, we have it with '.' already too
+
+for n in numbers {}
+for numbers as n {}
+# both are possible, right?
+# if yes, using 'as' for types/methods might be better.
+
+# still, I'm scared that with this model everything will be defined as methods, since why would you
+# create functions that are prone to fail?
+List.map thing  # should only work if 'thing' is of type 'List'.
+# again, what if I did both?
+# nah; if I have overloading, I don't need OOP.
+
+# maybe I should take a moderately sized piece of code and convert it?
+# then try different styles for that same piece of code?
+# maybe it's fine, the way it is? functions are extremely generic, and they should be. not attached
+# to any type or anything.
+# it's not like everything should be overloaded.
+# there is also the question of type hierarchies.
+
+# you know, weird thing is, even if I do parentheses, I can still do 'everything is a function' if I just have 'unquote'.
+# then again, how do you implement unquote?
+quote = [_]
+unquote = [...]
+# wait... how do you implement this?
+# maybe it's a blessing that it's hard to implement? should I keep it this way?
+
+for . map quote code {
+    print it " "
+}
+print\n
+# whatever way I use to implement 'map', the above code should work.
+# and be equivalent to this:
+print\n . . map quote code
+
+# what about haskell style fixed number of args, [] is for list and eager?
+# and there are types, just not many?
+x, y, z = 1, 2, 3
+print\n [x y z]  # [1 2 3]
+obj = [
+    ["x" 1]
+    ["y" 2]
+    ["z" 3]
+]
+# objects are still the same, just eager?
+
+# hmm. but are they eager eager or lazy eager?
+arr = [calcucate-value]
+print\n arr
+print\n arr
+# how many times is 'calculate-calue' called?
+# ... only once. only once because of fibs. it should be lazy, yes, but also memoized.
+
+# I guess '' should also be a different types?
+# I suppose I don't really need to do fixed stuff.
+
+square = * .
+square 5
+* . 5
+# hmm. maybe I should think of things in this way? (again)
+# anyway.
+hello = 123
+do "hello"  # returns "hello"
+do [hello]  # returns [123]
+do 321      # returns 321
+do {+ 1 2}  # returns 3
+# I guess [] expands to 'reduce quote ...'.
+
+# what if {} only creates a new scope?
+square =
+    x = take 1 _
+    * . x
+print\n x  # valid?
+x = 123
+{
+    x = 321
+}
+print\n x
+# idk
+square x = * . x
+# I just don't know.
+
+# huh.
+{ for _ print\n it } 1 2 3  # 1\n2\n3\n
+  for _ print\n it   1 2 3  # (cli args) 1 2 3\n(cli args) 1 2 3\n(cli args) 1 2 3\n
+# maybe?
+# so, like, _ is reassigned when use {}s?
+# maybe I could?
+print-args = for _ print\n it
+func = {
+    print-args
+}
+func 1 2 3
+{ print-args } 1 2 3
+{ for _ print\n it } 1 2 3
+# so the above code, then.
+# I think I like this.
+# but still, dynamic scope?
+# this is a problem.
+
+hello = print "Hello, World!\n"
+hello 123  # outputs "Hello, World!\n 123"
+# because 123 is treated as an argument.
+# then again, I guess it can easily be avoided?
+
+func = {
+    print-args
+}
+func = new-scope
+    print-args
+# equivalent?
+# I guess I could use $ for this.
+
+hello = print "Hello, World!\n"
+let hello print "Hello, World!\n"
+# hmm.
+
+print-args = for _ {
+    print\n it
+}
+# is there anyway to make this work? it looks so nice!
+# I think I should seriously consider fixed argument count and typing; this may be the way to make
+# this work, i.e. the {}s now have purpose.
+print [x y z]  # works
+print format "x = %, y = %, z = %\n" [x y z]  # good too.
+# not as good as the other things, but oh well!
+
+# wait, so I can't use _ anymore?
+# I guess that's fine. it caused a lot of problems, anyway.
+
+# I can do this now.
+value = if condition + 1 1 - 1 1
+# and even this!
+value = if condition + 1 1 if condition - 1 1 * 1 1
+# but I can't do this...
+value = if condition + - 1 1
+# or can I?
+value = if condition {+} {-} 1 1
+
+# fuck it, I'm making it immutable.
+
+let "value" 1  let "value2" 2
+let ["value1" "value2"] [1 2]
+let "func" + 1 2
+# this is why we need the '=' macro.
+
+# I guess variable args are still possible with macros? rust style.
+# maybe this is really just rust, but with very basic syntax?
+# just like how every crustaceans eventually evolve into a crap.
+# carcinisation is real, and we are all influenced by it...
+# become! implicit rust!
+
+# anyway, macros are the only way this could work...
+add x y = + x y
+# how is it possible for there to be 3 symbols to the left, otherwise!
