@@ -19028,6 +19028,8 @@ print-args = for _ {
 print [x y z]  # works
 print format "x = %, y = %, z = %\n" [x y z]  # good too.
 # not as good as the other things, but oh well!
+# ... then again, it is pretty sexy.
+# it follows the philosophy of using smaller functions to create complex logic.
 
 # wait, so I can't use _ anymore?
 # I guess that's fine. it caused a lot of problems, anyway.
@@ -19057,3 +19059,301 @@ let "func" + 1 2
 # anyway, macros are the only way this could work...
 add x y = + x y
 # how is it possible for there to be 3 symbols to the left, otherwise!
+
+# maybe I do optional args like with environment variables?
+PATH=/custom/bin:$PATH make
+
+func = fn [x y] {
+    print "Hello, World!\n"
+    print [x y]
+}
+func 1 2
+# becomes
+fn [x y] {
+    print "Hello, World!\n"
+    print [x y]
+} 1 2
+
+# this makes more sense for fixed argument count.
+func [1 2]
+
+# how about this.
+x, y, z = 1, 2, 3
+print "x = %, y = %, z = %\n" x y z
+print "x = %, y = %, z = %\n"  # error: expected more arguments (or something).
+# but this is just really nice...
+print format "x = %, y = %, z = %\n" [1 2 3]
+
+func f = f 2
+func (+ 2)  # returns 4
+func (+)    # returns (+ 2)
+                    # ^ I guess that's how we represent currying?
+
+say-hello = print "Hello, World!\n"  print "something else\n"
+x = 1  y = 2  z = 3
+
+print format "x = %, y = %, z = %\n" [take 3 _]
+
+func = print\n 123 print\n
+func 321
+print\n 123 print\n 321
+# I really just need to think of it from this point of view:
+# just replace the symbol with it's value and see what happens.
+
+# like, is this really a bug?
+say-hello = print "Hello, World!\n"
+say-hello 123  # outputs "Hello, World!\n123"
+# or a feature?
+
+say-hello = print "Hello, World!\n"
+say-hello = {
+    print "Hello, World!\n"
+    print "Hello, World!\n"
+}
+# I know I don't want this to change, at least.
+# but this...
+say-hello =
+print "Hello, World!\n"
+# breaks currying. and therefore
+square = * .
+
+say-hello name = { print "Hello, %!\n" name }
+say-hello name = [(print "Hello, %!\n" name)]
+say-hello "John"
+(say-hello "John")
+[(λ [name]) (print "Hello, %!\n" name)] "John"
+([(λ [name]) (print "Hello, %!\n" name)] "John")
+
+use "File"
+use ["File" "HTML"]
+# or just
+use [File]
+use [File HTML]
+# probably better.
+
+func 1, 2, 3  # maybe?
+
+print-w/-newline = print\n
+print-w/-newline "hello"  # outputs "hello\n"
+print-w/-newline          # outputs      "\n"
+
+print\n-args . _ = for _ print\n it
+print\n-args = for _ print\n it
+# huh.
+print\n-args = for _ print\n it
+# what if _ wasn't for 'print\n-args'? but for 'for'?
+# what if it's a functions that takes args until newline?
+
+# 'fn' or 'λ' have to have a variable argument count.
+
+# still, fixed argument count may just be the way/standard.
+print \n
+print format "x = %, y = %, z = %\n" [1 2 3]
+# it's a real shame for 'print\n' as 'newline', though. it was so nice...
+
+vec = object
+    x 1
+    y 2
+    z 3
+
+Object = object
+    say-hello
+        print "Hello, World!\n"
+    say-goodbye
+        print "Goodbye, World!\n"
+# I could even use this for the top-level!
+
+vec =
+    x = 1
+    y = 2
+    z = 3
+vec =
+    x, y, z = 1, 2, 3
+print vec:x  # : for function objects?
+
+Object =
+    say-hello =
+        print "Hello, World!\n"
+    say-goodbye =
+        print "Goodbye, World!\n"
+Object:say-hello  # outputs "Hello, World!\n"
+
+# wait, so something can both be a string object and a function object?
+# actually, that's kind of nice! you don't want to print function in this model anyway!
+
+main
+    print "Hello, World!\n"
+
+say-hello name
+    print "Hello, " name "!\n"
+main
+    say-hello "John"
+# hmm. there's something here, but I don't know if it is IT.
+
+say-hello fn [name]
+    print "Hello, " name "!\n"
+main
+    say-hello "John"
+
+say-hello name =
+    print "Hello, " name "!\n"
+say-hello "John"
+# no, this is just better.
+
+# unless...
+say-hello
+    print "Hello, " $name "!\n"
+main
+    say-hello "John"
+# so like, every other instance of $name is the same, but the first captures an argument!
+
+# I guess I could make it so every 'symbol not bound' captures an argument, but that sounds like a
+# recipe for disaster.
+# still, $name is ugly, so I don't think so.
+
+# if I do do this, this might be the way. the only problem is one liners.
+say-hello name
+    print "Hello, " name "!\n"
+main
+    say-hello "John"
+
+vec
+    x 1
+    y 2
+    z 3
+# the minimalism is really interesting...
+
+# but how do I do this?
+init-and-print-vec
+    vec
+        x 1
+        y 2
+        z 3
+    print vec.x vec.y vec.z
+
+# like this?
+let init-and-print-vec
+    let vec
+        x 1
+        y 2
+        z 3
+    print vec.x vec.y vec.z
+# or like this?
+init-and-print-vec
+    vec
+        x 1
+        y 2
+        z 3
+    return print vec.x vec.y vec.z
+# ... either everything is a function, or everything is an object.
+
+quoted-x = quote x  # only the symbol x points to.
+
+# you know, I guess I don't really have to change the internals for everything-is-a-function.
+# just put parentheses around everything.
+
+# multiple return problem
+square x = * . x
+square {1 2}
+* . 1 2
+
+vec = [
+    [[x] 1]
+    [[y] 2]
+    [[z] 3]
+]
+# this might actually be an advantage?
+vec = [
+    x: 1
+    y: 2
+    z: 3
+
+    other-fields
+]
+# : becomes a function that is executed?
+# same with 'other-fields', which is a function.
+
+vec object
+    x 1
+    y 2
+    z 3
+
+init-and-print-vec
+    let vec object
+        x 1
+        y 2
+        z 3
+    print vec.x vec.y vec.z
+# I think this is nice.
+
+# at this point, I might as well do this.
+let init-and-print-vec
+    let vec object
+        x 1
+        y 2
+        z 3
+    print vec.x vec.y vec.z
+
+# more like javascript?
+let func fn [x y] + x y
+let func [x y] => + x y
+
+let func fn [x y] {
+    + x y
+    + x y
+}
+let func [x y] => {
+    + x y
+    + x y
+}
+
+func = fn [x y] + x y
+func = [x y] => + x y
+
+func = fn [x y] {
+    + x y
+    + x y
+}
+func = [x y] => {
+    + x y
+    + x y
+}
+
+ fn [x y] + x y  1 2  # returns 3
+(fn [x y] + x y) 1 2  # returns (fn [any any] any) 1 2
+
+# I don't like operator precedence so I probably won't be doing 1 + 1.
+
+func f = {
+    print "Goodbye, World!\n"
+    f
+}
+func print "Hello, World!\n"  # outputs "Goodbye, World!\n", then "Hello, World!\n"
+
+say-hello = print "Hello, World!\n"  say-goodbye = print "Goodbye, World!\n"
+# so, 'say-goodbye = print "Goodbye, World!\n"' is still passed as an argument.
+# but because it's never used, it's returned. and the side-effects are also "returned".
+# I guess I could still do _ with this. though again, there's confusion. and it's useless.
+# the language will avoid it at all costs.
+
+say-hello = print "Hello, World!\n"
+print\n quote say-hello  # outputs [print "Hello, World!\n"]
+say-hello  # outputs "Hello, World!\n"
+
+# I'm starting to really like this model.
+
+# I suppose these two would be redundant.
+[print "Hello, World!\n"]
+quote print "Hello, World!\n"
+
+type {int int} {int}
+add x y = + x y
+# this kind of works, since {} implies unquoted list. and everything is a function.
+# wait.
+type [int] int
+sum ls = ...
+# if I make {} and [] different, I can do this!
+type [[String int]] IO
+# ^ takes object and prints it?
+Object = [[String int]]
+type Object IO
