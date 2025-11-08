@@ -19357,3 +19357,265 @@ type [[String int]] IO
 # ^ takes object and prints it?
 Object = [[String int]]
 type Object IO
+
+# wait, what if the '=' macro handled '.' cases and such?
+vec.x = 123
+# becomes
+set "vec" mut vec ["x" 123]
+# so I guess that's like a way to do precedence? '=' has a lot of complex logic.
+
+# macro type?
+print\n type (=)  # outputs Syntax Syntax
+# but I still don't know how to define macros in this new model.
+# hmm. I have to have two execution times. macro expansion time, and compilation time.
+# that's the only way.
+
+define-syntax "=" [
+    ...
+]
+# I guess I need a different environment for the macros?
+# wait... so macros and functions have different environments?! that might be good...
+# but also really confusing. I guess there is no point in passing a macro as value though.
+# no. it will be the same environment, but there will also be a list with all the macros.
+# just the names though.
+
+# maybe it's time to bring back _, but only for macros?
+# then again... is there really any point to it?
+
+env = next-env
+# this might be useful for macros?
+
+# if {} is different, I can dearray and destructure!
+
+# how does python do mutation again?
+def outer():
+    x = 10
+    def inner():
+        nonlocal x
+        x = 20  # rebinds outer x
+    inner()
+    print(x)
+
+outer()  # 20
+# yo, this is actually disgusting...
+
+# be careful, {} is for macros.
+# maybe when you expand functions, you get Module.func-name? so you could still write it like that, or something?
+add x y = { + x y } as { int int } int
+let ["add"] fn ["x" "y"] { + x y } as { int int } int
+
+# if you're asking the question: "why do we need yet another programming language?" this is not for you. stop reading.
+
+sum [1 2 3]
+sum 3
+# both work if
+sum = for _
+
+# I should revisit this; it looks kind of nice.
+let init-and-print-vec
+    let vec object
+        x 1
+        y 2
+        z 3
+    print vec.x vec.y vec.z
+# not the 'let vec' part though. that needs working on.
+
+let [x y] [1 2]
+# huh.
+let [
+    [x 1]
+    ...
+]
+# like 'use'? but I don't think so...
+use HTML String File OS
+
+# extremely easy to refactor, now that I think about it.
+
+let say-hello print "Hello, World!\n"
+
+# how do you get a random value...?
+let number random
+print number
+print number  # different
+let [number] random
+# this might be the way.
+
+# I'm starting to think print\n should be deprecated, and print should just put \n automatically.
+# the only reason is that it sometimes (always) looks ugly. and I never use it for strings.
+let func let [arg1 arg2] _
+    print arg1 arg2
+let func with [arg1 arg2]
+    print arg1 arg2
+
+list 1 2 3 4 5
+
+# maybe it should be convention to end all statements with ; to avoid the say-hello problem.
+# but then again, do people really put statements on the same line?
+# they would already use ; if they did.
+
+for obj
+    let [field value] obj
+    print field, quote value
+    # or
+    print field ": " quote value
+
+let vec list
+    list "x" 1
+    list "y" 2
+    list "z" 3
+
+use object ...
+
+let my-list list 1 2 3
+let my-list my-list 4
+print my-list  # outputs 1 2 3 4
+# but... that causes problems.
+
+let func delay
+    ...
+# maybe? so like, it's an actual function, and delay or whatever runs immediately?
+# I'm starting to think this language won't even have []!
+
+let Object
+    field value
+    field new with [initial-value]
+        set value initial-value
+        this
+vec x  # possible?
+
+print my-list
+    iter
+    map + 1
+    collect
+# this model seem to be against non-prefix macros...
+# regardless, I really need to pursue this.
+
+quote get-field obj x
+
+for list 1 2 3
+    print it
+# I mean... it's not THAT bad!
+
+for range 0 10 print it
+# or maybe it is?
+# parameters have to be eager, btw.
+
+# wait, no. this doesn't work: because of the way the language works, 'print it' is an argument for
+# 'list'...
+for list 1 2 3
+    print it
+
+let value
+for _ set value + value it
+let value + for _ it
+let value + .. _
++ [] 1  # returns 1?
+
+map + 2, list 1 2 3 4 5
+# ',' should frankly work like this. it's not as confusing as you would think. like ';',
+# it works for the highest scope on the line. and parentheses change the behavior.
+# but people with always use ',' then.
+
+# 'quote' is redundant with 'list'.
+
+let say-hello delay print "Hello, World!"
+let say-hello $ print "Hello, World!"
+let square delay * .
+let square [* .]
+# disgusting. so many more characters.
+let square $ * .  # this though...
+# it's ugly. it's ugly but it's short.
+# this is the best though.
+let square * .
+# but it causes problems.
+
+# maybe I should really consider making it a convention to use ',' everywhere...
+# you usually already put to make it easier to read nested function calls; where's the problem?
+
+let square lambda print "Hello, World!"
+
+# delay might be good though.
+let value + 1 2
+print quote value  # 3
+let value delay + 1 2
+print quote value  # + 1 2
+# the evaluation is "delayed", and that is the consequence.
+
+# this model doesn't seem to mix well with symbols like '$' and some-such.
+
+let before for _
+before print it  # outputs print it or some
+
+# is 'random' just an infinite array of random numbers?
+# also, I like the idea that the numbers can be anything,
+# but they you have to truncate them, or divide them to get floats.
+
+# maybe it's fine if 'get-field' is long.
+# maybe I should create function that allow mutation in bulk?
+
+# if this is how it works
+let [x y] [1 2]
+# then multiple return is useless.
+# but then, you know...
+let square * .
+
+# if I have to use 'delay', I might as well use {} and just go back to an earlier and simpler model.
+let quote _
+let value take 1 random  # this is more useful if you can "mutate" random whenever you take a value.
+
+# ',' also works better with 'vec x'!
++ vec x, vec y
+print quote vec
+func vec, mat
+vec ("x")
+vec (field)
+# if I go through with this, ',' will really need to be mandatory.
+
+import "Debug" step-into [print "Hello, World!"]
+import "Debug" step-into 2 [print "Hello, World!"]
+
+let step-into import "Debug" step-into
+step-into [print "Hello, World!"]
+
+# this is the nicest 'map' I've ever seen.
+map + 2, [1 2 3 4 5 6]
+map λ [x] + x x, [1 2 3 4 5 6]
+# now that I think about it, this fixes another problem!
+# if the values were not eager, then there was no way to determine how long one argument was!
+let func λ [x y]
+    + x y
+func + 1 1 + 2 2
+# is 'x' equal to '+ 1 1 + 2 2'? if not, how do you know?
+# yeah, I'm thinking the ',' is mandatory in all but name — in this model, at least.
+
+# huh.
+let [x y z] [1 2 3]
+let [x]     [1 2 3]
+# this is good?
+
+let vec field [x y z] [1 2 3]
+print vec x      # 1
+print vec x y z  # 1 2 3
+print vec x z y  # 1 3 2
+# maybe not. this would be better. no ambiguity.
+print vec [x z y]  # 1 3 2
+
+method
+field
+# shame.
+
+let vec
+    field x 1
+    field y 2
+    field z 3
+
+let vec field [x y z] [1 2 3]
+set-field vec debug λ [field-name] print this (field-name)
+print vec x
+vec debug x
+
+vec [x y z] debug  # prints for all the fields.
+# but how do I attach 'debug' to each value?
+
+set vec append vec field a 4
+print vec [x y z a]  # 1 2 3 4
