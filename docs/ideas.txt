@@ -19619,3 +19619,88 @@ vec [x y z] debug  # prints for all the fields.
 
 set vec append vec field a 4
 print vec [x y z a]  # 1 2 3 4
+
+map + 2, [1 2 3 4 5 6]
+map λ [x] + x x, [1 2 3 4 5 6]
+map (+ 2) [1 2 3 4 5 6]
+map λ [x] + x x [1 2 3 4 5 6]
+# you know, fixed arguments still works here.
+map λ [x] { + x x }, [1 2 3 4 5 6]
+
+# I just realized. how does the lambda work with no {} or anything model...
+# I need to come up with names. but anyway:
+λ [x] + x x 1  # return 2
+# this works in the fixed argument count model because... well, fixed arguments!
+# but it doesn't without it.
+
+# the whole premise of both models is that you can substitute the symbol with what it points to
+# without problem, but you can't do that here. for the lambda, it will just keep taking values...
+# assuming '+' takes more than two values.
+let square λ [x] * x x  # this looks suprisingly nice...
+square 5
+λ [x] * x x 5
+# how does λ get 5??
+# if arguments where eager, and λ actually ran before being passed to the function, that would be
+# simpler. but that's clearly not the case, so λ has to be able to run standalone.
+# it has to — but it can't.
+
+# as interesting as it looked, I have to give it up. you can't recover from this.
+# I'm still keeping the ',' feature though.
+# I think I'm returning to using 'print\n' though. or not?
+
+# sigh...
+let arguments { λ [x] + x x, [1 2 3 4 5 6] }
+map arguments
+# this doesn't work. arguments... they have to be eager.
+
+# then again, the only problem really, is when you expect a functiona. — but you always expect
+# function! every IS A FUNCTION!!
+# I suppose this could work if I abandon multiple return. I don't have to walk back everything.
+# that, or much like inputs, output count is fixed and managed accordingly.
+
+# this here take no arguments. it should run and return two values.
+map { λ [x] + x x, [1 2 3 4 5 6] }
+# but no matter how I look at it, this should be the function that is passed as an argument.
+
+# I think I'm abandoning multiple return, for this model at least.
+# it sucks, but it also makes sense:
+let [x y] [1 2]
+let my-func {
+    do-something
+    ...
+    return [1 2]
+}
+let [x y] my-func
+# this has been a long time coming. ever since I decided that 'let []' extracted thing.
+# there was a redundance that needed to be removed.
+
+let {x y} [["x" 1] ["y" 2] ["z" 3]]
+print reduce [x y]  # outputs [1 2]
+
+# is a string really a string, or it just delayed code?
+
+λ "x" + x x
+λ [x] + x x
+λ {x} + x x
+# what if λ is a macro?
+λ  x  + x x  # the first 'x' is a symbol.
+λ [x] + x x  # now it's a list of symbols.
+# this might be good. that way I can do this.
+print [x y]
+# it also allows for really short code.
+λ x + x x
+
+# shit! I just remembered.
+let list [for [1 2 3 4] it]
+# this no longer works, right? since there's no multiple return...
+# fuck.
+# how do I do 'fibs' then? fucking 'cons'?
+
+# this shit is so much simpler when you have eager evaluation.
+# yeah... it was.
+# the more I think about it, the more problems I find.
+# how do you return a function from a function?
+# when does function with side-effects actually run?
+# and of course, optional arguments. where are they?
+# I keep focusing on the nice parts of this model, but at the end of the day,
+# eager evaluation is just better.
