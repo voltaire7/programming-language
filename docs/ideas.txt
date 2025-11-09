@@ -19701,6 +19701,400 @@ let list [for [1 2 3 4] it]
 # the more I think about it, the more problems I find.
 # how do you return a function from a function?
 # when does function with side-effects actually run?
-# and of course, optional arguments. where are they?
+# 'random'?
+# and of course, optional arguments. where the fuck are they?
 # I keep focusing on the nice parts of this model, but at the end of the day,
 # eager evaluation is just better.
+
+# I'm not reverting yet.
+# I'm giving this model another chance.
+
+let get-func {
+    ...
+    return [{ print "Hello, World!" }]
+}
+let [say-hello] get-func
+# how don't know how the underlying logic causes this behavior to emerge,
+# but this is one way to fix it.
+
+let add λ x λ y + x y
+
+\ x + x x
+
+# I'm starting to realize that this lazy evaluation thing makes more sense when there are no
+# side-effects.
+
+atom [render] do [
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+]
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+}
+# right back around.
+
+# it's really unfortunate for multiple return and all the cool things you can do with it,
+# but I'm thinking a lot about the more normal use cases, and it's just so redundant!
+# not to mention, it just looks way cleaner when you use [] for returning.
+return ["hello" value 123]
+
+# I think I should make it a general rule?
+let func \ [x] {
+    ...
+    x  # outputs "hello", but only if 'x' is called.
+}
+func print "hello"
+# btw, \ actually looks better than λ here...
+
+# the language is more function composition than anything.
+
+# I should be careful.
+map { + 1 } [1 2 3 4]
+# this doesn't do what you think.
+map + 1 [1 2 3 4]
+# ^ it's equivalent to this.
+# then again...
+map
+    + 1
+    [1 2 3 4]
+# is it?
+# I guess to answer that, I have to answer this:
+print + 1
+# what happens here?
+# maybe a function only runs when it has all it's arguments?
+# that, or it throws an error.
+
+# wait, I know.
+force + 1 1  # returns 2
+# this is what 'print' does, since you need to actually get the values.
+# or should it be called 'eval'?
+# and every top-level statement is 'force'd/'eval'ed. (...)
+
+# this therefore throws an error.
+print + 1
+
+let func {
+    + 1
+    + 1
+}
+print func 2 2  # outputs 3, because there is no multiple return.
+# I mean, otherwise just throw an error.
+# I certainly can't return it, else this would return a function too.
+let func {
+    print "hello"
+}
+let other-func func
+other-func  # outputs "hello"
+# literals also run, they just return themselves, since there's no reduction needed.
+let func {
+    "hello"
+}
+
+for CLI-ARGS print it
+
+# I'm honestly really feeling this model.
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+let fibs : : 0 1 zipWith (+) fibs tail fibs
+# I guess it's manageble.
+# it's a real shame for all the cool tricks, but there's nothing to be done.
+
+let fibs : : 0 1 zip-with +, fibs, tail fibs
+# is this valid?
+# if not why? how does it fail? at which point?
+# honestly, it should work.
+
+map \ [x] + x x, [1 2 3 4 5]
+
+for CLI-ARGS print it
+map \ x + x x, [1 2 3 4 5]
+for CLI-ARGS {
+    print it
+}
+map \ x { + x x }, [1 2 3 4 5]
+map \ [x] + x x, [1 2 3 4 5]
+# unnecessary, but more readable.
+
+# it's still so depressing though...
+let square * .
+let square \ x * x x
+# damn. just damn.
+
+let say-hello print "Hello, World!"
+
+let double \ x + x x
+
+let value
+set value 123
+
+if let x T {
+    print x
+} else {
+    print x
+}
+# I think I could make 'else' a separate function, like that one other model.
+if let x T
+    print x
+else
+    print x
+# anyway, the point of this is that 'let' can now return.
+# also, function that 'return nothing' default to []?
+if let x T
+{
+    print x
+}
+else
+{
+    print x
+}
+# oh my god... 'if' returns the condition?
+# nevermind. bad idea, if you want if to be an expression.
+
+if condition print "true"
+else print "false"
+# or
+let bool if condition "true" else "false"
+
+# wait a motherfucking second.
+let vec [
+    let x 1
+    let y 2
+    let z 3
+]
+# 'let' returns right?!
+# so you can do this!!
+print vec.x
+print let x 1  # outputs ["x" 1]
+# this is magical.
+# though I think there's a problem.
+let say-hello print "Hello, World!\n"
+let [say-hello] [print "Hello, World!\n"]
+let [say-hello] {
+    ...
+    return [print "Hello, World!\n"]
+}
+# my point is can you even do this?
+let [x y z] [let x 1, let y 2, let z 3]
+let [x y z] vec
+# I suppose you can, since even if 'x' is assigned to a function,
+# the function returns the expected value.
+print x  # runs { let x 1 } and returns ["x" 1]
+# it's a shame for multiple return, but when god closes a door, he opens a window.
+
+# I still have to decide what 'set' returns, if not the same thing.
+# but I'll figure things out.
+
+let vec let [x y z] [1 2 3]
+print vec  # outputs [["x" 1] ["y" 2] ["z" 3]]
+# I don't like this.
+
+# hmm. I don't know. maybe I still have 'field', and 'let' just returns it's value?
+let vec {
+    field x 1
+    field y 2
+    field z 3
+}
+print vec x
+set-field vec x 10
+set-field vec [x y] [10 20]
+set-field [vec] [x 10]
+set-field [vec obj] [x 10 field "hello"]
+set-field [vec obj] [[x y] [10 20] field "hello"]
+
+set-field
+set-index
+
+set-index vec 0 ["x" 11]
+print vec  # outputs [["x" 11] ["y" 20] ["z" 3]]
+# wait, it's a function though...
+
+for quote obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# still need this to be a thing.
+
+set-field vec x 10
+print vec x
+set vec.x 10
+print vec.x
+# I like this.
+
+let arr [1 2 3 4]
+set-index arr 0 10
+print arr    # outputs [10 2 3 4]
+print arr 0  # outputs 10
+# this is not as nice.
+# no matter how I look at it, vec.x is the way to go.
+
+let vec [
+    field x 1
+    field y 2
+    field z 3
+]
+# but also
+let vec field [
+    x 1
+    y 2
+    z 3
+]
+# or is 'object' better?
+
+let Greetings object [
+    say-hello
+        print "Hello, World!"
+    say-goodbye
+        print "Goodbye, World!"
+]
+Greetings.say-hello
+Greetings.say-goodbye
+# that might be the best.
+# equivalent to this:
+let Greetings [
+    ["say-hello"   print "Hello, World!"  ]
+    ["say-goodbye" print "Goodbye, World!"]
+]
+
+let vec object [x 1, y 2, z 3]
+for vec print format "%: %" it  # this is mandatory.
+# and if it's mandatory, then using 'object' for easy initialization is best.
+
+for vec as field-value print format "%: %" field-value
+# 'as' actually takes two arguments here.
+let as \ [name body] {
+    rename it (name)  # macro!
+    body
+}
+# can it be that simple?
+# well anyway, that's how 'as' should behave.
+
+for vec as field-value {
+    print format "%: %" field-value
+}
+
+# shit! I can't even do 'swap'!!
+# I really don't know about this no-multiple-return thing man...
+# I guess I have to first put them in an array, then reverse the array?
+let [x y] swap [1 2]
+print [x y]  # outputs [2 1]
+# it could be worse. it's kind of nice actually.
+# though I would just call it reverse.
+let [x y] reverse [1 2]
+# though I could still have a 'swap' function;
+# I just need to find what happens with more than two values.
+
+let fibs flatten [1 2 zip-with +, fibs, tail fibs]
+# this could work?
+
+let vec object [x 1, y 2, z 3]
+let vec [["x" 1] ["y" 2] ["z" 3]]
+# yeah... I know what's I'll use.
+
+loop print "THE END IS NEVER "
+# now there's a reason why 'print\n' should be used.
+
+# btw, this doesn't work.
+loop print "THE END IS NEVER \b"
+# I tried it with this:
+int main() {
+    while (1) {
+        printf("THE END IS NEVER \n\b");
+    }
+}
+
+let {x y z} object [x 1, y 2, z 3]
+print [x y z]
+
+let func () {
+    print "Hello, World!"
+}
+let func \ [] {
+    print "Hello, World!"
+}
+
+let func () print "Hello, World!"
+let func \ [] print "Hello, World!"
+
+() { print "Hello, World!" }
+\ [] { print "Hello, World!" }
+# does it just return? you can't run it?
+# logically speaking, that's the only way. they don't take arguments, so you can't curry them.
+
+let func print "Hello, World!"
+print func  # outputs — I don't know, the numbers characters printed?
+
+# yeah, this model sucks. I might as well go back to using parentheses everywhere.
+# for any self-respecting model, you should be able to create a function and immediately run it.
+# if it can't do that much, it's trash.
+
+# hmm. both the parentheses model and everything-is-a-function model can do this.
+{
+    print "Hello, World!"
+}
+# you know... I'm kind of scared: even if I decide to switch back to the parentheses model,
+# I... I might not keep multiple return.
+
+try print "Hello, World!"  # better than 'unwrap'?
+
+# btw, how do this work?
+let value 123
+# how is 'value' quoted?
+let new-let \ [symbol value] {
+    print quote symbol  # outputs 'value'
+    ...
+}
+# like this?
+
+# I'm really liking \ as lambda.
+# this is suprising, but I think it encapsulates the simple but powerful nature of the language.
+# the language does have these symbols, but unlike APL for example, they are easy to understand.
+
+# I don't think I'm ever switching back to = for assignment.
+# it was nice, but it was just a phase.
+# now that my mind is more clear, I can see the glaring issues with the macro.
+# too complex for little to no benefit.
+# doesn't even match the rest of the language and it's S-expressions.
+# and it only looks nice for simple code.
+
+# I guess 'object' is fine really.
+let COLOR enum [
+    RED
+    GREEN
+    BLUE
+]
+# you have this too.
+# it also changes the type, so enums are actually type checked.
+
+# I think 'let' should probably just be a macro...
+let new-let macro [
+    let [symbol] _
+    symbol
+    assign symbol
+]
+# needs working on.
+# the problem with \ [] is that it can't take just the symbol.
+let new-let \\ [symbol] \ [value] {
+    ...
+}
+# I suppose this could work?
+type-of new-let  # returns { Symbol Any } Any
+
+let arr [1 2 3 4]
+set 0 arr 10
+print arr  # outputs [10 2 3 4]
+let index 3
+set (index) arr 40
+print arr  # outputs [10 2 3 40]
+print get 0 arr  # outputs 10
+
+# then again...
+let arr [1 2 3 4]
+set arr:0 10
+print arr    # outputs [10 2 3 4]
+print arr:0  # outputs 10
+# if I can do 'let {}' and 'let []', I don't see why I can't do this too.
+# it probably just converts to 'set-index' anyway, so whatever.
+print arr:[0 1 3]  # outputs [10 2 4]
