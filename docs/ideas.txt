@@ -20098,3 +20098,642 @@ print arr:0  # outputs 10
 # if I can do 'let {}' and 'let []', I don't see why I can't do this too.
 # it probably just converts to 'set-index' anyway, so whatever.
 print arr:[0 1 3]  # outputs [10 2 4]
+
+let arr [1 2]
+set arr:[1 0] arr
+# 'swap' basically?
+print arr  # outputs [2 1]
+# I guess 'set' can't do recursion? I don't see why it should.
+
+= [] 0  # returns T?
+# also, yay! I can once again use = to check for equality!
+
+func([1 2 3 4])
+func [1 2 3 4]
+
+arr[0]  # you know, I think I can do this?
+# that will allow me to use : for other things, too.
+# the only problem is what about returning multiple things?
+# seems pretty useful to me.
+# nah, for now, let's mirror objects.
+
+map \ [x] + x x, [1 2 3 4]
+map(\ [x] + x x, [1 2 3 4])
+
+try print "Hello, World!"
+let [err] print "Hello, World!"
+if err throw err
+# huh. wait, so is 'let [value]' eager then?
+# I guess it has no choice but to force the function to get the return value.
+
+let force let []
+# ?
+
+# oh my god!
+type [int int int]
+let add \ [x y] + x y
+# no multiple return!! so I can right type definitions like haskell!
+# hell yeah!
+type [{any} [any] any]
+let map ...
+# ... how do you represent the function type?
+# I'm thinking with {}, but how?
+type [int]                  # array of int.
+type {int}                  # function returning a singular int.
+type {int int int}          # function taking two ints, returning another int.
+type {[int] int}            # function taking an array of int, returning one.
+type [int str]              # tuple containing one int and one string.
+type [[str any] [str any]]  # object containing two fields.
+type [Field Field]          # same as above.
+type {int int [int]}        # take two ints, get an array of int.
+
+# you know, the language sometimes builds itself.
+let [err] print "Hello, World!"
+if err throw err
+# like with this: I never intended to have a way like this to make it eager,
+# but it just kind of happened.
+
+\ {x}  # macro? types? optionals?
+\ x  # rest of arg?
+\ [x] ->  # identity
+
+# maybe I could do optionals this way?
+option [...]
+my-func 1 2 3
+# it's just a object with settings.
+# and it kind of matches if/else. even 'type' could work like this.
+option [no-endl] print "THE END IS NEVER "
+
+# btw,
+let obj object [ say-hello, say-goodbye ]
+# you don't need to assign the values?
+
+# you know, haskell is basically lisp.
+# you still have syntax and all that, but you still call functions like this:
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+# emphasis on (tail fibs)
+# this is very similar to one of my models.
+zip-with + fibs (tail fibs)
+# where you don't have to call on the top level, but you do for arguments.
+# ... why was it again, that I didn't do it like this?
+let fibs [1 2 . . zip-with + fibs (tail fibs)]
+let fibs : : 0 1 . zip-with + fibs (tail fibs)
+
+map (\ [x] $ . + x x) [1 2 3 4]
+
+let say-hello $ . print "Hello, World!"
+say-hello
+let say-hello {
+    print "Hello, World!"
+}
+# if I every decide to go back to the old model, it won't be that bad.
+# or maybe I just forgot the shit parts. it's been some time, a few hundred lines.
+# okay, I'm starting to remember.
+
+print 123
+print\n 123
+println 123
+# I think I'm gonna go back to using 'print\n'...
+print\n [x y z]
+
+let Vector3 [
+    x int
+    y int
+    z int
+]
+let [vec] new Vector3 [x 1, y 2, z 3]
+let [vec] new Vector3 [1, 2, 3]  # ?
+# no, I don't think it's that easy.
+
+# for the parentheses model, I feel like it just doesn't work well with types.
+# or at least, you have to work hard to implement them.
+
+# my language is Polish Notation (PN) instead of Reverse Polish Notation (RPN).
+# I probably mentionned it before, but I'm rediscovering it.
+
+# I really need to learn dependent types...
+# I think the final language should be dependently typed.
+# there's no reason for a modern language not to be so.
+# and more importantly: dynamic typing sucks.
+
+# nevermind parentheses, maybe I should go back even further?
+let square [* .]
+# though with more knowledge now.
+let square {* .}
+let [x y z] [1 2 3]
+let say-hello {
+    print "Hello, World!\n"
+}
+say-hello
+let add {
+    args [x y]
+    + x y
+}
+# ugh... I really don't like 'args'.
+# but that's the only way to evaluate things.
+# or I guess I can rewrite it.
+let add \ [x y] {
+    + x y
+}
+print\n add 1 2
+# better.
+# ah... but you can't create a function and immediately run it.
+# that's trash. very trashy.
+
+# the current model is just really fucking elegant, you know?
+
+# let's call everything is a function 'lazy polish notation'.
+# 'eager polish notation' was the model I stuck to for a while.
+# and then, where 'macro parentheses' is the strongest contenter.
+
+# I have three models I could seriously consider. and they also have variations to them.
+# you could have significant whitespace, for example.
+# or multiple return or everything-is-a-string or variable argument count or whatever else.
+
+let [arg1 arg2] _
+# for 'macro parentheses', I think the arguments shouldn't be eager, until 'let []' evaluates them.
+# and I'm deprecating the whole _ gets 'mutated' or whatever when you do that.
+# it was an interesting idea, but it was stupid and dangerous.
+# just get all you arguments in one go.
+# if the argument count doesn't match, [] gets returned and you handle things accordingly.
+
+# the more I develop this language, the more I'm starting to see rust in a better light.
+# I still think it's excessive emphasis on safety is bad, but I should probably copy it.
+# there are a lot of lessons to be learned here.
+
+# if I do dependant types, either rust style traits or explicit overloading will do.
+
+ get-object obj-list .x
+(get-object obj-list).x
+# this is one of the ugliest parts of the language.
+# would be so much simpler if you could do this.
+get-object obj-list x
+# problem is...
+for (obj) print\n it
+func (obj)
+# this is one of the way 'macro parentheses' is still better.
+
+let hello print "hello\n"
+let fibs : (: 0 1) (zip-with + fibs (tail fibs))
+# ...
+let fibs (: (: 0 1) (zip-with + fibs (tail fibs)))
+# so like lazy parentheses?
+# but you obviously can't do currying with that.
+
+(let fibs (: (: 0 1) (zip-with + fibs (tail fibs))))
+(let [x y z] [1 2 3])
+(let func [(print "Hello, World!\n")])
+(let func [
+    (let [arg1 arg2] _)  # what if 'arg1' and 'arg2' still haven't been evaled here?
+    (print\n arg1 arg2)
+])
+# ironically, I think it look better with the parentheses.
+# like, because they are everywhere, you actually stop noticing them.
+# the whole language is just more uniform.
+
+let add \ [x y] {
+    + x y
+}
+(let add (\ [x y] [
+    (+ x y)
+]))
+
+let fibs (: (: 0 1) (zip-with + fibs (tail fibs)))
+let [x y z] [1 2 3]
+let func { print "Hello, World!\n" }
+let func {
+    let [arg1 arg2] _
+    print\n arg1 arg2
+}
+# but this feel like a good middle ground too.
+# how do you type it though?
+
+# btw.
+let vec [
+    ["x" 1]
+    ["y" 2]
+    ["z" 3]
+]
+let [x y z] vec
+print\n x y z  # outputs ["x" 1] ["y" 2] ["z" 3]
+let {x y z} vec
+print\n x y z  # outputs 1 2 3
+# and since {} is just a macro,
+let [(x y z)] vec
+# does the same?
+
+let quote [_]
+print quote Hello, World!\n  # still one of the coolest things about this model.
+
+# wait, so I no longer return what's left of _?
+# I can no longer know how much of it I used, after all?
+# wait, right. if I have multiple return, things need to be eager.
+
+(map [(let [x] _) (+ x x)] [1 2 3 4 5])
+map { let [x] _; + x x } [1 2 3 4 5]
+map \ [x] + x x, [1 2 3 4 5]
+
+(for list [(print\n it)])
+for list { print\n it }
+for list print\n it
+
+(let new-print print)
+let new-print print
+let new-print print
+
+# maybe I should just do parentheses with no macro.
+# I know, I know, it's insane. but so what?
+# it is the simplest and cleanest one!
+# no need for bullshit significant whitespace, or whatever.
+# no need for syntax with ',' or ';' or whatever.
+# it is consistent. it doesn't try to be smart. it is just an AST, really.
+# I mean, the macro system should still be power enough to allow 'vec.x' and therefore {} as well.
+# but aside from that, the base should be simple.
+
+# still, dependant types are a necessity.
+# the language cannot be without them.
+# I need to figure things out.
+
+# what if .value and "value" are equivalent?
+# and arr[0] does what you expect it to?
+# so vec.x and vec[x] are the same?
+# ... no, that seems like a bad idea.
+# '.' and ':' are the way to go for now.
+
+# okay... it seems there's this thing called 'program logic'.
+# it seems similar to dependent types, but it only happens after the program is completely written?
+# well, I don't know. I don't know about dependent types or program logic.
+# I'm just parroting what I read on the internet.
+# there are people who seem to disagree about things and stuff.
+
+(loop [
+    (print "THE END IS NEVER ")
+])
+
+(let func [
+    (let [arg1 arg2] _)
+    (if condition [
+        (let [arg1 arg2] _)  # this is invalid, since _ is rebound?
+    ])
+])
+
+(for obj [
+    (let [field value] it)
+    (print (format "%: %\n" [field value]))
+])
+
+(let func [
+    (let [arg1 arg2] _)
+    (print\n arg1 arg2)
+])
+(func 1 2)      # outputs 1 2
+(func 1 2 3 4)  # error: unused arguments [3 4]
+# but how?
+(let func [
+    (let [arg1 arg2] _)  # error: unused variables
+])
+# I mean, if I could do it, why not?
+
+(let obj [
+    ["field1" ...]
+    ["field2" ...]
+    ["field3" ...]
+    (other-obj)
+])
+
+# oh my god, just realized 'while' works perfectly with 'lazy polish notation'!
+while ! = value 0 {
+    set value - value 1  # yeah, 'set' can't do recursion.
+}
+
+# then again though
+map [(let [x y] _) (+ 1 2)] [1 2 3 4 5 6]
+# if 'let' consumed the arguments, this would be much easier to implement.
+# there is also power to doing so.
+(define (func x y . z) ...)
+
+let my-macro \ [] expand {
+    print "Hello, World!\n"
+}
+
+# isn't 'let x' just 'expand \ x' ?
+
+# I cant get over how nice this looks!
+let func \ [] {
+    print "Hello, World!\n"
+}
+# but I feel like \n ruins it...
+# when you see a \, you should think 'function!', not 'character!'.
+# but isn't that inevitable? not like I can change how escape characters work.
+# removing \n won't remove the other escape characters.
+let func \ [] {
+    print "Hello, World!"
+}
+# oh well! 'print' looks weird without the \n — so it's weird no matter what!
+
+# I feel like it makes sense for \ x to be the full list of arguments,
+# since much like let [x], \ [x] also extracts.
+# but I don't think it makes sense, in general, to have variable argument counts.
+# still, that might be a useful line of thought.
+# like with {}, which extract objects, you could extract optional arguments?
+
+let print-args \ _ for _ print\n it
+let quote \ _ _
+# I don't know. maybe it's one of those features the language has, but isn't recommended?
+# it just exists, and can be used.
+
+print 12345
+print\n 12345
+
+print [x y z]
+print\n [x y z]
+# whatever.
+
+let func inline {
+    print "Hello, World!\n"
+}
+
+# what if there are macros?
+let square * .
+# then multiple return is possible?
+let . \ [value] expand { value, value }
+# this is... nice.
+
+# returns [] if not found.
+let find \ [list id] for list if = it.id id return it
+print find 123
+# ngl, I really like this.
+
+print "hello"
+# nevermind, fuck 'print\n'. I'll figure something out.
+
+# so far, this model has the most potential.
+# like, I keep finding reasons why it's good.
+# it doesn't stop!
+# that said, I believe I said something similar with another model, yet I dropped it.
+# I'll have to see.
+
+# right, it was this model:
+let my-func {
+    print\n . _;
+};
+# or something.
+# before significant whitespace even.
+
+# how do I do 'else'?
+let find \ [list id] for list if = it.id id return it else do-something
+# I guess I have no choise but to put it in {}s?
+# but then...
+let value if condition "true" else "false"
+# I may have no choice in the matter.
+# either 'if' is some sort of macro that allows for this sort of behavior,
+# depending on whether or not the keyword 'else' follows,
+# or I have to do some boring shit.
+
+let value if condition "true" "false"
+let find \ [list id] for list if = it.id id return it []
+
+if condition print "true"
+else print "false"
+
+let value {
+    if condition "true"
+    else "false"
+}
+let find \ [list id] for list {
+    if = it.id id return it
+    else []
+}
+# you know, somehow the second one isn't that bad.
+
+# I can't do this,
+let value
+    if condition "true"
+    else "false"
+# or this
+let find \ [list id] for list
+    if = it.id id return it
+    else []
+
+let value if condition {
+    "true"
+} else {
+    "false"
+}
+let find \ [list id] for list if = it.id id {
+    return it
+} else []
+# I don't know man, I don't know.
+
+# you have to do it like this if 'if' is not on the first line...
+let find \ [list id] for list
+    if = it.id id {
+        return it
+    } else []
+# ew.
+
+# ok; until further notice, this is the way to do 'if'.
+if condition "true"
+else "false"
+
+# wait a second. 'if' returns [] if false... and that is assigned to a variable...
+let value if condition "true"
+else "false"
+# couldn't I do something here?
+# I mean, there is no situation where 'else' could work otherwise!
+# but how does it work for the 'for' loop?
+# I feel like the technical gymnastics that I have to do to implement this are too much.
+# I might as well not bother.
+
+# this is so nice.
+let find \ [list id] for list {
+    if = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+
+let find \ [list id] for list {
+    if = it.id id return it []
+    ...
+    do-something
+}
+
+if = it.id id return it []
+# is actually pretty good. [] is like a ';' for it.
+# and again, instead of doing ! = or whatever, you can just put it in the other branch!
+# it's the same character count, no matter what you choose!
+# and the implicit [] return is maybe not the best?
+if = it.id id {
+    return it
+} []
+# not to mention this! it looks so much better with the [] at the end!
+# so much so, that despite using the old model, I added it anyway.
+# because it felt like something was missing.
+
+# maybe I should do 'lambda bools'?
+let true  \ [x y] x
+let false \ [x y] y
+# you know, that a little weird.
+\ [x y] x print "true" print "false"
+# this is ok...
+# but this?
+\ [x y] x (+) (-) 1 2
+# I think I should figure out how to make it work,
+# even if it's just weird.
+# the more I think about it... it's not that weird.
+# this part runs first.
+\ [x y] x (+) (-)
+# then it reduces to this.
+x
+# or
++
+# yeah, it should be fine.
+# the (+) and (-) are gone after all.
+# the pointer to those values now point elsewhere.
+# it's on 1, ready to move again after the call of another \, +'s \!
+
+# wait, I can't do this.
+if condition, if-branch else-branch
+# I have to put a comma here. or parentheses.
+# we don't do that in there parts.
+# unless... 'if' is defined as such?
+# like, 'if' only takes one value, actually.
+# ... you know what? why do I even need 'if' in the first place? just use the condition!
+condition if-branch else-branch
+
+let find \ [list id] for list {
+    = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+
+# it's intersting, but it breaks 'while'.
+let n 10
+while n {
+    print n
+    set n - n 1
+}
+# I don't think I'll do that.
+
+# in general, these 'function' replicating normal behavior,
+# whether it's 'vec x' or 'arr 0' or 'true [] []',
+# they usually suck.
+# the only way to make them work,
+# is by somehow figuring out how to make passing functions as parameters less shit.
+# but it has not happened, so whoop-de-do!
+
+let n 10
+while { set n - n 1; n } {
+    print n
+}
+# or
+let n 10
+while (set n - n 1; n) {
+    print n
+}
+# I guess () and {} really are the same?
+# I kind of like that, since (1 1) doesn't do much.
+# and it automatically fixes my { + } problem.
+
+let do \ [body while-condition] {
+    body
+    while-condition body
+}
+# so
+let n 10
+do {
+    print n
+    set n - n 1
+} while n
+# nice!
+# of course, it breaks if 'while' gets it's second argument, but who cares!
+# maybe I can insert an expand in there, I don't know.
+
+for 100 print it
+
+let force \ [expr] {
+    let [value] expr
+    expr
+}
+# bro.
+# but wait. we don't have multiple return. can't forget that.
+let force let [value]
+# this is still the best definition.
+# problem is, it's not like every function can do this...
+
+let [str] "hello"  # error: attempt to extract values from string "hello"
+# there's no reason not to check for this.
+
+let n 10
+while set n - n 1 {
+    print n
+}
+# 'set' of course also returns so...
+
+# the big question is...
+map force, [+ 1 1, + 2 2, + 3 3]
+# what happens here?
+# ... I don't think this is a good example.
+map + (force random), [1 2 3 4 5]
+# okay, what happens here?
+# is it different from this?
+let [value] random
+map + value, [1 2 3 4 5]
+# I imagine yes.
+let [value1] random
+let [value2] random
+= value1 value2  # returns F.
+
+# I don't think () and {} are the same, though...
+map (+) [1 2 3 4 5 6]  # returns [3 7 11]
+map {+} [1 2 3 4 5 6]  # returns [3 7 11]
+
+for quote obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# this might be the best version.
+
+# the same?
+for obj {
+    let [field] it
+    print format "%: %" [quote field, quote obj.(field)]
+}
+# maybe not.
+# it'll be similar, but you'll get something like this:
+field: get field obj
+# or something.
+# like the composed functions and stuff.
+
+let value force random
+# I guess?
+# equivalent to this?
+let [value] random
+
+# () and {} are the same.
+# and like (), {} can do this.
+map {+} [1 2 3 4 5 6]  # returns [3 7 11]
+# I just need to figure out the logic behind it.
+
+let vec [["x" 1] ["y" 2] ["z" 3]]
+let [field-x field-y field-z] "vec"
+# maybe?
+# like, it immediately looks where "vec" points?
+
+# this could also be a macro, but I don't really why I should.
+# or I suppose it overlaps with 'reverse', so maybe.
+swap 1 2
+
+let add \ [x y] { + x y }
+add 1 2
+# expands to
+{
+    let [x y] [1 2]
+    { + x y }
+}
+# maybe?
+# so anyway, is \ like a macro then?
