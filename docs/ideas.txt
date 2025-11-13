@@ -20737,3 +20737,140 @@ add 1 2
 }
 # maybe?
 # so anyway, is \ like a macro then?
+# I guess that would make sense, since like '.',
+# it breaks the rules (variable argument count/multiple return).
+
+# macros run the moment the arguments are satisfied.
+
+let macro \ x for x print it
+macro 1 2 3 4 5 6  # outputs 1 2 3 4 5 6
+# expands to
+{
+    let x [1 2 3 4 5 6]
+    for x print it
+}
+
+# you know how this works?
+map {+} [1 2 3 4 5 6]
+# well, how about this:
+let value if condition "true"
+"false"
+# okay, nevermind.
+# extremely bad idea, obviously.
+
+# mutation is seriously dangerous with this model.
+let value if condition "true" "false
+# this isn't eager. if 'condition' is passed around, it keeps getting called.
+let value if {
+    print "hello"
+    condition
+} "true" "false
+value  # outputs "hello"
+value  # outputs "hello"
+# I guess this is my calling to make this model immutable?
+
+# I think ',' should only be whitespace, with no power.
+# for a while now, it just felt weird to use it as anything else.
+map +, [1 2 3 4 5 6]
+map (+) [1 2 3 4 5 6]
+map \ [x y] + x y, [1 2 3 4 5 6]
+map (\ [x y] + x y) [1 2 3 4 5 6]
+# nevermind. it just looks better.
+
+# this program.
+(load "pmatch.ss")
+
+(define eval-expr
+  (lambda (expr env)
+    (pmatch expr
+      [,n (guard (number? n)) n]
+      [(add1 ,e)
+       (add1 (eval-expr e env))]
+      [(sub1 ,e)
+       (sub1 (eval-expr e env))]
+      [(zero? ,e)
+       (zero? (eval-expr e env))]
+      [(* ,e1 ,e2)
+       (* (eval-expr e1 env) (eval-expr e2 env))]
+      [(if ,t ,c ,a)
+       (if (eval-expr t env)
+           (eval-expr c env)
+           (eval-expr a env))]
+      [,x (guard (symbol? x)) (env x)]
+      [(lambda (,x) ,body)
+       (lambda (arg)
+         (eval-expr body (lambda (y)
+                           (if (eq? x y)
+                               arg
+                               (env y)))))]
+      [(,rator ,rand)
+       ((eval-expr rator env) (eval-expr rand env))])))
+
+(define empty-env (lambda (x) (error 'lookup "unbound identifer" x)))
+(define expr '(((lambda (!)
+                  (lambda (n)
+                    ((! !) n)))
+                (lambda (!)
+                  (lambda (n)
+                    (if (zero? n)
+                      1
+                      (* n ((! !) (sub1 n)))))))
+               5))
+(display (eval-expr expr empty-env)) (newline)
+
+# I need to find how it translates into this model.
+# if I can't do basic lambda calculus with 'eval-expr' in my language, what's the point?
+
+# wait, is lambda creation, apply into one??
+# maybe not.
+
+let empty-env \ [x] error "lookup" "unbound identifer" x
+print eval-expr expr empty-env
+
+# jesus christ, the lambdas are hard to understand.
+let expr \ [!] \ [n] (! !) n \ [!] \ [n] if n 1 * n ((! !) (- n 1)) 5
+
+let expr \ [!] { \ [n] (! !) n } (\ [!] { \ [n] (if n { 1 } { * n ((! !) (- n 1))) } }) 5
+# that's... a little better?
+# but I have to rethink how lambda and shit work, maybe?
+# or maybe not. I think '\ [n] (! !) n', at least, could get 5 pretty easily.
+# yeah, I look at it and stuff, it's just good!
+# it's just really confusing.
+let expr \ [!] {
+    \ [n] ! ! n
+} (
+    \ [!] {
+        \ [n] {
+            if n { 1 } {
+                * n (! ! - n 1)
+            }
+        }
+    }
+) 5
+# okay, maybe be careful with (! !), but otherwise decent.
+# also, what do I do for quoting this whole thing?
+
+let value 123
+let ptr [value]
+let [value] ptr
+# ?
+# pointer dereference?
+# wait, no.
+# you could just as well pass it by value.
+# why you need pointers, it pass by reference.
+let value [123]
+let func \ [ptr] {
+    set ptr:0 321
+}
+func value
+# I think 'ptr:0' is just the way to go.
+# it's weird, but it's logical.
+
+let list [[]]
+set list:0 123
+print list  # outputs [123]
+set list:1 321  # error: index 1 out of bounds for 'list'
+
+# the only problem is that, what if I want things to be pass by value, like before?
+# do I seriously keep this model?
+# I added it, because I didn't have 'set' like before, with '=' for assignment.
