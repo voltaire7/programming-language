@@ -20874,3 +20874,367 @@ set list:1 321  # error: index 1 out of bounds for 'list'
 # the only problem is that, what if I want things to be pass by value, like before?
 # do I seriously keep this model?
 # I added it, because I didn't have 'set' like before, with '=' for assignment.
+
+# maybe instead of passing in a pointer, and overloading over it,
+# we change the type of the object, and overload over that!
+# it's way better for safety, I would say.
+# that, or again, immutability.
+
+# I think I need to start implementing.
+# there's a limit to how much I can progress this way.
+
+map {
+    +
+} [1 2 3 4 5 6]
+# has to work now.
+# which falls in line with ().
+
+let func {
+    print
+    print
+}
+func "hello" "there"
+# it kind of feels unnatural for one of these functions to not work.
+# but if that's the case, it feels dangerous for both to work, especially for a large program.
+# the effects will undoubtably cascade.
+# I really think it should only work for the last function, even if it's inconsistant.
+
+# if you think about it, so is 'returning' from a function.
+# why shouldn't it behave the same for input and output?
+# in a way, IT IS consistent!
+
+# implicit return + implicit input (doesn't have the same ring to it...)
+# implicit arguments?
+
+# I love how the logic is the same without the {}.
+
+let func
+    {
+}
+# this throws a syntax error, btw.
+
+# I can write 'expr' in a much cleaner way.
+let expr \ [!] {
+    \ [n] ! ! n
+} (
+    \ [!] \ [n]
+        if n
+            1
+            * n (! ! sub1 n)
+) 5
+# use 'sub1' instead of '-', since there is only one input.
+# put sub1 in the initial env?
+
+let func overload [func-str func-int]
+set func overload [func func-arr]
+
+# I love how lambda calculus factorial helped me figure shit out.
+
+# does this throw an error?
++ 1, 2, 3
+# I think it should.
+# this doesn't though.
+map \ [x] + x, []
+
+# btw, with that decision, () now officially == {}! hurray!!
+
+# type the whole program as Constant?
+type Constant
+let main ...
+
+# so I guess you can directly return functions?
+let get-func \ [x y] {
+    let value + x y
+    - value
+}
+let func get-func 1 2
+func 5  # returns -2
+# I just love how everything in this language falls in place — as long as you ignore side-effects.
+
+# maybe '.' shouldn't be a macro? or at least definable like other macros?
+# maybe macros, in general, should only be S-expressions?
+
+# is this a monad, then?
+let [value error] func
+# this language is literally begging to be functional...
+
+# implicit arguments is like returning a function — I just can't with this language.
+# or rather 'implicit return' == 'implicit arguments'!
+
+let macro \ [x y] expand {
+    let value + x y
+}
+# and
+let macro expand \ [x y] {
+    let value + x y
+}
+# are different. the first one makes 'value' accessible to the upper scope;
+# the second one make 'x' and 'y' also available.
+
+print quote obj  # outputs obj
+print + 1 2  # outputs 3
+print quote + 1 2  # outputs + 1 2
+# take in expressions and their arguments.
+for quote obj {
+    let [field value] it  # overload over quote, not string?
+    print format "%: %" [field value]  # 'field' and 'value' of type 'quote'.
+}
+
+# there is a type Type, can't forget.
+let obj object [
+    field1 int
+    field2 string
+]
+# I need to learn dependent type to figure this out though.
+
+loop print eval read
+
+# what if we had a variable called memory? and every inside of the memory could be accessed from there, like some data-structure?
+# put another way, I want it to be easy to visualize memory.
+
+# I really should have 'then' and 'else'.
+
+use [vec]
+get x vec
+get [x y z] vec
+print [x y z]
+
+# ah, shit.
+let value "str"
+let (value) 123
+print str  # outputs 123
+# and () == {}.
+let {value} 123
+# ^ this makes so much sense, btw. but anyway, that means I can't extract with {}.
+# I'll have to extract with 'extract'.
+# this is probably for the better, since O couldn't figure out \ {} or 'get {}'.
+extract [x y z] vec
+
+# maybe for that same reason, I should do this?
+print reduce [x y z]
+# I mean, otherwise what happens here?
+let "value" 123
+# "" has to == [].
+# I also like the symmetry between this and () == {} too.
+
+# oh.
+for quote obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# does it change?
+# maybe?
+for quote obj {
+    let [field value] it
+    print format "%: %" "field value"
+}
+# this is somehow valid...
+# but I feel like something is broken here.
+print vec         # outputs [["x" 1] ["y" 2] ["z" 3]]
+for vec print it  # outputs  ["x" 1] ["y" 2] ["z" 3]
+print quote vec   # ?
+# sigh... I'll have to figure this shit out eventually.
+
+# maybe 'force random' does work?
+let value force random
+print value
+# being equivalent to
+let func \ [value] {
+    print value
+}
+func force random
+# but then again, no. sure, the value is 'extracted',
+# but it just keeps getting extracted everytime value is called.
+# it's useful if you want a random value everytime, but without the [] around them.
+
+print-no-endl "Hello, World!\n"
+loop print-no-endl "THE END IS NEVER "
+
+# type ReducedList? pretty sure I thought about this before.
+# anyway, that would help with performance.
+
+# delayed functions and strings are not that different.
+
+# shit, big problem.
+let func take-func +
+func 1 2  # passed to + or take-func?
+# although, I think it's only a currying problem.
+# it should be passed to '+', because you can specify the other way by using ()s!
+let func take-func (+)
+
+# how many arguments does 'f' take?
+if let func \ [f] f 1 2 {
+    ...
+}
+# I don't see a case where this is useful...
+# but anyway...
+let func \ [f] f 1 2
+print func (+)  # outputs  3
+print func (-)  # outputs -1
+# it's not really a problem I need to concern myself with.
+# I can always type the function if things ever got weird or whatever.
+
+# C printf.
+loop printf "THE END IS NEVER " []
+printf "Hello, %s!\n" ["World"]
+
+print format "Hello, %!" ["World"]
+
+# maybe this is the only way.
+for quote-object obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# that, or again, [] != "".
+# maybe 'quote-values' is better?
+# or even
+print format "%: %" [field, step-into [value]]
+
+# btw, 'quote'.
+let quote \ [expr] {
+    import "Debug"
+    step-into [expr]
+}
+quote + 1 2  # returns [+ 1 2]
+
+# I prefer this now.
+import "Debug"
+step-into [expr]
+# only because
+(import "Debug").step-into [expr]
+# is kind of ugly.
+# if I can figure out a clean way to implement this, I'll do it.
+import "Debug" .step-into [expr]
+
+# huh.
+import Debug
+Debug.step-into [expr]
+import "Debug"
+step-into [expr]
+# maybe?
+
+import Debug
+Debug.step-into [expr]
+use import "Debug"
+step-into [expr]
+let Debug import "Debug"
+Debug.step-into [expr]
+import "Debug dbg"
+dbg.step-into [expr]
+
+# fuck this shit. I'll figure it out some other time.
+# I've already spent too much time on this.
+
+# oh, I just realized. technically this is possible.
+import "Debug" step-into [expr]
+# it's just that so is this.
+import "Debug" step-into [expr] step-into [expr]
+# or this.
+import "Debug"
+step-into [expr]
+step-into [expr]
+# this is an interesting model.
+# however unlikely, it'd be nice explore every object acting like this.
+
+print reduce [vec x y z]  # outputs [1 2 3]
+
+# maybe instead of having a global 'import "Something"',
+# I should make it so 'import' always add the things to the environment,
+# and put those things inside functions if I don't want them to influence other things?
+let func {
+    import "Debug"
+    step-into [print "Hello, World!"]
+}
+
+# wait. wait, wait, wait!
+let Debug import "Debug"
+step-into [print "Hello, World!"]  # error: unbound symbol 'step-into'.
+Debug step-into [print "Hello, World!"]
+# lowkey... I really like this. I don't know about objects, but I might do this.
+
+vec print reduce [x y z]
+# this is intersting too.
+# no weird infix macro or anything. just side-effect hell.
+vec
+set x 123
+print x  # 123
+# where is 'let x 1' defined? inside 'vec'. in other words, set kind of works here!
+# I guess you can't really return from a function though (unless you use 'expand').
+
+# what if the last 'let' of a function is in the upped scope?
+# because in what other situation do you use a let at the end of a function?
+# if I make this work, I could have one of the most interesting object models!
+# but I'm not too optimistic. it's too... gimicky.
+# not to mention, the very obvious 'for obj' not working anymore.
+
+let vec let [x y z] [1 2 3]
+print reduce [vec x y z]
+# nah, this is wild...
+
+# I don't think 'set' properly mutates, since 'vec' calls 'let' again and again.
+
+print  vec x   # this doesn't work either.
+print (vec x)  # this does?
+
+print . x vec
+print get x vec
+print get-field x vec
+print get-index i arr
+
+# if 'vec' didn't return anything, and 'print' kept search for arguments, this could work.
+print vec x
+# but then, how do you print the object itself?
+
+# if I use this model, this version of if/else might be better.
+if condition ...
+else ...
+# it falls in line with how objects operate.
+
+# bro, I might not even need 'expand' if I use this object model...
+
+# this doesn't work. ugh...
+print reduce [vec x y z]  # outputs [[] 1 2 3]
+
+print let [x y z] [1 2 3]  # outputs [1 2 3]
+
+# maybe it's fine if I don't have pass-by-reference?
+# it's a bad practice anyway.
+
+# I think it would be nice if I could do this:
+for quote obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# and this,
+print vec x
+# and this,
+set vec x 10
+# and this...
+print vec y x z
+# all in one model.
+# but I don't know. seems like one hell of a long shot.
+
+# the moment I start talking about objects in this language, it all goes to shit...
+
+print (obj field1 sub-field1)
+# this is pretty nice, actually.
+
+print (arr 1)
+# this doesn't really work here, though?
+# this might fix it?
+print (arr :1)
+
+let arr [1 2 3 4 5]
+# creating an array should be this simple...
+
+get-index
+set-index
+get-field
+set-field
+# maybe I'll just use this.
+# this + 'use'.
+
+let Debug import "Debug"
+Debug step-into [expr]
+# or
+import "Debug" step-into [expr]
