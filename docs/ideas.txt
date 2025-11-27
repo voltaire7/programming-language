@@ -21238,3 +21238,488 @@ let Debug import "Debug"
 Debug step-into [expr]
 # or
 import "Debug" step-into [expr]
+
+# python really looks nice.
+let say-hello print "Hello, World!"
+let say-hello
+    print "Hello, World!"
+    print "Hello, World!"
+# maybe I can do something here?
+map \ [x] [+ x x] [1 2 3 4 5 6]
+# or this?
+map \ [x] + x x, [1 2 3 4 5 6]
+
+# I'd rather think about this model than objects.
+# jesus christ, they ruin everything.
+
+let func
+    if condition
+        print "true"
+    else if condition
+        print "other true"
+    else
+        print "false"
+
+let add \ [x y]
+    + x y
+
+# how does haskell do objects?
+# maybe if I copy that, then it will work?
+
+let find \ [list id] for list {
+    if = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+let find \ [list id] for list
+    if = it.id id
+        return it
+    ...
+    do-something
+let find \ [list id]
+    for list
+        if = it.id id
+            return it
+        ...
+        do-something
+
+let find \ [list id] for list if = it.id id return it []
+let find \ [list id] for list if = it.id id return it
+
+# I thought this would work, but maybe not?
+let find \ [list id] for list if = it.id id return it else print "not found"
+# like, 'else' in inside the 'if' block.
+# then again, even if it's inside, it won't work without an if statement.
+
+# maybe there's something here...
+let find \ [list id] for list if = it.id id return it else print "not found"
+# like, unless you put it on a newline, you can only take one argument?
+# this is valid.
+let find \ [list id] for list
+    if = it.id id print "equal" else print "not equal"
+    if = it.id id print "equal" else print "not equal"
+# but this isn't?
+let find \ [list id] for list if = it.id id print "equal" else print "not equal" if = it.id id print "equal" else print "not equal"
+# but it doesn't work.
+# I wish I could figure out a way to make it work.
+
+if condition
+    do-something
+    else do-something
+# this is the only way.
+# 'else' can detect that there's no preceding block...
+# no. 'if' has to evaluate... god, this is so difficult.
+# but I want it to work!!
+
+# a good combination with this model would be macros.
+if condition do-something else do-something
+# 'if' search for 'else'.
+# that's why this works.
+if condition do-something ... do-something else do-something ... do-something
+# maybe it's a combination of both?
+# but in that case, this might be better.
+if condition then do-something ... do-something else do-something ... do-something
+# so you can do this.
+if do-something ... condition then do-something ... do-something else do-something ... do-something
+# only the last value of a block gets returned.
+# maybe I can make this a general rule for macros?
+# but I don't like 'then'.
+# it ruins this.
+if condition
+then
+    do-something
+else
+    do-something
+
+# this might be better.
+let find \ [list id] for list if = it.id id print "found" print "not found"
+#                                           ^ if          ^ else
+# if it's inline, it behave much like the fixed argument count model.
+# if you put it on a newline, though, it changes?
+# but the logic is just not coherent...
+
+let find \ [list id]
+    for list
+        if = it.id id return it
+        ...
+        do-something
+
+let value
+    if condition "true"
+    else "false"
+# this is fine.
+
+# so this throws an error.
+let value if condition "true" else "false"
+
+let find \ [list id] for list if = it.id id return it
+
+let render
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if !it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+
+let new-let expand let
+
+let find \ [list id] for list if = it.id id return it; else print "not it"
+# this is as close as it gets... but it doesn't work.
+let find \ [list id] for list
+    if = it.id id return it; else print "not it"
+# this does?
+# I'll just put 'if' and 'else' on different lines...
+
+let Greetings
+    let say-hello print "Hello, World!"
+    let say-goodbye print "Goodbye, World!"
+Greetings.say-hello
+for Greetings
+    let [field value] it
+    print format "%: %" [field value]
+
+map (\ [x] + x x) [1 2 3 4 5]
+map
+    \ [x]
+        + x x
+        + x x
+    [1 2 3 4 5]
+
+print ((\ [x] * x x) 5)  # outputs 25, maybe?
+
+let new-print print
+print 1 2 3 4 5
+new-print 1 2 3 4 5
+
+let func [
+    args [value1 value2]
+    print "%, %\n" value1 value2
+]
+func 1 2  # outputs "1, 2\n"
+func 1    # error: invalid argument count.
+2
+# so the old model, but it is whitespaced?
+
+# this is still the best model.
+let find \ [list id] for list {
+    if = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+# python style looks nice, but it's just not it.
+
+# there is pretty much only two models where you create a function and immediately call it.
+\ [x] + x x 5  # returns 10
+([(let [x] _) (+ x x)] 5)
+
+\ [x] + x x 5
+([(\ [x]) (+ x x)] 5)
+((\ [x] [(+ x x)]) 5)
+# it's just so obvious which model I should work with.
+
+# sigh... but like, what happens here?
+if condition
+    do-something
+    do-something
+    do-something
+# right?
+# actually, it's like this for every function...
+map + 2, [1 2 3 4 5 6], 213
+# ^ this should throw and error.
+# and this as well.
+map
+    + 2
+    [1 2 3 4 5 6]
+    213
+# what if the commas are obligatory then?
+
+if = it.id id
+    return it
+# so
+if
+    = it.id id
+        return it
+# in other words, it's equivalent to
+if
+    = it.id id
+    return it
+# this is invalid
+if
+    = it.id id
+            return it
+
+(import "Debug" step-into [expr])
+# this is the best model.
+# vec.x won't work for aforementioned reasons.
+print ((Iter [1 2 3]).map + 1).collect
+print (Iter [1 2 3] map (+ 1) collect)
+# then again, the parentheses are convenient for currying?
+# and everything is curried in this language, so...
+
+print Iter([1 2 3])
+    .map(+ 1)
+    .collect()
+
+# '.' put a parenthesis on the rest of the arguments?
+print . Iter [1 2 3]
+    map (+ 1)
+    collect
+# obviously, it's a macro.
+# maybe I should use $ instead.
+
+# the best part is that it emulates Jai's imports.
+import "Basic"
+let Basic import "Basic"
+# something I thought impossible to do cleanly.
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! (it dead) fill-rect target-rect it unpack-color TARGET-COLOR
+}
+
+# objective-c style?
+[[myObject generator] nextValue];
+
+# maybe '.' converts to ()?
+it.dead
+# becomes
+(it dead)
+
+print . Iter [1 2 3] map (+ 1) collect
+
+# ... if I use function objects, there no point in avoiding this.
+for obj, print it
+# since I'm just never passing 'obj' or whatever to 'for'.
+
+# maybe like in python ':' adds {}s?
+if = value 1:
+    print "the value is true."
+
+let render
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+
+let render
+    fill-rect proj-rect proj-x proj-y, unpack-color PROJ-COLOR
+    fill-rect bar-rect, unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect target-rect it, unpack-color TARGET-COLOR
+# so the ',' is mandatory?
+let render
+    fill-rect proj-rect proj-x proj-y, unpack-color PROJ-COLOR
+    fill-rect bar-rect, unpack-color BAR-COLOR
+    for targets-pool (if ! it.dead (fill-rect target-rect it, unpack-color TARGET-COLOR))
+# this is interesting, but I don't think I like it.
+if = 1 value, print "it's equal"
+if = 1 value, print "it's equal" print "also, hello there"
+# this is something...
++ 1, 2, 3, 4
+# though I suppose I don't have to use commas everywhere.
+
+\ [x] + x x, 5  # returns 10
+
+let render
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+
+let render {
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+}
+
+# maybe the language really, really does need to be immutable?
+# not just because of the weird way laziness work, but also objects.
+# and so I go back to using this:
+use Vector3
+print x vec
+
+# what if 'let' is just a macro? what if it's the case for 'for' and 'if' as well?
+# so it's not the whole program that behaves like that, it's just the few functions!
+# aside for the few macros, everything else is child.
+# you can have the really good syntax (or lack thereof) with the really good model.
+# but that doesn't fix \ []...
+
+let render
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+
+let render fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR fill-rect bar-rect unpack-color BAR-COLOR for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+# this should be possible...
+
+for obj
+    let [field value] it
+    print format "%: %" [field value]
+
+# no matter how I think about, this is ideal. at least for these pieces of code.
+
+# 'print format' is so fucking nice. I don't think I'm ever going back to 'print 1 2 3'.
+
+enum Color
+    RED
+    GREEN
+    BLUE
+
+enum Color RED GREEN BLUE
+# this is... ironically much better.
+
+let Color enum
+    RED
+    GREEN
+    BLUE
+
+let Color enum RED GREEN BLUE
+# but I don't think I want a bunch of functions with side-effects...
+
+let x 1 let y 2 let z 3
+# but what if... you know?
+# put on multiple lines for variable length argument count and all that.
+let say-hello print "Hello, World!" let say-goodbye print "Goodbye, World!"
+let say-hello
+    print "Hello, World!"
+    print "Hello, World!"
+let say-goodbye
+    print "Goodbye, World!"
+    print "Goodbye, World!"
+# this might actually be ideal.
+# I want to use ';' as little as possible.
+
+# this should also work?
+let say-hello
+    print "Hello, World!" print "Hello, World!"
+
+# btw, this is invalid.
+let say-hello
+    print "Hello, World!"
+        print "Hello, World!"
+# the syntax is confusing.
+# it's either this
+let say-hello
+    print "Hello, World!"
+    print "Hello, World!"
+# or this
+let say-hello
+    print "Hello, World!" print "Hello, World!"
+# even though I can make it work, it should an error by principle.
+# "don't write dumb code."
+
+let func
+    let [arg1 arg2] _
+    print format "%, %" [arg1 arg2]
+func 123 321  # outputs "123, 321"
+# I think it's fine if _ has to be used in the immediate scope.
+
+let func for _ print it
+func 1 2 3 4 5
+# couldn't the type of the function be inferred?
+
+let list 1 2 3 4 5
+for list print it
+# very interesting! but it only works for multiple return?
+
+let vec
+    let x 1
+    let y 2
+    let z 3
+
+if condition then-do else-do
+if condition
+    then-do
+else
+    else-do
+
+let func \ [x y] + x y
+func 1 2  # returns 3
+func
+    1
+    2
+func
+    1
+    2
+    3  # invalid?
+# it's clearly supposed to be passed to 'func', but it only takes two arguments.
+
+int x 1
+int y 2
+int z 3
+
+enum Color RED GREEN BLUE
+
+# but no...
+let value if condition "true" else "false"
+
+struct Vector3
+    x f64
+    y f64
+    z f64
+
+new Vector3 [1 2 3]
+
+object Greetings
+    say-hello
+        print "Hello, World!"
+
+    say-goodbye
+        print "Goodbye, World!"
+
+# ugh...
+class Greetings
+    say-hello
+        print "Hello, World!"
+    say-goodbye
+        print "Goodbye, World!"
+
+map \ [x] + x x [1 2 3 4 5]  # [2 4 6 8 10]
+map
+    \ [x] + x x
+    [1 2 3 4 5]  # [2 4 6 8 10]
+map
+    \ [x]
+        + x x
+        * x x
+    [1 2 3 4 5]  # [1 4 9 16 25], since only the last value is returned.
+
+# maybe I could also make this work?
+map \ [x]
+    + x x
+    * x x, [1 2 3 4 5]  # [1 4 9 16 25]
+# maybe not...
