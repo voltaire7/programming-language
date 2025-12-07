@@ -21723,3 +21723,277 @@ map \ [x]
     + x x
     * x x, [1 2 3 4 5]  # [1 4 9 16 25]
 # maybe not...
+
+let func _  # creates a new _ value
+let [func] _  # does not?
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+}
+
+let render
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+
+let render $
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+
+# no need for 'let render $ .' since there are no parentheses?
+
+# the great thing about {}s is that you can put it anywhere.
+# it's like LISP, where operator and operand can be replaced by any piece of code.
+# I have talked about this before? probably.
+
+# anyway, looking at the above examples of 'render', maybe it's better to just give it up.
+# it is better — what am I saying? I knew that from the beginning!
+
+let macro \ [symbol: Symbol, value: Any] {
+    print format "%, %" [symbol value]
+    ...
+}
+macro hello + 1 2  # outputs "hello, 3"
+# this might actually be a really nice way of doing this!
+# it incorporates types with macros!
+# I don't think I should add '!' to the macro though...
+# maybe to 'set!'?
+
+let vec [x 1 y 2 z 3]
+for map pair quote, vec {
+    let [field value] it
+    print format "%: %" [field value]
+}
+print vec.x
+# it's probably better to 'quote-object', but anyway, I'm unto something!
+
+let vec ["x" 1 "y" 2 "z" 3]
+print map pair, vec  # [["x" 1] ["y" 2] ["z" 3]]
+# better.
+
+let field "x"
+match field vec  # returns 1
+# nice.
+
+get "x" vec  # returns 1
+
+let obj [
+    "field1" 1
+    "field2" 2
+    "field3" [
+        "sub-field1" 1
+        "sub-field2" 2
+        "sub-field3" []
+    ]
+]
+get [field3 sub-field1] obj  # returns 1
+# the good thing about this, is that it's literally just JSON.
+
+let obj [
+    "field1" 1
+    "field2" 2
+    "field3" [
+        "sub-field1" 1
+        "sub-field2" 2
+        "sub-field3" [1 2 3 4 5 6]
+    ]
+]
+get [field3 sub-field3 0] obj  # returns 1
+# sigh... this thing again.
+get [field3 sub-field3 0] obj  # returns 1
+# well whatever. I can still overload over types.
+get 0 get [field3 sub-field3] obj  # returns 1
+# but this is maybe better.
+get [field3 sub-field3 [0]] obj  # returns 1
+# ('get 0' is still valid).
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+}
+# it's obviously worse than 'it.dead', but it's consistent too.
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! get [dead] it fill-rect target-rect it unpack-color TARGET-COLOR
+}
+# again, I can still have '.' there, as a macro for 'get'.
+# it's just that in particularly horrible situations where '.' is too ugly, there is 'get'.
+
+# I should still seriously consider the possibility that there is no '.' macro.
+
+let new-obj [for ["field1" "field2" "field3"] get it obj]
+# multile return... my old friend. just why, why did you die!
+# but I can't bring you back. because I'm LAZY!!!
+# *sob*
+
+let add1-to-index0 \ [obj] {
+    set 0 obj + 1 get 0 obj
+}
+print add1-to-index0 [0 1 2 3 4 5]  # outputs [1 1 2 3 4 5]
+
+# it should give a warning instead.
+func1
+    arg1
+        arg2  # warning: ambiguous syntax.
+
+# the reason we don't write
+if
+    condition
+    body
+# is because technically, it's all on one line!
+if condition {}
+if condition {
+    ...
+}
+# not like
+if
+    condition
+    {
+        ...
+    }
+fill-rect
+    proj-rect proj-x proj-y
+    unpack-color PROJ-COLO
+# so this is invalid? maybe not.
+if condition
+    {
+        ...
+    }
+let value
+    + 1 2
+
+loop debug "THE END IS NEVER "
+loop print "THE END IS NEVER "
+
+# 'debug' has no formatting?
+debug "Hello, World!\n"  # outputs "Hello, World!\n", but the \n is in characters?
+let field3 [
+    "sub-field1" 1
+    "sub-field2" 2
+    "sub-field3" [1 2 3 4 5 6]
+]
+let obj [
+    "field1" 1
+    "field2" 2
+    unquote field3
+]
+# I guess this works?
+
+# if 'unquote' is a macro, can't I do something like this?
+let new-obj [unquote for ["field1" "field2" "field3"] get it obj]
+# and if macros are that powerful...
+let fibs [1 2 .. zip-with +, fibs, tail fibs]
+
+: 0 [1 2 3 4]  # returns 1
+. 1 [1 2 3 4]  # returns 2
+# but no, I really think '.' should be 'duplicate'.
+
+# still, what about this?
+print reduce [. . 5]
+# how do macros run?
+print reduce [. . 5]  # returns [5 5 5 5]
+# or
+print reduce [. . 5]  # returns [5 5 5]
+# I think the second one is best.
+# so macro can take their input and run it as code... makes sense.
+
+# maybe '..' should be 'unquote'? because 'unquote' just looks bad.
+
+# force is a macro?
+
+# is 'it' just the last defined value?
+
+let make-add-x \ [x] {
+    + x
+}
+let add2 make-add-x 2
+print add2 4  # outputs 6
+# problem:
+\ [x] {
+    + x
+} 2 4
+\ [x] + x 2 4
+# it's not clear how it works.
+let make-add-x \ [x] + x
+let add2 make-add-x 2
+print add2 4  # outputs 6 ?
+# I don't like, but I should be consistent.
+\ [x y] + x y 2 4
+# don't use \ [] and other curried functions at the same time.
+
+# what if ':' worked like ','?
+if obj:
+    print obj x
+
+map \ [x] + 2 x, [1 2 3 4 5 6]
+# even putting the ()s, you have to have a ','?
+map (\ [x] + 2 x), [1 2 3 4 5 6]
+
+let value: 123
+let new-let: \ [symbol value] {
+    print quote symbol
+    ...
+}
+new-let hello123: 123  # outputs "hello123"
+new-let hello123, 123  # does the same.
+
+# but what if ':' takes in a list of items, determined by whitespace?
+let say-hello: print "Hello, World!"
+let say-hello:
+    print "Hello, World!"
+    print "Hello, World!"
+# that way, it's not just another ','!
+
+# in Odin, overloading is done this way.
+bool_to_string :: proc(b: bool) -> string {...}
+int_to_string  :: proc(i: int)  -> string {...}
+to_string :: proc{bool_to_string, int_to_string}
+# this is good because you can call the specific function, but bad because it's ugly.
+
+# in Zig, there is no overloading, but there is only one function.
+pub fn toString(comptime T: type, x: T) []const u8 {...}
+# this is arguably cleaner than odin. (I hate how the type is in the name!)
+
+# but the crown goes to Jai.
+to_string :: (b: bool) -> string {...}
+to_string :: (i:  int) -> string {...}
+# sure, you can't use specific functions, but how are they useful?
+
+# at the end of the day, Jai is just so much better.
+# john... when are you releasing the language?
+# I don't even care about it's quirks and sometimes weird syntax.
+# please. I know it will be like C, where I like it because it just rubs me the right way!
+
+let find \ [list id] for list {
+    if = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+
+let find \ [list id] for list:
+    if = it.id id:
+        return it
+    ...
+    do-something
+
+# this... almost feels perfect.
+# but it isn't.
+# the thing that made this good is the easy refactoring.
+# this kind of ruins it.
+
+let find: \ [list id]:
+    for list:
+        if = it.id id:
+            return it
+        ...
+        do-something
+# and it's ugly if we try to do something about it.
+
+# I really just need to let it die...
