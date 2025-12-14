@@ -21997,3 +21997,308 @@ let find: \ [list id]:
 # and it's ugly if we try to do something about it.
 
 # I really just need to let it die...
+
+let test-equal \ [value id] {
+    if = it.id id {
+        return it
+    } []
+    ...
+    do-something
+}
+
+let test-equal \ [value id]:
+    if = it.id id:
+        return it
+    ...
+    do-something
+
+let find \ [list id] for list if = it.id id return it
+let find \ [list id] for list if = it.id id:
+    ...
+    return it
+
+let value: if condition do-something else do-something
+let value: if condition do-something else {
+    do-something
+    ...
+    do-something
+}
+let value: if condition do-something else:
+    do-something
+    ...
+    do-something
+# but this is also an option...
+let value if condition do-something {
+    do-something
+    ...
+    do-something
+}
+# again, worse case scenario: 'else' == 'identity'!
+# wait... even if I do 'if cond [] []', it still works with—
+# okay, nevermind. it doesn't work.
+let value:
+    if condition:
+        do-something
+    else:
+        do-something
+# this is not possible.
+# but this is, even with the non-indentity else.
+let value:
+    if condition {
+        do-something
+    } else {
+        do-something
+    }
+# is that a reason to use it?
+
+let test-scope {
+    let x 123
+    {
+        let x 321
+    }
+    print x
+}
+let test-scope:
+    let x 123
+    :
+        let x 321
+    print x
+# it's weird... but fine?
+# or not. how do you end the scope? you can't.
+
+# I'll just use 'range'.
+for range 1 10 {
+    print it
+}
+
+range []  # what if [] is a structure, like in go?
+# it allows you to iterate over objects?
+for range vec:
+    let [field value] it
+    print format "%: %" [field value]
+# or the uglier
+for range vec, {
+    let [field value] it
+    print format "%: %" [field value]
+}
+# somehow this is just better?
+for (range vec) {
+    let [field value] it
+    print format "%: %" [field value]
+}
+
+let render:
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+
+let Greetings:
+    field say-hello:
+        print "Hello, World!"
+    field say-goodbye:
+        print "Goodbye, World!"
+
+let Greetings {
+    field say-hello {
+        print "Hello, World!"
+    }
+    field say-goodbye {
+        print "Goodbye, World!"
+    }
+}
+
+# what if 'field' ignores the thing following it, if it doesn't have '.'?
+Greetings .say-hello
+Greetings say-hello  # ignored. 'Greetings' returns itself. 'say-hello' called by itself.
+Greetings .say-hi    # error: field 'say-hi' not found on object 'Greetings'.
+
+let step-into import "Debug" step-into
+step-into [...]
+
+let step-into get "step-into" import "Debug"
+step-into [...]
+
+extract [step-into] import "Debug"
+step-into [...]
+
+# at the end of the day, whatever I decide won't work, unless I can do this: [1 2 3 4 5].
+
+# if I just have a clean syntax for accessing object field, that's all I need.
+. "x" vec
+@ "x" vec
+
+let func \ [x y] {
+    + 1 2
+}
+let "func" \ [x y] {
+    + 1 2
+}
+let [func] \ [x y] {
+    + 1 2
+}
+
+let println \ [str] {
+    print str
+    print "\n"
+}
+let [println] \ [str] {
+    print str
+    print "\n"
+}
+# things are simpler this way.
+
+# but that also means...
+let [value error] .. do-something
+# this, or...
+extract [value error] do-something
+
+for list as i print i
+for list as [i] print i
+# this might useful though...
+for (enumerate list) as [index value] {
+    print format "%: %" [index value]
+}
+
+: [0 0 0] arr
+arr[0][0][0]
+: [0] arr
+
+(let [say-hello] [(print "Hello, World!")])
+let say-hello print "Hello, World!"
+# jesus christ.
+(let [say-hello] $ . print "Hello, World!")
+(let [say-hello] { print "Hello, World!" })
+(let [say-hello] {
+    print "Hello, World!"
+})
+(let say-hello {
+    print "Hello, World!"
+})
+let say-hello {
+    print "Hello, World!"
+}
+# I really don't want to switch back to this.
+let say-hello {
+    print {
+        if true "Hello, World!" "hello"
+    }
+}
+say-hello  # outputs (
+    if true "Hello, World!" "hello"
+)
+# this is just stupid...
+
+# the shit I have to go through to make this one liner possible.
+print "Hello, World!"
+
+let Vector3 [x y z]
+let vec [1 2 3]
+use Vector3
+print x vec
+# maybe I should just do this? and not worry about mutability?
+# from the start, this model has just been really good for functional programming.
+# I really need to consider it. but also learn it...
+
+# but no, I need hashmaps.
+import "Basic"
+
+let func \ [x:int y:int] {
+    + x y
+}
+let func \ [x: int, y: int] {
+    + x y
+}
+
+# the ':' syntax works better when doing this.
+func :: (x: int, y: int) {
+    return x + y;
+}
+# the syntax is not consistent otherwise.
+
+# I kind of like this...
+let func \ [x y] where & = x int, = y int {
+    + x y
+}
+# it follows the whole syntax of the language too.
+# what if 'where' is compile time?
+
+# this is good, since it prevents the first line from being too long.
+type [Number Number Number]
+let func \ [x y] where ! = y 0 {
+    / x y
+}
+# better?
+@type [Number Number Number]
+let func \ [x y] where ! = y 0 {
+    / x y
+}
+# yeah, this might be the thing that sticks.
+
+let macro \ ['symbol value] expand {
+    let (symbol) value
+}
+macro str "hello"
+print str  # outputs "hello"
+# or
+let macro \ ["symbol" value] expand { ... }
+
+cross :: proc(a, b: Vector3) -> Vector3 {
+    i := swizzle(a, 1, 2, 0) * swizzle(b, 2, 0, 1)
+    j := swizzle(a, 2, 0, 1) * swizzle(b, 1, 2, 0)
+    return i - j
+}
+cross_shorter :: proc(a, b: Vector3) -> Vector3 {
+    i := a.yzx * b.zxy
+    j := a.zxy * b.yzx
+    return i - j
+}
+
+@type [Vector3 Vector3 Vector3]
+let cross \ [a b] {
+    let i * swizzle a [1 2 0], swizzle b [2 0 1]
+    let j * swizzle a [2 0 1], swizzle b [1 2 0]
+    return - i j
+}
+@type [Vector3 Vector3 Vector3]
+let cross \ [a b] {
+    let i * a.[y z x] b.[z x y]
+    let j * a.[z x y] b.[y z x]
+    return - i j
+}
+
+# equivalent?
+@type [Vector3 Vector3 Vector3]
+@type [. . Vector3]
+# but how does it work...
+
+let cross \ [a b] {
+    let i * . [y z x] a . [z x y] b
+    let j * . [z x y] a . [y z x] b
+    return - i j
+}
+# or maybe I should go backwards?
+let cross \ [a b] {
+    let i a.[y z x] * b.[z x y]
+    let j a.[z x y] * b.[y z x]
+    return i - j
+}
+# and even further, since we have operators now?
+cross :: [a b] {
+    i :: a.[y z x] * b.[z x y]
+    j :: a.[z x y] * b.[y z x]
+    return i - j
+}
+# nah, too far.
+# when you have operator precedence, that's too far.
+
+let say-hello print "Hello, World!"
+say_hello :: print "Hello, World!"
+say_hello :: () {print("Hello, World!")}
