@@ -22302,3 +22302,281 @@ cross :: [a b] {
 let say-hello print "Hello, World!"
 say_hello :: print "Hello, World!"
 say_hello :: () {print("Hello, World!")}
+
+# when {} is operand, it doesn't evaluate arguments.
+# when it's operator, it does?
+
+# maybe this was better?
+map [+] [1 2 3 4 5 6]
+
+# maybe functions are the only things that are typed, and everything else is inferred?
+# things have to be passed to functions for anything to happen anyway.
+# and you can't implicitly cast, so if you pass 'value' to a function expecting a string, then the
+# same to a function expecting a struct, it will fail?
+
+# isn't this basically a prototype?
+vec := struct {x, y, z: int} {1, 2, 3}
+# the problem is that you have to type it.
+# it's not fully inferred like in Jai.
+# and this doesn't help.
+vec := struct {x, y, z: any} {1, 2, 3}
+vec := struct {x := 1, x := 2, x := 3}
+# it's the same length, though?
+
+fn main() {
+    let values = ["a", "b", "c"];
+
+    for (index, value) in values.iter().enumerate() {
+        println!("{}: {}", index, value);
+    }
+}
+
+let main {
+    let values ["a" "b" "c"]
+
+    for enumerate values as [index value] {
+        print format "%: %" [index value]
+    }
+}
+
+let main {
+    let values ["a" "b" "c"]
+    for enumerate values {
+        print it
+        as [index value] {
+            print format "%: %" [index value]
+        }
+    }
+}
+
+import "IO"
+IO.print "Hello, World!"
+import "IO" as io
+io.print "Hello, World!"
+# but I really don't think I'll go the odin/go way for imports.
+use import "IO"
+print "Hello, World!"
+let io import "IO"
+io.print "Hello, World!"
+# this just fit the language better.
+
+for enumerate list as [index value] {
+    print format "%: %" [index value]
+}
+for enumerate list print format "%: %" it
+
+# you know what? fuck it.
+import "Debug" .step-into [...]
+# I'll allow this, even if it's ugly, and use '..' or '...' or whatever
+# when I want to go further back.
+# anything is better that using parentheses.
+(import "Debug").step-into [...]
+import("Debug").step-into [...]  # this is better too.
+# I guess I should avoid LISP style?
+for (enumerate list) as [index value] { print format "%: %" [index value] }
+for enumerate(list) as [index value] { print format "%: %" [index value] }
+# or not. well, it's not that bad.
+
+((import "Debug").step-into [...])
+import("Debug").step-into([...])
+# yeah... it's obvious which is better.
+
+let(value {
+    print("Hello, World!")
+})
+# but {}s remove the need for ()?
+let value {
+    print "Hello, World!"
+}
+# but you still need them?
+let value {
+    print format("%: %" [index value])
+}
+# and then, we have operators, which are basically macros.
+let value {
+    print 1 + 1
+}
+# vs
+let value {
+    print +(1 1)
+}
+# if I do operators, it should still work like this.
+let value {
+    print + 1 1
+}
+
+# the reason I'm exploring this model is because this lowkey looks good.
+import("Debug").step-into([...])
+import "Debug" .step-into [...]
+
+(let add-and-print [
+    (let [x y] _)
+    (print (+ x y))
+])
+let add-and-print {
+    let [x y] _;
+    print (+ x y);
+}
+# even if I switch back to this model (extremely unlikely), I shouldn't do this:
+let print-all {
+    for _ {
+        print it
+    }
+}
+print-all 1 2 3 4 5  # outputs "1\n2\n3\n4\n5\n"
+# I feel like I've said this before.
+
+let print-all \ [_] {
+    for _ {
+        print it
+    }
+}
+print-all [1 2 3 4 5]
+# or
+let print-all \ [_] for _ print it
+
+# eager polish notation
+map {+} [1 2 3 4]
+map (+) [1 2 3 4]
+let list [1 2 3 4]
+let [x y] [1 2 3 4]
+while (! = x y) {
+    print x
+    set x + 1 x
+}
+let print-all {
+    args [_]
+    for _ {
+        print it
+    }
+}
+print-all [1 2 3 4 5]
+# there's no way to make it shorter.
+let print-all \ [_] {
+    for _ { print it }
+}
+map \ [x] (* x x) [1 2 3 4 5 6]
+let x 123
+do {
+    let x 321
+}
+print x  # outputs 123
+
+# this model... should still be whitespace sensitive, but in a different way.
+let value  # should throw error.
+"hello"
+let value  # valid
+    "hello"
+print value
+# I guess the big difference, is that this model doesn't have 'currying', per se.
+
+let add \ [x y] {
+    + x y
+}
+add (- 2) 2 0  # returns 0
+# this is valid for both lazy and eager polish notation.
+# or I should say 'broken'.
+# so it doesn't really matter which of the two models I take.
+
+for each i list {
+    print i
+}
+# no, this is better.
+for list as i {
+    print i
+}
+
+# if I choose eager though, it has to be multiple return. it would be dumb not to.
+let list [for 100 { it }]
+# best part, is that it forces you to be clean.
+
+# this is an error, since 'let' returns null.
+if let x true {
+    print "it's true :("
+}
+# this is valid, but it's still doesn't allow 'x' to extend to the body.
+if (let x true; x) {
+    print "it's true :("
+}
+# the thing is, with laziness, and single return, the first one could work.
+# but I don't think it should...
+# or maybe, it really should! because {}s create a new scope!
+# and when do you really need to have a single statement with 'let'?
+
+# take this for example.
+let Debug import "Debug"
+Debug
+step-into [...]
+step-into [...]
+# cool. now this.
+let Debug { import "Debug" }
+# this doesn't work the same, because 'import "Debug"' is in another scope.
+# ... or maybe it should work, because it's the last value?
+# and you're returning it? so it's equivalent to you having a single statement?
+
+# the big reason why I'm hesitating, it that I simply don't like this:
+map + 1, [1 2 3 4 5 6]
+# this form of currying is just weird.
+# I don't like how ',' is significant.
+# maybe I should disable it? and just have {} and ()?
+map (+ 1) [1 2 3 4 5 6]
+# this is SO MUCH nicer! despite being longer too!!
+# from now on, ',' is just whitespace.
+
+# honestly, there's really not much difference between eager and lazy.
+# the major difference is single vs multiple return.
+# as long as lazy use {} and () almost everywhere, it's basically the same.
+# ... okay, there are more difference that just that, but they're intricacies.
+
+let args (100, { print it })
+for args
+# this is just nice.
+
+# the best part is that I don't need significant whitespace!
+let value
+let other-value 123
+# this throws error because the second 'let' doesn't return anything!
+
+# I thought I was done with this model, but whatever.
+
+do [print "hello"]
+do {
+    ...
+    [print "hello"]
+}
+# both lazy and eager work for this.
+
+for list as i {
+    print i
+}
+for list {
+    rename it i
+    print i
+}
+let double \ [x] {
+    + x x
+}
+let double {
+    args [x]
+    + x x
+}
+# if I use 'eager', there will be a lot of duplicate functions...
+
+# what if I can still do this in lazy polish notation?
+let list [for 100 it]
+
+map [+] [1 2 3 4]
+# but instead of 'do' or 'args [[]]', you have ()s?
+let plus [+]
+print (plus 1 2)  # outputs 3
+# I feel like like talked about this before...
+([+] 1 2)
+([+ 1] 2)
+let func \ [f x] (f x)
+func [+ 1] 1  # returns 2
+
+let func \ [f x] {
+    let value (f x)
+    print value
+}
+func [+ 1] 1  # outputs 2
