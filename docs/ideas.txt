@@ -22580,3 +22580,411 @@ let func \ [f x] {
     print value
 }
 func [+ 1] 1  # outputs 2
+
+# I honestly want this...
+print take 10 [for 0 it]
+
+# there are so many things I want but can't do...
+
+# so this doesn't work?
+let func \ [f x] {
+    let value f x
+    print value
+}
+func (+ 1) 1  # outputs 2
+# I think that would make sense. this means that ()s and {}s evaluate.
+# it becomes this.
+func 2
+
+# I kind of like this. it's natural when it does work, and when it doesn't.
+
+let find \ [list id] for list if = it.id id return it []
+let find \ [list id] for list if = it.id id {
+    return it
+} {
+    []
+}
+# only this is possible with the second model.
+let find \ [list id] {
+    for list {
+        if = it.id id {
+            return it
+        } {
+            []
+        }
+    }
+}
+# I think lazy is the way, but ([]) might be interesting.
+map [+] [1 2 3 4]
+([+] 1 2)
+([+] 1 2 3 4)  # what happens here?
+
+let enumerate \ [list] {
+    let index -1
+
+    map \ [x] {
+        set index + 1 index
+        reduce [index, x]
+    }, list
+}
+
+map (\ [x] {
+    set index + 1 index
+    reduce [index, x]
+}) list
+(\ [x] { print x })
+((\ [x] { print x }) 213)  # outputs 213
+
+let output-thing (\ [x] { print x })
+let output-thing (\ [x] {
+    print x
+})
+output-thing 213
+# nah.
+let output-thing \ [x] {
+    print x
+}
+output-thing 213
+
+do print "hello" while true
+do {
+    print "hello"
+} while true
+
+int calculate(int bottom, int top) {
+    if (top > bottom) {
+        int sum = 0;
+        for (int number = bottom; number <= top; number++)
+            if (number % 2 == ) sum += number;
+        }
+        return sum;
+    } else return 0;
+}
+fn calculate(bottom: i32, top: i32) -> i32 {
+    (bottom..=top).filter(|e| e % 2 == 0).sum()
+}
+calculate :: Int -> Int -> Int
+calculate bottom top = sum $ filter even [bottom..top]
+let calculate \ [bottom top] sum filter even, .. bottom top
+let calculate \ [bottom top] sum filter (even) .. bottom top
+let calculate \ [bottom top] sum . filter even . range bottom top
+# hmm.
+# what if {} is equivalent to 'do []', like before?
+let calculate \ [bottom top] {
+    sum . filter even . range bottom top
+}
+# and so, only the first value is evaluated...
+# in this case, 'first value' is '\' and 'sum' or the {}s.
+let calculate \ [bottom top] do [
+    sum . filter even . range bottom top
+]
+# I seriously love how '.' works like a comma.
+# but how does it work?
+let say-hello [
+    print "hello"
+]
+let say-hello do [
+    print "hello"
+]
+# the second one, right?
+# or this
+let say-hello {
+    print "hello"
+}
+
+# anyway, it means I can do this, which is the best version.
+map + [1 2 3 4]
+
+map  \ [x] + x x, [1 2 3 4]  # comma required.
+map (\ [x] + x x) [1 2 3 4]  # or parentheses.
+# but the parentheses can have a dual meaning, and that's the great thing!
+
+# still, how does that work?
+let double \ [x] + x x
+double 5  # returns 10
+\ [x] + x x 5
+# so I guess 'lazy parentheses'?
+
+let calculate \ [bottom top] sum . filter even . range bottom top
+let calculate \ [bottom top] sum (filter even (range bottom top))
+# hmm...
+let list [1 2 3 4]
+# so this isn't possible.
+let list [1 2 3 4]
+
+let value [+ 1] 1
+print value  # outputs 2
+# 'let' takes the symbol, the function, and then the arguments (applied to the function).
+# there's an implicit 'do'.
+
+let [x y] [1 2 3 4]
+print . format "%, %" [x y]  # outputs "1, [2 3 4]"
+# this could be a way to do _!
+
+# there's an even bigger problem...
+let list [1 2 3 4]
+# 'list' is also a function.
+# and so you have to call it.
+# I think... parentheses may be inherently incompatible with this model.
+
+let arr [1 2 3 4]
+arr[-1]  # returns [], or null?
+arr[10]  # same
+
+arr[10]   # this syntax is very similar to calling a function...
+arr [10]  # is this different?
+
+# so these are not the same thing?
+print (+ 1 2)
+print(+ 1 2)
+
+let func [print "Hello, World!"]
+func    # returns [print "Hello, World!"]
+func()  # outputs "Hello, World!"
+
+# so this is valid!
+import("Debug").step-into([...])
+
+# as long as the parentheses is glued to the function name, it can work!
+# okay! I have a new tool at my disposal. now I need to see how I can make use of it.
+
++ + 1 2 + 3 4
++(+(1 2)+(3 4))
++ + + 1 2 3 4
++(+(+(1 2)3)4)
+# this is all valid syntax!
+
+map print, [1 2 3 4]
+# this works, but this doesn't.
+map print(), [1 2 3 4]
+# I guess the ()s requires all the arguments?
+# wait... is the () basically 'force'? or eager evaluation?!
+# holy fuck!
+
+# or not?
++(1)(2)  # returns 3
+
+print (
+    let x 123
+    let y 321
+    return + x y
+)  # outputs 444
+# and for this...
+print(
+    let x 123
+    let y 321
+    return + x y
+)  # error: function 'print' only takes 1 argument.
+# also, what happens here?
+print return + 123 321
+# I guess 'print' never gets called?
+# and this probably errors (on the top level).
+return + 123 321
+
+let func \ [x y] {
+    if = y 0 return
+    / x y
+}
+# though it should really be 'error' or 'throw'.
+
+# maybe there's still a way to do
+return 123
+return
+# and
+import "Debug" .step-into [...]
+import "Debug" .step-into 2 [...]
+# but I don't know...
+
+# this doesn't work...
+for 2 import "Debug" .step-into [...]
+# unless 'step-into' is some sort of macro that rewrites it's input?
+# that... would be interesting!
+# but also impractical.
+
+# btw, commas are now required.
+map \ [x] {
+    set index + 1 index
+    reduce [index, x]
+}, list
+# this looks extremely ugly with parentheses.
+
+let vec [1 2 3] as Vector3
+print x vec
+# or?
+let vec [1 2 3] be Vector3
+# anyway
+let vec [1 2 3] as Vector3
+set x vec 10  # this is where it's broken.
+print x vec
+
+# but I want anonymous structs...
+let vec [
+    "x" 1
+    "y" 2
+    "z" 3
+]
+print vec.x
+
+# in odin.
+main :: proc() {
+    take_struct({1, 2, 3})
+}
+take_struct :: proc(st: struct {x, y, z: int}) {
+    fmt.println(st)
+    fmt.println(st.x)
+}
+# this works.
+# but in my language
+let main {
+    take-struct [1 2 3]
+}
+let take-struct \ [st] {
+    print st
+    print st.x
+}
+# it doesn't.
+# I guess the obvious thing to do is to add types?
+@type ["x" int, "y" int, "z" int]
+let take-struct \ [st] {
+    print st
+    print st.x
+}
+# or
+@type ["x" "y" "z" int]
+# or
+@type ["x y z" int]
+# so I guess a [""] means a field?
+
+# btw.
+@type int int int
+let add \ [x y] + x y
+
+take_struct :: proc(st: struct {x, y, z: int}) {
+    fmt.println(st)
+    fmt.println(st.x)
+}
+@type ["x y z" int] let take-struct \ [st] {
+    print st
+    print st.x
+}
+
+@type List[int]
+let list [1 2 3 4]
+
+let list List[int] [1 2 3 4]
+let list [1 2 3 4] as List[int]
+# ^ the second one's better.
+# or?
+let list [1 2 3 4] :: List[int]
+# to avoid conflict with 'for [] as i'.
+# 'be' is also possible... but it's ugly.
+
+let x 1 2  # error: function 'let' only takes 2 arguments.
+let x 1
+2
+
+Vector3[1 2 3]
+["x" "y" "z"][1 2 3]
+
+# is this even allowed? the two spaces, I mean. or should it error/warn?
+let say-hello  print "Hello, World!"
+# no, it shouldn't.
+let say-hello   print   "Hello, World!"
+let say-goodbye print "Goodbye, World!"
+
+let vec [
+    "x" 1
+    "y" 2
+    "z" 3
+]
+# vs
+let vec [
+    x: 1
+    y: 2
+    z: 3
+]
+# becomes
+let vec [
+    ["x" 1]
+    ["y" 2]
+    ["z" 3]
+]
+
+let vec [x: 1, y: 2, z: 3]
+let vec [x: 1; y: 2; z: 3]
+print vec.x
+
+let Greetings [
+    say-hello   print "Hello, World!"
+    say-goodbye print "Goodbye, World!"
+]
+let Greetings [
+    say-hello {
+        print "Hello, World!"
+    }
+
+    say-goodbye {
+        print "Goodbye, World!"
+    }
+]
+
+let Greetings [
+    "say-hello"   print "Hello, World!"
+    "say-goodbye" print "Goodbye, World!"
+]
+let Greetings [
+    "say-hello" {
+        print "Hello, World!"
+    }
+
+    "say-goodbye" {
+        print "Goodbye, World!"
+    }
+]
+
+let Greetings [
+    say-hello:   print "Hello, World!"
+    say-goodbye: print "Goodbye, World!"
+]
+let Greetings [
+    say-hello: {
+        print "Hello, World!"
+    }
+
+    say-goodbye: {
+        print "Goodbye, World!"
+    }
+]
+
+# what if numbers where church encodings/functions?
+5 print "hello"  # outputs "hello", five times.
+
+# if I didn't have significant whitespace, I could do this.
+do print "hello"
+while true
+# or
+if condition print "yes"
+else print "no"
+
+let list [1 2 3 4]
+print list 0
+# so...
+print [1 2 3 4] 0
+
+let list [1 2 3 4]
+print list^  # outputs 1
+
+# this kind of makes sense?
+let list [1 2 3 4]
+print list()^
+# since everything is a function.
+
+print fibs    # outputs progressively.
+print fibs()  # never outputs, because 'fibs' is filling itself up.
+
+# these two are not the same.
+Vector3[]
+Vector3.[]
+
+# I guess this works?
+let Result[x] func
