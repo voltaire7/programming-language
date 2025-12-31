@@ -23149,3 +23149,123 @@ for [1 2 3 4 5 6] as x print x
 [1 2 3 4 5 6].for-each as i print i
 for-each [1 2 3 4 5 6] print it
 for-each [1 2 3 4 5 6] as i print i
+
+let thing = 123
+let thing \ [x y] + 1 2
+
+@type int int int
+let func \ [x y] + x y
+@ int int int
+let func \ [x y] + x y
+
+fn main() {
+    let [a, b, _] = [1, 2, 3];
+    println!("{a}, {b}");
+}
+# there are a lot of ugly part to rust... but this is good.
+# once, I was infatuated with this language. obviously, there's a good reason for that.
+# it's only once you get more into it, that the ugly parts show up.
+let func x y = x + y
+func 1 2
+
+let partial-func = func 1
+partial-func 2
+let partial-func = func(1)
+partial-func(2)
+
+# it's just better when it's explicit.
+let [a, b, _] = [1, 2, 3];
+let [a b _] [1 2 3]
+
+for i in [1, 2, 3, 4] { println!("{i}") }
+for [1 2 3 4] as i { print i }
+
+# what an interesting language.
+fn sum((x, y): (i32, i32)) -> i32 {
+    x + y
+}
+fn main() {
+    let t = (3, 4);
+    let result = sum(t);
+    println!("{result}"); // 7
+}
+# if only it weren't such a pain about safety and stuff.
+
+# maybe I should really use rust as my base, not Jai.
+# there are so many cool features in rust, yet it doesn't deliver.
+
+[1 + 1, 2 + 2, 3 + 3]
+[+ 1 1, + 2 2, + 3 3]
+[+ 1 1 + 2 2 + 3 3]  # well, this would throw, because you're giving '+' too many arguments.
+# still, the last one is bad, but I fix it with a rule.
+# and the second is better than I thought. looks ugly in a lot of cases,
+# but there's no need for stupid operator precedence or parentheses.
+# ... I guess you don't really need operator precedence for the first one either...
+# but the parser has to work hard.
++ func 1 2 func 3 4  # this will warn about too many arguments...
+
+(let value 123)
+(let [a b _] [1 2 3])
+# back to the drawing board?
+
+(let say-hello [(print "Hello, World!")])
+(let say-hello [
+    (print "Hello, World!")
+])
+(for vec [
+    (let [field value] it)
+    (print (format "%: %" [field value]))
+])
+(for vec (as [
+    (print (format "%: %" [field value]))
+)])
+(for vec . as [
+    (print . format "%: %" [field value])
+])
+
+# let's discuss rust inference for a bit.
+# depending on how it's used, it can easily infer lifetime and stuff.
+# but it doesn't, because the designers of the language decided not to.
+# so here's my thinking: what if I take rust, and put the inference to the extreme,
+# to the point where it's essentially dynamically typed?
+# probably a bad idea, and I'm pretty sure I thought of this before,
+# but again! this language is more of a proof of concept than anything.
+let foo = [1, 2];    // array
+let foo = [1, "2"];  // tuple
+# there is no reason at all this can't be inferred, from the types inside.
+
+# even in rust, you initialize structs like this, with the ':' thing.
+let vec = Vec3 { x: 1, y: 2, z: 3 };
+
+fn is_odd(x: i64) -> bool { if x % 2 != 0 { true } else { false } }
+@type i64 bool let is-odd \ [x] if ! = 0 % x 2 true false
+
+# this is allowed in rust, btw.
+fn main() {
+    println!("FUNC: {}", FUNC(1));
+}
+const FUNC: fn(i32) -> i32 = |x| x + x;
+# why can't it be inferred? because these rustaceans hate fun, that's why.
+# safety != fun
+
+# maybe I should take the best of both worlds.
+# if I don't call malloc or whatever explicitly, RAII is used.
+# if I do, well, the type changes, and the interpreter knows I want manual handling of memory.
+
+\([x], + x x)(1)  # outputs 2
+\ [x] + x x 1
+
+# it would be easier if I started with rust, and remove/changed features.
+# when you work around syntax, it's just simpler.
+
+const FUNC: fn(i32) -> i32 = |x| x + x;
+const FUNC: fn(i32) -> i32 = fn(x) -> x + x;
+func :: proc(x: i32) { return x + x }
+
+# maybe I should instead start with odin, and add more type inference?
+# maybe not.
+
+(for vec . as [
+    print . format("%: %" [field value])
+])
+# no, I don't think so. I can't reason about it.
