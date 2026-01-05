@@ -23269,3 +23269,594 @@ func :: proc(x: i32) { return x + x }
     print . format("%: %" [field value])
 ])
 # no, I don't think so. I can't reason about it.
+
+# go has it too.
+func main() {
+	fmt.Println("Hello, World!")
+	fmt.Println(test())
+}
+func test() (int, int) {
+	return 1, 2
+}
+
+let Basic = import "Basic";
+Basic :: import "Basic"
+Basic.print("Hello, World!");
+let { print } = import "Basic";
+print("hello");
+
+let arr = [1 + 1, 2 + 2, 3 + 3];
+let arr [+ 1 1, + 2 2, + 3 3]
+let arr = [1, 2, 3];
+let arr [1 2 3]
+# I don't think I'll ever be able to do rust-style destructuring...
+# but I can emulate odin-style returns?
+# and the [].iter().map(...) style also doesn't work well, because of the lack of parentheses...
+
+main :: proc() {
+    data, ok := os.read_entire_file("main.odin", context.allocator)
+    if !ok {
+        // could not read file
+        return
+    }
+    defer delete(data, context.allocator)
+
+    it := string(data)
+    for line in strings.split_lines_iterator(&it) {
+        // process line
+        fmt.println(line)
+    }
+}
+
+let main {
+    let [data ok] read-entire-file "main.odin", context.allocator
+    if ! ok {
+        # could not read file
+        return
+    }
+    defer delete data, context.allocator
+
+    let it string(data)
+    for line in split-lines-iterator(&it) {
+        // process line
+        print line
+    }
+}
+
+let main = || {
+    let [data, ok] = read_entire_file("main.odin", context.allocator);
+    if !ok {
+        # could not read file
+        return;
+    }
+    defer delete(data, context.allocator);
+
+    let it = string(data);
+    for line in split_lines_iterator(&it) {
+        // process line
+        print(line);
+    }
+}
+
+let say-hello = print "Hello, World!";
+say-hello();
+# I just don't know anymore.
+# I'm starting to think: what's the point?
+
+# like, commas, and the equal sign. I used to think them inferior.
+let [a, b, _] = [1, 2, 3];
+# but now, now I think I can see the point.
+# it was always about readability.
+let [a, b, _] = [1 + 1, 2 + 2, 3 + 3];
+# and syntax gives more power. types as well.
+let {x, y} = Vector3.{1, 2, 3};
+let Some(value) = my_func(123);
+# or like this.
+print([1, 2, 3, 4, 5, 6].map(|x| x + x));
+# it's just better...
+
+print format "%: %" [field value]
+# then again, there are good parts to my language as well.
+for [] as value {
+    print value
+}
+# yeah. it's not all pointless.
+# it's just... not revolutionary.
+# maybe I lost sight... of what I wanted along the way?
+# every language I use had something that I disliked and complained about.
+# and yet, my language is the same.
+
+# ...
+# I guess it comes down to one choice:
+# either I continue down the lispy path, where everything is a function.
+# or I add rust-style syntax, and not everything is a function anymore.
+
+# no matter how I look at it, option two is better.
+# already, objects have forced me to add syntax.
+# then I added syntax for function calls, and realized it could extend to types.
+# then I realized... "syntax", is not evil.
+# looking back at concept.md, ... how things have changed.
+# it started as a LISP without the parentheses, but even LISP (scheme) has become uninteresting.
+# I became disillusioned with things.
+
+let func {
+    return [Error, "this is an error"];
+}
+let [type, value] = func();
+if type == Error { throw value; }
+handle value
+# doesn't really work.
+# it should be
+let func {
+    return [null, "this is an error"];
+}
+let [value, err] = func();
+if err { throw err; }
+# or
+let func {
+    return Error.["this is an error"];
+}
+let f = func();
+if let Error(e) = f { throw err; }
+if let Some(value) = f { handle(value); }
+# okay... I didn't think of this?
+# it seems if I use rust-style error handling, I often need a third symbol?
+# while go-style is just simpler and cleaner?
+# maybe my crisis from earlier about not being able to mimic rust was misguided?
+# maybe... I should just follow the simpler path laid before me?
+
+# think about it.
+# in rust, types are essential.
+# in Jai, Odin and Go, types are primitive, and there for optimization.
+# it's trivial for my language to essentially emulate Jai, even without types.
+# while with rust, things are more complicated.
+# my language already has tuple/array destructuring. just use that for error handling.
+# don't complicate things by adding more "features".
+
+# then again, having a 'result' value can be good?
+let result = foo();
+match result {
+    Ok(value) => ...
+    Err(error) => ...
+}
+
+v, err := foo()
+if err != nil {
+    return err
+}
+
+let find \ [list id] for list if = it.id id return it []
+let find = |list id| for list if it.id = id return it []
+# interesting.
+
+# I need to take a break from this.
+
+# if I do rust-style, this might be the best function declaration.
+let func() = print("Hello, World!");
+let func() = {
+    print("Hello, World!");
+}
+# seeing 'print' with parentheses just feels wrong.
+let func() = {
+    print "Hello, World!"
+}
+# or
+let func name = {
+    print format "Hello, %!" [name]
+}
+func "World"
+# assuming there is syntax, this is the best model.
+let func greeting name = {
+    print format "%, %!" [greeting name]
+}
+func "Hello" "World"
+func "Hi" "World"
+# and like Ocaml, there is very clever inference going on.
+# honestly, I prefer this over rust-style.
+# it's cleaner.
+let func obj = {
+    print format "%, %!" [obj.greeting, obj.name]
+}
+let func { greeting, name } = {
+    print format "%, %!" [greeting, name]
+}
+func { greeting = "Hello", name = "World" }
+func { greeting = "Hi", name = "World" }
+# maybe I take this, and add some odin-style to it?
+# keep the general syntax the same, but with some odin semantics?
+# still tho...
+let func (greeting, name) = {
+    print format "%, %!" [greeting, name]
+}
+func("Hello", "World")
+
+# maybe you don't need func(123).value?
+let { value } = func 123
+print value
+value = 321  # changes the value in the struct as well?
+# the problem is mutability.
+# this would be a valid solution if mutability wasn't a thing.
+
+# ...
+print-line("Hello, World!");
+print("Hello, World!", no_endl = true);
+
+# yeah, sure, whatever — fuck the break. ideas will keeps coming!
+
+let func vec = {
+    use vec
+    print [x, y, z]
+}
+func { x = 1, y = 2, z = 3 }
+
+let x, y = 1, 2
+let x, y = y, z
+print [x, y]  # outputs [2, 1]
+
+# ok, I genuinely like this syntax.
+let func arg1 arg2 = {
+    ...
+}
+# it is so fucking clean!
+let func \ [arg1 arg2] {
+    ...
+}
+# and shorter!
+# sometimes.
+
+let Vector3 (x, y, z) = { x = x, y = y, z = z }
+print Vector3 (1, 2, 3)
+# I guess a 'tuple' shouldn't implicitly convert to a 'struct', like in odin?
+
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n-1) + fib (n-2)
+
+let fib 0 = 0
+let fib 1 = 1
+let fib n = fib (n-1) + fib (n-2)
+# kind of hard to tell it's a tuple? or I guess a tuple with a single value is useless.
+
+let value: int = 123
+let func x: int, y: int = x + y
+# so no multiple assignment.
+let x, y = 1, 2
+let (x, y) = (1, 2)  # it has to be done like this
+# which is fine. verbose, but not redundant.
+
+let func x: int, y: int = x / y
+    where y != 0
+# literally haskell.
+
+if/else
+for/as
+
+for [1, 2, 3, 4] print it
+for [1, 2, 3, 4] {
+    print it
+}
+for [1, 2, 3, 4] as i {
+    print i
+}
+for enumerate [1, 2, 3, 4] as (index, value) {
+    print i
+}
+for { x = 1, y = 2, z = 3 } as { field, value } {
+    print format "%: %" (field, value)
+}
+# maybe parentheses should just be parentheses? and arrays can hold any type?
+for { x = 1, y = 2, z = 3 } {
+    let { field, value } = it;
+    print format "%: %" [field, value];
+}
+# this might be good.
+# ugh... that means I can't do this.
+for { x = 1, y = 2, z = 3 } {
+    print format "%: %" it;
+}
+# no, I will allow it. it would be too shit otherwise.
+# a struct is basically and array/tuple anyway.
+# there will be an implicit cast for any struct passed where an array/tuple is expected.
+# ... or not? what type is 'it' anyway? 'Field/Value' type?
+# no, it should be a tuple.
+for { x = 1, y = 2, z = 3 } {
+    let [field, value] = it
+    print format "%: %" [field, value];
+}
+for { x = 1, y = 2, z = 3 } as [field, value] {
+    print format "%: %" [field, value];
+}
+for { x = 1, y = 2, z = 3 } as field_and_value {
+    print field_and_value;  # outputs ["x", 1] and so forth...
+}
+
+# damn. now that I have types, I can do this!
+"Hello," + " World!"
+[1, 2] + [3, 4]
+vec1 + vec2
+# and stuff.
+
+let value = if condition then "true" else "false";
+if condition {
+    ...
+    "true"
+} else {
+    ...
+    "false"
+}
+
+for [1, 2, 3] do print it
+for [1, 2, 3] {
+    print it
+}
+# I know this contradicts my feelings about Jai, but still,
+# it looks better.
+# or should I do this?
+for [1, 2, 3] do {
+    print it
+}
+# I kind of like it.
+
+let func _ = for _ do print it
+let func _ = {
+    let [x, y, z] = _
+    print [x, y, z]
+}
+func [1, 2, 3]
+
+for vec {
+    print format "%, %!" it
+}
+# maybe I could do it like this?
+for vec {
+    print . format "%, %!" it
+}
+# as in literal function composition?
+
+# I think that would be fine.
+map + [1, 2, 3, 4]
+# still can't do this, though, since it's an operator now.
+map (+) [1, 2, 3, 4]  # only way.
+
+if ["x", 1] in vec {
+    ...
+}
+
+# this is why odin's 'for' is a little dumb.
+while ["x", 1] in vec {
+    ...
+}
+for [field, value] in vec { ... }
+for vec as [field, value] { ... }
+
+# maybe struct should be []s? I feel like there are problems otherwise.
+let vec = [
+    x = 1,
+    y = 2,
+    z = 3,
+]
+# this might be better.
+let vec = Vector3.[1, 2, 3]
+
+# hmm.
+let print-vector3 v = {
+    use v
+    print [x, y, z]
+}
+print-vector3 [x = 1, y = 2, z = 3]
+# this works, but this doesn't.
+print-vector3 [1, 2, 3]
+# because field information is gone.
+# but you can cast it.
+print-vector3 Vector3.[1, 2, 3]
+# or redefine the function where you know the type of the argument.
+let print-vector3 v: Vector3 = {
+    use v
+    print [x, y, z]
+}
+print-vector3 [1, 2, 3]
+# this seems like a good model.
+
+# I guess I'll go full javascript and have this as well.
+let obj = ["hello there" = 123]
+print obj["hello there"]
+
+# shit, no.
+# that doesn't work.
+let { x, y, z } = vec
+# I need objects to be {}s...
+# unless... it's overloaded on the type?
+let [x, y, z] = vec  # 'vec' is obviously an object.
+
+# ...
+let [x y z] vec
+# it just doesn't look good, no matter how you write it.
+
+let vec = Vector3.[1, 2, 3]
+let vec: Vector3 = [1, 2, 3]
+
+let vec = Vector3.[1, 2, 3]
+let vec = [x, y, z: float].[1, 2, 3]
+
+# I don't think it's worth it.
+let [x, y, z] = vec;
+extract [x, y, z] vec
+# do I really need syntax?
+# no, right?
+let func \ [obj] for obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+func [x: 1, y: 2, z: 3]  # there is no implicit casting between array and object.
+# and that's not a bad thing! it's verbose, but it's good.
+# consider it a feature.
+let func \ [obj] for obj {
+    let [field value] it
+    print format "%: %" [field value]
+}
+func [x = 1, y = 2, z = 3]
+func [1, 2, 3]
+
+let Greetings = [
+    say_hello = {
+        print "Hello, World!"
+    },
+    say_goodbye = {
+        print "Goodbye, World!"
+    }
+]
+Greetings.say_hello
+
+# in the 'everything is a function' or 'lazy polish notation' model,
+# ()s actually have a reason for existing!
+func().value
+
+# in the syntax model, they make things weird.
+
+# also, the biggest reason why I wanted the syntax model, was advanced destructuring,
+# but as it was demonstrated, it doesn't work:
+let { x, y, z } = vec
+
+# and it I do enums, or whatever, I could do them this way instead.
+let MyEnum [Option1: 0, Option2: 1]
+let [type, value] func
+match type [
+    MyEnum.Option1 ...
+    MyEnum.Option2 ...
+]
+let func \ [] {
+    ...
+    return [MyEnum.Option1, 123]
+}
+# but I confess it could be better.
+
+# and I just don't like this.
+let value = 123;
+value = 321;
+# this is better.
+let value 123
+set value 321
+
+func 1 2 + func 1 2  # infix just complicates things too much.
+# and it's only benefit is that it looks a little better.
+
+let func \ [ptr] {
+    set ptr^ 321
+}
+let value 123
+func ^value
+print value  # outputs 321
+
+# hmm. well, it's not that simple.
+# I should still explore it. see, if there's lessons to be learnt.
+
+[x: 1, y: 2, z: 3]
+[x = 1, y = 2, z = 3]
+
+let value = 123
+set value = 123
+# ...
+
+(for vec . as [field value] [
+    (print . format "%: %" [field value])
+])
+(for vec [field value] [
+    (print . format "%: %" [field value])
+])
+(for vec it [
+    (let [field value] it)
+    (print . format "%: %" [field value])
+])
+# but objects are ugly with this model.
+# sigh...
+
+# objects and mutation. these two things are the bane of my existence.
+# I've worked and worked to make them even a little better,
+# but I can't find the right model...
+
+let find \ [list id] for list if = it.id id return it []
+(let find [(let [list id] _) (for list [(if (= it.id id) [(return it)])])])
+(let find $ (let [list id] _) (for list $ (if (= it.id id) $ (return it))))
+
+(let find [
+    (let [list id] _)
+    (for list [
+        (if (= it.id id) [
+            (return it)
+        ])
+    ])
+])
+
+(let find $
+    (let [list id] _)
+    (for list $
+        (if (= it.id id) $
+            (return it))))
+# '])' might be better.
+
+let find {
+    let [list id] _;
+    for list {
+        if (= it.id id) {
+            return it
+        }
+    }
+}
+
+let func {
+    print "hello"
+    [value: 123]
+}
+let value func().value  # outputs "hello"
+value  # returns 123
+value  # returns 123
+let value func.value
+value  # outputs "hello", returns 123
+value  # outputs "hello", returns 123
+# I guess this could work. no reason for it not to.
+
+for list i print i
+for list i {
+    print i
+}
+for vec [field value] {
+    print format "%: %" [field value]
+}
+for vec it {
+    let [field value] it
+    print format "%: %" [field value]
+}
+for vec it {
+    print format "%: %" it
+}
+for vec it print format "%: %" it
+for vec print format "%: %" it
+for vec as x print format "%: %" x
+# yeah, 'lazy polish notation' is just better, man.
+
+# I'll just call them LPN for 'lazy polish notation',
+# EPN for 'eager polish notation', and MP for 'macro parentheses'.
+
+# but this doesn't really work...
+let value func()
+let value {
+    let sub-value func()
+    sub-value
+    sub-value
+}
+value
+value  #
+# or something. I didn't write it clearly, but you get the gist.
+# 'func' is supposed to be eager, because of the ()s,
+# but what about inside a function, where we expect the same,
+# but in a specific place this time?
+# do the {}s change it's behavior? I guess it could...
+
+# I should still consider multiple return for LPN...
+# even though it's redundant, it could work.
+# there are benefits to it.
+let list [for 100 it]  # and this is just so nice!
+
+for [for 100 it] print it
+# the key is the ()s for function calls.
+# they have to work if I even want to consider this.
