@@ -23860,3 +23860,67 @@ let list [for 100 it]  # and this is just so nice!
 for [for 100 it] print it
 # the key is the ()s for function calls.
 # they have to work if I even want to consider this.
+
+# another problem with the LPN with syntax.
+let func x y = x + y
+let func = \ [x y] x + y
+# there are two way to do arguments. why? why do you need two ways?
+let func \ [x y] + x y
+# this is all you need.
+
+# get all the values (remove the fields).
+vec.*
+# or not.
+get-fields vec
+get-values vec
+# the 'get-' is ugly, but necessary for clarity.
+
+[x y z].[1 2 3]
+Vector3.[1 2 3]
+# then again...
+new Vector3 [1 2 3]
+
+# LPN is so LISPy.
+
+# hmm. 'LPN' could serve as a temporary name.
+# like BQN or something.
+# it does define the language.
+
+let vec [
+    x: 1
+    y: 2
+    z: 3
+]
+let vec = [
+    x = 1
+    y = 2
+    z = 3
+]
+# the equals don't look that good.
+
+@type [int string]              # tuple?
+@type [3]int                    # array of int?
+@type [3][int string]           # array of tuples?
+@type ["x" int, "y" string]     # object?
+@type [3]["x" int, "y" string]  # array of objects?
+@type [][string any]            # dynamic hashtable?
+
+for vec as [_ value] print value
+
+@type Enum[u8]
+let Direction enum [NORTH EAST SOUTH WEST]
+let [type value] func
+match type [
+    NORTH: ...
+    EAST: ...
+    _: ...  # default
+]
+# so 'match' overloads on type?
+
+# I don't know. in rust, you use Direction.NORTH pretty for the match, right?
+# but not anywhere else?
+
+let vec [1, 2, 3]
+let vec [x: 1, y: 2, z: 3]
+let vec Vector3.[1, 2, 3]
+# yeah, I think this model is fine. you can easily change an array into a object.
