@@ -23917,10 +23917,91 @@ match type [
 ]
 # so 'match' overloads on type?
 
-# I don't know. in rust, you use Direction.NORTH pretty for the match, right?
+# I don't know. in rust, you use Direction.NORTH pretty often for the match, right?
 # but not anywhere else?
 
 let vec [1, 2, 3]
 let vec [x: 1, y: 2, z: 3]
 let vec Vector3.[1, 2, 3]
 # yeah, I think this model is fine. you can easily change an array into a object.
+
+let find \ [list id] for list if = it.id id return it []
+# suppose 'for' actually multiple returns... 'find' still doesn't! so I could actually do it!!
+
+# this is possible, right?
+{}()
+
+let get-new-int new int 0
+let new-int get-new-int()
+
+let args [1 2]
++ .. args
+# explicit multiple return.
+# this language seems to prefer explicitness. interesting.
+
+let @type \ type-list { ... }
+let @type \ _ { ... }
+let add-all \ _ fold-left +, _
+add-all 1 2 3 4 5 6
+
+# so [3]int{1 2 3} is now possible?
+# even int(3)?
+x: 1  # returns ["x" 1], but it's also of type Field!
+int.[1 2 3]
+
+# what does rust type system look like again? [u8]?
+let add \ [x y] + x y
+add 1 2
+add y: 1, z: 2
+# overload over Field type?
+# maybe 'if' should really be a macro?
+if condition then "true" else "false"
+
+let var-args \ _ {
+    let [x y] _
+    + x y
+    return _
+}
+# this doesn't really work...
+# _'s return should be implicit.
+
+# objects use ':' because they describe data, not assignment.
+
+let value + 1 2
+value :: 1 + 2;
+x, y: int = 1, 2;
+let [x y] int.[1 2]  # extracting from an array of int.
+# so both 'x' and 'y' and ints!
+
+take-vec .[1 2 3]
+@type Vector3 []
+let take-vec \ [vec] { ... }
+# so like, the '.' is like Jai, in that it tells the compiler to infer?
+
+func 123 opt: [
+    with-stuff: true
+]
+
+err, val := can_error()
+try(can_error())  # I guess you can do this.
+# do you can do it in rust too...
+
+# my language should have advanced destructuring and pattern patching capabilities.
+# I really like how rust function call is just tuple.
+
+let func = let x, y = ...;
+# thought I could make them arguments?
+
+# I just realized.
+let func x y = ...;
+# literally doesn't work with ()s!
+# unless...
+let func(x y) = ...;
+# ?
+
+# 'let mut' is just better than 'var'.
+
+let func { x, y } = x + y;
+let func { x, y: int } = x + y;
+func { x = 1, y = 2 };
+func { 1, 2 };
