@@ -24005,3 +24005,201 @@ let func { x, y } = x + y;
 let func { x, y: int } = x + y;
 func { x = 1, y = 2 };
 func { 1, 2 };
+
+let func \ [] {
+    return [Err "not implemented yet"]
+}
+let [result value] func
+match result [
+    Ok: {
+        print value
+    }
+    Err: throw value
+]
+# I can emulate rust with multiple return, but it just feels awkward.
+let func \ [] {
+    return [[], "not implemented yet"]
+}
+let [value, err] func
+if err throw err []
+print value
+
+let func \ [] {
+    return [Err "not implemented yet"]
+}
+let result func
+match car result [
+    Ok: {
+        print value
+    }
+    Err: throw value
+]
+# whatever...
+
+let [value err] func
+throw! err
+print value
+# hmm. I think it's fine if 'throw' just doesn't throw if the input is null.
+
+let obj = {
+    x: 1,
+    y: 2,
+    z: () => 3,
+}
+console.log(obj.z())
+
+let obj [
+    x: 1
+    y: 2
+    z: 3
+]
+print obj.z
+# I think this is good.
+
+let obj = [
+    x = 1
+    y = 2
+    z = 3
+]
+print obj.z()
+# I don't think I will do this, since I prefer this:
+set value 321
+# over this
+value = 321
+
+let func \ [str] {
+    let parsed-str parse str
+    print parse-str
+}
+func "hello"
+
+let func str = {
+    let parsed-str = parse str
+    print parse-str
+}
+func "hello"
+
+print reduce [for 100 it]  # outputs [0 1 2 3 4 5 ...]
+print map (* 2) [for 100 it]  # outputs [0 2 4 6 8 10...]
+
+x, y := 1, 2
+func :: () 1, 2
+x, y := func()
+result := [func()]
+print(result)  # outputs [1, 2]
+add(func())
+print([func()])
+# maybe that's not so bad?
+
+(let func [1 2])
+(func)
+(let [x y] func)
+(let [x y] [(func)])
+
+(print . format "%: %" [field value])
+print(format("%: %", [field, value]))
+
+func :: []
+func :: [
+    print("Hello, World!")
+]
+func()
+values :: [1 2]
+x, y := values()
+func :: () [
+    print("Hello, World!")
+]
+func :: () print("Hello, World!")
+func()
+
+func :: (str) {
+    parsed_str := parse(str)
+    print(parse_str)
+}
+func("hello")
+
+let func(x, y) = print(x + y)
+func(1, 2)
+let func x y = print(x + y)
+func 1 2
+
+let [x y] = func();
+extract [x y] = func();
+# this doesn't feel right.
+
+# no need for vec.x with destructuring?
+
+let (add x y, sub x y) = (x + y, x - y)
+
+if condition {
+    print "true"
+}
+if condition print "true"
+
+[1, 2, 3, 4, 5].map(|x| x * 2).map(|x| x / 2)  # returns [1, 2, 3, 4, 5]
+map \ [x] / x 2, map (* 2) [1 2 3 4 5]  # returns [1 2 3 4 5]
+# in haskell:
+map (\ x -> x / 2) (map (* 2) [1, 2, 3, 4, 5])
+map (\ [x] / x 2) map (* 2) [1 2 3 4 5]
+# not that different.
+
+# I've tried so many combinations.
+# I have a good idea of what works, what doesn't.
+# and yet, I'm not satisfied. this is not what I was working towards.
+# I wanted a language that didn't make me complain about things.
+# yet, this may be the end.
+# I don't know how to improve this further.
+# now I must pick my poison, decide my priorities, what my language will look like.
+
+# I already explored LISP, and realized it's nothing special.
+# unless you treat it as a toy language, it just doesn't make that much sense.
+# to make it useful, you have to change it inherently.
+# and at that point, just write the language from scratch for those features.
+# semantics should matter more, but I care more about syntax.
+
+# maybe changing rust's syntax really is the way? then adding dependant types.
+# I know this doesn't fall in line with mr. blow's philosophy, but I think it's the future.
+# merging math and computer science, that is.
+
+# object are a necessity. namespacing, for one; any complex computation, for two.
+# and if there are objects, I need operators.
+# again, LISP was bad from the onset.
+# and because objects are required, haskell style function call syntax is a no go.
+# I had found a way hack for it with LPN, but it's that, a hack.
+# it feels weird to have this simple thing language, then putting a small bit of syntax on it.
+# just go all the way.
+
+# the language shouldn't be dynamic, but should be flexible.
+# like haskell, function signatures should be inferred (when unspecified).
+# tuple are really nice. that's a thing I like about rust:
+# calling a function, is placing a tuple after a function pointer!
+
+# I've tried using polish notation for everything, but infix syntax for operators is just better.
+# it's easier to read, and matches mathematics conventions, while not often being longer.
+# and operators are of course an intuitive way of doing objects.
+# also, they are required when you have ()s for function calls.
+
+let hello() = {
+    print("Hello, World!")
+}
+hello()
+
+let add(x, y) = x + y  # inferred.
+
+# or is this better?
+hello() = {
+    print("Hello, World!")
+}
+hello()
+add(x, y) = x + y
+# if it's pure functional, then sure?
+
+add(x, y) = x + y
+add x y = x + y
+
+add(x, y) = x + y
+my_tuple = (1, 2)
+add my_tuple
+# equivalent to
+add(1, 2)
+# ?
