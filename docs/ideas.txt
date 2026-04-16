@@ -24203,3 +24203,406 @@ add my_tuple
 # equivalent to
 add(1, 2)
 # ?
+
+# what if I do have multiple return, but also extraction?
+let x, y = 1, 2
+let [x, y] = vec
+
+# this should actually throw.
+do {
+    print "hello"
+} while condition body
+# because
+let do \ [body loop] expand {
+    body
+    loop body  # here, 'loop' doesn't take any arguments, since they were already passed ^
+}
+# only this is valid.
+do {
+    print "hello"
+} while condition
+
+# honestly, there is ugliness everywhere.
+# even with syntax, even without.
+# what's the point?
+
+# man, python is so weird...
+list(map(lambda x: x / 2, map(lambda x: x * 2, [1, 2, 3, 4, 5])))
+
+map \ [x] / x 2, map (* 2) [1 2 3 4 5]
+(map [(let [x] _) (/ x 2)] (map [(let [x] _) (* x 2)] [1 2 3 4 5]))
+# but again, what if we had currying? with the same rules?
+(map (\ [x] [(/ x 2)]) (map (* 2) [1 2 3 4 5]))
+map . \ [x] { / x 2 } . map (* 2) [1 2 3 4 5]
+# eh.
+
+# if the metric is how short it is, then it even had haskell beat.
+# only array programming language can really compete.
+
+# this is just so fucking stupid...
+for i in list {
+    print i
+}
+# why?! why do you need these keyword things?
+# just use functions!
+
+# yeah, I know. I know I can't decide.
+# but there is a reason why I wanted to create a new language from scratch.
+# there is a reason why I wrote 24000 lines worth of ideas to understand the problem.
+# sure, it won't go all the way like in LISP.
+# I think make the language somewhat terse is necessary.
+# and so, polish notation is required, even if it's ugly.
+# and if I do that, then there's no need for operator precedence, and the whole language changes.
+
+let obj.field2 123  # throws if 'field2' already exists?
+
+[1, 2, 3, 4, 5].map(|x| x * 2).map(|x| x / 2)
+[1 2 3 4 5] |> map(|x| x * 2) |> map(|x| x / 2)
+[1 2 3 4 5] . map (* 2) . map \ [x] / x 2
+[1 2 3 4 5]
+    . map (* 2)
+    . map \ [x] / x 2
+map \ [x] / x 2, map (* 2) [1 2 3 4 5]
+
+# what if $ places the []s at the end?
+[1 2 3 4 5] . map (* 2) . map \ [x] / x 2
+[1 2 3 4 5] $ map (* 2) $ map \ [x] / x 2
+# so I don't have to change the definition of map?
+
+[1 2 3 4 5] $ map (* 2)
+# becomes
+map (* 2) [1 2 3 4 5]
+
+# what if '.' is not an operator?
+# what if it's literally part of the name,
+# but the functions that interact with it always behave like it a special value?
+# even the LSP.
+
+(let func [
+    (args [x y])
+    (print . format "%, %" [x y])
+])
+(func 1 2 3 4)
+# what if 'args' deferred returned 3 and 4?
+# but that doesn't work... what if 'func' takes no arguments?
+
+let [[x] [v]] vec
+# but no, 'extract' is better.
+# 'let []' should always behave the same, no matter the amount of nesting.
+
+let find \ [list id] for list if it.id = id return it []
+let find list id = for list if it.id = id return it []
+
+let find \ [list id]
+    for list
+        if it.id == id
+            return it
+        ...
+        do-something
+let find list id =
+    for list
+        if it.id == id
+            return it
+        ...
+        do-something
+
+# if I have operators, then this makes sense? kind of?
+import "Debug" .step-into [...]
+import "Debug" . step-into [...]
+# then again, maybe not, since 'step-into may run before 'import' is finished?
+
+# hmm. just found out that nim has interesting borrow-checking semantics. like opt-in.
+# I should check it out.
+
+# nim
+import tables
+var map = {"one": 1, "two": 2, "three": 3}.toTable
+for key, value in map:
+    echo key, ": ", value
+if "two" in map:
+    echo "Found: ", map["two"]
+
+# rust
+use std::collections::HashMap;
+fn main() {
+    let mut map: HashMap<&str, i32> = HashMap::new();
+    map.insert("one", 1);
+    map.insert("two", 2);
+    map.insert("three", 3);
+
+    for (key, value) in &map {
+        println!("{}: {}", key, value);
+    }
+
+    if let Some(v) = map.get("two") {
+        println!("Found: {}", v);
+    }
+}
+
+# this
+let map ["one": 1, "two": 2, "three": 3]
+for map print format "%: %" it
+if exists "two" map print format "Found: %" map["two"] []
+
+# btw, this is valid in rust.
+let mut map = HashMap::new();
+# and this.
+let map = HashMap::from([
+    ("one", 1),
+    ("two", 2),
+    ("three", 3),
+]);
+# kind of sexy, actually.
+
+# the syntax of nim is all over the place, though.
+# never going to like it.
+
+# this is just nice.
+fn main() {
+    let app = App::new(123);
+    app.run();
+}
+
+struct App {
+    value: i32,
+}
+
+impl App {
+    fn new(value: i32) -> Self {
+        Self { value }
+    }
+
+    fn run(&self) {
+        println!("{}", self.value);
+    }
+}
+# but I guess it's kind of stupid to have a function dedicated to initializing the struct,
+# when you could just have an initializer, period.
+# and the function returning Self... yuck.
+
+# wait, you can do this.
+fn main() {
+    let app = App { value: 123 };
+    app.run();
+}
+
+struct App {
+    value: i32,
+}
+
+impl App {
+    fn run(&self) {
+        println!("{}", self.value);
+    }
+}
+# much cleaner.
+
+# I guess the cleanest way to do this would be like this?
+App :: [
+    value: i32
+]
+App.run :: () {
+    print("%", self.value);
+}
+app := App.[value = 123]
+app.run()
+
+# or like this?
+let App = [
+    value: i32
+]
+let App.run() = {
+    print("%", self.value);
+}
+app := App.[value = 123]
+app.run()
+# I can never figure this out.
+# I will never be able to decide.
+
+App :: [
+    value: i32
+]
+run :: (app: App) {
+    print("%", app.value);
+}
+app := App.[value = 123]
+app.run()
+# if functions are () {}, then structs can be only {}!
+App :: {
+    value = i32
+}
+run :: (app: App) {
+    print("%", app.value);
+}
+app := App.{value = 123}
+app.run()
+# it's just better when you have overloading and UFCS.
+# but how do you do enums or unions?
+
+let App = {
+    value: i32
+}
+let run = (app: App) {
+    print("%", app.value);
+}
+app := App.{value = 123}
+app.run()
+# () {} for typed functions, and || {} for non-typed?
+# you can also do App.[{}, {}, {}] and stuff.
+let run = |app| {
+    print("%", self.value);
+}
+# of course, that means no overloading.
+
+# this is okay. better than odin?
+for i in [1, 2, 3, 4, 5] {
+    println!("{i}");
+}
+
+# as much as I hate the problems with my model, there are just these incredible things in there.
+for arr as i {
+    print i
+}
+# this can't be beat. this is the ultimate 'for' loop.
+
+# maybe I really should just have the model at it's core, but add everything on top of it?
+[1 2 3 4 5] . map (* 2) . map \ [x] / x 2
+# you know, macros to make the rest of the language more readable.
+# just because in doesn't have parentheses, doesn't mean it doesn't need macros.
+# I guess, what I really need to figure out is the macros, then.
+
+# maybe I could have a mix of functions that require ()s to be called, and functions that don't?
+# so like, 'for' is still a function, and so is 'as'?
+# but the rest of the language uses ()s to be called, as well as operators?
+# the big reason I don't want to add SYNTAX is that keywords suck.
+# huh. I just realized, 'keywords' and 'operators' are kind of the same? yeah, they kind of are!
+# who said 'operators' have to be these weird little things! they can use every character!
+# call them operators; call them keywords; call them directives; call them whatever!
+# like, I could have a sub-field of the language that just kind of works how LPN works? somewhat?
+# what I really need to figure out, is how to define operators?
+
+# if
+x = 1
+# becomes
+["x", 1]
+# then
+let x = 1
+# becomes
+let ["x", 1]
+# ?
+
+# algebraic data types, huh.
+struct Request {
+    is_authenticated: bool,
+    user_id: Option<u32>,
+}
+# vs
+enum Request {
+    Anonymous,
+    Authenticated { user_id: u32 },
+}
+# I see the benefit.
+
+# you will never destructure a functions, so this makes sense for structs.
+let { x, y, z } = vec
+let { open, close } = import "File"
+let [x, y] = func()
+let (x, y) = func()
+# and again, you're placing a tuple after a functions, and that's how you call!
+# still one of my favorite features of rust.
+# but anyway, I guess bugs should be unrepresentable?
+let x, y = 1, 2
+
+# what if operators are whatever the fuck you want to be?
+let + = |x, y| {
+    return add(x, y)
+}
++ 1 2
+1 + 2
+1 2 +
+# and stuff?
+
+# eh.
+# but this is just better.
+let value 123
+set value 321
+# I figure out how to get the for loop in there, but how do I figure this out?
+let [x, y, z] = [1, 2, 3]
+let [x, y, z] [1, 2, 3]
+# then again... well, both are fine.
+let value = 123
+value = 321
+# *sigh*, I just don't know.
+
+let func {
+    print "Hello, World!"
+    {
+        print "Hello, World!"
+    }
+    print "Hello, World!"
+}
+
+# inferred scopes?
+let func
+    print "Hello, World!"
+        print "Hello, World!"
+    print "Hello, World!"
+
+# but it creates ambiguity.
+let func
+{
+    print "Hello, World!"
+    {
+        print "Hello, World!"
+    }
+    print "Hello, World!"
+}
+# I guess it doesn't matter it some ways?
+let func { print "Hello, World!" { print "Hello, World!" } print "Hello, World!" }
+
+# it looks good, but it will never work. keep using {}s.
+
+let [x y] [1 2]
+let func {
+    print . format "%: %" [x y]
+}
+func
+
+for arr . as i {
+    print i
+}
+
+[1 2 3 4 5] . map (* 2) . map \ [x] / x 2
+map (\ [x] { / x 2 }) . map (\ [x] { * x 2 }) [1 2 3 4 5]
+# but again, it's redundant. I don't like how 'as' and '\' have duplicates, technically.
+
+# can't forget that 'for' can also be a macro.
+for arr {
+    print it
+}
+for arr as i {
+    print i
+}
+
+# I'm starting to think this model is just better.
+fn main() {
+    let (x, y, z) = (1, 2, 3);
+    println!("{x}, {y}, {z}");
+}
+# 'fn' is used to force types in the function signature and stuff.
+# but really, I need to learn Haskell.
+# it will most likely save me from this rot.
+
+fn main() {
+    for it in [1, 2, 3, 4, 5].iter().enumerate() {
+        let (index, value) = it;
+        println!("({index}, {value})");
+    }
+}
+
+@type [["x" int] ["y" int] ["z" int]] []
+let func \ [obj] {
+    obj.method
+}
+func MyObject.[["x" 1] ["y" 2] ["z" 3]]
+# maybe if I distinguished types and values?
