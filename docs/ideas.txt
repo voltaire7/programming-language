@@ -25137,9 +25137,164 @@ v.x + v.y  # it. just. makes. sense.
 0..N+1   # but this doesn't work.
 0.. N+1  # maybe?
 
-map [x] -> [x / 2] map (* 2) [1, 2, 3, 4, 5]
+map [x] -> [x / 2], map (* 2) [1, 2, 3, 4, 5]
 [1, 2, 3, 4, 5] $ map (* 2) $ map [x] -> [x / 2]
 [1, 2, 3, 4, 5]
     $ map (* 2)
     $ map [x] -> [x / 2]
 # way better than methods.
+
+print [1, 2, 3] $ map (+ 1)
+# but this doesn't really follow the same principles, does it?
+
+print [1, 2, 3] + [4, 5, 6]
+# and what about this?
+print ([1, 2, 3] + [4, 5, 6])  # like this?
+print [1, 2, 3]+[4, 5, 6]
+
+print { field: 123 }.field
+func { in: 123 } .out
+let func { in } = { out: in }
+# this is one of the sexiest pieces of code I've written in a while.
+
+# I suppose $ is kind of a macro?
+# so, because the left argument is...
+# no, I don't think this works.
+
+# but I think I'm unto something.
+# I don't necessarilly have to change the rules of operators for $.
+
+func obj . field
+# in this case, because the right side of the operator is a symbol, it doesn't change anything?
+# maybe?
+
+# I need to figure out how macros work.
+
+# lowkey, kind of sexy.
+let func = (will_error) => will_error ? [null, "*message*"] : [123, null]
+let [val, err] = func(true)
+if (err) {
+    console.log("error:", err)
+    return
+}
+console.log("value: ", val)
+
+let func will_error = if will_error [[null, "*message*"]] else [[123, null]]
+let [val, err] = func true
+if err [
+    print format "error: %" [err]
+    return
+]
+print format "value: %" [val]
+
+# I don't like this.
+let func will_error = if will_error [
+    [null, "*message*"]
+] else [
+    [123, null]
+]
+# I want sexy one-liners.
+
+# what if, the moment a ':' character appears inside {}s, that becomes an object?
+let func = {
+    print "hello"
+}
+let obj = {
+    field: 123
+}
+# because, I mean, in what other situaton do you get ':'?
+
+# this is the ideal.
+let func will_error = if will_error [null, "*message*"] else [123, null]
+
+# maybe you don't need []s if it's in one line?
+let func will_error = if will_error [null, "*message*"] else [123, null]
+let func will_error = if will_error [
+    [null, "*message*"]
+] else [
+    [123, null]
+]
+# both valid?
+# but that in itself causes problems if the return value is large.
+# not to mention the obvious, it's hella ambiguous.
+let func will_error = if will_error do [
+    [null, "*message*"]
+] else do [
+    [123, null]
+]
+# and this seems bad. but then again, it's consistent with 'for'.
+
+# this is something.
+fn main() {
+    let func = |will_error| if will_error { (None, Some("*message*")) } else { (Some(123), None) };
+    let (val, err) = func(true);
+
+    if let Some(err) = err {
+        println!("error: {}", err);
+        return;
+    }
+
+    let val = val.unwrap();
+    println!("value: {}", val);
+}
+# but yeah, ADTs still win.
+# or not?
+
+# no, I think they do. because how do you convert 'val' into a non-nullable value?
+# if you move it around to other functions, do you know it's no longer null?
+# you have to do something like 'unwrap', but how?
+
+let func will_error = if will_error [null, "*message*"] else [123, null]
+let [val, err] = func true
+if err do [
+    print format "error: %" [err]
+    return
+]
+print format "value: %" [unwrap val]
+
+let obj = [
+    field: 123
+]
+# no.
+let obj = {
+    field: 123
+}
+# {}s and ()s are no longer the same, right?
+let func = {
+    print "hello"
+}
+# so there.
+let symbol = "value"
+let (symbol) = 123
+print value  # outputs 123
+# in destructuring, ()s, []s and {}s all do different things.
+# same goes for function evaluation.
+
+# you think I went into a weird direction, but I don't think so,
+# because 'do []' still uses []s anyway.
+# so what does it matter if there's some overlap?
+# ':' to {}s is like 'do' for []s.
+
+# you know what?
+# objects are functions.
+# just as functions are lists.
+# so yeah, what does it matter if some a [field, value] gets added to a list?
+# the type is inferred, because [field, value] is of type ObjectField.
+# and an object is a [ObjectField] list.
+# so... I suppose this makes sense?
+
+# then again, no.
+# because functions can return objects.
+# so what's what?
+
+# I should stick with 'do []', even if it looks weird.
+
+# then again...
+# man, I don't know.
+# but I think, for now, I should try to differenciate {} and {:}.
+# let's just say that operators are pretty damn smart, yeah?
+
+# hell, even during destructuring, we differentiate.
+let { x } = vec
+let { x: value } = vec  # reassignment
+# they were literally never the same operators!
