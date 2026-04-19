@@ -24606,3 +24606,540 @@ let func \ [obj] {
 }
 func MyObject.[["x" 1] ["y" 2] ["z" 3]]
 # maybe if I distinguished types and values?
+
+# maybe I should drop this language.
+# I mean, the whole point of it was that scheme was good,
+# and I should take the core of scheme and remove the parentheses.
+# but I can't do that.
+# I need syntax.
+# I can't do it without syntax, but adding it ruins the language, removes the magic.
+
+# what if 'let' is a macro, and we have optional ()s? with ocaml style operators?
+# but it still has this problem:
+let func() = ...
+# extremely sexy, btw. but is it destructuring, or enums?
+# I guess it can be enums, because how do you create one?
+let result = Some(123)
+# and tuples are here again!
+# alright, I think I can do this. as long as ...
+
+# I just realized: functional languages already solved this problem, with the {}!
+# they don't have them!! they use whitespace or something shit!
+# so I guess ; is only there for 'let'? and like javascript, it's implicit?
+# these curly braces have been a nightmare for me, that almost made me quit the project!
+
+let func = {
+    print "Hello, World!"
+}
+
+# I guess expects a follow up function?
+let x = 1
+let y = 2
+[]  # end of application.
+
+let func = print "hello"
+let func =
+    print "hello"
+    print "hello"
+
+map |x|
+        print x
+        x * 2
+    [1, 2, 3, 4, 5]
+# if you have more than one statement, you are required to have indentation like that?
+# also, fuck.
+{
+    let x = 1
+    {
+        let x = 2
+    }
+}
+
+# also, also.
+let { x, y } = vec
+let Vector3 { x, y } = vec
+# do they do the same thing?
+let (x, y) = value
+let MyEnum(x, y) = value
+# I suppose they should. makes sense.
+let [x, y] = value
+let my_arr[x, y] = value  # this one doesn't make sense.
+# then again, that would be this.
+my_arr[i] = value
+# no 'let'.
+my_tuple(1)  # this, could work?
+# but it's ambiguous.
+# and why do structures have '.'?
+my_struct{1}
+# hmm. I very quickly hit another roadblock.
+# and of course, you can't pass in a tuple to a function. unless func() calls are no long available.
+# well, since I have operators now, it's not that bad?
+
+import "Debug" .step_into [...]  # though, you don't have [] stuff.
+# well, since I have operators and currying, things are far simpler.
+
+print calculate_pi  # outputs function pointer
+print (calculate_pi)  # outputs pi
+# kind of works the same as func()! and more naturally!
+
+# anyway, 'for'! it remains the same!
+for enumerate arr as (index, value) print . format "%, %" (index, value)
+
+# tuples are more powerful than in rust.
+for enumerate arr
+    let (index, value) = it
+    print . format "%, %" (index, value)
+# I'll need to figure out how this works.
+
+# hmm, I guess it's fine if functions required commas?
+func 1, 2, 3
+add 1, 2
+add 1 + 2 3 + 4
+# I'll have to think about this.
+
+# I can also just let indentation be scopes. just need a seperator.
+let func =
+    let x = 1  # btw, this doesn't take the indented stuff, because it already has 1!
+        let x = 2
+        print x
+    ..
+        let x = 3
+        print x
+    print x
+# something like that.
+
+# hmm.
+let Vector3 { x, y, z } = vec
+let Vector3[[_, x], [_, y], [_, z]] = vec
+# I don't think so.
+
+# I guess operators still get called?
+let value = 1 + 2
+let value = add (1 + 2), (3 + 4)
+# as well as curried?
+# or just passed around as pointers?
+map +, [1, 2, 3, 4]
+
+# should I allow this?
+let x, y = x, y
+# I don't really see why not?
+# and it's shorter and stuff.
+# so I would have both destructuring and multiple return?
+
+let func = 1, 2  # okay, that immediately looks weird, but bear with me.
+let my_tuple = (func)
+let my_array = [func]
+# cool, but no.
+# and I inadvertently figure out why not.
+
+# operators are weird...
+(1 * 2) + (3 * 4)  # what happened to operator precedence?
+1*2 + 3*4  # what about this?
+# nevermind. it obviously doesn't work like that.
+
+let value = add 1 2 + add 1 2
+# + adds parentheses around it's arguments!
+# it needs a parenthesis here!
+let value = sub 44 (add 1 2 + add 1 2)
+# still undecided about the commas.
+
+# what if they are required whenever you have a sufficiently complex expression?
+let vec = { x: 1, y: 2, z: 3 }
+
+print vec.x
+print vec["x"]
+# I don't know, though.
+
+# maybe I could still allow this?
+let x, y = 1, 2
+# just no return?
+# but there are strict rules.
+
+@type int -> int -> int
+let add x y = x + y
+
+# this is also extraction.
+let Vector3.x = vec
+print x
+
+let Object { field1, field2.sub_field1 } = obj
+# makes sense.
+
+# oh my god!
+let func x y = print . format "x = %, y = %" (x, y)
+# functions are also kind of extraction!
+
+let Some x = func
+# no, it has to be distinct.
+# huh.
+let Some x = func
+print x  # outputs (123), a tuple?
+# since it's now destructured?
+# shit, that kind of breaks everything though?
+
+let func { x, y } = print . format "%, %" (x, y)
+func { x: 1, y: 2 }
+# it should only be destructuring. and function definition.
+
+match func {
+    Some (x) => print x
+    _ => halt
+}
+# I don't know. I feel like we can use tables for this though?
+let Option = Enum {
+    Some: (any)
+    None: null
+}
+# no, this doesn't feel right.
+
+# maybe ()s should only be there for precedence and stuff? and []s allow any type? like in javascript?
+# I guess this is very much currying?
+map (+) [1 2 3 4 5 6]
+for enumerate arr as [index, value] print . format "%, %" [index, value]
+for vec as [field, value] print . format "%: %" [field, value]
+
+# I don't know man, curly braces just work for functions.
+let func x y = do
+    let sum = x + y
+    print sum
+end
+# I guess this also looks okay?
+# I like the symmetry between 'let' and 'end'.
+let func x y = {
+    let sum = x + y
+    print sum
+}
+let
+    x = 1
+    y = 2
+    z = 3
+in [x, y, z]  # no.
+
+for vec as [field, value] do
+    print . format "%: %" [field, value]
+end
+for vec do
+    let [field, value] = it
+    print . format "%: %" [field, value]
+end
+# I don't dislike this?
+# I mean, we already have "keywords" like 'for' and 'let', right? why not more?
+
+# the more I look at it, the more I like it.
+# there's sort of balance between operators and "keywords".
+for enumerate [1, 2, 3, 4] as [index, value] do
+    print . format "%: %" [field, value]
+end
+# see what I mean?
+
+# maybe I should just do it the normal way?
+let [val, err] = func
+if err do
+    exit 1
+end
+print val
+
+# fuck, how do I do if/else in a clean way?
+if condition do
+    print "true"
+end else do
+    print "false"
+end
+# this is incredibly ugly.
+if condition then
+    print "true"
+end
+# 'then' isn't part of 'if'?
+if condition then
+    print "true"
+else
+    print "false"
+end
+
+let vec [
+    x: 1
+    y: 2
+    z: 3
+]  # how many times have I written this?
+let vec = {
+    x: 1
+    y: 2
+    z: 3
+}
+let vec = [
+    x: 1
+    y: 2
+    z: 3
+]
+
+# I should try writing the compiler in rust, just to see.
+
+# maybe it's really better to do a sort of macro expansion...
+import "Debug" .step-into [...]
+
+# how do I make the language sexy?
+func 1 2 ^  # deref pointer returned by 'func'
+ptr^  # deref
+^ptr  # invalid, only works for types.
+
+# wait, so it's like a requirement then, to have no {}s for functions? so I can do this then!
+let func print "hello"
+let func
+    print "hello"
+    print "hello"
+# and it's fine if the rules are arbitrary and shit. who cares!
+print if cond "true" else "false"
+print if cond
+    "true"
+else
+    "false"
+# as long as you can make sense of it, it's fine!
+
+# but now you can do this:
+let { x, y } vec
+# that leaves a lot of things to consider...
+let func = do
+    print "hello"
+    print "hello"
+end
+# then again, maybe this is just better.
+
+let func \ [{ x, y }] print format "{ x: %, y: % }" [x, y]
+let func { x, y } = print format "{ x: %, y: % }" [x, y]
+func { x: 1, y: 2 }
+func { 1, 2 }
+
+# can you do this in rust?
+let func = |{ x, y }| x + y;
+func(Vector2 { 1, 2 });
+# you can, but barely.
+struct Vector2 {
+    x: i32,
+    y: i32,
+}
+fn main() {
+    let func = |Vector2 { x, y }| x + y;
+    println!("{}", func(Vector2 { x: 1, y: 2 }));
+}
+
+# honestly, functions being lists is just kind of good.
+(let func [
+    (print "Hello, World!")
+])
+(func)
+
+List.map (fun x -> x + 1) (List.filter p xs)
+(List.map (fun [x] [(+ x 1)]) (List.filter p xs))
+List.map [x] => [x + 1] (List.filter p xs)
+
+# scope? scope.
+let func = do
+    do
+        print "hello"
+    end
+end
+# but man, there's something beautiful about a function body being a list.
+(let func [
+    ([
+        print "hello"
+    ])
+])
+# no, I don't like it. because the extraction syntax is weird otherwise.
+let vec = struct {
+    x: 1
+    y: 2
+    z: 3
+}
+# ... this is lowkey the best middle ground?
+let func = do [
+    print "hello"
+    print "hello"
+]
+# I like functions as lists.
+# this IS a list.
+# but unlike the parentheses model, you can also do single statement functions.
+# so like, it's better in every way?
+# this feels weird.
+# I've struggled so long with this shit,
+# and the solution was something I conceived literally when I first created this file.
+# is this for real?
+
+let sub2 = sub <>
+let sub2 = sub swap
+
+for vec as [field, value] do [
+    print format "%: %" [field, value]
+]
+for vec do [
+    let [field, value] = it
+    print format "%: %" [field, value]
+]
+for vec do [
+    print format "%: %" it
+]
+for vec print format "%: %" it
+
+let func = let x = 1
+func
+# or
+print x  # outputs 1
+let func = do [
+    let x = 1
+]
+func
+print x  # error: symbol 'x' is unbound.
+
+# this is unironically the fourth line in ideas.txt
+# I can't.
+
+for vec = print format "%: %" it  # ...
+for vec = as [field, value] do [
+    print format "%: %" [field, value]
+]
+# I don't think so.
+# and anyway, '=' is supposed to be used for assignment.
+
+print if cond ["true"] else ["false"]
+# rust style. you're forced to put it in []s.
+
+# what if 'return' is just a macro that does this?
+return 123
+...
+321
+# becomes
+if true [
+    123
+] else [
+    ...
+    321
+]
+
+# if 'let' can do this...
+let value
+value = 123
+# then, 'if' can do this:
+if cond [
+    print "true"
+]
+if cond [
+    print "true"
+] else [
+    print "false"
+]
+
+# btw, you have to do this:
+for vec do []
+# you can't do this:
+for vec []
+# because otherwise, you can't do this.
+for vec as v do []
+
+let func = [] => [
+    print "hello"
+    print "hello"
+]
+
+let func = [name] => [
+    print format "Hello, %!" [name]
+]
+let func name = [
+    print format "Hello, %!" [name]
+]
+let func = [name] -> [
+    print format "Hello, %!" [name]
+]
+# ^ looks better.
+let func = |name| [
+    print format "Hello, %!" [name]
+]  # really don't like this.
+
+# what if we flip it around?
+# arrays are the objects.
+[1, 2, 3, 4] -> { 0: 1, 1: 2, 2: 3, 3: 4 }
+# so what? functions are also objects?
+
+# fuck it, I just do this.
+import "Debug" .step_into [...]  # error: literal "Debug" is not an object
+(import "Debug").step_into [...]  # this works
+# and this
+let Debug = import "Debug"
+Debug.step_into [...]
+# just do it like all the other normal languages.
+
+# but that means I can't do this...
+[1, 2, 3]
+    .iter
+    .map (+ 1)
+    .collect
+# hmm.
+func value .field
+obj.method obj.field
+
+let func(arg1, arg2) = do [
+    let value arg1 + arg2
+    return { field: value }
+]
+func(1, 2).value
+# I guess, if a function returns a struct,
+# we could just make it so the arguments have to be parenthesized?
+let func [arg1, arg2] = do [
+    let value arg1 + arg2
+    return { field: value }
+]
+func [1, 2] .value
+
+() function_body     # defining function
+defined_function ()  # calling defined function
+
+# maybe I should really make whitespace significant for operators.
+# that would also be a cool way to do "precedence".
+add 1 2 + 3
+add 1 2+3
+add 1 (2 + 3)
+# I don't think any other language does this?
+# and that would solve so many problems. with '^' too.
+# and it makes sense!
+
+# also, unlike before we have this:
+let value = obj.field
+let value = obj .field
+let value = obj
+    .field
+# where the '=' serves as a delimeter.
+
+# kind of works?
+print Iter [1, 2, 3] .map (+ 1) .collect
+# but this one doesn't work.
+print [1, 2, 3] .iter .map (+ 1) .collect
+# this does?
+print [1, 2, 3].iter .map (+ 1) .collect
+# but this should work too.
+obj.field.sub_field
+# so like, what?
+# what if it's just the first '.' that matters?
+# no, I don't like it.
+
+# but that doesn't mean I have to abandon the project.
+# I just need to abandon methods. forever.
+
+# man, the fact that this could possibly work...
+import "Debug" .step_into [...]
+
+1+2 * 3+4
+1 + 2*3 + 4
+1 + 2 * 3 + 4  # left to right?
+
+# oh my god...
+v.x + v.y  # it. just. makes. sense.
+
+# and the rules are SO general too!
+
+0..N+1   # but this doesn't work.
+0.. N+1  # maybe?
+
+map [x] -> [x / 2] map (* 2) [1, 2, 3, 4, 5]
+[1, 2, 3, 4, 5] $ map (* 2) $ map [x] -> [x / 2]
+[1, 2, 3, 4, 5]
+    $ map (* 2)
+    $ map [x] -> [x / 2]
+# way better than methods.
