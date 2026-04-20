@@ -25298,3 +25298,136 @@ print value  # outputs 123
 let { x } = vec
 let { x: value } = vec  # reassignment
 # they were literally never the same operators!
+
+# because really, I don't like 'if cond do []'.
+# it sucks. and it's confusing.
+
+# applying that very same logic...
+let {
+    Some [x] => print x
+    None => _
+} = func
+
+func { field: 123 }
+func { 123 }  # passing function as argument?
+
+# ...
+# honestly, I miss this.
+map {
+    let value + 1 2
+    * value
+}, [1 2 3 4 5 6]
+# how do you do this in the current model?
+map [] -> {
+    let value = 1 + 2
+    value *  # maybe this needs to be parenthesized
+}, [1 2 3 4 5 6]
+# but really, I don't think we can pass in structures implicitly.
+
+func { 123 }  # this is a function taking a function
+# even if 'func' expects a structure, it will get a function that may return a structure.
+
+func { field: 123 }
+func { { field: 123 } }
+# ^ equivalent.
+
+# btw, what does this do?
+[:]
+# maybe this?
+[0: 1, 1: 2, 2: 3]  # like the index, I mean.
+
+let x: i32 = 123
+let x = 123 as i32
+
+let func = (will_error) => will_error ? [null, "*message*"] : [123, null]
+let func will_error = if will_error [null, "*message*"] else [123, null]
+let func will_error = will_error ? [null, "*message*"] : [123, null]
+# I could.
+
+# this shouldn't be allowed. therefore, it should be a function.
+let vec = { 1, 2, 3 }
+
+# unless, that's how you do enums?
+let Option = { Some, None }
+# fuck, that's good.
+print Option.Some  # outputs 0
+
+let func = do [
+    print "hello"
+]
+let macro = expand [
+    print "hello"
+]
+# damn, this sucks.
+
+# but this is so sexy, though.
+let func = [name] -> [
+    print name
+]
+
+let func name = do [
+    print name
+]
+
+# I don't think so.
+let func = (name) -> {
+    print(name)
+}
+func("John")
+
+# I kind of like this.
+let func will_error = will_error ? do [
+    [null, "*message*"]
+] : do [
+    [123, null]
+]
+
+for list do [
+    print it
+]
+list $ do [
+    print it
+]
+
+for enumerate list as [index, value] do [
+    print it
+]
+enumerate list $ as [index, value] do [
+    print it
+]
+# I don't think so. also, it's still ambiguous with operators and function calls.
+
+print do {
+    x: 1
+    y: 2
+    z: 3
+}  # outputs ["z", 3]
+# because all ojects are actually lists within lists.
+
+print [0..100: 69]  # maybe?
+
+a == b ? do [
+    print "a is equal to b"
+] : do [
+    print "a is not equal to b"
+]
+a == b ? print "a is equal to b" : print "a is not equal to b"
+
+if a == b print "a is equal to b"
+else print "a is not equal to b"
+# honestly, the ?: operator is just better.
+# it separates the conditions from the branches.
+
+print num % 2 ? "even" : "odd"
+num == 0 ? throw "Division by zero"
+
+map (is_positive ? (+ 1) : (- 1)) [1, 2, 3, 4]
+
+let vec = struct ["x" 1, "y" 2, "z" 3]
+# I mean, I could, but I don't want.
+let vec = { x: 1, y: 2, z: 3 }
+
+let { x } = [["x", 1], ["y", 2], ["z", 3]]
+let func { x } = print x
+func [["x", 1], ["y", 2], ["z", 3]]
+func { x: 1, y: 2, z: 3 }
