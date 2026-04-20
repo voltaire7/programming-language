@@ -24978,6 +24978,7 @@ for vec do [
     print format "%: %" it
 ]
 for vec print format "%: %" it
+for vec print it
 
 let func = let x = 1
 func
@@ -25431,3 +25432,266 @@ let { x } = [["x", 1], ["y", 2], ["z", 3]]
 let func { x } = print x
 func [["x", 1], ["y", 2], ["z", 3]]
 func { x: 1, y: 2, z: 3 }
+
+@type int -> int -> int
+let add x y = x + y
+
+@type int -> int -> int
+let add = [x] -> [y] -> [x + y]
+# can I?
+
+add :: int -> int -> int
+let add x y = x + y
+
+add :: int -> int -> int
+add x y = x + y
+# nah.
+
+# can it just infer it?
+int -> int -> int
+let add x y = x + y
+
+# does this work like that?
+[x, y] -> [print x + y] 1 2
+\ [x y] print + x y 1 2
+\ [x y] { print + x y } 1 2
+
+let expr \ [!] {
+    \ [n] ! ! n
+} (
+    \ [!] {
+        \ [n] {
+            if n { 1 } {
+                * n (! ! - n 1)
+            }
+        }
+    }
+) 5
+let expr = [!] -> [
+    [n] -> [! ! n]
+] (
+    [!] -> [
+        [n] -> [
+            n ? 1 : n * (! ! n - 1)
+        ]
+    ]
+) 5
+let expr = [!] -> [
+    [n] -> [! ! n]
+] (
+    [!] -> [n] -> [
+        n ? 1 : n * (! ! n - 1)
+    ]
+) 5
+let expr = [!] -> [n] -> [! ! n] (
+    [!] -> [n] -> [
+        n ? 1 : n * (! ! n - 1)
+    ]
+) 5
+
+# I just realized.
+let func is_success = do [
+    is_success ? do [
+        return [Result.Ok]
+    ] : do [
+        return [Result.Err, Error.{ message: "something" }]
+    ]
+]
+# no, nevermind.
+# I thought I maybe didn't need to implement ADTs,
+# and that I could emulate them using clever language rules.
+
+# or, maybe I can?!
+@type [Result.Ok] | [Result.Err, Error]
+# but how do I put this in the type definition for result?
+
+# I guess 'let' extraction assumes the return value?
+
+match func false [
+    [Result.Ok, ...] -> _
+    [Result.Err, ...] -> _
+]
+# ...
+
+# jesus! already at 25000 lines.
+
+# I somehow hate this more than 'do []'.
+let func = (
+    print "hello"
+    print "hello"
+)
+let (symbol) = 123
+
+let find \ [list id] for list if = it.id id return it []
+let find list id = for list it.id == id ? return it
+
+let func id = do [
+    id == 0 ? [1, 2] : [1]
+]
+let [x, y] = func 0
+let [x, y] = func 1  # error
+let [x] = func 1
+let value = func 0
+let value = func 1
+
+let func cond = do [
+    cond ? do [
+        return [Option.Some, "hello"]
+    ] : do [
+        return [Option.None]
+    ]
+]
+let result = func true
+match result [
+    [Some, x] -> print _
+    [None] -> throw "*message*"
+]
+# I think I'm close to something, but I don't know.
+# but no, it's pointless if 'Option' doesn't encode the value in itself.
+# people can return 'Option' types however they want.
+# it's pointless.
+
+# I should just follow Jai and Odin and Go.
+# just take advantage of multiple return.
+# it's simpler anyway.
+# be functional, but data-oriented as well.
+# a weird mix.
+# although, I've already noticed that there are similarities between the two.
+
+let func cond = cond ? do [
+    return [Option.Some, "hello"]
+] : do [
+    return [Option.None]
+]
+let func cond = cond ? [Option.Some, "hello"] : [Option.None]
+# I need to do this more often.
+# don't know why I always write the long-form.
+
+let pi = run [calculate_pi]
+# I guess this just makes sense, really.
+# but isn't this the same as putting 'struct' and 'enum' and 'proc' everywhere?
+# well, it's necessary.
+# and you don't need to "extract" a function.
+# plus, my opinion of 'do []' did increase, so there's that.
+
+let func "test" = print "got test value"
+let func name = print name
+func "john"  # outputs "john"
+func "test"  # outputs "got test value"
+
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n - 1) + fib (n - 2)
+main = print (fib 20)
+
+let fib 0 = 0
+let fib 1 = 1
+let fib n = fib (n - 1) + fib (n - 2)
+let main = print fib 20
+
+# I don't think I will ever do 'print (fib 20)',
+# since that means no more 'print format'.
+# and of course, 'print . format' is not really an option.
+# not with objects.
+
+let func ["value", 123] = print "used hidden arguments"
+let func [str, num] = print format "%, %" [str, num]
+let func args = print format "%, %" args
+
+# I guess this makes sense? don't reinvent the wheel.
+let func args = other_func (expand args)
+
+# "don't reinvent the wheel."
+let func args = apply [other_func, args]
+
+print [1 + 2, 3 + 4]  # outputs [3, 7]
+
+# left-associative evaluation makes a lot of sense.
+let func x y = x + y
+func 1 2  # returns 3
+func 1 2 3  # error
+# so much simpler to reason about.
+# becomes:
+(((func 1) 2) 3)
+
+# huh.
+import "Debug" .step_into [...]
+(((import "Debug") .step_into) [...])
+# but no, same problem as usual.
+
+for vec as [field, value] do [
+    print $ format "%: %" [field, value]
+]
+# maybe I should do it.
+# but, then it would have to be like this.
+for vec $ as [field, value] $ do [
+    print $ format "%: %" [field, value]
+]
+# that's disgusting.
+for vec $ print $ format "%: %" it
+
+# according to chatGPT, what I'm seeking is:
+# Application is variadic and automatically grouped by saturation of curried function types.
+# Expression evaluation performs implicit eta-expansion and application chaining based on type-driven arity resolution.
+
+# I need to think, though.
+# aside from the 'for' loop, is there another situation where I want this?
+
+# makes 'for' more powerful, but 'do' still needs a $.
+for vec : [field, value] $ do [
+    print $ format "%: %" [field, value]
+]
+# I guess this makes sense, since 'as' can only really be used with 'for'.
+
+# I'm starting to get the feeling that all these things were thought through extensively.
+# I mean, it's not a complete waste of time, but I basically rediscovered OCaml.
+
+# I don't need a $ for 'do'. just like 'let' doesn't require it either.
+for vec : [field, value] do [
+    print $ format "%: %" [field, value]
+]
+# I can just decide these things.
+for vec do [
+    print $ format "%: %" it
+]
+for vec print $ format "%: %" it
+# and so, this is the major thing fixed?
+# now I can use a left associative model?
+
+# in haskell.
+map (/ 2) $ map (* 2) [1, 2, 3, 4]  # returns [1.0,2.0,3.0,4.0]
+# and no need for commas! like, left-associative is simpler, AND cleaner!
+
+# I was really overcomplicating my life for no reason whatsoever.
+
+for array : i do [
+    print i
+]
+array $ do [
+    print it
+]
+array $ print it
+array $ i : print i
+
+# okay, so I just realized something.
+data Person = Person { name :: String, age :: Int }
+p = Person { name = "Alice", age = 30 }
+name p   -- "Alice"
+age p    -- 30
+# so...
+let p = { name: "Alice", age: 30 }
+p name  # "Alice"
+p age   # 30
+# because I don't give a fuck anymore, I can do this!
+for p print . format "%: %" it
+# oh my god, it even gives me back '.'!
+
+print . { field: 123 } field
+print ({ field: 123 } field)
+
+import "Debug" step_into [...]
+(((import "Debug") step_into) [...])
+# shockingly, I think this works!
+
+# my guy...
+for p print.format "%: %" it
