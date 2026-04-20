@@ -25695,3 +25695,46 @@ import "Debug" step_into [...]
 
 # my guy...
 for p print.format "%: %" it
+
+# ah. wait, no.
+for vec print . format "%: %" it
+for ((((vec print) . format) "%: %") it)
+# WAIT, NO!
+# because of the new rules!
+for vec (print ((format "%: %") it))
+# 'vec' is not called!!
+# there is literally no problem with this model!!!
+
+let Person = {
+    name: String
+    age: int
+}
+let p = Person {
+    name: "Alice"
+    age: 30
+}
+# need to think about this.
+
+# ho-ly fuck.
+let p = Person ["Alice", 30]
+
+# I'll need to think about the ramifications of this.
+
+let object = {
+    field: 123
+}
+object other_field = 321
+print . object field        # outputs 123
+print . object other_field  # outputs 321
+
+let arr = [1, 2, 3, 4]
+print . arr 0
+arr 0 = 10
+print arr  # outputs [10, 2, 3, 4]
+# maybe?
+
+print "hello"  # outputs hello
+debug "hello"  # outputs "hello"
+debug [123]    # outputs [123]
+print [123]    # error: function 'print' expects String
+# this is analogous to 'putStrLn' and 'print' in Haskell.
