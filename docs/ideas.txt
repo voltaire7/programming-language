@@ -26105,3 +26105,156 @@ let pi (calculate-pi)
 let [] []
 let [] [1 2 3]  # error
 let [x y z] [1 2 3]
+
+# random polynomial.
+let f [x] -> [(+ (* 3 (^ x 5)) (* -7 (^ x 4)) (* 2 (^ x 3)) (* 9 (^ x 2)) (* -5 x) 11)]
+let f [x] -> [3*x^5 - 7*x^4 + 2*x^3 + 9*x^2 - 5*x + 11]
+
+let f x = 3*x^5 - 7*x^4 + 2*x^3 + 9*x^2 - 5*x + 11
+f x = 3*x^5 - 7*x^4 + 2*x^3 + 9*x^2 - 5*x + 11
+# whatever I choose in the end, I must have operator precedence.
+
+# maybe I should go full on haskell.
+# it will fix a lot of problems, while creating others.
+
+func x y = x + y
+func 1 2
+
+func = do [
+    print "hello"
+    print "hello"
+]
+# who needs mutation.
+
+for vec do [
+    print $ format "%: %" it
+]
+# fuck it, we ball.
+
+let i = 2
+for 10 {
+    i = i * i
+}
+print i
+
+let i = for 10 {
+    i * i
+}
+print i
+# I thought I had an idea, but nevermind.
+
+main = do
+    let i = foldl (\acc _ -> acc + acc) 2 [1..10]
+    print i
+let main = do [
+    let i = fold-left ([acc _] -> [acc + acc]) 2 [1..10]
+    print i
+]
+# 'fold-left' is so much better than 'fold_left'...
+
+# btw, this is so fucking sexy. one of the best parts of haskell.
+[1..10]
+[0..]
+
+for [0..10] print it
+for 0..10 print it
+# um, what do I do?
+
+for [0..10] do [
+    print it
+]
+
+for vec : print $ format "%: %" it
+for vec : do [
+    print $ format "%: %" it
+]
+# I think this kind of makes sense?
+# in object as well, you have : with the right... called.
+for vec as [field, value] : do [
+    print $ format "%: %" [field, value]
+]
+# or not.
+# because how is 'as' called?
+# maybe using my new trick?
+for vec [field, value] : do [
+    print $ format "%: %" [field, value]
+]
+# I love how it mimics 'let'.
+for vec item : do [
+    let [field, value] = item
+    print $ format "%: %" [field, value]
+]
+
+let func [print "Hello, World!"]
+let arr [1 2 3]
+# what if, when putting ()s, it treats the list like {}s?
+# and otherwise, it's a normal list/string?
+func  # outputs "Hello, World!"
+arr   # returns [1 2 3]
+
+let func [x y] -> [x + y]
+let value (func 1 2)
+
+# implicit return doesn't make sense with macro parentheses.
+let func [[1 2] ++ [3 4]]
+(func)  # returns 4
+let func [
+    return [1 2] ++ [3 4]]
+]
+(func)  # returns [1 2 3 4]
+# some people don't like implicit return, so I guess it's fine.
+let value [1 2] ++ [3 4]
+print value  # outputs [1 2 3 4]
+
+# holy fuck, this is a long as one.
+let func [x y] -> [return x + y]
+let value (func 1 2)
+let func x y = x + y
+let value = func 1 2
+
+# *sigh*
+# but how do I extract from an object without {}s?
+
+let func { in } = { out: in }
+print (func { in: 123 }).out
+let func [{ in }] -> [return [out: in]]
+print (func [in: 123]).out
+
+# what if, : quotes twice?
+in: 123
+# becomes
+[["in" 123]]
+# and there's no problem when it runs because of {}s?
+
+let func _ -> [for _ print it]
+(func 1 2 3 4)  # outputs 1 2 3 4
+let func [for _ print it]  # don't even think you need it.
+# it's only there for renaming.
+
+let func [.in] -> [return [out: in]]
+# no.
+
+# I'll just use {}s.
+let func { in } = do [
+    return { out: in }
+]
+print (func { in: 123 }).out
+let func [{ in }] -> {
+    return { out: in }
+}
+print (func { in: 123 }).out
+
+let list [
+    0: 123
+    2: 444
+    1: 321
+]
+for list [print it]  # outputs 123, 321, 444 ?
+# like, [[[0 123]]] is processed differently?
+
+# then again, what if I just don't care?
+let func [{ in }] -> {
+    return [out: in]
+}
+print (func [in: 123]).out
+# I see humans, but no humanity.
