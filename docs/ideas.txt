@@ -26257,4 +26257,230 @@ let func [{ in }] -> {
     return [out: in]
 }
 print (func [in: 123]).out
-# I see humans, but no humanity.
+# fuck it, right?
+
+let func [obj] -> {
+    extract [in] obj
+    return [out: in]
+}
+# but then again, I just don't want the object to disgust me.
+
+# god, there objects! from start to fucking finish!
+# they don't stop!!
+
+# I hate how necessary they are.
+
+# maybe there is benefit to?
+let func [{ in }] -> {
+    return { out: in }
+}
+print (func { 123 }).out
+# but again, that's for enums.
+print (func [123]).out
+# and implicit conversions everywhere, since they are kind of the same?
+
+# this model only works if I really take advantage of operators.
+
+# implicit conversion.
+print { 10, 20, 30 }  # outputs [[10, 0], [20, 1], [30, 2]]
+print [10, 20, 30]    # outputs [[0, 10], [1, 20], [2, 30]]
+# but I don't know.
+# what if we the rust thing where if the field and variable name are the same, it replaces that?
+
+# wait, am I not unto something?
+print [10 20 30]  # outputs [[0 10] [1 20] [2 30]]
+# "everything is an object."
+
+for arr [
+    let [index value] it
+    print $ format "%: %" [index value]
+]
+# I'll need to learn lua to now how this works.
+
+print { 10, 20, 30 }  # outputs { 10: 0, 20: 1, 30: 2 }
+print [10, 20, 30]    # outputs { 0: 10, 1: 20, 2: 30 }
+
+# that said, it doesn't make sense.
+# it has to be lists within a list.
+# no matter how you look at it.
+
+# I guess it could work if 'for' loops use 'car' and 'cdr'.
+let arr [10, 20, 30]
+arr.[1]   # returns 20
+let arr { 10, 20, 30 }
+arr.[10]  # returns 0
+# but it still doesn't explain how to get this and that.
+
+# or does it?
+let func [{ in }] -> {
+    return { out: in }
+}
+print (func [123]).out
+# it's only significant when there are not two values.
+[123] -> [0: 123]
+{ in } -> { in: in }
+{ out: in } -> { out: in }
+# I don't think this is it. very clumsy, and doesn't make that much sense.
+
+# I'll just stick to everything is a list.
+# far more elegant as far a objects and enums are concerned.
+
+let Directions = { NORTH, EAST, SOUTH, WEST }
+Direction.NORTH
+
+let arr = [0: 10, 1: 20, 2: 30]
+# I guess the important detail here, is that they can't be arbitrary indices.
+
+# "Hindley–Milner type inference"
+# it seems type inference is harder with dependent types.
+
+# why the fuck is both 'dependent' and 'dependant' valid?
+
+let Directions = { [NORTH 1 0], [EAST 0 1], [SOUTH -1 0], [WEST 0 -1] }
+Direction.NORTH
+# could I do ADTs this way?!
+# wait, this isn't exactly right, but you know what I mean, right?
+
+enum Shape {
+    Circle(f64),
+    Rectangle(f64, f64),
+    Square(f64),
+}
+fn area(shape: Shape) -> f64 {
+    match shape {
+        Shape::Circle(r) => 3.1415 * r * r,
+        Shape::Rectangle(w, h) => w * h,
+        Shape::Square(s) => s * s,
+    }
+}
+fn main() {
+    let c = Shape::Circle(2.0);
+    println!("{}", area(c));
+}
+
+let Shape = {
+    Circle f64
+    Rectangle f64 f64
+    Square f64
+}
+let area shape = match shape [
+    Circle r => 3.1415 * r * r
+    Rectangle w h => w * h
+    Square s => s * s
+]
+let main = do [
+    let c = [Shape.Circle, 2.0]
+    print $ area c
+]
+# hmm, not exactly what I'm look for.
+
+data Shape
+  = Circle Double
+  | Rectangle Double Double
+  | Square Double
+area shape =
+  case shape of
+    Circle r        -> pi * r * r
+    Rectangle w h   -> w * h
+    Square s        -> s * s
+main = print (area (Circle 2.0))
+
+let Shape = {
+    Circle Double
+    Rectangle Double Double
+    Square Double
+}
+let area shape = match shape [
+    Circle r      -> pi * r * r
+    Rectangle w h -> w * h
+    Square s      -> s * s
+]
+let main = print (area (Circle 2.0))
+# man, I don't know.
+
+let Shape = use {
+    Circle: [Double]
+    Rectangle: [Double, Double]
+    Square: [Double]
+}
+let area shape = match shape [
+    Circle.[r]       -> pi * r * r
+    Rectangle.[w, h] -> w * h
+    Square.[s]       -> s * s
+]
+let main = print (area Circle.[2.0])
+# maybe I'm the right path?
+
+# or like this?
+let Shape = enum {
+    Circle: [Double]
+    Rectangle: [Double, Double]
+    Square: [Double]
+}
+# but isn't that exactly what I was trying to avoid?
+
+# or like in scheme, 'case' is quoted?
+let area shape = match shape [
+    [(Circle), r]       -> pi * r * r
+    [(Rectangle), w, h] -> w * h
+    [(Square), s]       -> s * s
+]
+
+# then again, no.
+let func direction = match 1 [
+    Direction.NORTH -> print "going north"
+    Direction.EAST  -> print "going east"
+    Direction.SOUTH -> print "going south"
+    Direction.WEST  -> print "going west"
+]
+
+let Shape = Circle Double | Rectangle Double Double | Square Double
+# this is kind of important since it touches types.
+# something I haven't played with much.
+
+# well, I figured out actual C-style enums, so it's not the end of the world.
+# could be worse.
+
+# what if 'match' matches the type?
+
+@type Circle Double | Rectangle Double Double | Square Double
+let Shape
+
+# typescript.
+type Option<T> =
+  | { kind: "none" }
+  | { kind: "some"; value: T };
+const none = (): Option<never> => ({ kind: "none" });
+const some = <T>(value: T): Option<T> => ({
+  kind: "some",
+  value
+});
+function divide(a: number, b: number): Option<number> {
+  if (b === 0) return none();
+  return some(a / b);
+}
+function matchOption<T, R>(
+  opt: Option<T>,
+  onNone: () => R,
+  onSome: (value: T) => R
+): R {
+  switch (opt.kind) {
+    case "none":
+      return onNone();
+    case "some":
+      return onSome(opt.value);
+  }
+}
+
+let Option T = { kind: "None" } | { kind: "Some"; value: T };
+let None = { kind: "None" }
+let Some value = { kind: "Some", value: value }  # would be useful if value got mapped to itself.
+let divide a b = b == 0 ? None : Some (a / b)
+let match_option opt on_none on_some = do [
+    match opt.kind {
+        "None": on_none
+        "Some": on_some opt.value
+    }
+]
+# this is shit.
+# I will put this one hold, for a while.
