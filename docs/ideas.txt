@@ -25732,9 +25732,376 @@ print . arr 0
 arr 0 = 10
 print arr  # outputs [10, 2, 3, 4]
 # maybe?
+arr(n) = 10
 
 print "hello"  # outputs hello
 debug "hello"  # outputs "hello"
 debug [123]    # outputs [123]
 print [123]    # error: function 'print' expects String
 # this is analogous to 'putStrLn' and 'print' in Haskell.
+
+# the moment I stopped giving a fuck about consistency, is the moment all shit broke loose.
+# I wanted all this for a while, but couldn't bring myself to let things go.
+
+# mutation?
+vec { x: 10, z: 30 }
+
+let obj = {
+    value: 123
+    change_value: do [
+        this value = this value + 1
+    ]
+}
+obj change_value
+print (obj value)  # outputs 124
+app run
+# I think data-oriented is the way.
+
+format "%, %, %" [123, "hello", { x: 1 }]  # outputs 123, "hello", { x: 1 } ?
+# this doesn't feel right.
+print("hello", 123, { "x": 123 })  # outputs hello 123 {'x': 123}
+# this is how it works in python.
+
+# haskell has a variadic function hack...
+putStrLn $ format "%: %" "x" 1
+
+    {-# LANGUAGE FlexibleInstances #-}
+
+    -- 1. Create a class for things that can act as a formatter
+    class Formattable r where
+        format' :: String -> r
+
+    -- 2. Base Case: If the expected result is a String, we're done
+    instance Formattable String where
+        format' template = template
+
+    -- 3. Recursive Case: If the expected result is a function (a -> r), 
+    --    we take an argument, inject it into the string, and keep going.
+    instance (Show a, Formattable r) => Formattable (a -> r) where
+        format' template x = format' (replaceFirst template (show x))
+
+    -- Helper function to replace the first '%' with the show value
+    replaceFirst :: String -> String -> String
+    replaceFirst [] _ = []
+    replaceFirst ('%':xs) rep = rep ++ xs
+    replaceFirst (x:xs) rep = x : replaceFirst xs rep
+
+    -- The final function
+    format :: Formattable r => String -> r
+    format = format'
+
+    main :: IO ()
+    main = do
+        -- This now works exactly as requested:
+        putStrLn $ format "%: %" "x" 1
+
+# hmm.
+let main = do
+    print "hello"
+    print "hello"
+
+let vec : [field, value] do
+    print.format "%: %" "x" 1
+let vec do
+    let [field, value] = it
+    print.format "%: %" "x" 1
+
+# 'do {}' is kind of useless, so...
+
+# well, this doesn't work.
+let value = condition ? do
+    print "true"
+: do
+    print "false"
+
+[int] [1, 2, 3, 4, 5]
+[String, int] ["x", 1, "x", 2, "x", 3]
+# I feel like '.' isn't completely gone.
+[int]:[1, 2, 3, 4, 5]
+[String, int]:["x", 1, "x", 2, "x", 3]
+# becomes
+([int] [1, 2, 3, 4, 5])
+([String, int] ["x", 1, "x", 2, "x", 3])
+
+# hmm.
+let vec = {
+    [x, y, z]: [1, 2, 3]
+}
+# could I?
+
+# I can't do this if 'it' is not a tuple. it has to be.
+for vec print.format "%: %" it
+
+# maybe I should just have really powerful pattern matching?
+# like, full on regex shit.
+
+# what if '.' has a dual purpose? like, it's overloaded, I mean.
+print.format "%: %" it  # one of it's purposes.
+(print ((format "%: %") it))  # makes this happen.
+# or
+Vector3.{ x: 1, y: 2, z: 3 }  # this
+(Vector3 { x: 1, y: 2, z: 3 })  # becomes this.
+# we could literally make it do that.
+(Vector3 ({ x: 1, y: 2, z: 3 } ... ...))
+# but that's probably not a good idea.
+# it should overload on type.
+# but then again...
+func obj1 . Vector3 { x: 1, y: 3, z: 3 }
+func obj1 Vector3.{ x: 1, y: 3, z: 3 }
+# there's ambiguity.
+func obj1 (Vector3 { x: 1, y: 3, z: 3 })
+func obj1 Vector3:{ x: 1, y: 3, z: 3 }
+# this... works?
+# ':' is basically used to define relations, so I guess?
+
+print:format "%: %" it   # maybe this is better.
+print::format "%: %" it  # could also be used for something.
+print..format "%: %" it  # or this. though I think the use is obvious.
+
+# wait, what was the reason I couldn't do this, again?
+for vec as [field, value] do [
+    print.format "%: %" [field, value]
+]
+# I think it was that I thought I needed the $?
+# but I don't.
+# so I guess I can use it.
+
+# btw
+for (enumerate arr) as [index, value] do [
+    print.format "%: %" [index, value]
+]
+# I actually prefer this!
+
+for (enumerate arr) do [
+    let [index, value] = it
+    print.format "%: %" [index, value]
+]
+for (enumerate arr) print.format "%: %" it
+# as long as I don't use the ugly $, I'm fine.
+
+# I guess I can still get this.
+func v.x v.y
+
+# for 'operator precedence', you really only need to think about ()s,
+# as well as where expression vs macros, or something.
+# then again, I don't think so.
+
+# but maybe? instead of being assigned a number, you're assigned a type of expression?
+
+print { field: 123 }.field
+(func { in: 123 }).out
+func { in: 123 } out
+
+# do I want this? I feel like I do.
+vec 0  # returns ["x", 1]
+# this could also work.
+vec x    # returns 1
+vec "x"  # returns 1
+
+# what if I do have tuples, but they get implicitly converted?
+# but no, it may work one way, but not the other.
+let [x, y] = func
+
+[1, 2] ++ [3, 4]   # returns [1, 2, 3, 4]
+
+# this might be better.
+let vec = {
+    x = 1
+    y = 2
+    z = 3
+}
+let obj = {
+    value = 123
+    func x y = x + y
+}
+obj func 1 2
+# you feel me?
+# and I'm getting : back for other things.
+
+# but I don't know about this...
+obj func 1 2
+# it's hard to read.
+obj.func 1 2
+import "Debug" :step_into [...]
+# no, this sucks.
+import "Debug" step-into [...]
+
+# like, fuck it. this is unironically better. why do I try so hard to avoid it?!
+(import "Debug").step_into [...]
+
+# I want this back... looks so much better.
+step-into [...]
+
+# so I guess I no longer do this? probably.
+(vec x)
+
+# ...
+let obj = {
+    value: 123
+    func x y: x + y
+}
+# this looks better.
+let obj = {
+    value : 123
+    func x y : x + y
+}
+
+print : format "%: %" it
+print:format "%: %" it
+print (format "%: %" it)
+# sometimes parentheses make sense.
+func x : other_func 1 2 3
+func x (other_func 1 2 3)
+# still, ':' is a problem. with ?:, for example.
+
+let value = condition ? "true" : "false"
+let value = condition ? "true"
+let value = condition ? "true" "false"
+
+# what if '.' is overloaded?
+# no. if the left function returns an object, it won't work.
+# but what if it's a function that takes no arguments – so a variable?
+# what if it overloads on that?
+
+# if I don't do this, it throws an error.
+# but if I do, '.' just works.
+
+func v.x (other_func 1 2)
+func v.x . other_func 1 2
+# this is ugly. just use parentheses.
+
+# this is so ugly.
+print$format "%: %" it
+
+# even with the older model, this looks weird.
+func v.x other-func 1 2
+# it's better now that things are less ambiguous.
+func v.x, other-func 1 2
+# I even used commas, lol.
+
+let v.x = 10
+# becomes
+let (v x) = 10
+# which also becomes
+let ([["x", 1], ["y", 2], ["z", 3]] x) = 10
+# interesting, but I don't think so.
+
+func = [
+    print "hello"
+]
+func
+arr = [1 2 3]
+for arr as i [print i]
+(let func [(add1 x) + (sub1 y)])
+(let value (func))
+func = [(add1 x) + (sub1 y)]
+value = (func)
+
+(let func [(print "hello")])
+(let func [name] -> [(print $ format "Hello, %!" [name])])
+let func [name] -> {
+    print $ format "Hello, %!" [name]
+}
+let func name = {
+    print . format "Hello, %!" [name]
+}
+
+let vec [
+    ["x" 1]
+    ["y" 2]
+    ["z" 3]
+]
+let vec [
+    x: 1
+    x: 1
+    x: 1
+]
+let obj [
+    func: [word] -> {
+        print word
+    }
+]
+obj.func "hello"
+# operators get run right-to-left?
+
+for (enumerate arr) {
+    let [index value] it
+    print $ format "%: %" [index value]
+}
+# if three arguments:
+for (enumerate arr) [index value] {
+    print $ format "%: %" [index value]
+}
+for (enumerate arr) { print $ format "%: %" it }
+
+if (condition) {
+    print "true"
+} else {
+    print "false"
+}
+if (condition) { print "true" }
+
+let args [true { print "true" }]
+if (args)
+# maybe macro parentheses is the way. not that I'm switching anytime soon.
+# just exploring.
+
+let Option = { Some, None }
+let Option [["Some"] ["None"]]
+let Option [["Some" 0] ["None" 1]]
+# that's bad...
+
+print [name] -> { print name }  # outputs [(let [name] _) (print name)]
+# I guess?
+
+let find \ [list id] for list if = it.id id return it []
+let find list id = for list it.id == id ? return it
+let find [list id] -> { for list { if it.id == id { return it } } }
+let find [list id] -> {
+    for list {
+        if it.id == id {
+            return it
+        }
+    }
+}
+
+let func cond = cond ? do [
+    return [Option.Some, "hello"]
+] : do [
+    return [Option.None]
+]
+let func [cond] -> [
+    if cond {
+        return [Option.Some, "hello"]
+    } else {
+        return [Option.None]
+    }
+]
+# maybe I can still have the ?: operator?
+let func [cond] -> cond ? [Option.Some, "hello"] : [Option.None]
+
+# there are so many way to remove ()s and []s with operators.
+cond ? (print "hello") : (print "goodbye")
+(cond ? { print "hello" } : { print "goodbye" })
+
+let func [value] -> [value, value]
+let [arg-line ret-line] [value] -> [value, value]
+print arg-line  # ouptuts (let [value] _)
+print ret-line  # ouptuts [value, value]
+
+print $ format "% % %" [1 2 3]
+
+for {
+    print "THE END IS NEVER "
+}
+for 0 print "THE END IS NEVER "
+
+let pi = run [calculate_pi]
+let pi #run { calculate-pi }
+# wait, no. I don't need this shit. not in this model.
+
+let pi (calculate-pi)
+
+let [] []
+let [] [1 2 3]  # error
+let [x y z] [1 2 3]
