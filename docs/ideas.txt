@@ -26638,3 +26638,10 @@ let func 0 = ...
 
 # I fucking love it when things fall into place. it's beautiful.
 # I hate when they don't.
+
+# can I?
+let print-all = _ -> for _ : print it
+print-all 1 2 3 4 5
+
+# I really am leaning towards 'for :'.
+for : print "THE END IS NEVER "
