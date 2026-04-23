@@ -26484,3 +26484,157 @@ let match_option opt on_none on_some = do [
 ]
 # this is shit.
 # I will put this one hold, for a while.
+
+let func 'symbol = print symbol
+func hello  # outputs "hello"
+
+# union?
+let MyUnion = { str: String | num: Number }
+MyUnion.{ str: "hello" }.num  # error: cannot cast 'str' of type String into 'num' of type Number.
+
+# what if this changes the precedence?
+let step-into = import("Debug").step-into
+# nah, not any better.
+let step-into = (import "Debug").step-into
+let { step-into } = import "Debug"
+
+# wait a second, what happens here?
+let value = { Yes | No }
+# here, 'value' is either 'Yes' or 'No'.
+# but what does that mean?
+
+# what's the difference?
+let value = { Yes | No }
+let value = { Yes , No }
+
+let Decision = { NO, YES }
+print Decision.NO   # outputs 0
+print Decision.YES  # outputs 1
+
+# maybe I should allow a lot of things?
+let Decision = enum { NO, YES }
+# in this case, you could remove the 'enum' function,
+# but doing so, no longer forces 'match' to match everything?
+
+# two ways to do arrays.
+let arr = [1, 2, 3, 4, 5]
+let arr = int.[1, 2, 3, 4, 5]
+# but I don't know.
+# should the first example be dynamic or inferred?
+
+# btw, zig feature I really like:
+let Decision = enum { NO, YES, _ }
+# it means the enum is not exhaustive.
+# I want this.
+
+let Decision = enum { NO, YES, _ }
+
+let num = int 123
+
+# I need to think about this some more.
+# what about this?
+[x: 1, y: 2, z: 3]
+# why not use []s and {}s as ways to determine if it's an object or an enum?
+
+# this has to be an object because of extraction syntax.
+{ x: 1, y: 2, z: 3 }
+# this could be shorthand for this.
+{ x, y, z }
+{ x: x, y: y, z: z }
+# so what is this?
+[x: 1, y: 2, z: 3]
+# no, seriously, what the fuck is this?
+
+let num = int 123
+let Money = type int
+let Money = distinct int
+# maybe?
+
+# this has to be an enum.
+{ x, y, z }
+# and this could be a typed enum, with actual logic.
+enum { x, y, z }
+# again, you write more code to constrain your logic.
+
+# object by default are basically hashmaps, but you can have your own implementation?
+HashMap { x: 1, y: 2, z: 3 }
+HashMap [["value1", 123], ["something", "hi"]]
+
+# even the {}s are specialized syntax. it's all []s under the hood.
+# yes, even ""s are []s.
+
+# I think I should still do this.
+Vector3 { x: 1, y: 2, y: 3 }
+# you know, without the '.' separating them.
+# but I don't do this:
+import "Debug" step-into [...]
+# maybe this?
+import "Debug" "step-into" [...]
+# I don't know.
+# I should think about it.
+
+# this makes it an actual structure?
+let vec = struct {
+    x: float
+    y: float
+    z: float
+}
+let vec = struct { x, y, z: float }
+# but that kind of like an enum?
+
+[1, 2, 3, 4] [1]  # returns 2 ?
+# so you can have this syntax?
+arr[1]
+# but what about this?
+arr 1
+arr [1, 0, 2, 3]  # returns [2, 1, 3, 4]
+# maybe.
+
+{ x: 1, y: 2, z: 3 } 1  # returns ["y", 2]
+# but what about this?
+Vector3.[1, 2, 3]
+Vector3.{ x: 1, y: 2, z: 3 }
+# I guess, just don't worry too much about consistency.
+# wait, what about the '.'?
+Vector3 [1, 2, 3]
+Vector3.[1, 2, 3]
+# oh!
+
+let arr = [1, 2, 3]
+arr 0 = 10
+print arr  # outputs [10, 2, 3]
+# I really like this. really taking advantage of the facilities of the language.
+
+# oh my god, I just realized.
+let vec = { x: 1, y: 2, z: 3 }
+vec [3, 2, 1]  # returns [[z, 3], [y, 2], [x, 1]]
+vec { y, x }  # returns { y: 2, x: 1 }
+# but this feel wrong?
+# well, no. without the '.', the behavior is just different.
+
+vec { y, x }
+vec.{ y, x }  # what does this even do?
+
+arr.0  # should not be valid.
+# or should it? but if it is, I can't do this:
+.1 + .2
+# I want this.
+
+let tuple = [1, "2"]
+tuple 1 = 2  # error: attempt to change the type of 'tuple' from [int, string] to [int, int]
+
+let n = 0
+arr n = 10
+# I feel like I should allow this.
+# it'd be dumb not to.
+# to begin with, why change the function signature on reassignment?
+# no, it's only quoted when 'let' is there.
+
+# I suppose you can still do this?
+let func 0 = ...
+# and this time it's quoted.
+# wait – and this time, it doesn't actually mutate the object!
+# yeah, I think I'm unto something!
+
+# I fucking love it when things fall into place. it's beautiful.
+# I hate when they don't.
