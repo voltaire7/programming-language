@@ -26645,3 +26645,416 @@ print-all 1 2 3 4 5
 
 # I really am leaning towards 'for :'.
 for : print "THE END IS NEVER "
+
+for { i: 0 } i < 10 i += 1 : do []
+# no, I don't think so. just use a 'while' loop.
+
+# I'm giving up on 'for as' the same way I'm giving up on 'print\n'.
+# unfortunate, but it has to be done.
+# but the more I do it, the more I wonder why I'm even creating this language.
+
+import "Debug" step-into [...]
+# kebab-case is infinitely better.
+# I think I'm just going to allow this. fuck it.
+# I'll figure out how to fix it later.
+# maybe whitespace is required for + and - only?
+step_into
+# or maybe I'll grow to love it one day.
+
+fn is_divisible_by(lhs: u32, rhs: u32) -> bool {
+    if rhs == 0 {
+        return false;
+    }
+    lhs % rhs == 0
+}
+
+let is-divisible-by _ 0 = false
+let is-divisible-by lhs rhs = lhs % rhs == 0
+let is_divisible_by _ 0 = false
+let is_divisible_by lhs rhs = lhs % rhs == 0
+# I guess it doesn't look that bad?
+let isDivisibleBy _ 0 = false
+let isDivisibleBy lhs rhs = lhs % rhs == 0
+
+let func name = print name
+let func = _ -> do [
+    let [name] = _
+    print name
+]
+# very sexy.
+
+# I was wondering what to do with this.
+let func [x, y, z: 1] = ...
+# maybe I can use it for the rest of the args?
+
+# since you will put it in parentheses anyway?
+let func = x y -> x + y
+# I prefer it that way since you can do this.
+let func = { x, y } -> x + y
+func [1, 2]
+
+map (\x -> x + 1) [1,2,3]
+map (x -> x + 1) [1,2,3]
+# shorter, lol.
+
+# maybe I shouldn't use $ for application, but composition?
+# application is just parentheses.
+f = other_func . \x -> x + 1
+
+# fucking shit. I need both function application and composition.
+
+let find \ [list id] for list if = it.id id return it []
+let find list id = for list it.id == id ? return it
+let find [list id] -> { for list { if it.id == id { return it } } }
+let find list id = for list : it.id == id ? return it
+let find list id = for list : if it.id == id then return it
+
+-- Define our own 'for'
+for :: [a] -> (a -> IO ()) -> IO ()
+for [] _ = return ()            -- Base case: empty list, do nothing
+for (x:xs) action = do
+    action x                    -- Run the body for the current item
+    for xs action               -- Recurse for the rest of the list
+
+main :: IO ()
+main = for [1..3] $ \i -> do
+    putStrLn $ "Hello " ++ show i
+
+# haskell is lowkey kind of beautiful.
+# also, I just realized, the 'for' loop is basically 'map', but point free with side-effects.
+
+# I fucking love 'return ()'. it's seriously beautiful!
+
+for arr $ i -> print i
+# I actually really like that.
+for arr : i -> print i
+for arr (i -> print i)
+
+arr n
+arr.n
+(arr n)
+
+f . g = \x -> f (g x)
+f $ x = f x
+
+let (.) f x = f x
+
+print format "%: %" it
+# in old model, this becomes
+(print (format ("%: %" (it))))
+# I guess there is multiple return?
+
+for arr \ [i] print i
+# the important thing is the implicit 'it'.
+# the implic-it.
+
+# maybe I should give up on it as well. implicit values are a little silly.
+for vec : [field, value] -> print : format "%: %" [field, value]
+# an awful lot of :s.
+for vec : it -> print : format "%: %" it
+for vec : it -> do [
+    print : format "%: %" it
+]
+
+# maybe I should just give up on the 'for' loop.
+# maybe I should go full functional.
+
+for vec $ it -> do [
+    print $ format "%: %" it
+]
+# lol.
+for vec £ it -> do [
+    print £ format "%: %" it
+]
+# like raku, don't care about people's keyboards.
+
+find _ [] = Nothing
+find p (x:xs)
+  | p x       = Just x
+  | otherwise = find p xs
+find even [1,3,5,6,7]
+-- Just 6
+find (>10) [1,2,3]
+-- Nothing
+
+find p = foldr (\x acc -> if p x then Just x else acc) Nothing
+
+find p = foldr step Nothing
+  where
+    step x acc = if p x then Just x else acc
+
+func : int
+func = 1 + 1
+
+# what if some things just ignored whitespace?
+# things like 'if' and 'else'?
+
+# I think my ideal language might be something like haskell.
+test = do
+    putStrLn "testing..."
+    return 123
+main = do
+    test >>= print
+
+    # btw, ^ iconic symbol.
+# the more I learn about the language, the more I like it.
+# okay, obviously, some things I don't like. I wouldn't be creating a language otherwise.
+# but I've come a long way since thinking scheme is extremely close to perfection.
+
+# if I am to build a new language, it will mainly be inspired by haskell.
+
+main = for [1..3] (\i -> putStrLn $ "Hello " ++ show i)
+main = for [1..3] $ \i -> print i
+main = for [1..3] $ \_ -> putStrLn "hi"
+# I think $ is ok?
+
+# python is lowkey kind of sexy too.
+for dirpath, _, filenames in os.walk(root):
+    for name in filenames:
+        if name.lower() == ".ds_store":
+            continue
+
+        full_path = os.path.join(dirpath, name)
+
+        base, _ = os.path.splitext(name)   # <- strip extension
+        files[base].append(full_path)      # <- group by base name
+
+# hmm. in python, if you have $, and it does the same thing...
+full_path = os.path.join(dirpath, name)
+full_path = os.path.join $ dirpath, name
+
+# python style if/else?
+value = "true" if cond else "false"
+# or this
+value = cond if "true" else "false"
+
+type int -> int -> int
+let add x y = x + y
+
+# honestly, I don't need it to be 'do []'.
+map (x -> x + x) [1, 2, 3, 4]  # returns [2, 4, 6, 8]
+# the parentheses are required, and if they are required, then why have []s?
+map (x -> do
+    let value = x + x
+    value
+) [1, 2, 3, 4]
+
+# the parsing for haskell is fucking stupid.
+main = do
+    print $ map (\x -> do
+            x + x
+        ) [1,2,3,4]
+
+main = do
+    hello = "hello"
+    print hello
+
+files[base].append(full_path)
+append full_path (files base)
+# surprisingly the same length!
+
+# maybe I don't need '.' syntax?
+# I can leave it to composition?
+for vec $ [field, value] -> print . format "%: %" [field, value]
+for vec $ it -> print . format "%: %" it
+# perfect balance.
+
+# that also means I don't have to worry about this:
+vec.x = ...
+# just do it normally!
+vec x = ...
+
+for [1..5] $ \i -> print i
+for [1..5] $ i -> print i
+
+import "Debug" step_into [...]
+
+# I don't need composition if I do the old model, though.
+print format "%: %" it
+(print (format ("%: %" (it))))
+
+# but that brings back a problem: how to access arrays, differently to objects.
+for vec $ [field, value] -> print format "%: %" [field, value]
+for vec $ it -> print format "%: %" it
+print vec.x
+
+let printf = print format
+printf "%: %" it
+let test = print (format)
+test  # outputs (String -> [Any] -> IO ())
+# or something.
+
+# god, not this again!
+arr.0 = ...
+
+# I think the new — sorry, "new" model is better.
+# not just because of mutation, but because it forces parentheses, which act as delimeters.
+# it's easier to read, and also, easier to implement.
+# basically lisp, really.
+
+# way better!
+print . format "%: %" [field, value]
+
+# wow! just realized I don't need the parentheses here!
+vec x + vec y
+
+let arr = [1, 2, 3, 4]
+let vec = { x: 1, y: 2, z: 3 }
+print $ arr 0  # outputs 1
+print $ vec 0  # outputs ["x", 1]
+print $ vec x  # outputs 1
+let i = 0
+print $ arr (i)  # outputs 1
+print $ vec (i)  # outputs ["x", 1]
+print $ vec (i)  # outputs 1
+# seems fine, but there are still a lot of cases to think about.
+
+cond ? do
+    print "true"
+    print "true"
+: do
+    print "false"
+    print "false"
+# it's always 'if' that puts a break on things!
+
+base, _ = os.path.splitext(name)
+let [base, _] = os path splitext name
+# extremely ambiguous to read...
+
+print . format "%: %" [field, value]
+print . format("%: %", field, value)
+print(f"{field}: {value}")
+# I mean...
+
+# maybe I should just build a normal programming language?
+let [base, _] = os.path.splitext(name)
+
+let func = () -> [
+    print("hello")
+]
+# ugh. no, thanks. the more I think about it, the more ugly it seems.
+# can't even do 'do []' because of how functions work.
+
+# this is pretty bad, but it's manageable?
+let [base, _] = os path splitext name
+
+# then again...
+let func = ({ x, y }) [
+    print(x, y)
+]
+
+let func = [
+    print("Hello, World!")
+]
+func()
+# this is kind of nice.
+[
+    print("Hello, World!")
+]()
+[print("Hello, World!")]()
+[print("hello"), print("goodbye")]()
+print([1, 2, 3]())  # does this spread?
+# I think spreading should be an important part of things.
+
+# alright, why not?
+# let's explore this model for a while.
+
+for (field, value) in vec [
+    print(f"{field}: {value}")
+]
+# I guess the []s are obligatory.
+# also, since I have parentheses to call functions, I must have a tuple type.
+
+let func = (x, y) x + y
+func(1, 2)
+# no, I can't do this.
+
+[1, 2, 3, 4][0]  # returns 1
+[1, 2, 3, 4](0)  # error: invalid argument count, expected 0.
+
+# oh my god.
+[1, 2, 3, 4].[0]
+# was wondering how I would do objects...
+{ x: 1, y: 2, z: 3 }[0]  # returns ["x", 1]
+{ x: 1, y: 2, z: 3 }.x   # returns 1
+{ x: 1, y: 2, z: 3 }[x]  # returns 1
+# this model is just so much easier to reason about.
+# maybe I shouldn't do extraction?
+
+val, err = func()
+val, _ = func()  # no implicit discards.
+
+# if I don't do destructuring, I can do this:
+[x: 1, y: 2, z: 3]
+# that's actually really nice.
+
+# let's go with a dynamic, javascript-esque model, for starters.
+
+val, _ := func()  # decisions, decisions.
+# I think it's fine if I have python style declarations.
+# just take a page from haskell's book.
+
+# but then, why do I have the parentheses?
+# if []s are just dynamic lists, and therefore tuples, why have them?
+# I guess I don't, with destructuring gone?
+# I just have multiple return and stuff.
+
+obj = [
+    func: () [
+        print("hello")
+    ]
+]
+obj.func()
+
+obj = [
+    value: 123
+    func: () [
+        print(self.value)
+    ]
+]
+obj.func()  # outputs 123
+
+obj = [
+    value: ref 123
+    func: () [
+        print(self.value.get())
+    ]
+    other_func: () [
+        self.value.set(333)
+    ]
+]
+obj.other_func()
+obj.func()  # outputs 333
+
+# I guess both () and [] are lists, it's just that () evaluates immediately.
+x, y = (1, 2)  # works
+x, y = [1, 2]  # error
+
+func = [print("hello")]
+func()
+
+list = [
+    1, 2
+    3, 4
+]
+print(list())  # outputs 3 4
+# that would be a way to avoid some problems in the future?
+
+# should I allow this as well?
+func(name) = [
+    print(name)
+]
+# well...
+arr[0] = 123
+# maybe.
+
+Globals.value = "something"
+# first time, it's a declaration; all other times, it's mutation?
+
+# no need for this.
+arr = []
+arr[0] = 123
+# just do this.
+arr[0] = 0
+arr[1] = 1
+arr[2] = 2
