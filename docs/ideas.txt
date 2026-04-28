@@ -27058,3 +27058,247 @@ arr[0] = 123
 arr[0] = 0
 arr[1] = 1
 arr[2] = 2
+
+# maybe I should call it this?
+global.value = "something"
+
+import("debug").step_into([...])
+import("debug")
+debug.step_into([...])  # I suppose this is necessary, with the mutation model?
+
+# better.
+obj = [
+    func : () [
+        print("hello")
+    ]
+]
+
+# idk.
+obj = [
+    func(): [
+        print("hello")
+    ]
+]
+
+map((x) [x + x], [1, 2, 3, 4])
+[1, 2, 3, 4].map((x) [x + x])
+
+let [base, _] = os.path.splitext(name)
+let base, _ = os.path.splitext(name)
+base, _ = os.path.splitext(name)
+
+arr = [1, 2; 3, 4]
+arr()  # returns 3, 4
+# I guess?
+
+use import [File Math HTTP OS]
+import("File", "Math", "HTTP", "OS")
+
+# I think this model has to be somewhat functional.
+# it's still better then whatever else I have planned.
+
+enum [True, False]
+enum Bool [True, False]
+
+([1, 2] ++ [3, 4])()  # returns 1,2,3,4
+
+# this creates a new scope, right?
+let Debug = import "Debug"
+Debug.step_into [...]
+# so,
+let Debug = do [
+    import "Debug"
+    step_into [...]
+]
+# 'import' both returns, and has side-effects?
+# the only reason you don't see it with 'let Debug', is because of the new scope?
+let func = do [
+    let value = 123
+    print value
+]
+func
+print value  # error: symbol 'value' not bound.
+# this... makes sense.
+# I guess the older, no parentheses model gets points for looking good.
+
+# this is the new battle: haskell-style vs python-style.
+# let's see who wins.
+
+# in python-style, if it's not a function, does it create a new scope?
+Debug = import("Debug")
+Debug.step_into [...]
+
+# I think this is fine.
+map (x -> do [
+    let value = x + x
+    return x
+]) [1, 2, 3, 4]
+# basically this in macro parentheses.
+(map [x] -> [
+    let value = x + x
+    return x
+] [1, 2, 3, 4])
+
+# but in haskell-style, I can't use '.' for initializers anymore?
+Vector3.[1, 2, 3]
+# but this is fine?
+Vector3 [1, 2, 3]
+# I guess it is.
+arr 0  # since this is how you access an array.
+
+# wait a second...
+int . [1, 2, 3]
+# function composition, right?
+int . [1, 2, 3] 0
+int.[1, 2, 3]
+
+# I guess I need to figure out what happens here.
+(0 1)  # apply 0 to 1
+
+# everything is a function – everything.
+
+# the problem is that 'step_into' is implicitly quoted.
+import "Debug" step_into [...]
+# I need something like this.
+import "Debug" 'step_into [...]
+# the ideal is this, but it doesn't seem to be available.
+import "Debug" .step_into [...]
+
+# stlll can't do this, though.
+pirnt v.x
+pirnt $ v.x
+# this is available.
+
+# no, seriously. have both types.
+print format("%: %", x, y)
+use import("Debug")
+use obj = ...
+import(modules..) = ...
+# then again, that's kind of ugly.
+
+# um, wait.
+let func { x, y } = x + y
+# but what about this?
+let func { x, { y } } = x + y
+# this doesn't work.
+
+# I guess I can copy javascript.
+const user = {
+  name: "Alice",
+  address: {
+    city: "Montreal",
+    zip: "H2X"
+  }
+};
+const {
+  address: { city, zip }
+} = user;
+console.log(city); // "Montreal"
+# the renaming is useful.
+# lol, I thought I hit another road block there.
+
+# other things to think about:
+const user = { name: "Alice", age: 25, country: "Canada" };
+const { name, ...rest } = user;
+console.log(name); // "Alice"
+console.log(rest); // { age: 25, country: "Canada" }
+
+function greet({ name, age }) {
+  return `Hello ${name}, you are ${age}`;
+}
+greet({ name: "Alice", age: 25 });
+
+# scala
+def read: IO[String] = IO {
+  println("reading")
+  "data"
+}
+
+# if you don't want to use the variable.
+let func { x, _: { y } } = x + y
+# wait, that doesn't work!
+# well, with the renaming thing, the original symbol gets deleted anyway.
+# not sure what I was thinking when I wrote this.
+
+# python unpacking is crazy.
+
+# what happened?
+# I remember a time where I though := and :: was extremely clever.
+
+# in haskell, a function returns itself no matter how many times you call.
+add1 10  # returns 11
+(((((add1)))))  # return (int -> int)
+# is that really so different to the old evaluation model?
+add1 1 2 3  # returns 2 2 3
+# pass it too many arguments, and it multiple returns.
+# I think I'm trying to justify going back to this:
+map [x] -> do [
+    let value = x + x
+    value
+], [1, 2, 3, 4]
+# or whatever the old model was – but no, I won't.
+# map's lambda will always use parentheses for haskell-style, and comma tuples for python-style.
+
+# you know, since arrays are just function...
+let arr = [1, 2, 3, 4]
+arr 69 = 70
+for arr $ i -> print i  # outputs 1 2 3 4 70
+# the 'for' loop is the big concern, though.
+# as it was with 'everything is a table'.
+
+import Control.Monad.State
+
+-- Define the loop logic
+incrementToTen :: State Int ()
+incrementToTen = do
+    i <- get
+    if i /= 10
+        then do
+            put (i + 1)
+            incrementToTen  -- Recursive call acts as the 'while' loop
+        else return ()
+
+main :: IO ()
+main = do
+    -- Run the state starting at 0
+    let finalI = execState incrementToTen 0
+    print finalI
+
+# all this just to do 'i += 1'?
+main = do
+    let i = execState (do
+                i <- get
+                put (i + 1)
+                return ()
+            ) 0
+    print i
+# then again, it's probably shorter with modify.
+main = do
+    let i = execState (modify (+ 1)) 0
+    print i
+# WAY shorter!
+
+i := 0
+i += 1
+
+print $ any (== 69) [1, 2, 3, 69, 4]
+
+# hmm.
+import {
+    File: "File"
+    Math: "Math"
+    HTTP: "HTTP"
+    OS: "OS"
+}
+# overload?
+
+let value = [
+    let x = 1
+    let y = 2
+    x + y
+]()
+print(value)  # outputs 3
+
+main = do
+    let i' = 0; i = execState (modify (+ 1)) i'
+    print i
