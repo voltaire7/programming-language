@@ -27302,3 +27302,531 @@ print(value)  # outputs 3
 main = do
     let i' = 0; i = execState (modify (+ 1)) i'
     print i
+
+# ocaml.
+let add (x : int) (y : int) : int = x + y
+# maybe I should give ocaml more of a change. it seems interesting.
+
+# so, I just had an idea. if I don't have anonymous objects, couldn't I do this?
+p = Person { name = "Alice", age = 30 }
+func = {
+    print "hello"
+}
+func = {
+    value = 123
+    print value
+}
+# you pass a function to the object constructor, and it just works?
+# maybe even this?
+p = Person ["Alice", 30]
+
+# I still don't know how Jai does it, though.
+# if you put an anonymous struct as a type for a function, does it just become generic?
+# I feel like it should. that seems to be the most sensible approach to this problem.
+
+# but does that mean that when you initiliaze an object, it should always have the type?
+p = Person { name = "Alice", age = 30 }
+# I think so.
+# there is an advantage to not specifying the actual name of the object in a function signature.
+# but I can't think of any real reason to do the same it a normal object.
+# if I want real ADTs, I should seek something like this.
+# that said, it's not like 'do []' is that bad...
+# I should make the switch that quick.
+# I'll see what I see.
+
+# what if objects are macros, but they only accept symbols that obviously fields?
+obj field  # error
+obj .field  # valid
+# or, I could make it so that it considers 'field' a variable if it doesn't have '.'?
+arr 0
+arr n
+obj .field
+# or maybe '.' overloads when the left-hand side is an object?
+
+obj . field
+func1 . func2
+
+# but that doesn't work like I want it to.
+print v.x
+
+obj field = 123
+# ultimately, it must reflect this...
+# I think I just need to have '.' be a quick quotation thing. that's the simplest.
+
+print .field
+
+neg 3  # better than (-3)?
+# probably not.
+
+-3 + 4
+- 3 + 4
+# I think there would be benefit to making operator being separated by whitespace or not disctinct.
+# hell, you don't even really have to call them operators, or whatever.
+# just another thing.
+# I guess they would often only take one argument too.
+# well, no. or yes?
+v.x
+v .x
+# operators are inconsistent, with precedence and shit.
+# so I should just embrace the idea, and take it further.
+# if I do it well, I could even do this:
+my-func = ...
+# I probably won't though. because of this:
+1 + -1
+1+1 * 2-2
+# this creates an entirely new dimension of complexity, but it might be worth it.
+
+v.x = ...
+v .x = ...
+v 0 = ...
+v .0 = ...  # holy shit! decimals are not allowed – but they are!!
+# just like that, I fixed a problem that has plagued me for years.
+
+# I guess this works too?
+for vec $ [field, value] -> do [
+    print `$field: $value`
+]
+# could also do this.
+for vec $ [field, value] -> do [
+    print `{field}: {value}`
+]
+
+import "Debug" .step_into [...]
+
+let field = "step_into"
+import "Debug" . field [...]
+# this doesn't work, because you're passing [...] to "step_into".
+import "Debug" .(field) [...]
+# this is better.
+
+# haskell, man...
+['a'..'z']
+# also, ocaml sucks.
+# I may sound cheap for actually caring about syntactic sugar, but I care about syntax.
+# bite me.
+
+0 100  # apply 0 to 100, returns 100, of the same type as 0?
+# so like a cast?
+
+int == 0
+# oh my god.
+let x = int 123
+
+# so ugly.
+if condition then do
+    print "true"
+    print "true"
+else do
+    print "false"
+    print "false"
+
+# a benefit to using '=' instead of 'let =':
+obj = {
+    field = 123
+}
+# I know I said I don't like it before, but fuck it.
+# if objects are just functions, then...
+# wait. they are just functions?
+
+[1, 2, 3] 0  # return 1
+{
+    print "hello"
+}  # outputs "hello"
+{ x = 1 }.x  # ...
+# like, I stopped giving a fuck about these things, right?
+# and the language is lazy, so the fields don't get evaluated...
+# I... can totally do this...?
+
+# you would say that it breaks mutation, but I don't think so...
+obj = {}
+obj "x" = 123
+obj .x = 123
+print obj.x
+# they are literals...
+# everything is an object.
+
+# but that can only work if it's a function that returns nothing.
+
+# how many times have I had this epiphany?
+# where a function is an object?
+# well, this time, it will stay. probably.
+# since I already committed to it with 'arr 0',
+# and it makes more sense in the new evaluation model.
+
+# this is a 'no shits given' language, a bit like Jai.
+# we do shit, because we can. fuck it.
+
+Money = Type Float
+# I don't know. I NEVER KNOW!
+
+# so fucking cool.
+[2,4..20]  # returns [2,4,6,8,10,12,14,16,18,20]
+[3,6..20]  # returns [3,6,9,12,15,18]
+
+# in haskell...
+cycle "THE END IS NEVER "
+# incredible.
+
+take 10 (repeat 5)
+take 10 (cycle [5])
+# ...
+
+# wait, lists have to have the same type for every value, right?
+vec = [
+    x = 1
+    y = '2'
+]
+# type 'Field'?
+# well, there are many ways I could do this, but this isn't it.
+# I need {} for destructuring.
+
+[x * 2 | x <- [1..10]]
+# basically
+[for [1..10] it * 2]
+
+[x*2 | x <- [1..10-1]]
+
+func [x, y, z] = x + y + z
+func [1, 2, 3]  # returns 6
+func [z = 1, y = 2, x = 3]  # returns 6
+# ...
+# can I just do this?
+# because if I can, why was I worrying so much?
+# huh.
+
+[x = 1, y = 2, z = 3] x
+
+# invalid.
+0 = 1
+
+# I think I can do this. just no multiple return.
+x, y = 1, 2
+# but considering the way python works...
+
+x -> {
+    print x
+} 123
+
+# I think I am over complicating my language for no reason.
+v x + v y
+# this should be enough.
+# why have multiple ways of doing the same thing?
+# that said... I now need it, because I decided to not use 'let'.
+# unless I do this?
+let v = [
+    x = 1
+    y = 2
+    z = 3
+]
+v x = 10
+# I really don't like the = syntax.
+let v = [
+    x: 1
+    y: 2
+    z: 3
+]
+v x = 10
+
+let v = [x = 1, y = 2, z = 3]
+let v = [x: 1, y: 2, z: 3]
+# : is just better.
+# though there are case where it's not.
+
+let x, y = 1, 2
+
+# wait, fuck. I don't have this anymore.
+value = run [calculate_pi]
+
+fizzbuzz =
+  [ case (n `mod` 3, n `mod` 5) of
+      (0, 0) -> "FizzBuzz"
+      (0, _) -> "Fizz"
+      (_, 0) -> "Buzz"
+      _      -> show n
+  | n <- [1..100]
+  ]
+
+fizzbuzz = [f n | n <- [1..100]]
+  where
+    f n
+      | n `mod` 15 == 0 = "FizzBuzz"
+      | n `mod` 3  == 0 = "Fizz"
+      | n `mod` 5  == 0 = "Buzz"
+      | otherwise       = show n
+
+fizzbuzz = map
+    (\n -> case (n `mod` 3, n `mod` 5) of
+        (0, 0) -> "FizzBuzz"
+        (0, _) -> "Fizz"
+        (_, 0) -> "Buzz"
+        _ -> show n
+    ) [1..100]
+
+# I really like the haskell switch statement.
+# it's basically just a list of lambdas being pattern matched.
+
+# btw, I'm doing it like this:
+print `{field}: {value}`
+# because this way I can have any arbitrary expression in there.
+# like in python:
+print(f"{1 + 1}")
+
+for vec $ [field, value] -> print `{field}: {value}`
+for vec print . format "%: %" it
+
+for vec $ it -> print . format "%: %" it
+for vec $ print . format "%: %" it
+# it sucks, but I think 'for' should just required the name.
+for vec $ it -> print . format "%: %" it
+
+# I didn't think of this...
+print (field ++ ": " ++ value)
+
+for vec $ [field, value] -> print (field ++ ": " ++ value)
+for vec $ [field, value] -> print . format "%: %" [field, value]
+# well, well...
+for vec $ [field, value] -> print $ field ++ ": " ++ value
+
+main :: proc() {
+    func({ 1, 2, 3 })
+}
+func :: proc(value: struct { x, y, z: int }) {
+    fmt.println(value)
+}
+
+# capitalized is for types, and non-capitalized is not?
+Vector3 = [x, y, z: int]
+vec = Vector3 [1, 2, 3]
+vec = Vector3 [x: 1, y: 2, z: 3]
+# and the compiler looks at the name to determine the type?
+
+vec :: struct { x, y, z: int } { 1, 2, 3 }
+vec :: Vector3 { 1, 2, 3 }
+# ^ in odin, these two things are not the same.
+
+main :: proc() {
+    {
+        vec :: Vector3 { 1, 2, 3 }
+        fmt.println(vec)  // outputs Vector3{x = 1, y = 2, z = 3}
+    }
+    {
+        vec :: struct { x, y, z: int } { 1, 2, 3 }
+        fmt.println(vec)  // outputs {x = 1, y = 2, z = 3}
+    }
+}
+
+func :: (x, y, z = 3) [
+    print(x, y, z)
+]
+func(1, 2)
+func(1, 2, 3)
+
+()[]()
+
+let func \ [x y] + x y
+let vec [["x" 1] ["y" 2] ["z" 3]]
+vec x  # returns 1
+# I don't think I'm ever going back to no syntax.
+
+calculate bottom top = sum $ filter (\x -> mod x 2 == 0) [bottom..top]
+calculate :: (bottom, top) [sum(filter(x -> x % 2 == 0, [bottom..top]))]
+# not so bad.
+# or I guess it would be more like this?
+calculate :: (bottom, top) [sum(filter((x) [x % 2 == 0], bottom..top))]
+let calculate bottom top = sum $ filter (x -> x % 2 == 0) [bottom..top]
+
+let say_hello = print "Hello, World!"
+say_hello :: [print "Hello, World!"]
+
+# oh my god...
+factorial n = product [1..n]
+
+# I think I really like the haskell way of doing string interpolation.
+tell [] = "The list is empty"
+tell (x:[]) = "The list has one element: " ++ show x
+tell (x:y:[]) = "The list has two elements: " ++ show x ++ " and " ++ show y
+tell (x:y:_) = "This list is long. The first two elements are: " ++ show x ++ " and " ++ show y
+# it's very clean.
+
+import Control.Monad (forM_)
+for = forM_
+main = for [1..5] $ \x -> print x
+
+# haskell is such a sexy ass language.
+main = for [1..5] $ \x -> do
+    putStrLn $ "Printing: " ++ show x
+
+max' a b | a > b = a | otherwise = b
+
+# huh.
+otherwise = True
+
+import Control.Monad (forM_)
+for = forM_
+vec = [("x",1),("y",2),("z",3)]
+main = for vec $ \(field, value) ->
+    putStrLn $ field ++ ": " ++ show value
+
+# but still, fucking hell...
+for vec print it
+
+# 'let in' might be useful?
+[let square x = x * x in (square 5, square 3, square 2)]
+(let (a,b,c) = (1,2,3) in a+b+c) * 100
+
+# if haskell has this, why not have 'for in'?
+describeList xs = "The list is " ++ case xs of [] -> "empty."
+                                               [x] -> "a singleton list."
+                                               xs -> "a longer list."
+
+maximum' [] = error "maximum of empty list"
+maximum' [x] = x
+maximum' (x:xs) = max x (maximum' xs)
+
+# apperently a sort of poster child for haskell.
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) =
+    let smallerSorted = quicksort [a | a <- xs, a <= x]
+        biggerSorted = quicksort [a | a <- xs, a > x]
+    in  smallerSorted ++ [x] ++ biggerSorted
+
+# you can also do it like this.
+quicksort [] = []
+quicksort (x:xs) =
+    let smallerSorted = quicksort $ filter (<= x) xs
+        biggerSorted = quicksort $ filter (> x) xs
+    in  smallerSorted ++ [x] ++ biggerSorted
+
+# just learned about haskell's tuple constructors...
+(,)
+(,,)
+(,,,)
+
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+
+flip f y x = f x y
+main = print $ flip (,) 1 2
+
+for [] _ = return ()
+for (x:xs) f = do
+    f x
+    for xs f
+main = for [1,2,3,4,5,6] $ \x -> print x
+
+# cleaner.
+for [] _ = return ()
+for (x:xs) f = f x >> for xs f
+main = for [1,2,3,4,5,6] $ \x -> print x
+
+map _ [] = []
+map f (x:xs) = f x : map f xs
+
+map ($ 3) [(4+), (10*), (^2), sqrt]
+
+# insane!
+quicksort [] = []
+quicksort (x:xs) = (quicksort $ filter (<=x) xs) ++ [x] ++ (quicksort $ filter (>x) xs)
+
+replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))
+replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]
+
+(??) :: [a] -> [a] -> [a]
+[] ?? ys = ys
+xs ?? _  = xs
+
+[1,2,3] ?? [9]   -- [1,2,3]
+[] ?? [9]        -- [9]
+
+func a a : a
+func x y = x + y
+# or
+func a a : Num a
+func x y = x + y
+
+# emulate Jai?
+use Vector3 in ...
+let func vec = use vec in print [x, y, z]
+# we may not need destructuring that way,
+# but that's no longer a problem with [:].
+
+# what if I play around with the haskell compiler and change the syntax?
+
+# operators should behave differently to functions.
+quicksort [] = []
+quicksort (x:xs) =
+    quicksort [a | a <- xs, a <= x]
+    ++ [x] ++
+    quicksort [a | a <- xs, a > x]
+# this should be a valid way to write quicksort.
+# then again, perhaps not?
+
+# even this is not allowed:
+func = +
+# has to be this.
+func = (+)
+
+# I feel like you could pretty easily make it so that the top-level of a file is a part of haskell 'main'.
+
+let sum: i32 = xs.iter().filter(|x| x % 2 == 0).map(|x| x * 2).sum();
+
+# maybe I can have something like this in the language?
+let func xs = xs.iter().filter(|x| x % 2 == 0).map(x -> x * 2).sum()
+func [0..99]
+
+|x| x + x
+x -> x + x
+
+|x, y| x + y
+x y -> x + y
+
+(define (quicksort lst)
+  (if (null? lst)
+      '()
+      (let* ((pivot (car lst))
+             (rest  (cdr lst))
+             (smaller (filter (lambda (x) (<= x pivot)) rest))
+             (greater (filter (lambda (x) (> x pivot)) rest)))
+        (append (quicksort smaller)
+                (list pivot)
+                (quicksort greater)))))
+
+print . format "%: %" [field, value]
+print . format("%: %", [field, value])
+
+# if you don't specify the type, this is just a linked list?
+list = [1,2,3,4,5,6]
+
+func a a : a where Num a
+func x y = x + y
+
+func a a : a => Num a
+func x y = x + y
+
+obj := HashMap {}
+obj.x
+obj[x]
+# operators should be overloaded.
+
+pairwiseProduct = zipWith (*)
+
+(import "Debug").step_into [...]
+
+# I think I should adopt rust's package system, or something similar.
+use Debug
+Debug.step_into
+use Debug.{step_into}
+step_into
+# then again, I don't know if it makes that much sense.
+print obj.{field, field2}
+# what does this mean?
+# but I really like the deconstruction syntax.
+# okay, I guess the old model had that as well...
+let { Debug } = import "Debug"
+# and don't forget the new object syntax.
+let [Debug] = import "Debug"
+
+let Imports = import ["HTML", "String", "File", "OS"]
+let file = Imports.open "file.txt"
