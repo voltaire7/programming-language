@@ -27830,3 +27830,295 @@ let [Debug] = import "Debug"
 
 let Imports = import ["HTML", "String", "File", "OS"]
 let file = Imports.open "file.txt"
+
+# I just realized something.
+data Vector a = Vector a a a deriving (Show)
+Vector a = Vector [x, y, z: a]
+Vector a = [x, y, z: a]
+# so these things are different?
+
+# oh my god...
+[Thursday .. Sunday]
+[minBound .. maxBound] :: [Day]
+# although, admittedly, you can do the same thing with C enums.
+
+# that's actually so fucking clever!
+infixr 5 ++
+(++) :: [a] -> [a] -> [a]
+[]     ++ ys = ys
+(x:xs) ++ ys = x : (xs ++ ys)
+# (x:xs) here is no different from (Just x) destructuring!
+
+infixr 5 :
+data List a = Empty | a : (List a) deriving (Show, Read, Eq, Ord)
+
+# this is nice.
+data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
+
+singleton :: a -> Tree a
+singleton x = Node x EmptyTree EmptyTree
+
+treeInsert :: (Ord a) => a -> Tree a -> Tree a
+treeInsert x EmptyTree = singleton x
+treeInsert x (Node a left right)
+    | x == a = Node x left right
+    | x < a  = Node a (treeInsert x left) right
+    | x > a  = Node a left (treeInsert x right)
+
+# in scheme?
+(define EmptyTree '())
+(define (Node value left right) (list value left right))
+
+(define (singleton x) (Node x EmptyTree EmptyTree))
+
+(define (value tree) (car tree))
+(define (left tree) (cadr tree))
+(define (right tree) (caddr tree))
+
+(define (tree-insert x tree)
+  (cond
+    ((null? tree) (singleton x))
+    ((= x (value tree)) (Node x (left tree) (right tree)))
+    ((< x (value tree)) (Node (value tree) (tree-insert x (left tree)) (right tree)))
+    ((> x (value tree)) (Node (value tree) (left tree) (tree-insert x (right tree))))))
+
+(define nums (list 8 6 4 1 7 3 5))
+(display (fold-right tree-insert EmptyTree nums))
+
+result :: can_fail(213) $ unwrap()
+
+fmap (*4) (foldr treeInsert EmptyTree [5,7,3,2,1,7])
+
+fn main() {
+    let input = "42";
+    let parsed = input.parse::<i32>().ok();
+
+    if let Some(number) = parsed {
+        println!("Parsed number is: {}", number);
+    }
+}
+
+# I can't forget the original stack-based design.
+let x = 1 2
+print x  # outputs 1 2
+[1,2,3,4] map (+)
+[1,2,3,4] map (x -> x + x) map (x -> x * x)
+
+func 1 2
+# equivalent to?
+2
+1
+func
+# or
+1 2
+func
+
+[1,2,3,4]
+    map (x -> x + x)
+    map (x -> x * x)
+
+let x = 1 2
+print x  # outputs 1 2
+print + x  # outputs 3
+
+let x = (+) [1,2,3,4]
+map x  # outputs [3,7]
+
+# I think I prefer this, though. it's just clearer.
+[1,2,3,4] $ map (x -> x + x) $ map (x -> x * x)
+
+# but same problem as usual: operator precedence.
+
+# what if both of these where valid?
+[1,2,3,4] map (x -> x + x) map (x -> x * x)
+map (x -> x + x) (map (x -> x * x) [1,2,3,4])
+# the rules won't be as clear cut,
+# but it could work if you think of it as function composition + currying?
+
+# honestly, barely any benefit at all.
+map (x -> x + x) $ map (x -> x * x) [1,2,3,4]
+[1,2,3,4] $ map (x -> x + x) $ map (x -> x * x)
+# even here ^, you need operators!
+# fuck!!
+
+# applicative is just easier to read, man.
+# you will never escape the (((parentheses)))!!!!
+
+let func = + * *
+func 1 2 3 4  # returns 10
+func = (+) . (*) . (*)
+
+* - 1 2  # returns -2?
+
+# oh my god! my old friend!!
+square = * .
+
+# concatenative shit brings a lot of the problems back, though.
+# I think it comes down to whether I hate operator precedence enough.
+
+map (x -> + x x) map (x -> * x x) [1,2,3,4]
+[1,2,3,4]
+    map (x -> + x x)
+    map (x -> * x x)
+# infix operators are so much easier to understand.
+
+# do it like raku?
+func 1, 2
+# no...
++ 1, 2
+
+# the moment I think about objects, is the moment everything goes to shit.
+# seriously.
+
+map (x -> + x x) map (x -> * x x) [1,2,3,4]
+# equivalent to
+[1,2,3,4]
+map (x -> * x x)
+map (x -> + x x)
+
+map (x -> + x x) map (x -> * x x) [1,2,3,4]
+# equivalent to
+[1,2,3,4]
+map (x -> * x x)
+map (x -> + x x)
+
+func arr = arr
+    map (x -> * x x)
+    map (x -> + x x)
+
+func = "Hello, World!" print
+func  # outputs "Hello, World!"
+x y func = x y +
+1 2 func
+1 2 +
+# the code is read left-to-right.
+
+# what if, the parentheses are not necessary if it's the first argument?
+func = () [
+    print "Hello, World!"
+]
+func
+# but that still has the same problems with objects.
+
+main = mapM_ (\ f -> f) $ map print [1,2,3,4]
+
+# maybe I should just create namespaces...
+# a big reason I want objects, is because of that.
+
+namespace Debug {
+    import "Debug"
+}
+namespace Debug import "Debug"
+# ... it's ugly.
+
+# applicative haskell style just looks nicer.
+# and if it doesn't look pleasing to the eye, what's the point?
+
+# true stack based design.
+let "value" 123
+# but then you lose the terseness given by the ugliness.
+
+# holy fuck! scheme handles polar complex notation!
+1@3.14159
+
+let [value] 123
+let [x y z] 1 2 3
+# goddamn, this is disgusting.
+# it has to be extraction.
+
+let value 123
+let func [
+    print "Hello, World!"
+]
+for arr [
+    print . format "%: %" it
+]
+for arr [field value] [
+    print . format "%: %" [field value]
+]
+
+# this is better. I can't believe I'm saying this, but it is.
+(let value 123)
+(let func [
+    (print "Hello, World!")
+])
+(for arr [
+    (print . format "%: %" it)
+])
+(for arr [field value] [
+    (print . format "%: %" [field value])
+])
+
+(let [x y z] [1 2 3 4])  # this errors.
+(let func [
+    (let [arg1 arg2] _)
+    (print . + arg1 arg2)
+])
+(func 1 2 3)  # so this does too.
+(func 1 2)    # outputs 3
+
+# and of course, macros!
+(let func [arg1 args2] -> [
+    (print . + arg1 arg2)
+])
+# but how do I chain them?
+# if I do this too much, I get operator precedence...
+
+# I've talked about it before, but maybe it's not possible.
+# it's just not possible to find a language that hits all the boxes.
+# chase two hares, you get none.
+
+# 'macro parentheses' explains itself, but I think 'polish notation' has changed.
+# now it's more 'applicative polish notation' vs 'concatenative polish notation'.
+# so... MP, APN and CPN.
+# I guess there's also this:
+let func = (word) [ print(word) ]
+# what the fuck do I call this?
+# it is applicative... and parentheses, but so is the other.
+# so I suppose it's 'postfix parentheses'?
+# no, 'syntax parentheses' sounds better.
+
+# so anyway, 'macro parentheses' is not an option, because it's too long,
+# it doesn't have good destructuring, which is necessary at this point,
+# and I've already established that some syntax and typing is kind of necessary at this point.
+# also, macros + parentheses with commas is just ugly, and you can't wrap your head around it.
+
+# wait, I just realized I can do this.
+(let func [
+    (let [arg1 args2] _)
+    (print . + arg1 arg2)
+])
+(let func [arg1 args2] [
+    (print . + arg1 arg2)
+])
+# well anyway, back to it.
+
+# 'applicative polish notation' is the haskell style,
+# and the style of model functional programming languages.
+# it is the one with the most potential.
+# there are so many implementations, that figuring it out is trivial.
+# just copy everything; change what you don't like.
+
+# 'concatenative polish notation' is the one I was gunning for, for most of this.
+# it's a real shame...
+# while it is often extremely terse, it also unreadable.
+# tradeoffs after tradeoffs.
+# and goddammit! it fixed the operator precedence issue, but objects ruin everything!
+# best of all: it works like computers, where stuff is placed in the stack and run.
+# the implemantation is as easy as LISP!
+# why does usefulness == ugliness?
+
+# and then... 'syntax parentheses'.
+# lol, what can I say? it's just a modern language with maybe a cleaner syntax.
+# whatever, boring.
+# why did I waste so many years?
+
+# SP for 'syntax parentheses'.
+
+# even if I don't like the semantics of APN, I do like the syntax.
+# vice versa for CPN...
+
+# I really like how APN + Calculus of Constructions (CoC) has a very simple yet powerful syntax.
+# you could probably emulate it in LISP, but I'll have to see.
+
+# for SP, I still need to wait for Jai to release, and base my shit on that.
