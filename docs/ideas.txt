@@ -28122,3 +28122,241 @@ let func = (word) [ print(word) ]
 # you could probably emulate it in LISP, but I'll have to see.
 
 # for SP, I still need to wait for Jai to release, and base my shit on that.
+
+# the popular programming languages all stabilized around a specific model.
+# and each of them make sense in their own way.
+# none are perfect. but all fulfill a certain objective.
+# I already knew this, because of that Bjarne Stroustrup quote, but it's still disappointing.
+# because it's true.
+# even if I'm the only one using this language, I will not not complain about it.
+# I hate it.
+
+. x = x x
+square = * .
+square 5  # returns 25
+
+# I just realized: in APN, this is not valid.
+use import "Debug"
+# it has to be this.
+use $ import "Debug"
+# well, at least there's this con for APN.
+
+# still one of the most beautiful pieces of code.
+arr = [for 100 it]
+
+do map (print) [1,2,3,4]  # outputs 1\n2\n3\n4\n
+
+vec.x
+(import "Debug").step-into [...]
+# damn, I can't forget kebab-case! the best-case!
+
+# wait, what if we had multiple return, and only object destructuring?
+let func [x, y] = + x y
+func [x: 1, y: 2]
+# well, I don't know.
+# but I think it makes sense, since we don't have tuples.
+let func x y = + x y
+func 1 2
+# multiple return mirrors function application.
+
+# I think my hatred for operator precedence maybe actually win in the end!
+# but I don't think I'm ever going back to '\ []'. it's just not good.
+# but if I don't go back, I have to use 'x -> + x x'?
+# that's such a weird combo!
+
+map (\ [x] + x x) [1,2,3,4]
+map (x -> x + x) [1,2,3,4]
+# I suppose it's not that bad?
+# I could probably still have '->' though. shouldn't rule it out.
+map (x -> + x x) [1,2,3,4]
+
+func : int int [int int]
+func x y = [x y]
+# multiple return! you suck as usual!
+
+let func \ [x y] + x y
+# '\ []' makes more sense with CPN...
+
+let func \ [x y]
+    + x y
+    + x y
+    print print
+# also, this fixes my issue of what happens when you don't have a argument passed!
+123
+print let x 1
+# yeah, this is better!
+
+if = value true
+    print "true"
+else
+    print "false"
+# fuck it, right?
+
+let func (+)
+let func +
+
+map (\ [x] + x x) [1 2 3 4]
+
+func x y = + x y
+func x y =
+    + x y
+    + x y
+    print print
+
+func [x y] = + x y
+func [1 2]
+func [x = [y]] = + 1 y
+func [x = [y = 1]]
+# this is odd. and not just for CPN. for APN too.
+func [x=[y]] = + 1 y
+func [x=[y=1]]
+# a little better.
+func x=2 = print x
+func x=1  # outputs 1
+# but no, this kind of breaks it?
+
+# how about this? until + is defined, it assumes that it takes 2 arguments.
+func x y = + x y
+# no... because 'x' could be a function, and that function could take 'y'.
+# not to mention multiple return!
+
+# jesus christ, APN is just better in so many ways...
+
+(define fact
+  ((lambda (!)
+     (lambda (n)
+       ((! !) n)))
+   (lambda (!)
+     (lambda (n)
+       (if (zero? n)
+         1
+         (* n ((! !) (sub1 n))))))))
+(display (fact 5)) (newline)
+
+let fact = (! -> (n -> ! ! n)) (! -> n -> n ? n * ! ! (n-1) : 1)
+print $ fact 5
+
+let fact \ [!] (\ [n] ! (!) n) (\ [!] (\ [n] if n * n ! (!) - n 1 1))
+print fact 5
+# CPN is genuinely impossible to reason about...
+# and it's not even shorter, which was the promise!
+
+let new-let = {
+    let [symbol, value] = [get-token, get-value]
+    env.next += [symbol, value]
+}
+new-let x 1
+print x  # outputs 1
+# this is actually so simpler to read. far simpler than those 'simple' languages...
+
+new_let :: [
+    symbol, value :: get_token, get_value
+    env.next += [symbol, value]
+]
+
+define fact
+  lambda (!)
+    lambda (n) ! ! n
+    lambda (!)
+      lambda (n)
+        if (zero? n)
+           1
+           * n (! ! (sub1 n))
+display (fact 5); newline
+# no, this doesn't work.
+# at most, the top-level won't be with parentheses.
+# unless 'lambda' works a bit like 'do' in haskell?
+
+ifx cond true false = if cond then true else false
+main = ifx (1 == 0)
+    (print "true")
+    (print "false")
+
+main = do
+    print "hello"; print "hello"
+
+# I feel like I might be unto something.
+let fact
+  \ [!]
+    \ [n] ! ! n
+    \ [!]
+      \ [n]
+        if n
+           * n (! ! (sub1 n))
+           1
+print (fact 5)
+# anytime I use prefix everything, it's because I do it in a concatenative way,
+# but what if I just don't?
+# what if it's applicative, but implicit like haskell?
+# the if statement sucks though. but I can't change it because everything is prefix.
+let fact
+  \ [!]
+    \ [n] ! ! n
+    \ [! n] if n (* n (! ! (sub1 n))) 1
+# somehow not that bad.
+# I just had to get rid of concatenativeness.
+let fact
+  \ [!]
+    \ [n] ! (!) n
+    \ [! n] if n * n ! (!) sub1 n 1
+# yeah, still impossible to wrap your head around.
+# there are times where I feel like I'm unto something, but it keeps going away.
+
+# you know... not too bad!
+let fact \ [!] (\ [n] ! ! n) (\ [! n] ? n (* n (! ! (- n 1))) 1)
+let fact = (! -> (n -> ! ! n)) (! n -> n ? n * ! ! (n - 1) : 1)
+
+# though this may be required.
+let arr [(+ 1 2)(- 1 2)]
+let arr = [1 + 2, 1 - 2]
+# you know, I may have found a certain something...
+
+let func \ [name] {
+    print . format "My name is %." [name]
+}
+func "John"
+
+let func name = {
+    print . format "My name is %." [name]
+}
+func "John"
+
+# never thought of it this way... but it works!
+let func \ _ {
+    print . format "My name is %." _
+}
+func "John"
+# btw, '\ _' is how you do macros!
+
+let arr [1 2 3 4]
+let arr = [1,2,3,4]
+
+arr 0  # returns 1
+arr [0 10]  # returns [10 2 3 4]
+
+if cond {
+    print "true"
+} else {
+    print "false"
+}
+if cond {
+    print "true"
+}
+# it's a macro.
+let value if cond "true" else "false"
+# return [] if 'else' is not provided.
+
+# I need to create a scheme first, with this model.
+
+if (= 1 2) {
+    print "hello"
+}
+# or something like that...
+if (= 1 2) : print "hello"
+
+# how about a varargs function?
+(chain * * + 1 2 3 4)  # returns 36
+# switch to concatenative, basically.
+# I feel like I could even do it in scheme!
+
+# I love how I despise operator precedence more than I do parentheses.
