@@ -28360,3 +28360,164 @@ if (= 1 2) : print "hello"
 # I feel like I could even do it in scheme!
 
 # I love how I despise operator precedence more than I do parentheses.
+
+for arr as i print i
+
++ (expand [1 2])  # returns 3
+# so...
+let dup \ [value] expand [value value]
+let square * (dup 5)
+# hmm, I don't know.
+let macro \ [value] expand {
+    print "creating value"
+    [let x value]
+}
+macro 5
+print x  # returns 5
+
+# you know, if we do it like this, it's actually kind of good?
+let func [
+    let [name] _
+    print name
+]
+func "John"
+# it throws an error if the arguments are now exactly like that.
+# but if there is no 'let'...
+func "John" "Lennon"  # error
+let func [
+    print "Hello, World!"
+]
+func . func  # outputs "Hello, World!" x 2
+
+# I probably talked about this before.
+# also, how do I make so the function recognizes if _ has been used?
+
+# if ',' war a macro for ')(', it wouldn't change a thing.
+let arr [(+ 1 2)(- 1 2)]
+let arr [(+ 1 2, - 1 2)]
+# wait, I could do this...
+let arr [+ 1 2, - 1 2]
+# assume that '[' is '[(' and vice versa.
+
+# huh, accidental discovery.
+print 1 2 3 4
+print (1) (2) (3) (4)
+print (1,2,3,4)
+print(1, 2, 3, 4)
+# this feature is too cool. I need it.
+# this is why currying is awesome.
+# I wouldn't be able to do this with MP!
+
+let arr [1,2,3,4]
+let arr [1 2 3 4]
+
+let arr [$ 1, 2, 3, 4]
+# nah.
+
+# yeah, I can't do this.
+let [field, value] it
+# just this.
+let [(field, value)] it
+
+let [x y z] [1,2,3]
+# so bad...
+
+(define (f x) (+ (* 5 (expt x 4)) (- (* 2 (expt x 3))) (expt x 2) (- (* 7 x)) 3))
+let f \ [x] + (* 5 (^ x 4)) (- (* 2 (^ x 3))) (^ x 2) (- (* 7 x)) 3
+# this only works if + takes more than one argument...
+let f \ [x] + (* 5 (^ x 4)) (- (* 2 (^ x 3))) (^ x 2) (- (* 7 x)) 3
+f x = 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+f x = 5 * x ^ 4 - 2 * x ^ 3 + x ^ 2 - 7 * x + 3
+let f \ [x] + (* 5 (^ x 4),-(* 2 (^ x 3)),^ x 2,- (* 7 x),3)
+let f \[x]+(* 5(^ x 4))(- (* 2(^ x 3)))(^ x 2)(- (* 7 x))3
+# jesus, operator precedence is so much shorter...
+f x = 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+let f \ [x] + - + - ^ * 5 x 4 ^ * 2 x 3 ^ x 2 * 7 x 3
+f x = 5 * x ^ 4 - 2 * x ^ 3 + x ^ 2 - 7 * x + 3
+# less short AND harder to read. tsk tsk.
+
+# I might have to bite the bucket, and add operator precedence.
+# I don't think there's any excuse not to have it...
+# can't even do (+ 1) currying...
+
+# then again, as long as I don't do math, I'm fine?
+
+let f \ [x] + (* 5 . ^ x 4) (- . * 2 . ^ x 3) (^ x 2) (- . * 7 x) 3
+let f \ [x] + . + . + . + (* 5 . ^ x 4) (- . * 2 . ^ x 3) (^ x 2) (- . * 7 x) 3
+(define (f x) (+ (* 5 (expt x 4)) (- (* 2 (expt x 3))) (expt x 2) (- (* 7 x)) 3))
+# wow...
+let f \ [x] math 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+# this can also work...
+let f \ [x] | 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+# it should be one character.
+        f x = 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+let f \ [x] | 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+f x = 5 * x ^ 4 - 2 * x ^ 3 + x ^ 2 - 7 * x + 3
+# but really, if I have a function like that, I should just have operators.
+
+sumSquares = sum . map (^2) . filter odd
+
+let func x y = expand {
+    print "expanding..."
+    [x, y]
+}
++ (func 1 2)
+
+# I can still do this with infix operators, though.
+if (1 == 0) {
+    print "true"
+}
+if true {
+    print "true"
+}
+# wait, I just realized.
+if cond {
+    ...
+} else if {
+    ...
+} else []
+# I can probably fix it with more macroing...
+
+# maybe I should go back to this model...
+map [+] [1 2 3 4]
+# but then...
+print "%, %" 1 2
+# I hate this.
+# ugh, getting reminded of all the things I hate about this model.
+
+# man, APN + infix might be the only way to go...
+# I'm just reinventing haskell here...
+
+let f \ [x] + . + . + . + (* 5 . ^ x 4) (- . * 2 . ^ x 3) (^ x 2) (- . * 7 x) 3
+let f \ [x] $ + + + + * 5 ^ x 4 - * 2 ^ x 3 ^ x 2 - * 7 x 3
+let f \ [x] | 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+let f \ [x] | 5 * x ^ 4 - 2 * x ^ 3 + x ^ 2 - 7 * x + 3
+f x = 5*x^4 - 2*x^3 + x^2 - 7*x + 3
+# wait no, there's a problem with the CPN version:
+let f \ [x] $ + - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3
+# interesting.
+let f \ [x] $ + - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3
+let f \ [x] | 5 * x ^ 4 - 2 * x ^ 3 + x ^ 2 - 7 * x + 3
+# you would say it's less readable, but only because you're familiar with operator precedence.
+# plus, it's eager (hence the $).
+# and since we have that, we can have no types!
+# the evaluation is extremely simple.
+
+# I should still have currying.
+let func print
+func "hello"
+# it is after all how '\ []' works.
+
+# eager evalution is so much easier to reason about.
+if = 1 2 $ print "true"
+# AND easier to read!
+
+for arr as i $ print i
+# but this isn't as clean.
+for arr \ i $ print i
+# and this doesn't feel right.
+# okay, 'for' is a macro. end of story.
+# I already have 'if' as a macro – who cares.
+for arr \ [i] $ print i
+for arr i $ print i
+# I could also just not have implicit stuff?
