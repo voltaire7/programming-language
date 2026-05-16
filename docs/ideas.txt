@@ -28521,3 +28521,293 @@ for arr \ i $ print i
 for arr \ [i] $ print i
 for arr i $ print i
 # I could also just not have implicit stuff?
+
+for vec [field value] {
+    print format "%, %" [field value]
+}
+for vec it {
+    print format "%, %" it
+}
+for vec it $ print format "%, %" it
+# fuck it, right?
+
+[for range 0 100 $ it]
+# then again, since 'for' is a macro, I could actually make it so it takes variable argument count?
+
+if = 1 2 :
+    print "true"
+    print "true"
+else :
+    print "false"
+    print "false"
+# I could probably do this.
+# like, ':' add a curly brace not after the last "true", but at the start of the next line.
+# that's a quick and easy way of doing this.
+# never thought of this...
+# huh.
+
+if = 1 2 : print "true"
+let f \ [x] :
+    + - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3
+    + - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3
+# not sure how I feel about this.
+# maybe I shouldn't even have curly braces. just parentheses.
+# ah, right. good ol' scope.
+# always forget about you.
+{
+    let x 1
+}
+
+while (= value thing) $ print "yes"
+
+let vec {
+    x 1
+    y 2
+    z 3
+}
+let obj {
+    field \ [name] :
+        print name
+        print name
+}
+# maybe something more like this?
+let obj $ [
+    field \ [name] {
+        print name
+        print name
+    }
+]
+# this might be good.
+# I have to say, I don't very much like the lack of curly braces.
+
+# how about, unlike haskell, it is genuinely dynamic, until you type it?
+# like javascript/typescript?
+
+# I might not be able to do implicit overloading though.
+
+# but I can't do this...
+let func \ [value] where (= value 123) {
+    print value
+}
+# well, I guess I could? if 'where' is a curried function, that is.
+# by the way, the parentheses are actually necessary here. (nice)
+
+# ':' is necessary.
+let obj $ [
+    field \ [name] { print name }
+]
+let obj $ [
+    field \ [name] : print name
+]
+# this is one of the things I hated about rust.
+# if people want to write like python, let them. it shows the power of the language.
+# but I will never.
+# either that, or I'm an asshole, and disallow ':' past the new line.
+# by the way, I love the semantics. it almost looks like 'field name = print name'.
+
+let obj $ [
+    field \ [name] = print name
+]
+let obj = [
+    field name = print name
+]
+let obj = [
+    field name : print name
+]
+# it's actually amazing how nice it is...
+let obj $ [
+    field \ [name] : print name
+]
+
+# this is the only one model that gets rid of both parentheses and operator precedence.
+# only one.
+
+# you know, I probably don't need ':'?
+let f \ [x] + - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3
+let f \ [x] (+ - + - * 5 ^ x 4 * 2 ^ x 3 ^ x 2 * 7 x 3)
+# I mean, I have currying and all that.
+
+# it also breaks and fixes the 'for' loop?
+for vec {
+    print format "%, %" it
+}
+for vec {
+    as x
+    print format "%, %" x
+}
+for vec {
+    as x
+    print format "%, %" x
+}
+for vec
+    as x
+    {
+        print format "%, %" x
+    }
+# you know?
+for vec as x { print format "%, %" x }
+# you know??
+for vec as x {
+    print format "%, %" x
+}
+# YOU GET ME?!?
+
+# I love how I have curly braces, but they are literally optional.
+let obj $ [
+    field \ [name] print name
+]
+# ah, but I really liked the ':' here.
+let obj $ [
+    field \ [name] {
+        print name
+    }
+]
+
+# I think this model also fixes 'expand' and 'where' in the same way.
+
+# not as pretty anymore, huh?
+let func \ _ for _ print it
+let func \ _ : for _ : print it
+
+let func {
+    let [x y] _
+    + x y
+}
+print = func 1 2 3
+# no, it won't work. even if _ is a function.
+
+# I can't believe I'm actually implementing this.
+let render
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+# well, it IS the shortest model, essentially.
+
+# I can't do true PN though.
+# I need to do the old model where each function is responsible for it's arguments.
+
+let func
+    let [x y] args 2
+    print + x y
+# ew. that brought back so many memories.
+# but I can still implement this. it just returns a list this time.
+let func
+    print args 2
+func 1 2  # outputs [1 2]
+# I should call it something else.
+
+# holy fuck.
+let func
+    \ [x y]
+    print reduce [x y]
+# I'm back to this...
+let func
+    \ [x y]
+    where (! = 0 y)
+    print / x y
+# is this a guard?!
+
+# this is the shortest model ever. the best for refactoring.
+# but I'll have to see if I actually implement it.
+
+# how unreadable without the indentation...
+let render
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+# but holy fuck, is it clean.
+
+# dammit! I just remembered for the thousanth time why I can do this.
+\ [x y] + x y 1 2
+# then again, it's no longer the case?
+(\ [x y] + x y) 1 2
+# no, it is, because the ()s make it return a function.
+# maybe it's significant if the function is first in the line?
+\ [x y] (+ x y) 1 2
+# does this even fix it though?
+# yeah, it does. damn.
+# I need ':'. I have no choice.
+
+let render :
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool :
+        if ! it.dead :
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+let render :
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool : if ! it.dead : fill-rect target-rect it unpack-color TARGET-COLOR
+# I mean, it's definitely easier to read?
+
+# I guess 'where' just returns a modified body or some shit. whatever.
+let func \ [value] where (= value 123) {
+    print value
+}
+
+# then again, what if the function is kind of smart?
+(\ [x y] + x y) 1 2
+(\ [x y] (+ x y) 1 2)
+# like here. they actually behave differently?
+# nah, that's stupid.
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool : if ! it.dead : fill-rect target-rect it unpack-color TARGET-COLOR
+}
+# *sob*
+
+# is this fine?
+let : \ _ (_)
+# no, because _ is a list.
+let : \ _ (eval _)
+
+# still, eager/strict evaluation does simplify things a lot.
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool {
+        if ! it.dead : fill-rect target-rect it unpack-color TARGET-COLOR
+    }
+}
+
+if cond : print "true"
+else : print "false"
+# it has to be a macro.
+if cond : print "true"
+else : if ! cond : print "false"
+# then again, it doesn't look so bad?
+if cond {
+    print "true"
+} else : if ! cond {
+    print "false"
+}
+# it actually kind of looks pretty nice!
+if cond { print "true" } else : if ! cond { print "false" }
+# I actually like it!
+
+let func \ _ : for _ : print it
+let func \ _ {
+    for _ : print it
+}
+let func \ _ : for _ {
+    print it
+}
+# well, not so bad.
+# it's all about balance.
