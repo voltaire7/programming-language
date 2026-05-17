@@ -28811,3 +28811,237 @@ let func \ _ : for _ {
 }
 # well, not so bad.
 # it's all about balance.
+
+# I'm happy about this, though.
+let obj $ [
+    field \ [name] : print name
+]
+
+sumSquares = sum . map (^2) . filter odd
+= sumSquares sum map (^ ~ 2) filter odd
+# ~ is swap?
+# I think this model is going places.
+
+let ~ \ [x y] : y x
+
+# I think I really shouldn't have multiple return.
+flip f x y = f y x
+dup f x = f x x
+
+let flip \ [f x y] : f y x
+let dup \ [f x] : f x x
+flip (-) 1 2
+dup (*) 5
+
+let square * .
+let square dup (*)
+let square \ [x] : * x x
+square 5
+
+# perhaps not having currying makes more sense?
+
+let my-print print  # error
+# since print's arguments are not satisfied?
+let my-print : print
+
+# nah, again. needed for '\ []'.
+
+# I just remembered an old problem.
+let func {
+    print "test"
+    {
+        print "test"
+    }
+    print "test"
+}
+# doesn't the scope here actually return?
+
+# applicative is so much simpler to understand.
+func ((\ [x y] + x y) 1 2)
+func $ (\ [x y] + x y) 1 2
+
+# if I could do this, things would be simpler.
+func \ [x y] + x y 1 2
+# then again...
+func \ [x y] (+ x y) 1 2
+# this is clearer.
+
+func   \ [x y] (+ x y)  1 2   # equivalent to 'func 3'
+func  (\ [x y] (+ x y)) 1 2   # equivalent to 'func (FUNCTION) 1 2'
+func ((\ [x y] (+ x y)) 1 2)  # equivalent to 'func (3)', but lazy.
+# why not?
+# but this still doesn't solve my scoping problem.
+
+# I guess there is something I could do?
+let func {
+    print "test"
+    [{ print "test" }]
+    print "test"
+}
+let [other-func] func
+other-func  # outputs "test"
+# that would be a dumb way to do it.
+
+# another would be the old way I remember.
+let func {
+    print "test"
+    print "test"
+    { print "test" }
+}
+# the last value of a function gets returned.
+func  # outputs "test" x 3
+# equivalent to
+let other-func func  # outputs "test" x 2
+other-func  # outputs "test" x 1
+# so whether it evaluate immediately or not, depends entirely on the position of the function.
+
+# I have some questions about recursion, and more specifically tail recursion.
+
+# I feel like I'm overcomplicating the problem.
+# "what if I want the lambda to only run once?"
+# as if APN + infix can even do that.
+# the fact that this model even has a way to eager evaluate makes it better already.
+
+# hmm. what if we forget about the eager evaluation, and go back to lazy?
+func (\ [x y] + x y) 1 2
+func ((\ [x y] + x y) 1 2)
+# even though this is concatenative, it can work just as well.
+# (by lazy I mean macros.)
+# the only way this fails, is if I have multiple return.
+# it fucks everything.
+# I can get the same parentheses logic as haskell, but still be concatenative.
+# some things are reversed, but it works.
+
+# I feel like strict evaluation adds another level of complexity.
+
+# even scheme has nothing on this.
+let render
+    fill-rect
+        proj-rect proj-x proj-y
+        unpack-color PROJ-COLOR
+    fill-rect
+        bar-rect
+        unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect
+                target-rect it
+                unpack-color TARGET-COLOR
+# how many times am I gonna write this piece of code?
+# it is pretty sexy, though.
+
+let func \ [x y] + x y
+let func \ [name]
+    print name
+    print name
+    print name
+
+let func \ [name] {
+    print name
+    print name
+    print name
+}
+# eh. I don't really need the curly braces.
+
+let render
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+
+let render {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool {
+        if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+    }
+}
+# then again...
+
+for vec as [field value] print format "%: %" [field value]
+for vec as [field value]
+    print format "%: %" [field value]
+for vec
+    let [field value] it
+    print format "%: %" [field value]
+for vec
+    print format "%: %" it
+# it's genuinely so easy to refactor...
+
+let func \ _ for _ print it
+func 1 2 3 4
+
+let value
+    if cond "true"
+    else "false"
+
+let arr [1 2 3 4]
+let arr ((\ _ _) 1 2 3 4)
+print arr  # outputs [1 2 3 4]
+
+# it should be noted, that the language is eager by default, unless it's a macro.
+let my-if \ [condition true-branch false-branch] {
+    if condition true-branch
+    else false-branch
+}
+my-if = 1 2 (print "true") (print "false)
+# it's eager unless you add parentheses.
+# because there is no typing (normally), you have to demarcate lazy things yourself.
+
+let my-if \ [condition true-branch false-branch] {
+    if condition true-branch else false-branch
+}
+
+let my-if \ [condition true-branch false-branch] {
+    if condition {
+        true-branch
+    } else {
+        false-branch
+    }
+}
+
+# honestly, this is so sexy.
+if cond {
+    print "true"
+} else : if ! cond {
+    print "false"
+}
+# it's making consider using ':' seriously...
+
+let value if cond "true" else "false"
+let value \ [cond] : if cond "true" else "false"
+# I just really don't like some things like 'where' in this implementation.
+# as well as how there is no ':' when it's eager.
+# not very balanced.
+
+if cond {
+    print "true"
+} else if ! cond {
+    print "false"
+}
+# well, whatever.
+# I think I will settle for no ':', but keep the curly braces. we'll see.
+
+let render \ [PROJ-COLOR TARGET-COLOR]
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool
+        if ! it.dead
+            fill-rect target-rect it unpack-color TARGET-COLOR
+
+# doesn't look that bad, actually.
+
+let render \ [PROJ-COLOR TARGET-COLOR] {
+    fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+    fill-rect bar-rect unpack-color BAR-COLOR
+    for targets-pool {
+        if ! it.dead {
+            fill-rect target-rect it unpack-color TARGET-COLOR
+        }
+    }
+}
+
+# there's so much wasted space after the function...
+# yeah, sometimes it doesn't look that good, sometimes it does.
+# but I think I can work without the curly braces.
+# it's surprisingly elegant.
