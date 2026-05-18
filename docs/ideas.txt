@@ -29045,3 +29045,55 @@ let render \ [PROJ-COLOR TARGET-COLOR] {
 # yeah, sometimes it doesn't look that good, sometimes it does.
 # but I think I can work without the curly braces.
 # it's surprisingly elegant.
+
+if cond {
+    print "true"
+} else if ! cond {
+    print "false"
+}
+
+if cond
+    print "true"
+else if ! cond
+    print "false"
+
+if cond
+    print "true"
+else
+    if ! cond
+        print "false"
+    else
+        print "how?!"
+
+if cond {
+    print "true"
+} else {
+    if ! cond {
+        print "false"
+    } else {
+        print "how?!"
+    }
+}
+
+let fact \ [!] (\ [n] ! (!) n) (\ [! n] ? n * n ! (!) - n 1 : 1)
+let fact \ [!] (\ [n] ! ! n) (\ [! n] ? n (* n (! ! (- n 1))) 1)
+let fact = (! -> (n -> ! ! n)) (! n -> n ? n * ! ! (n - 1) : 1)
+# not that hard to reason about, shockingly!
+
+# this language has a simplicity that puts scheme to shame.
+
+let func
+    \ _
+    \ x
+    for _ print it
+    print x
+func 1 2 3 4
+123
+# outputs 1 2 3 4 123
+# this is how you do if/else.
+
+let fact (\ [! n] ! (!) n) (\ [! n] ? n * n ! (!) - n 1 : 1)
+let fact = (! n -> ! ! n) (! n -> n ? n * ! ! (n - 1) : 1)
+
+let list : 1 : 2 : 3 : 4 []
+let list [1 2 3 4]
