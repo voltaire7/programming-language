@@ -29290,3 +29290,15 @@ let Module $
                 fill-rect target-rect it unpack-color TARGET-COLOR
 
 # ...
+
+let Module $ [
+    render \ [PROJ-COLOR TARGET-COLOR] {
+        fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+        fill-rect bar-rect unpack-color BAR-COLOR
+        for targets-pool {
+            if ! it.dead {
+                fill-rect target-rect it unpack-color TARGET-COLOR
+            }
+        }
+    }
+]
