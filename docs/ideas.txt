@@ -29302,3 +29302,22 @@ let Module $ [
         }
     }
 ]
+
+# yuck. just as bad.
+# and that's what I am saying! if it looks bad in one model, it often looks bad in the other!
+
+let Module $ [
+    render \ [PROJ-COLOR TARGET-COLOR] {
+        fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+        fill-rect bar-rect unpack-color BAR-COLOR
+        for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
+    }
+]
+
+# much better.
+
+let Module $
+    render \ [PROJ-COLOR TARGET-COLOR]
+        fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+        fill-rect bar-rect unpack-color BAR-COLOR
+        for targets-pool if ! it.dead fill-rect target-rect it unpack-color TARGET-COLOR
