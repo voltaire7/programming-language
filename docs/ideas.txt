@@ -29348,3 +29348,22 @@ let Module $ [
         }
     }
 ]
+
+# the moment you add even a little too many curly braces, it stops looking as good.
+
+let func \ [list-of-objects]
+    let obj $ [
+        field1 \ [list] for list print format "%: %" it
+        field2 \ [list] for list print format "%: %" it
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+    
+let func \ [list-of-objects] {
+    let obj $ [
+        field1 \ [list] for list print format "%: %" it
+        field2 \ [list] for list print format "%: %" it
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+}
