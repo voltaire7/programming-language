@@ -29097,3 +29097,196 @@ let fact = (! n -> ! ! n) (! n -> n ? n * ! ! (n - 1) : 1)
 
 let list : 1 : 2 : 3 : 4 []
 let list [1 2 3 4]
+
+let func
+    let x 1
+    (
+        let x 10
+        print x  # outputs 10
+    )
+    print x  # outputs 1
+# I should use parentheses, since I won't be using scopes that much.
+# and, I can use the {}s for objects!
+
+let vec { x 1; y 2; z 3 }
+# then again, I don't know.
+# I guess ';' here is a macro for ']['?
+# but I think I prefer '$ []'.
+let vec $ [x 1 y 2 z 3]
+# the only problem is that these are macros, and they require separators.
+let vec $ [
+    x 1
+    y 2
+    z 3
+]
+
+let obj $ [
+    field \ [name] print name
+]
+let obj $ [
+    field \ [list]
+        for list
+            print format "%: %" it
+]
+# this looks pretty bad.
+let obj $ [
+    field \ [list] {
+        for list {
+            print format "%: %" it
+        }
+    }
+]
+# but this isn't that much better.
+let obj $
+    field \ [list]
+        for list
+            print format "%: %" it
+
+let obj $
+    field1 \ [list] for list print format "%: %" it
+    field2 \ [list] for list print format "%: %" it
+
+let obj $ [
+    field1 \ [list] : for list print format "%: %" it
+    field2 \ [list] : for list print format "%: %" it
+]
+
+let obj $ [
+    field1 \ [list] for list print format "%: %" it
+    field2 \ [list] for list print format "%: %" it
+]
+
+let vec $ x 1, y 2, z 3
+
+# it's always objects that ruin things for me.
+
+let func \ [list-of-objects]
+    let obj $ [
+        field1 \ [list] for list print format "%: %" it
+        field2 \ [list] for list print format "%: %" it
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+
+# you know, it's not bad all!
+
+let func \ [list-of-objects]
+    let obj $ [
+        field1 \ [list]
+            for list print format "%: %" it
+            for list print format "%: %" it
+
+        field2 \ [list]
+            for list print format "%: %" it
+            print "test"
+            debug info
+            return .Error
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+
+# not as good.
+
+let func \ [list-of-objects] {
+    let obj $ [
+        field1 \ [list] {
+            for list print format "%: %" it
+            for list print format "%: %" it
+        }
+
+        field2 \ [list] {
+            for list print format "%: %" it
+            print "test"
+            debug info
+            return .Error
+        }
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+}
+
+let func \ [list-of-objects] {
+    let obj $ [
+        field1 \ [list] for list print format "%: %" it
+        field2 \ [list] for list print format "%: %" it
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+}
+
+let func \ [list-of-objects]
+    let obj $ [
+        field1 \ [list]
+            for list print format "%: %" it
+            for list print format "%: %" it
+
+        field2 \ [list]
+            for list print format "%: %" it
+            for list print format "%: %" it
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+
+let func \ [list-of-objects] {
+    let obj $ [
+        field1 \ [list] {
+            for list print format "%: %" it
+            for list print format "%: %" it
+        }
+
+        field2 \ [list] {
+            for list print format "%: %" it
+            for list print format "%: %" it
+        }
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+}
+
+# this is annoying the ever living fuck out of me, but {}s are better.
+# well, I've already established that sometimes it looks better with parentheses, sometimes not.
+# so why not mix them?
+
+let func \ [list-of-objects]
+    let obj $ [
+        field1 \ [list] {
+            for list print format "%: %" it
+            for list print format "%: %" it
+        }
+
+        field2 \ [list] {
+            for list print format "%: %" it
+            for list print format "%: %" it
+        }
+    ]
+    obj.field1 list-of-objects
+    return .Valid
+
+# this is so scuffed, and yet it kind of works?
+# but do I want to trade consistency for it? probably not.
+# still, it's not like I have to change the model or anything.
+# it's beautiful that this is possible within the same interpreter.
+
+let vec [["x" 1] ["y" 2] ["z" 3]]
+let vec $ [x 1, y 2, z 3]
+
+let Module $ [
+    render \ [PROJ-COLOR TARGET-COLOR]
+        fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+        fill-rect bar-rect unpack-color BAR-COLOR
+        for targets-pool
+            if ! it.dead
+                fill-rect target-rect it unpack-color TARGET-COLOR
+]
+Module.render [] []
+# no, it just looks bad.
+
+let Module $
+    render \ [PROJ-COLOR TARGET-COLOR]
+        fill-rect proj-rect proj-x proj-y unpack-color PROJ-COLOR
+        fill-rect bar-rect unpack-color BAR-COLOR
+        for targets-pool
+            if ! it.dead
+                fill-rect target-rect it unpack-color TARGET-COLOR
+
+# ...
